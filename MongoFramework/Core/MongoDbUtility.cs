@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +32,17 @@ namespace MongoFramework.Core
 			var client = new MongoClient(connectionString);
 			var database = client.GetDatabase(databaseName);
 			return database;
+		}
+
+		/// <summary>
+		/// Checks whether the provided string matches the 24-character hexadecimal format of an ObjectId
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
+		public static bool IsValidObjectId(string id)
+		{
+			ObjectId result;
+			return ObjectId.TryParse(id, out result);
 		}
 	}
 }
