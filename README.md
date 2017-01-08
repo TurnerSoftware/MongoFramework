@@ -6,6 +6,8 @@ An "Entity Framework"-like interface for the MongoDB C# Driver
 - Utilises .Net's data annotations to control how the entity behaves
 - Object validation via data annotations on save
 - Automatically detects the "Id" type and the appropriate generator for it
+- Automatically maps derived classes (where a public property is detected)
+- Recursively configures types of mapped properties
 
 ## Data Annotations
 To allow a greater separation between the MongoDB C# Driver and your entities, MongoFramework utilises data annotations built into the .Net framework itself. Some of these control the mapping between the Entity and MongoDB while others allow for validation.
