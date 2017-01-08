@@ -16,7 +16,7 @@ namespace MongoFramework.Core
 	{
 		public BsonClassMap<TEntity> ClassMap { get; private set; }
 
-		private HashSet<Type> configuredBaseClasses { get; set; } = new HashSet<Type>();
+		private HashSet<Type> configuredTypesCache { get; set; } = new HashSet<Type>();
 
 		public DbEntityWorkflow()
 		{
@@ -38,20 +38,27 @@ namespace MongoFramework.Core
 			ClassMap = classMap;
 		}
 
-		/// <summary>
-		/// The MongoDb driver requires base class fields to have their own mapping defined.
-		/// See: https://jira.mongodb.org/browse/CSHARP-398
-		/// </summary>
-		/// <param name="baseType"></param>
-		private void ConfigureBaseClass(Type baseType)
+		public DbEntityWorkflow(HashSet<Type> configuredTypesCache) : this()
 		{
-			if (!configuredBaseClasses.Contains(baseType))
+			this.configuredTypesCache = configuredTypesCache;
+		}
+
+		/// <summary>
+		/// Special handling is required for mapping base class fields (https://jira.mongodb.org/browse/CSHARP-398).
+		/// Properties with a "Class" property type also need particular handling
+		/// </summary>
+		/// <param name="type"></param>
+		private void ConfigureType(Type type)
+		{
+			if (configuredTypesCache.Contains(type))
 			{
-				var baseEntityWorkflowType = typeof(DbEntityWorkflow<>).MakeGenericType(baseType);
-				var baseEntityWorkflow = Activator.CreateInstance(baseEntityWorkflowType) as IDbEntityWorkflow;
-				baseEntityWorkflow.ConfigureEntity();
-				configuredBaseClasses.Add(baseType);
+				return;
 			}
+
+			var entityWorkflowType = typeof(DbEntityWorkflow<>).MakeGenericType(type);
+			var entityWorkflow = Activator.CreateInstance(entityWorkflowType, configuredTypesCache) as IDbEntityWorkflow;
+			entityWorkflow.ConfigureEntity();
+			configuredTypesCache.Add(type);
 		}
 
 		/// <summary>
@@ -59,9 +66,17 @@ namespace MongoFramework.Core
 		/// </summary>
 		public void ConfigureEntity()
 		{
+			if (ClassMap.IsFrozen)
+			{
+				return;
+			}
+
 			ConfigureEntityId();
 			ConfigureMappedFields();
 			ConfigureExtraElements();
+			ConfigureSubProperties();
+
+			configuredTypesCache.Add(typeof(TEntity));
 		}
 
 		/// <summary>
@@ -88,7 +103,7 @@ namespace MongoFramework.Core
 					}
 					else
 					{
-						ConfigureBaseClass(idProperty.DeclaringType);
+						ConfigureType(idProperty.DeclaringType);
 					}
 				}
 			}
@@ -148,7 +163,7 @@ namespace MongoFramework.Core
 				}
 				else
 				{
-					ConfigureBaseClass(property.DeclaringType);
+					ConfigureType(property.DeclaringType);
 				}
 			}
 		}
@@ -180,6 +195,32 @@ namespace MongoFramework.Core
 				{
 					ClassMap.SetExtraElementsMember(new BsonMemberMap(ClassMap, extraElementsProperty));
 				}
+			}
+		}
+
+		/// <summary>
+		/// Checks all public properties on <see cref="TEntity"/> for any classes that may also need configuring.
+		/// </summary>
+		public void ConfigureSubProperties()
+		{
+			if (ClassMap.IsFrozen)
+			{
+				return;
+			}
+
+			var publicProperties = typeof(TEntity).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+			var propertiesWithClasses = publicProperties.Where(p => p.PropertyType.IsClass && p.PropertyType != typeof(TEntity));
+			var mappedMembers = ClassMap.AllMemberMaps;
+
+			foreach (var property in propertiesWithClasses)
+			{
+				//Check that the property is mapped. If so, we don't need to configure the property.
+				if (mappedMembers.Any(m => m.MemberName == property.Name))
+				{
+					continue;
+				}
+
+				ConfigureType(property.PropertyType);
 			}
 		}
 

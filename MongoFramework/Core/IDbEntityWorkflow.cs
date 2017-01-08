@@ -13,6 +13,7 @@ namespace MongoFramework.Core
 		void ConfigureEntityId();
 		void ConfigureMappedFields();
 		void ConfigureExtraElements();
+		void ConfigureSubProperties();
 	}
 
 	public interface IDbEntityWorkflow<TEntity> : IDbEntityWorkflow
