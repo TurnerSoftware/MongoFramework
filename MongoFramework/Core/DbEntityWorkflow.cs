@@ -55,10 +55,10 @@ namespace MongoFramework.Core
 				return;
 			}
 
+			configuredTypesCache.Add(type);
 			var entityWorkflowType = typeof(DbEntityWorkflow<>).MakeGenericType(type);
 			var entityWorkflow = Activator.CreateInstance(entityWorkflowType, configuredTypesCache) as IDbEntityWorkflow;
 			entityWorkflow.ConfigureEntity();
-			configuredTypesCache.Add(type);
 		}
 
 		/// <summary>
@@ -71,12 +71,12 @@ namespace MongoFramework.Core
 				return;
 			}
 
+			configuredTypesCache.Add(typeof(TEntity));
+
 			ConfigureEntityId();
 			ConfigureMappedFields();
 			ConfigureExtraElements();
 			ConfigureSubProperties();
-
-			configuredTypesCache.Add(typeof(TEntity));
 		}
 
 		/// <summary>
