@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -40,6 +41,11 @@ namespace MongoFramework.Core
 
 		public void SetEntityState(TEntity entity, EntityState state)
 		{
+			if (entity == null)
+			{
+				throw new ArgumentNullException("entity");
+			}
+
 			if (state == EntityState.NoChanges)
 			{
 				if (objectStates.ContainsKey(entity))

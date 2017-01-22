@@ -72,6 +72,11 @@ namespace MongoFramework
 		/// <param name="entity"></param>
 		public void Add(TEntity entity)
 		{
+			if (entity == null)
+			{
+				throw new ArgumentNullException("entity");
+			}
+
 			ChangeSet.SetEntityState(entity, EntityState.Added);
 		}
 		/// <summary>
@@ -80,6 +85,11 @@ namespace MongoFramework
 		/// <param name="entities"></param>
 		public void AddRange(IEnumerable<TEntity> entities)
 		{
+			if (entities == null)
+			{
+				throw new ArgumentNullException("entity");
+			}
+
 			foreach (var entity in entities)
 			{
 				Add(entity);
@@ -92,6 +102,11 @@ namespace MongoFramework
 		/// <param name="entity"></param>
 		public void Update(TEntity entity)
 		{
+			if (entity == null)
+			{
+				throw new ArgumentNullException("entity");
+			}
+
 			ChangeSet.SetEntityState(entity, EntityState.Updated);
 		}
 		/// <summary>
@@ -100,6 +115,11 @@ namespace MongoFramework
 		/// <param name="entities"></param>
 		public void UpdateRange(IEnumerable<TEntity> entities)
 		{
+			if (entities == null)
+			{
+				throw new ArgumentNullException("entity");
+			}
+
 			foreach (var entity in entities)
 			{
 				Update(entity);
@@ -112,6 +132,11 @@ namespace MongoFramework
 		/// <param name="entity"></param>
 		public void Delete(TEntity entity)
 		{
+			if (entity == null)
+			{
+				throw new ArgumentNullException("entity");
+			}
+
 			ChangeSet.SetEntityState(entity, EntityState.Deleted);
 		}
 		/// <summary>
@@ -120,6 +145,11 @@ namespace MongoFramework
 		/// <param name="entities"></param>
 		public void DeleteRange(IEnumerable<TEntity> entities)
 		{
+			if (entities == null)
+			{
+				throw new ArgumentNullException("entity");
+			}
+
 			foreach (var entity in entities)
 			{
 				Delete(entity);
