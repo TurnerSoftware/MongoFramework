@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MongoFramework.Core
+namespace MongoFramework.Infrastructure
 {
-	public enum EntityState
+	public enum DbEntityEntryState
 	{
 		/// <summary>
 		/// There are no known changes to the entity

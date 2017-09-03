@@ -9,16 +9,33 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using MongoFramework.Infrastructure.Mutators;
+using MongoFramework.Attributes;
 
-namespace MongoFramework.Core
+namespace MongoFramework.Infrastructure
 {
-	public class DbEntityWorkflow<TEntity> : IDbEntityWorkflow<TEntity>
+	public class DbEntityMapper<TEntity> : IDbEntityMapper<TEntity>
 	{
 		public BsonClassMap<TEntity> ClassMap { get; private set; }
 
 		private HashSet<Type> configuredTypesCache { get; set; } = new HashSet<Type>();
 
-		public DbEntityWorkflow()
+		public DbEntityMapper()
+		{
+			InitialiseClassMap();
+		}
+		public DbEntityMapper(HashSet<Type> configuredTypesCache)
+		{
+			InitialiseClassMap();
+			this.configuredTypesCache = configuredTypesCache;
+		}
+		
+		public DbEntityMapper(BsonClassMap<TEntity> classMap)
+		{
+			ClassMap = classMap;
+		}
+
+		private void InitialiseClassMap()
 		{
 			//For reasons unknown to me, you can't just call "BsonClassMap.LookupClassMap" as that "freezes" the class map
 			//Instead, you must do the lookup and initial creation yourself.
@@ -30,17 +47,8 @@ namespace MongoFramework.Core
 				ClassMap = new BsonClassMap<TEntity>();
 				ClassMap.AutoMap();
 				BsonClassMap.RegisterClassMap(ClassMap);
+				ConfigureEntity();
 			}
-		}
-
-		public DbEntityWorkflow(BsonClassMap<TEntity> classMap)
-		{
-			ClassMap = classMap;
-		}
-
-		public DbEntityWorkflow(HashSet<Type> configuredTypesCache) : this()
-		{
-			this.configuredTypesCache = configuredTypesCache;
 		}
 
 		/// <summary>
@@ -56,8 +64,8 @@ namespace MongoFramework.Core
 			}
 
 			configuredTypesCache.Add(type);
-			var entityWorkflowType = typeof(DbEntityWorkflow<>).MakeGenericType(type);
-			var entityWorkflow = Activator.CreateInstance(entityWorkflowType, configuredTypesCache) as IDbEntityWorkflow;
+			var entityWorkflowType = typeof(DbEntityMapper<>).MakeGenericType(type);
+			var entityWorkflow = Activator.CreateInstance(entityWorkflowType, configuredTypesCache) as IDbEntityDescriptor;
 			entityWorkflow.ConfigureEntity();
 		}
 
@@ -83,7 +91,7 @@ namespace MongoFramework.Core
 		/// If no Id is automatically found, finds the first property with <see cref="KeyAttribute"/> and uses that property as the Id.
 		/// With any Id found or not, assigns a <see cref="IIdGenerator"/> to it appropriately based on the Id member's type.
 		/// </summary>
-		public void ConfigureEntityId()
+		private void ConfigureEntityId()
 		{
 			if (ClassMap.IsFrozen)
 			{
@@ -131,7 +139,7 @@ namespace MongoFramework.Core
 		/// <summary>
 		/// Finds all properties marked with <see cref="NotMappedAttribute"/> and unmaps the properties in the <see cref="BsonClassMap"/>
 		/// </summary>
-		public void ConfigureMappedFields()
+		private void ConfigureMappedFields()
 		{
 			if (ClassMap.IsFrozen)
 			{
@@ -172,7 +180,7 @@ namespace MongoFramework.Core
 		/// Checks to see if <see cref="IgnoreExtraElementsAttribute"/> is set on <see cref="TEntity"/> and applies it if it is.
 		/// Otherwise finds the first property named "ExtraElements" with the type <see cref="IDictionary{object, object}"/>, using that as a catch-all when not all properties match.
 		/// </summary>
-		public void ConfigureExtraElements()
+		private void ConfigureExtraElements()
 		{
 			if (ClassMap.IsFrozen)
 			{
@@ -201,7 +209,7 @@ namespace MongoFramework.Core
 		/// <summary>
 		/// Checks all public properties on <see cref="TEntity"/> for any classes that may also need configuring.
 		/// </summary>
-		public void ConfigureSubProperties()
+		private void ConfigureSubProperties()
 		{
 			if (ClassMap.IsFrozen)
 			{
@@ -259,13 +267,17 @@ namespace MongoFramework.Core
 			var idMemberMap = ClassMap.IdMemberMap;
 			if (idMemberMap != null)
 			{
-				var propertyInfo = idMemberMap.MemberInfo as PropertyInfo;
-				if (propertyInfo != null)
+				if (idMemberMap.MemberInfo is PropertyInfo propertyInfo)
 				{
 					return propertyInfo.GetValue(entity);
 				}
 			}
 			return null;
+		}
+
+		public IEnumerable<PropertyInfo> GetMappedProperties()
+		{
+			return ClassMap.DeclaredMemberMaps.Select(m => m.MemberInfo as PropertyInfo);
 		}
 	}
 }

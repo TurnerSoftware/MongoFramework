@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MongoFramework.Core
+namespace MongoFramework.Infrastructure
 {
 	public static class MongoDbUtility
 	{
@@ -41,8 +41,7 @@ namespace MongoFramework.Core
 		/// <returns></returns>
 		public static bool IsValidObjectId(string id)
 		{
-			ObjectId result;
-			return ObjectId.TryParse(id, out result);
+			return ObjectId.TryParse(id, out ObjectId result);
 		}
 	}
 }

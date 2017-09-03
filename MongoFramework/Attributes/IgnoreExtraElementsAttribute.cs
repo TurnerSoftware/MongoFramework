@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MongoFramework
+namespace MongoFramework.Attributes
 {
 	/// <summary>
 	/// Instructs the MongoDb Driver to ignore extra elements (properties defined in the DB that aren't on the model)

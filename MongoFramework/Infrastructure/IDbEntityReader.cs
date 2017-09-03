@@ -5,11 +5,11 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MongoFramework.Core
+namespace MongoFramework.Infrastructure
 {
 	public interface IDbEntityReader<TEntity>
 	{
-		IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> criteria);
+		IDbEntityMapper<TEntity> EntityMapper { get; }
 		IQueryable<TEntity> AsQueryable();
 	}
 }

@@ -1,4 +1,4 @@
-﻿using MongoDB.Driver;
+﻿using MongoDB.Bson;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,16 +6,11 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MongoFramework
+namespace MongoFramework.Infrastructure
 {
-	public interface IMongoDbSet
+	public interface IDbEntityWriter<TEntity>
 	{
-		void SetDatabase(IMongoDatabase database);
-		void SaveChanges();
-	}
-
-	public interface IMongoDbSet<TEntity> : IMongoDbSet, IQueryable<TEntity>
-	{
+		IDbEntityMapper<TEntity> EntityMapper { get; }
 		void Add(TEntity entity);
 		void AddRange(IEnumerable<TEntity> entities);
 		void Update(TEntity entity);

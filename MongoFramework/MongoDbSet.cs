@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using MongoDB.Driver;
 using System.Linq.Expressions;
-using MongoFramework.Core;
+using MongoFramework.Infrastructure;
 using System.Collections;
 using System.ComponentModel.DataAnnotations;
+using MongoDB.Driver.Linq;
+using MongoFramework.Infrastructure.Linq;
+using MongoFramework.Infrastructure.Linq.Processors;
 
 namespace MongoFramework
 {
@@ -15,9 +18,9 @@ namespace MongoFramework
 	/// <typeparam name="TEntity"></typeparam>
 	public class MongoDbSet<TEntity> : IMongoDbSet<TEntity>
 	{
-		public EntityChangeSet<TEntity> ChangeSet { get; private set; } = new EntityChangeSet<TEntity>();
+		public IDbChangeTracker<TEntity> ChangeTracker { get; private set; } = new DbChangeTracker<TEntity>();
 
-		private IDbEntityWriter<TEntity> dbWriter { get; set; }
+		private IDbEntityChangeWriter<TEntity> dbWriter { get; set; }
 		private IDbEntityReader<TEntity> dbReader { get; set; }
 
 		/// <summary>
@@ -27,6 +30,9 @@ namespace MongoFramework
 
 		public MongoDbSet() { }
 
+		/// <summary>
+		/// Creates a new MongoDbSet using the connection string in the configuration that matches the specified connection name.
+		/// </summary>
 		/// <param name="connectionName">The name of the connection string stored in the configuration.</param>
 		public MongoDbSet(string connectionName)
 		{
@@ -39,31 +45,37 @@ namespace MongoFramework
 
 			SetDatabase(MongoDbUtility.GetDatabase(mongoUrl));
 		}
-		
+
+		/// <summary>
+		/// Creates a new MongoDbSet using the specified connection string and database combination.
+		/// </summary>
 		/// <param name="connectionString">The connection string to the server</param>
-		/// <param name="databaseName">The database name on the server</param>
+		/// <param name="databaseName">The database name on the server</param> 
 		public MongoDbSet(string connectionString, string databaseName)
 		{
 			SetDatabase(MongoDbUtility.GetDatabase(connectionString, databaseName));
 		}
 
-		public static MongoDbSet<TEntity> CreateWithDatabase(IMongoDatabase database)
+		/// <summary>
+		/// Creates a new MongoDbSet with the specified entity reader and writer.
+		/// </summary>
+		/// <param name="reader">The reader to use for querying the database.</param>
+		/// <param name="writer">The writer to use for writing to the database.</param>
+		public MongoDbSet(IDbEntityReader<TEntity> reader, IDbEntityChangeWriter<TEntity> writer)
 		{
-			var dbSet = new MongoDbSet<TEntity>();
-			dbSet.SetDatabase(database);
-			return dbSet;
+			dbReader = reader;
+			dbWriter = writer;
 		}
-
+		
+		/// <summary>
+		/// Initialise a new entity reader and writer to the specified database.
+		/// </summary>
+		/// <param name="database"></param>
 		public void SetDatabase(IMongoDatabase database)
 		{
-			dbWriter = new DbEntityWriter<TEntity>(database);
-			dbReader = new DbEntityReader<TEntity>(database);
-		}
-
-		public void SetDatabase(IMongoDatabase database, string collectionName)
-		{
-			dbWriter = new DbEntityWriter<TEntity>(database, collectionName);
-			dbReader = new DbEntityReader<TEntity>(database, collectionName);
+			var entityMapper = new DbEntityMapper<TEntity>();
+			dbWriter = new DbEntityWriter<TEntity>(database, entityMapper);
+			dbReader = new DbEntityReader<TEntity>(database, entityMapper);
 		}
 
 		/// <summary>
@@ -77,7 +89,7 @@ namespace MongoFramework
 				throw new ArgumentNullException("entity");
 			}
 
-			ChangeSet.SetEntityState(entity, EntityState.Added);
+			ChangeTracker.Update(entity, DbEntityEntryState.Added);
 		}
 		/// <summary>
 		/// Marks the collection of entities for insertion into the database.
@@ -87,7 +99,7 @@ namespace MongoFramework
 		{
 			if (entities == null)
 			{
-				throw new ArgumentNullException("entity");
+				throw new ArgumentNullException("entities");
 			}
 
 			foreach (var entity in entities)
@@ -107,7 +119,7 @@ namespace MongoFramework
 				throw new ArgumentNullException("entity");
 			}
 
-			ChangeSet.SetEntityState(entity, EntityState.Updated);
+			ChangeTracker.Update(entity, DbEntityEntryState.Updated);
 		}
 		/// <summary>
 		/// Marks the collection of entities for updating.
@@ -117,7 +129,7 @@ namespace MongoFramework
 		{
 			if (entities == null)
 			{
-				throw new ArgumentNullException("entity");
+				throw new ArgumentNullException("entities");
 			}
 
 			foreach (var entity in entities)
@@ -130,38 +142,30 @@ namespace MongoFramework
 		/// Marks the entity for deletion.
 		/// </summary>
 		/// <param name="entity"></param>
-		public void Delete(TEntity entity)
+		public void Remove(TEntity entity)
 		{
 			if (entity == null)
 			{
 				throw new ArgumentNullException("entity");
 			}
 
-			ChangeSet.SetEntityState(entity, EntityState.Deleted);
+			ChangeTracker.Update(entity, DbEntityEntryState.Deleted);
 		}
 		/// <summary>
 		/// Marks the collection of entities for deletion.
 		/// </summary>
 		/// <param name="entities"></param>
-		public void DeleteRange(IEnumerable<TEntity> entities)
+		public void RemoveRange(IEnumerable<TEntity> entities)
 		{
 			if (entities == null)
 			{
-				throw new ArgumentNullException("entity");
+				throw new ArgumentNullException("entities");
 			}
 
 			foreach (var entity in entities)
 			{
-				Delete(entity);
+				Remove(entity);
 			}
-		}
-		/// <summary>
-		/// Deletes the specified the entity matching the Id. This deletion will be performed immediately.
-		/// </summary>
-		/// <param name="id"></param>
-		public void DeleteById(object id)
-		{
-			dbWriter.DeleteById(id);
 		}
 
 		/// <summary>
@@ -171,16 +175,17 @@ namespace MongoFramework
 		{
 			if (dbWriter == null)
 			{
-				throw new InvalidOperationException("No database has been specified.");
+				throw new InvalidOperationException("DbWriter is not set.");
 			}
 
-			var insertingEntities = ChangeSet.GetEntitiesByEntityState(EntityState.Added);
-			var updatingEntities = ChangeSet.GetEntitiesByEntityState(EntityState.Updated);
-			var deletingEntities = ChangeSet.GetEntitiesByEntityState(EntityState.Deleted);
+			ChangeTracker.DetectChanges();
 
 			if (PerformEntityValidation)
 			{
-				var savingEntities = insertingEntities.Concat(updatingEntities);
+				var savingEntities = ChangeTracker.Entries()
+					.Where(e => e.State == DbEntityEntryState.Added || e.State == DbEntityEntryState.Updated)
+					.Select(e => e.Entity);
+
 				foreach (var savingEntity in savingEntities)
 				{
 					var validationContext = new ValidationContext(savingEntity);
@@ -188,31 +193,28 @@ namespace MongoFramework
 				}
 			}
 
-			if (insertingEntities.Count() > 0)
-			{
-				dbWriter.InsertEntities(insertingEntities);
-			}
-
-			if (updatingEntities.Count() > 0)
-			{
-				dbWriter.UpdateEntities(updatingEntities);
-			}
-
-			if (deletingEntities.Count() > 0)
-			{
-				dbWriter.DeleteEntities(deletingEntities);
-			}
-
-			ChangeSet.ClearChanges();
+			dbWriter.WriteChanges(ChangeTracker);
 		}
 
 		#region IQueryable Implementation
+
+		private IQueryable<TEntity> GetQueryable()
+		{
+			if (dbReader == null)
+			{
+				throw new InvalidOperationException("DbWriter is not set.");
+			}
+
+			var queryable = dbReader.AsQueryable() as IMongoFrameworkQueryable<TEntity, TEntity>;
+			queryable.EntityProcessors.Add(new EntityTrackingProcessor<TEntity>(ChangeTracker));
+			return queryable;
+		}
 
 		public Expression Expression
 		{
 			get
 			{
-				return dbReader.AsQueryable().Expression;
+				return GetQueryable().Expression;
 			}
 		}
 
@@ -220,7 +222,7 @@ namespace MongoFramework
 		{
 			get
 			{
-				return dbReader.AsQueryable().ElementType;
+				return GetQueryable().ElementType;
 			}
 		}
 
@@ -228,18 +230,18 @@ namespace MongoFramework
 		{
 			get
 			{
-				return dbReader.AsQueryable().Provider;
+				return GetQueryable().Provider;
 			}
 		}
 
 		public IEnumerator<TEntity> GetEnumerator()
 		{
-			return dbReader.AsQueryable().GetEnumerator();
+			return GetQueryable().GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return dbReader.AsQueryable().GetEnumerator();
+			return GetEnumerator();
 		}
 
 		#endregion

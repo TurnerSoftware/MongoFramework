@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using MongoDB.Driver;
 using System.Reflection;
-using MongoFramework.Core;
+using MongoFramework.Infrastructure;
 using System.Linq;
-using System.ComponentModel.DataAnnotations;
 
 namespace MongoFramework
 {
-	public class MongoDbContext : IDisposable
+	public class MongoDbContext : IMongoDbContext, IDisposable
 	{
 		protected IMongoDatabase database { get; set; }
 
@@ -24,26 +23,26 @@ namespace MongoFramework
 			}
 
 			database = MongoDbUtility.GetDatabase(mongoUrl);
-			initialise();
+			InitialiseDbSets();
 		}
 
 		public MongoDbContext(string connectionString, string databaseName)
 		{
 			database = MongoDbUtility.GetDatabase(connectionString, databaseName);
-			initialise();
+			InitialiseDbSets();
 		}
 
 		internal MongoDbContext(IMongoDatabase database)
 		{
 			this.database = database;
-			initialise();
+			InitialiseDbSets();
 		}
 		public static MongoDbContext CreateWithDatabase(IMongoDatabase database)
 		{
 			return new MongoDbContext(database);
 		}
 
-		private void initialise()
+		private void InitialiseDbSets()
 		{
 			dbSets = new List<IMongoDbSet>();
 

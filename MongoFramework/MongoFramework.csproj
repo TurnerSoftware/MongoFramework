@@ -58,17 +58,42 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\DbEntityReader.cs" />
-    <Compile Include="Core\DbEntityWorkflow.cs" />
-    <Compile Include="Core\DbEntityWriter.cs" />
-    <Compile Include="Core\EntityState.cs" />
-    <Compile Include="Core\IDbEntityReader.cs" />
-    <Compile Include="Core\IDbEntityWorkflow.cs" />
-    <Compile Include="Core\IDbEntityWriter.cs" />
-    <Compile Include="Core\MongoDbUtility.cs" />
-    <Compile Include="IgnoreExtraElementsAttribute.cs" />
+    <Compile Include="Attributes\IncrementNumberAttribute.cs" />
+    <Compile Include="Attributes\MutatePropertyAttribute.cs" />
+    <Compile Include="Attributes\UpdatedDateAttribute.cs" />
+    <Compile Include="Attributes\CreatedDateAttribute.cs" />
+    <Compile Include="Bson\BsonDiff.cs" />
+    <Compile Include="Bson\DiffResult.cs" />
+    <Compile Include="Bson\UpdateDefinitionExtensions.cs" />
+    <Compile Include="IMongoDbContext.cs" />
+    <Compile Include="Infrastructure\DbChangeTracker.cs" />
+    <Compile Include="Infrastructure\DbEntityEntry.cs" />
+    <Compile Include="Infrastructure\DbEntityEntryExtensions.cs" />
+    <Compile Include="Infrastructure\DbEntityWriterExtensions.cs" />
+    <Compile Include="Infrastructure\IDbChangeTracker.cs" />
+    <Compile Include="Infrastructure\IDbEntityChangeWriter.cs" />
+    <Compile Include="Infrastructure\Linq\Processors\EntityMutationProcessor.cs" />
+    <Compile Include="Infrastructure\Linq\Processors\EntityTrackingProcessor.cs" />
+    <Compile Include="Infrastructure\Mutators\DbEntityMutator.cs" />
+    <Compile Include="Infrastructure\Linq\IMongoFrameworkQueryable.cs" />
+    <Compile Include="Infrastructure\Linq\IMongoFrameworkQueryProvider.cs" />
+    <Compile Include="Infrastructure\Linq\MongoFrameworkQueryable.cs" />
+    <Compile Include="Infrastructure\Linq\MongoFrameworkQueryProvider.cs" />
+    <Compile Include="Infrastructure\Linq\Processors\IEntityProcessor.cs" />
+    <Compile Include="Infrastructure\Mutators\DbEntityMutatorType.cs" />
+    <Compile Include="Infrastructure\Mutators\EntityAttributeMutator.cs" />
+    <Compile Include="Infrastructure\DbEntityReader.cs" />
+    <Compile Include="Infrastructure\DbEntityMapper.cs" />
+    <Compile Include="Infrastructure\DbEntityWriter.cs" />
+    <Compile Include="Infrastructure\DbEntityEntryState.cs" />
+    <Compile Include="Infrastructure\IDbEntityReader.cs" />
+    <Compile Include="Infrastructure\IDbEntityMapper.cs" />
+    <Compile Include="Infrastructure\IDbEntityWriter.cs" />
+    <Compile Include="Infrastructure\MongoDbUtility.cs" />
+    <Compile Include="Attributes\IgnoreExtraElementsAttribute.cs" />
     <Compile Include="IMongoDbSet.cs" />
-    <Compile Include="Core\EntityChangeSet.cs" />
+    <Compile Include="Infrastructure\Mutators\IDbEntityMutator.cs" />
+    <Compile Include="Infrastructure\Linq\Processors\EntityProcessorCollection.cs" />
     <Compile Include="MongoDbContext.cs" />
     <Compile Include="MongoDbSet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -77,6 +102,7 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
