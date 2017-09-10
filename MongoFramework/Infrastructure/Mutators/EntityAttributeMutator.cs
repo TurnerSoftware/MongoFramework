@@ -31,6 +31,11 @@ namespace MongoFramework.Infrastructure.Mutators
 				{
 					property.MutateAttribute.OnUpdate(entity, property.PropertyInfo);
 				}
+
+				if (MutatorType.HasFlag(DbEntityMutatorType.Select))
+				{
+					property.MutateAttribute.OnSelect(entity, property.PropertyInfo);
+				}
 			}
 		}
 	}

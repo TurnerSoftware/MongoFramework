@@ -11,5 +11,6 @@ namespace MongoFramework.Attributes
 	{
 		public virtual void OnInsert(object target, PropertyInfo property) { }
 		public virtual void OnUpdate(object target, PropertyInfo property) { }
+		public virtual void OnSelect(object target, PropertyInfo property) { }
 	}
 }
