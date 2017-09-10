@@ -187,7 +187,7 @@ namespace MongoFramework.Bson
 
 			if (name != string.Empty)
 			{
-				name = ".";
+				name += ".";
 			}
 
 			foreach (var propertyName in propertyNames)
