@@ -35,7 +35,11 @@ namespace MongoFramework.Infrastructure
 		{
 			State = state;
 			Entity = entity;
-			Refresh(entity);
+
+			if (state == DbEntityEntryState.NoChanges)
+			{
+				Refresh();
+			}
 		}
 
 		/// <summary>
