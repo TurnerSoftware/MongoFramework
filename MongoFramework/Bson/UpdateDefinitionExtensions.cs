@@ -1,4 +1,5 @@
 ﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,21 @@ namespace MongoFramework.Bson
 		public static UpdateDefinition<TEntity> Set<TEntity>(this UpdateDefinition<TEntity> definition, string fieldName, BsonValue value)
 		{
 			var dotNetValue = BsonTypeMapper.MapToDotNetValue(value);
-			var valueType = dotNetValue.GetType();
+			var valueType = dotNetValue?.GetType();
+			var reflectedValueType = typeof(TEntity).GetNestedPropertyType(fieldName);
+
+			if (valueType == null && reflectedValueType == null)
+			{
+				var message = string.Format("Unable to determine value type for field \"{0}\"", fieldName);
+				throw new Exception(message);
+			}
+
+			if (valueType == null || (reflectedValueType != null && valueType != reflectedValueType))
+			{
+				valueType = reflectedValueType;
+				dotNetValue = BsonSerializer.Deserialize(value.ToJson(), valueType);
+			}
+
 			var typeArgs = new[] { typeof(TEntity), valueType };
 
 			var specificDefinitionType = typeof(StringFieldDefinition<,>).MakeGenericType(typeArgs);

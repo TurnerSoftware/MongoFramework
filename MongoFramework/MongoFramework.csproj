@@ -64,6 +64,7 @@
     <Compile Include="Attributes\CreatedDateAttribute.cs" />
     <Compile Include="Bson\BsonDiff.cs" />
     <Compile Include="Bson\DiffResult.cs" />
+    <Compile Include="Bson\ReflectionExtensions.cs" />
     <Compile Include="Bson\UpdateDefinitionExtensions.cs" />
     <Compile Include="IMongoDbContext.cs" />
     <Compile Include="Infrastructure\DbChangeTracker.cs" />
