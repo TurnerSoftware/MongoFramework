@@ -12,7 +12,11 @@ namespace MongoFramework.Bson
 	{
 		public static bool HasDifferences(BsonDocument documentA, BsonDocument documentB)
 		{
-			if (documentA.ElementCount != documentB.ElementCount)
+			if (documentA == null && documentB == null)
+			{
+				return false;
+			}
+			else if (documentA == null || documentB == null || documentA.ElementCount != documentB.ElementCount)
 			{
 				return true;
 			}
@@ -81,15 +85,17 @@ namespace MongoFramework.Bson
 		public static DiffResult GetDifferences(BsonDocument documentA, BsonDocument documentB)
 		{
 			var result = new BsonDocument();
-			var propertyNames = documentA.Names.Union(documentB.Names);
+			var documentAProperties = documentA?.Names ?? Enumerable.Empty<string>();
+			var documentBProperties = documentB?.Names ?? Enumerable.Empty<string>();
+			var propertyNames = documentAProperties.Union(documentBProperties);
 
 			foreach (var propertyName in propertyNames)
 			{
-				if (!documentB.Contains(propertyName))
+				if (documentB == null || !documentB.Contains(propertyName))
 				{
 					result.Add(propertyName, BsonUndefined.Value);
 				}
-				else if (!documentA.Contains(propertyName))
+				else if (documentA == null || !documentA.Contains(propertyName))
 				{
 					result.Add(propertyName, documentB[propertyName]);
 				}
@@ -183,7 +189,9 @@ namespace MongoFramework.Bson
 		private static UpdateDefinition<TEntity> GetUpdateDefinition<TEntity>(UpdateDefinition<TEntity> definition, string name, BsonDocument documentA, BsonDocument documentB)
 		{
 			var result = new BsonDocument();
-			var propertyNames = documentA.Names.Union(documentB.Names);
+			var documentAProperties = documentA?.Names ?? Enumerable.Empty<string>();
+			var documentBProperties = documentB?.Names ?? Enumerable.Empty<string>();
+			var propertyNames = documentAProperties.Union(documentBProperties);
 
 			if (name != string.Empty)
 			{
@@ -194,11 +202,11 @@ namespace MongoFramework.Bson
 			{
 				var fullName = name + propertyName;
 
-				if (!documentB.Contains(propertyName))
+				if (documentB == null || !documentB.Contains(propertyName))
 				{
 					definition = definition.Unset(new StringFieldDefinition<TEntity>(fullName));
 				}
-				else if (!documentA.Contains(propertyName))
+				else if (documentA == null || !documentA.Contains(propertyName))
 				{
 					definition = definition.Set(fullName, documentB[propertyName]);
 				}
