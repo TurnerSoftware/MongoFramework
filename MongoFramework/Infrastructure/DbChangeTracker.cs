@@ -92,5 +92,10 @@ namespace MongoFramework.Infrastructure
 				}
 			}
 		}
+		
+		public void Clear()
+		{
+			entries.Clear();
+		}
 	}
 }

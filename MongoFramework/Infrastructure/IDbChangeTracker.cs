@@ -15,5 +15,6 @@ namespace MongoFramework.Infrastructure
 		void Remove(TEntity entity);
 		void RemoveRange(IEnumerable<TEntity> entities);
 		void DetectChanges();
+		void Clear();
 	}
 }
