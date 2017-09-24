@@ -72,11 +72,22 @@ namespace MongoFramework
 
 		public void Dispose()
 		{
-			if (database != null)
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (disposing)
 			{
 				database = null;
 				dbSets = null;
 			}
+		}
+
+		~MongoDbContext()
+		{
+			Dispose(false);
 		}
 	}
 }
