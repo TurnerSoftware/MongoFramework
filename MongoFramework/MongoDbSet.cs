@@ -82,7 +82,7 @@ namespace MongoFramework
 		/// Marks the entity for insertion into the database.
 		/// </summary>
 		/// <param name="entity"></param>
-		public void Add(TEntity entity)
+		public virtual void Add(TEntity entity)
 		{
 			if (entity == null)
 			{
@@ -95,7 +95,7 @@ namespace MongoFramework
 		/// Marks the collection of entities for insertion into the database.
 		/// </summary>
 		/// <param name="entities"></param>
-		public void AddRange(IEnumerable<TEntity> entities)
+		public virtual void AddRange(IEnumerable<TEntity> entities)
 		{
 			if (entities == null)
 			{
@@ -112,7 +112,7 @@ namespace MongoFramework
 		/// Marks the entity for updating.
 		/// </summary>
 		/// <param name="entity"></param>
-		public void Update(TEntity entity)
+		public virtual void Update(TEntity entity)
 		{
 			if (entity == null)
 			{
@@ -125,7 +125,7 @@ namespace MongoFramework
 		/// Marks the collection of entities for updating.
 		/// </summary>
 		/// <param name="entities"></param>
-		public void UpdateRange(IEnumerable<TEntity> entities)
+		public virtual void UpdateRange(IEnumerable<TEntity> entities)
 		{
 			if (entities == null)
 			{
@@ -142,7 +142,7 @@ namespace MongoFramework
 		/// Marks the entity for deletion.
 		/// </summary>
 		/// <param name="entity"></param>
-		public void Remove(TEntity entity)
+		public virtual void Remove(TEntity entity)
 		{
 			if (entity == null)
 			{
@@ -155,7 +155,7 @@ namespace MongoFramework
 		/// Marks the collection of entities for deletion.
 		/// </summary>
 		/// <param name="entities"></param>
-		public void RemoveRange(IEnumerable<TEntity> entities)
+		public virtual void RemoveRange(IEnumerable<TEntity> entities)
 		{
 			if (entities == null)
 			{
@@ -171,7 +171,7 @@ namespace MongoFramework
 		/// <summary>
 		/// Writes all of the items in the changeset to the database.
 		/// </summary>
-		public void SaveChanges()
+		public virtual void SaveChanges()
 		{
 			if (dbWriter == null)
 			{
