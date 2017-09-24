@@ -175,7 +175,7 @@ namespace MongoFramework
 		{
 			if (dbWriter == null)
 			{
-				throw new InvalidOperationException("DbWriter is not set.");
+				throw new InvalidOperationException("No IDbEntityWriter has been set.");
 			}
 
 			ChangeTracker.DetectChanges();
@@ -202,7 +202,7 @@ namespace MongoFramework
 		{
 			if (dbReader == null)
 			{
-				throw new InvalidOperationException("DbWriter is not set.");
+				throw new InvalidOperationException("No IDbEntityReader has been set.");
 			}
 
 			var queryable = dbReader.AsQueryable() as IMongoFrameworkQueryable<TEntity, TEntity>;
