@@ -25,14 +25,13 @@ namespace MongoFramework.Infrastructure.Mutators
 
 		public static void MutateEntities(IEnumerable<TEntity> entities, DbEntityMutatorType mutationType)
 		{
-			var mutators = Mutators.Where(m => m.MutatorType.HasFlag(mutationType)).ToList();
-			var entityDescriptor = new DbEntityMapper<TEntity>();
+			var entityMapper = new DbEntityMapper<TEntity>();
 
 			foreach (var entity in entities)
 			{
-				foreach (var mutator in mutators)
+				foreach (var mutator in Mutators)
 				{
-					mutator.MutateEntity(entity, entityDescriptor);
+					mutator.MutateEntity(entity, mutationType, entityMapper);
 				}
 			}
 		}

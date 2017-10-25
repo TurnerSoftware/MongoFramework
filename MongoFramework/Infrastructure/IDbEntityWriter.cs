@@ -10,7 +10,6 @@ namespace MongoFramework.Infrastructure
 {
 	public interface IDbEntityWriter<TEntity>
 	{
-		IDbEntityMapper<TEntity> EntityMapper { get; }
 		void Add(TEntity entity);
 		void AddRange(IEnumerable<TEntity> entities);
 		void Update(TEntity entity);

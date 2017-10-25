@@ -8,7 +8,6 @@ namespace MongoFramework.Infrastructure.Mutators
 {
 	public interface IDbEntityMutator<TEntity>
 	{
-		DbEntityMutatorType MutatorType { get; }
-		void MutateEntity(TEntity entity, IDbEntityMapper<TEntity> descriptor);
+		void MutateEntity(TEntity entity, DbEntityMutatorType mutationType, IDbEntityMapper entityMapper);
 	}
 }

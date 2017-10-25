@@ -14,25 +14,17 @@ using MongoFramework.Attributes;
 
 namespace MongoFramework.Infrastructure
 {
-	public class DbEntityMapper<TEntity> : IDbEntityMapper<TEntity>
+	public class DbEntityMapper : IDbEntityMapper
 	{
-		public BsonClassMap<TEntity> ClassMap { get; private set; }
+		private Type EntityType { get; set; }
+		private BsonClassMap ClassMap { get; set; }
 
-		private HashSet<Type> configuredTypesCache { get; set; } = new HashSet<Type>();
+		private IEnumerable<BsonClassMap> ClassMapHierarchyCache { get; set; }
 
-		public DbEntityMapper()
+		public DbEntityMapper(Type entityType)
 		{
+			EntityType = entityType ?? throw new ArgumentNullException("entityType");
 			InitialiseClassMap();
-		}
-		public DbEntityMapper(HashSet<Type> configuredTypesCache)
-		{
-			InitialiseClassMap();
-			this.configuredTypesCache = configuredTypesCache;
-		}
-		
-		public DbEntityMapper(BsonClassMap<TEntity> classMap)
-		{
-			ClassMap = classMap;
 		}
 
 		private void InitialiseClassMap()
@@ -40,57 +32,38 @@ namespace MongoFramework.Infrastructure
 			//For reasons unknown to me, you can't just call "BsonClassMap.LookupClassMap" as that "freezes" the class map
 			//Instead, you must do the lookup and initial creation yourself.
 			var classMaps = BsonClassMap.GetRegisteredClassMaps();
-			ClassMap = classMaps.Where(cm => cm.ClassType == typeof(TEntity)).FirstOrDefault() as BsonClassMap<TEntity>;
+			ClassMap = classMaps.Where(cm => cm.ClassType == EntityType).FirstOrDefault() as BsonClassMap;
 
 			if (ClassMap == null)
 			{
-				ClassMap = new BsonClassMap<TEntity>();
+				ClassMap = new BsonClassMap(EntityType);
 				ClassMap.AutoMap();
 				BsonClassMap.RegisterClassMap(ClassMap);
 				ConfigureEntity();
 			}
 		}
 
-		/// <summary>
-		/// Special handling is required for mapping base class fields (https://jira.mongodb.org/browse/CSHARP-398).
-		/// Properties with a "Class" property type also need particular handling
-		/// </summary>
-		/// <param name="type"></param>
-		private void ConfigureType(Type type)
-		{
-			if (configuredTypesCache.Contains(type))
-			{
-				return;
-			}
-
-			configuredTypesCache.Add(type);
-			var entityWorkflowType = typeof(DbEntityMapper<>).MakeGenericType(type);
-			var entityWorkflow = Activator.CreateInstance(entityWorkflowType, configuredTypesCache) as IDbEntityDescriptor;
-			entityWorkflow.ConfigureEntity();
-		}
-
-		/// <summary>
-		/// Configures various aspects of the entity including the Id, mapped fields and extra fields.
-		/// </summary>
-		public void ConfigureEntity()
+		private void ConfigureEntity()
 		{
 			if (ClassMap.IsFrozen)
 			{
 				return;
 			}
 
-			configuredTypesCache.Add(typeof(TEntity));
-
+			ConfigureHierarchy();
 			ConfigureEntityId();
-			ConfigureMappedFields();
+			ConfigureMappedProperties();
 			ConfigureExtraElements();
-			ConfigureSubProperties();
 		}
 
-		/// <summary>
-		/// If no Id is automatically found, finds the first property with <see cref="KeyAttribute"/> and uses that property as the Id.
-		/// With any Id found or not, assigns a <see cref="IIdGenerator"/> to it appropriately based on the Id member's type.
-		/// </summary>
+		private void ConfigureHierarchy()
+		{
+			if (EntityType.BaseType != typeof(object))
+			{
+				new DbEntityMapper(EntityType.BaseType);
+			}
+		}
+
 		private void ConfigureEntityId()
 		{
 			if (ClassMap.IsFrozen)
@@ -98,21 +71,14 @@ namespace MongoFramework.Infrastructure
 				return;
 			}
 
-			//If no Id member map exists, find the first property with the "Key" attribute and use that
+			//If no Id member map exists, find the first property with the "Key" attribute or is named "Id" and use that
 			if (ClassMap.IdMemberMap == null)
 			{
-				var publicProperties = typeof(TEntity).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-				var idProperty = publicProperties.Where(p => p.GetCustomAttribute<KeyAttribute>() != null).FirstOrDefault();
+				var properties = EntityType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+				var idProperty = properties.Where(p => p.GetCustomAttribute<KeyAttribute>() != null || p.Name == "Id").FirstOrDefault();
 				if (idProperty != null)
 				{
-					if (idProperty.DeclaringType == typeof(TEntity))
-					{
-						ClassMap.MapIdField(idProperty.Name);
-					}
-					else
-					{
-						ConfigureType(idProperty.DeclaringType);
-					}
+					ClassMap.MapIdField(idProperty.Name);
 				}
 			}
 
@@ -136,50 +102,42 @@ namespace MongoFramework.Infrastructure
 			}
 		}
 
-		/// <summary>
-		/// Finds all properties marked with <see cref="NotMappedAttribute"/> and unmaps the properties in the <see cref="BsonClassMap"/>
-		/// </summary>
-		private void ConfigureMappedFields()
+		private void ConfigureMappedProperties()
 		{
 			if (ClassMap.IsFrozen)
 			{
 				return;
 			}
 
-			var publicProperties = typeof(TEntity).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+			var properties = EntityType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
-			foreach (var property in publicProperties)
+			foreach (var property in properties)
 			{
-				if (property.DeclaringType == typeof(TEntity))
+				//Unmap fields with the "NotMappedAttribute"
+				var notMappedAttribute = property.GetCustomAttribute<NotMappedAttribute>();
+				if (notMappedAttribute != null)
 				{
-					//Unmap fields with the "NotMappedAttribute"
-					var notMappedAttribute = property.GetCustomAttribute<NotMappedAttribute>();
-					if (notMappedAttribute != null)
-					{
-						ClassMap.UnmapProperty(property.Name);
-						continue;
-					}
-
-					//Remap fields with the "ColumnAttribute"
-					var columnAttribute = property.GetCustomAttribute<ColumnAttribute>();
-					if (columnAttribute != null)
-					{
-						var mappedName = columnAttribute.Name;
-						var memberMap = ClassMap.GetMemberMap(property.Name);
-						memberMap.SetElementName(mappedName);
-					}
+					ClassMap.UnmapProperty(property.Name);
+					continue;
 				}
-				else
+
+				//Remap fields with the "ColumnAttribute"
+				var columnAttribute = property.GetCustomAttribute<ColumnAttribute>();
+				if (columnAttribute != null)
 				{
-					ConfigureType(property.DeclaringType);
+					var mappedName = columnAttribute.Name;
+					var memberMap = ClassMap.GetMemberMap(property.Name);
+					memberMap.SetElementName(mappedName);
+				}
+
+				//Map the DeclaredType of any properties where the PropertyType is a class
+				if (property.PropertyType.IsClass && property.PropertyType != EntityType)
+				{
+					new DbEntityMapper(property.PropertyType);
 				}
 			}
 		}
 
-		/// <summary>
-		/// Checks to see if <see cref="IgnoreExtraElementsAttribute"/> is set on <see cref="TEntity"/> and applies it if it is.
-		/// Otherwise finds the first property named "ExtraElements" with the type <see cref="IDictionary{object, object}"/>, using that as a catch-all when not all properties match.
-		/// </summary>
 		private void ConfigureExtraElements()
 		{
 			if (ClassMap.IsFrozen)
@@ -187,54 +145,55 @@ namespace MongoFramework.Infrastructure
 				return;
 			}
 
-			var ignoreExtraElementsAttribute = typeof(TEntity).GetCustomAttribute<IgnoreExtraElementsAttribute>();
-			if (ignoreExtraElementsAttribute != null)
+			//Ignore extra elements when the "IgnoreExtraElementsAttribute" is on the Entity
+			var ignoreExtraElements = EntityType.GetCustomAttribute<IgnoreExtraElementsAttribute>();
+			if (ignoreExtraElements != null)
 			{
 				ClassMap.SetIgnoreExtraElements(true);
-				ClassMap.SetIgnoreExtraElementsIsInherited(ignoreExtraElementsAttribute.IgnoreInherited);
+				ClassMap.SetIgnoreExtraElementsIsInherited(ignoreExtraElements.IgnoreInherited);
 			}
 			else
 			{
-				var publicProperties = typeof(TEntity).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-				var extraElementsProperty = publicProperties.Where(p => p.Name.ToLower() == "extraelements").FirstOrDefault();
-				var extraElementsRequiredType = typeof(IDictionary<object, object>);
+				//If any of the Entity's properties have the "ExtraElementsAttribute", assign that against the BsonClassMap
+				var extraElementsProperty = EntityType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+					.Select(p => new
+					{
+						PropertyInfo = p,
+						ExtraElementsAttribute = p.GetCustomAttribute<ExtraElementsAttribute>()
+					}).Where(p => p.ExtraElementsAttribute != null).FirstOrDefault();
 
-				if (extraElementsProperty != null && extraElementsRequiredType.IsAssignableFrom(extraElementsProperty.PropertyType))
+				if (extraElementsProperty != null && typeof(IDictionary<object, object>).IsAssignableFrom(extraElementsProperty.PropertyInfo.PropertyType))
 				{
-					ClassMap.SetExtraElementsMember(new BsonMemberMap(ClassMap, extraElementsProperty));
+					ClassMap.SetExtraElementsMember(new BsonMemberMap(ClassMap, extraElementsProperty.PropertyInfo));
 				}
 			}
 		}
 
-		/// <summary>
-		/// Checks all public properties on <see cref="TEntity"/> for any classes that may also need configuring.
-		/// </summary>
-		private void ConfigureSubProperties()
+		private IEnumerable<BsonClassMap> GetClassMapChain()
 		{
-			if (ClassMap.IsFrozen)
+			if (ClassMapHierarchyCache != null)
 			{
-				return;
+				return ClassMapHierarchyCache;
 			}
-
-			var publicProperties = typeof(TEntity).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-			var propertiesWithClasses = publicProperties.Where(p => p.PropertyType.IsClass && p.PropertyType != typeof(TEntity));
-			var mappedMembers = ClassMap.AllMemberMaps;
-
-			foreach (var property in propertiesWithClasses)
+			else
 			{
-				//Check that the property is mapped. If so, we don't need to configure the property.
-				if (mappedMembers.Any(m => m.MemberName == property.Name))
+				var results = new List<BsonClassMap> { ClassMap };
+				var classMaps = BsonClassMap.GetRegisteredClassMaps();
+				var currentType = EntityType.BaseType;
+				while (currentType != typeof(object))
 				{
-					continue;
+					var currentClassMap = classMaps.Where(c => c.ClassType == currentType).FirstOrDefault();
+					results.Add(currentClassMap);
+					currentType = currentType.BaseType;
 				}
-
-				ConfigureType(property.PropertyType);
+				ClassMapHierarchyCache = results;
+				return results;
 			}
 		}
 
 		public string GetCollectionName()
 		{
-			var tableAttribute = typeof(TEntity).GetCustomAttribute<TableAttribute>();
+			var tableAttribute = EntityType.GetCustomAttribute<TableAttribute>();
 			if (tableAttribute != null)
 			{
 				if (string.IsNullOrEmpty(tableAttribute.Schema))
@@ -248,13 +207,13 @@ namespace MongoFramework.Infrastructure
 			}
 			else
 			{
-				return typeof(TEntity).Name;
+				return EntityType.Name;
 			}
 		}
 
-		public string GetEntityIdName()
+		public string GetIdName()
 		{
-			var idMemberMap = ClassMap.IdMemberMap;
+			var idMemberMap = GetClassMapChain().Where(c => c.IdMemberMap != null).Select(c => c.IdMemberMap).FirstOrDefault();
 			if (idMemberMap != null)
 			{
 				return idMemberMap.MemberName;
@@ -262,9 +221,9 @@ namespace MongoFramework.Infrastructure
 			return null;
 		}
 
-		public object GetEntityIdValue(TEntity entity)
+		public object GetIdValue(object entity)
 		{
-			var idMemberMap = ClassMap.IdMemberMap;
+			var idMemberMap = GetClassMapChain().Where(c => c.IdMemberMap != null).Select(c => c.IdMemberMap).FirstOrDefault();
 			if (idMemberMap != null)
 			{
 				if (idMemberMap.MemberInfo is PropertyInfo propertyInfo)
@@ -277,7 +236,26 @@ namespace MongoFramework.Infrastructure
 
 		public IEnumerable<PropertyInfo> GetMappedProperties()
 		{
-			return ClassMap.DeclaredMemberMaps.Select(m => m.MemberInfo as PropertyInfo);
+			return GetMappedProperties(true);
 		}
+
+		public IEnumerable<PropertyInfo> GetMappedProperties(bool includeInherited)
+		{
+			if (includeInherited && EntityType.BaseType != typeof(object))
+			{
+				var declaredProperties = GetMappedProperties(false);
+				var inheritedProperties = new DbEntityMapper(EntityType.BaseType).GetMappedProperties();
+				return declaredProperties.Concat(inheritedProperties);
+			}
+			else
+			{
+				return ClassMap.DeclaredMemberMaps.Select(m => m.MemberInfo as PropertyInfo);
+			}
+		}
+	}
+
+	public class DbEntityMapper<TEntity> : DbEntityMapper
+	{
+		public DbEntityMapper() : base(typeof(TEntity)) { }
 	}
 }

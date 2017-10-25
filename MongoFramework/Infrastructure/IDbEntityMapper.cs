@@ -9,17 +9,11 @@ using System.Threading.Tasks;
 
 namespace MongoFramework.Infrastructure
 {
-	public interface IDbEntityDescriptor
+	public interface IDbEntityMapper
 	{
-		void ConfigureEntity();
-	}
-
-	public interface IDbEntityMapper<TEntity> : IDbEntityDescriptor
-	{
-		BsonClassMap<TEntity> ClassMap { get; }
+		string GetIdName();
+		object GetIdValue(object entity);
 		string GetCollectionName();
-		string GetEntityIdName();
-		object GetEntityIdValue(TEntity entity);
 		IEnumerable<PropertyInfo> GetMappedProperties();
 	}
 }

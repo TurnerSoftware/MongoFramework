@@ -15,9 +15,11 @@ namespace MongoFramework.Infrastructure
 	public class DbEntityReader<TEntity> : IDbEntityReader<TEntity>
 	{
 		public IMongoDatabase Database { get; set; }
-		public IDbEntityMapper<TEntity> EntityMapper { get; private set; }
+		private IDbEntityMapper EntityMapper { get; set; }
 
-		public DbEntityReader(IMongoDatabase database, IDbEntityMapper<TEntity> mapper)
+		public DbEntityReader(IMongoDatabase database) : this(database, new DbEntityMapper(typeof(TEntity))) { }
+
+		public DbEntityReader(IMongoDatabase database, IDbEntityMapper mapper)
 		{
 			Database = database;
 			EntityMapper = mapper;

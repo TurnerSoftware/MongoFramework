@@ -9,7 +9,6 @@ namespace MongoFramework.Infrastructure
 {
 	public interface IDbEntityReader<TEntity>
 	{
-		IDbEntityMapper<TEntity> EntityMapper { get; }
 		IQueryable<TEntity> AsQueryable();
 	}
 }

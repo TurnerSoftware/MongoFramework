@@ -13,11 +13,11 @@ namespace MongoFramework.Infrastructure
 		public DbEntityEntry<TEntity> GetEntry(TEntity entity)
 		{
 			var entityMapper = new DbEntityMapper<TEntity>();
-			var entityId = entityMapper.GetEntityIdValue(entity);
+			var entityId = entityMapper.GetIdValue(entity);
 
 			foreach (var entry in entries)
 			{
-				var entryEntityId = entityMapper.GetEntityIdValue(entry.Entity);
+				var entryEntityId = entityMapper.GetIdValue(entry.Entity);
 				if (entryEntityId.Equals(entityId))
 				{
 					return entry;
