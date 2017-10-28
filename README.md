@@ -1,6 +1,8 @@
 # MongoFramework
 An "Entity Framework"-like interface for the MongoDB C# Driver
 
+[![Build status](https://ci.appveyor.com/api/projects/status/ylg69oh66nkyd0mg?svg=true)](https://ci.appveyor.com/project/Turnerj/mongoframework)
+
 ## Key Features
 - Changeset support, allowing you to queue many changes before submitting them all at once.
 - Utilises .Net's data annotations to control how the entity behaves
