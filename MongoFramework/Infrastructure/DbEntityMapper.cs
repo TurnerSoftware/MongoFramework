@@ -78,7 +78,7 @@ namespace MongoFramework.Infrastructure
 				var idProperty = properties.Where(p => p.GetCustomAttribute<KeyAttribute>() != null || p.Name == "Id").FirstOrDefault();
 				if (idProperty != null)
 				{
-					ClassMap.MapIdField(idProperty.Name);
+					ClassMap.MapIdMember(idProperty);
 				}
 			}
 
