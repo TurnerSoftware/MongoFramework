@@ -14,36 +14,36 @@ namespace MongoFramework.Infrastructure.Linq
 {
 	public class MongoFrameworkQueryable<TEntity, TOutput> : IMongoFrameworkQueryable<TEntity, TOutput>
 	{
-		private IMongoFrameworkQueryProvider<TEntity, TOutput> internalProvider { get; set; }
+		private IMongoFrameworkQueryProvider<TEntity, TOutput> InternalProvider { get; set; }
 		
 		public Type ElementType => typeof(TOutput);
 		public Expression Expression { get; }
-		public IQueryProvider Provider => internalProvider;
+		public IQueryProvider Provider => InternalProvider;
 
-		public EntityProcessorCollection<TEntity> EntityProcessors => internalProvider.EntityProcessors;
+		public EntityProcessorCollection<TEntity> EntityProcessors => InternalProvider.EntityProcessors;
 
 		public MongoFrameworkQueryable(IMongoQueryable<TOutput> underlyingQueryable)
 		{
-			internalProvider = new MongoFrameworkQueryProvider<TEntity, TOutput>(underlyingQueryable);
+			InternalProvider = new MongoFrameworkQueryProvider<TEntity, TOutput>(underlyingQueryable);
 			Expression = Expression.Constant(underlyingQueryable, typeof(IMongoQueryable<TOutput>));
 		}
 
 		public MongoFrameworkQueryable(IMongoQueryable<TOutput> underlyingQueryable, Expression expression)
 		{
-			internalProvider = new MongoFrameworkQueryProvider<TEntity, TOutput>(underlyingQueryable);
+			InternalProvider = new MongoFrameworkQueryProvider<TEntity, TOutput>(underlyingQueryable);
 			Expression = expression;
 		}
 
 		public MongoFrameworkQueryable(IMongoQueryable<TOutput> underlyingQueryable, Expression expression, EntityProcessorCollection<TEntity> queryableProcessor)
 		{
-			internalProvider = new MongoFrameworkQueryProvider<TEntity, TOutput>(underlyingQueryable);
-			internalProvider.EntityProcessors.AddRange(queryableProcessor);
+			InternalProvider = new MongoFrameworkQueryProvider<TEntity, TOutput>(underlyingQueryable);
+			InternalProvider.EntityProcessors.AddRange(queryableProcessor);
 			Expression = expression;
 		}
 
 		public IEnumerator<TOutput> GetEnumerator()
 		{
-			var result = (IEnumerable<TOutput>)internalProvider.Execute(Expression);
+			var result = (IEnumerable<TOutput>)InternalProvider.Execute(Expression);
 			using (var enumerator = result.GetEnumerator())
 			{
 				while (enumerator.MoveNext())
