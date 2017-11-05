@@ -18,7 +18,7 @@ namespace MongoFramework.Infrastructure
 		/// <param name="changes"></param>
 		public static void WriteChanges<TEntity>(this IDbEntityChangeWriter<TEntity> writer, IDbChangeTracker<TEntity> changes)
 		{
-			var entriesByState = changes.Entries().GroupBy(e => e.State);
+			var entriesByState = changes.GetEntries().GroupBy(e => e.State);
 
 			foreach (var group in entriesByState)
 			{

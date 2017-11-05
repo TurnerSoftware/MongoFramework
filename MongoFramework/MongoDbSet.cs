@@ -182,7 +182,7 @@ namespace MongoFramework
 
 			if (PerformEntityValidation)
 			{
-				var savingEntities = ChangeTracker.Entries()
+				var savingEntities = ChangeTracker.GetEntries()
 					.Where(e => e.State == DbEntityEntryState.Added || e.State == DbEntityEntryState.Updated)
 					.Select(e => e.Entity);
 

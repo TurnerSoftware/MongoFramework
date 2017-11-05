@@ -8,14 +8,14 @@ namespace MongoFramework.Infrastructure
 {
 	public class DbChangeTracker<TEntity> : IDbChangeTracker<TEntity>
 	{
-		private List<DbEntityEntry<TEntity>> entries { get; set; } = new List<DbEntityEntry<TEntity>>();
+		private List<DbEntityEntry<TEntity>> Entries { get; set; } = new List<DbEntityEntry<TEntity>>();
 		
 		public DbEntityEntry<TEntity> GetEntry(TEntity entity)
 		{
 			var entityMapper = new DbEntityMapper<TEntity>();
 			var entityId = entityMapper.GetIdValue(entity);
 
-			foreach (var entry in entries)
+			foreach (var entry in Entries)
 			{
 				var entryEntityId = entityMapper.GetIdValue(entry.Entity);
 				if (entryEntityId.Equals(entityId))
@@ -27,9 +27,9 @@ namespace MongoFramework.Infrastructure
 			return null;
 		}
 
-		public IEnumerable<DbEntityEntry<TEntity>> Entries()
+		public IEnumerable<DbEntityEntry<TEntity>> GetEntries()
 		{
-			return entries;
+			return Entries;
 		}
 
 		public void Update(TEntity entity, DbEntityEntryState state)
@@ -43,13 +43,13 @@ namespace MongoFramework.Infrastructure
 				}
 				else
 				{
-					entries.Remove(entry);
-					entries.Add(new DbEntityEntry<TEntity>(entity, state));
+					Entries.Remove(entry);
+					Entries.Add(new DbEntityEntry<TEntity>(entity, state));
 				}
 			}
 			else
 			{
-				entries.Add(new DbEntityEntry<TEntity>(entity, state));
+				Entries.Add(new DbEntityEntry<TEntity>(entity, state));
 			}
 		}
 		public void UpdateRange(IEnumerable<TEntity> entities, DbEntityEntryState state)
@@ -65,7 +65,7 @@ namespace MongoFramework.Infrastructure
 			var entry = GetEntry(entity);
 			if (entry != null)
 			{
-				entries.Remove(entry);
+				Entries.Remove(entry);
 			}
 		}
 		public void RemoveRange(IEnumerable<TEntity> entities)
@@ -78,7 +78,7 @@ namespace MongoFramework.Infrastructure
 
 		public void DetectChanges()
 		{
-			var entries = this.entries.Where((DbEntityEntry<TEntity> e) => e.State == DbEntityEntryState.NoChanges || e.State == DbEntityEntryState.Updated);
+			var entries = Entries.Where((DbEntityEntry<TEntity> e) => e.State == DbEntityEntryState.NoChanges || e.State == DbEntityEntryState.Updated);
 
 			foreach (var entry in entries)
 			{
@@ -95,7 +95,7 @@ namespace MongoFramework.Infrastructure
 		
 		public void Clear()
 		{
-			entries.Clear();
+			Entries.Clear();
 		}
 	}
 }
