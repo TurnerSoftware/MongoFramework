@@ -50,6 +50,29 @@ namespace MongoFramework.Tests
 		}
 
 		[TestMethod]
+		public void AddMixedEntities()
+		{
+			var database = TestConfiguration.GetDatabase();
+			var writer = new DbEntityWriter<CommonEntity>(database);
+			var entities = new[]
+			{
+				new CommonEntity
+				{
+					Description = "DbEntityWriterTests.AddMixedEntities"
+				},
+				new ExtendedEntity
+				{
+					IsDisabled = true,
+					Description = "DbEntityWriterTests.AddMixedEntities"
+				}
+			};
+
+			writer.AddRange(entities);
+
+			Assert.IsTrue(entities.All(e => e.Id != null));
+		}
+
+		[TestMethod]
 		public void UpdateEntity()
 		{
 			var database = TestConfiguration.GetDatabase();

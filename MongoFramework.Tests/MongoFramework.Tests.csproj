@@ -79,6 +79,7 @@
     <Compile Include="TestSetup.cs" />
     <Compile Include="DbEntityWriterTests.cs" />
     <Compile Include="DbChangeTrackerTests.cs" />
+    <Compile Include="DbEntityReaderTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
