@@ -62,6 +62,10 @@ namespace MongoFramework.Infrastructure
 			{
 				new DbEntityMapper(EntityType.BaseType);
 			}
+			else
+			{
+				ClassMap.SetIsRootClass(true);
+			}
 		}
 
 		private void ConfigureEntityId()
