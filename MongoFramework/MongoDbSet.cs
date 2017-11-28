@@ -102,10 +102,7 @@ namespace MongoFramework
 				throw new ArgumentNullException("entities");
 			}
 
-			foreach (var entity in entities)
-			{
-				Add(entity);
-			}
+			ChangeTracker.UpdateRange(entities, DbEntityEntryState.Added);
 		}
 
 		/// <summary>
@@ -132,10 +129,7 @@ namespace MongoFramework
 				throw new ArgumentNullException("entities");
 			}
 
-			foreach (var entity in entities)
-			{
-				Update(entity);
-			}
+			ChangeTracker.UpdateRange(entities, DbEntityEntryState.Updated);
 		}
 
 		/// <summary>
@@ -162,10 +156,7 @@ namespace MongoFramework
 				throw new ArgumentNullException("entities");
 			}
 
-			foreach (var entity in entities)
-			{
-				Remove(entity);
-			}
+			ChangeTracker.UpdateRange(entities, DbEntityEntryState.Deleted);
 		}
 
 		/// <summary>
