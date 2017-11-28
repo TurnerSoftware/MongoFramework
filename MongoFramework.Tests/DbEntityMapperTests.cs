@@ -46,7 +46,7 @@ namespace MongoFramework.Tests
 		}
 
 		[TestMethod]
-		public void AccessToInherrittedProperty()
+		public void AccessToInheritedProperty()
 		{
 			var mapper = new DbEntityMapper<ExtendedEntity>();
 			var mappedProperties = mapper.GetMappedProperties();
