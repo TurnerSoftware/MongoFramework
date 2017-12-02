@@ -1,115 +1,13 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C3A55809-BD51-4966-9AD9-E009B6F6DAEC}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MongoFramework</RootNamespace>
-    <AssemblyName>MongoFramework</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="MongoDB.Bson, Version=2.4.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MongoDB.Bson.2.4.4\lib\net45\MongoDB.Bson.dll</HintPath>
-    </Reference>
-    <Reference Include="MongoDB.Driver, Version=2.4.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MongoDB.Driver.2.4.4\lib\net45\MongoDB.Driver.dll</HintPath>
-    </Reference>
-    <Reference Include="MongoDB.Driver.Core, Version=2.4.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MongoDB.Driver.Core.2.4.4\lib\net45\MongoDB.Driver.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+    <PackageReference Include="MongoDB.Driver" Version="2.4.4" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.4.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.4.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Attributes\ExtraElementsAttribute.cs" />
-    <Compile Include="Attributes\IncrementNumberAttribute.cs" />
-    <Compile Include="Attributes\MutatePropertyAttribute.cs" />
-    <Compile Include="Attributes\UpdatedDateAttribute.cs" />
-    <Compile Include="Attributes\CreatedDateAttribute.cs" />
-    <Compile Include="Bson\BsonDiff.cs" />
-    <Compile Include="Bson\DiffResult.cs" />
-    <Compile Include="Bson\ReflectionExtensions.cs" />
-    <Compile Include="Bson\UpdateDefinitionExtensions.cs" />
-    <Compile Include="IMongoDbContext.cs" />
-    <Compile Include="Infrastructure\DbChangeTracker.cs" />
-    <Compile Include="Infrastructure\DbEntityEntry.cs" />
-    <Compile Include="Infrastructure\DbEntityEntryExtensions.cs" />
-    <Compile Include="Infrastructure\DbEntityWriterExtensions.cs" />
-    <Compile Include="Infrastructure\IDbChangeTracker.cs" />
-    <Compile Include="Infrastructure\IDbEntityChangeWriter.cs" />
-    <Compile Include="Infrastructure\Linq\Processors\EntityMutationProcessor.cs" />
-    <Compile Include="Infrastructure\Linq\Processors\EntityTrackingProcessor.cs" />
-    <Compile Include="Infrastructure\Mutators\DbEntityMutator.cs" />
-    <Compile Include="Infrastructure\Linq\IMongoFrameworkQueryable.cs" />
-    <Compile Include="Infrastructure\Linq\IMongoFrameworkQueryProvider.cs" />
-    <Compile Include="Infrastructure\Linq\MongoFrameworkQueryable.cs" />
-    <Compile Include="Infrastructure\Linq\MongoFrameworkQueryProvider.cs" />
-    <Compile Include="Infrastructure\Linq\Processors\IEntityProcessor.cs" />
-    <Compile Include="Infrastructure\Mutators\DbEntityMutatorType.cs" />
-    <Compile Include="Infrastructure\Mutators\EntityAttributeMutator.cs" />
-    <Compile Include="Infrastructure\DbEntityReader.cs" />
-    <Compile Include="Infrastructure\DbEntityMapper.cs" />
-    <Compile Include="Infrastructure\DbEntityWriter.cs" />
-    <Compile Include="Infrastructure\DbEntityEntryState.cs" />
-    <Compile Include="Infrastructure\IDbEntityReader.cs" />
-    <Compile Include="Infrastructure\IDbEntityMapper.cs" />
-    <Compile Include="Infrastructure\IDbEntityWriter.cs" />
-    <Compile Include="Infrastructure\MongoDbUtility.cs" />
-    <Compile Include="Attributes\IgnoreExtraElementsAttribute.cs" />
-    <Compile Include="IMongoDbSet.cs" />
-    <Compile Include="Infrastructure\Mutators\IDbEntityMutator.cs" />
-    <Compile Include="Infrastructure\Linq\Processors\EntityProcessorCollection.cs" />
-    <Compile Include="Linq\LinqExtensions.cs" />
-    <Compile Include="MongoDbContext.cs" />
-    <Compile Include="MongoDbSet.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>
