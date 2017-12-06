@@ -45,15 +45,19 @@ Remaps the property with the specified name when reading/writing.
 There are additional attributes defined by MongoFramework that allow for more advanced functionality. These include controlling how "extra elements" are handled as well as entity mutation.
 
 `[IgnoreExtraElements]` and `[ExtraElements]`
+
 These instruct the MongoDB driver to either ignore any extra data in the record that was fetched or to map it to a specific field. For more details, [read the documentation on the MongoDB driver](http://mongodb.github.io/mongo-csharp-driver/2.4/reference/bson/mapping/#ignoring-extra-elements)
 
 `[CreatedDate]`
+
 Populates the property with the current date/time on insert. _Note: The property must be of type `DateTime`_
 
 `[UpdatedDate]`
+
 Populates the property with the current date/time on update. _Note: The property must be of type `DateTime`_
 
 `[IncrementNumber(int incrementAmount = 1, bool onUpdateOnly = false)]`
+
 Updates the value of a property by the defined increment amount on insert or update.
 
 ## Example
