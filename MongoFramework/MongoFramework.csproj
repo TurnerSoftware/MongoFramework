@@ -2,6 +2,19 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <Title>MongoFramework</Title>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseUrl>https://github.com/TurnerSoftware/MongoFramework/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/TurnerSoftware/MongoFramework</PackageProjectUrl>
+    <PackageTags>mongo mongodb</PackageTags>
+    <Authors>James Turner</Authors>
+    <Company>Turner Software</Company>
+    <Copyright>Copyright 2017</Copyright>
+    <Description>An "Entity Framework"-like interface for the MongoDB C# Driver</Description>
+    <AssemblyVersion>0.6.0</AssemblyVersion>
+    <FileVersion>0.6.0</FileVersion>
+    <Version>0.6.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
