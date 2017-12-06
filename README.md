@@ -14,7 +14,7 @@ Some of the major features include:
 - Entity mutation (allowing automatic changes on properties during select/insert/update calls)
 
 ## Installation
-MongoFramework is available as a NuGet package. You can install it using the NuGet Package Console window:
+MongoFramework is available [as a NuGet package](https://www.nuget.org/packages/MongoFramework/). You can install it using the NuGet Package Console window:
 ```
 PM> Install-Package MongoFramework
 ```
