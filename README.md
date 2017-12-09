@@ -1,7 +1,8 @@
 # MongoFramework
 An "Entity Framework"-like interface for the MongoDB C# Driver
 
-[![Build status](https://ci.appveyor.com/api/projects/status/ylg69oh66nkyd0mg?svg=true)](https://ci.appveyor.com/project/Turnerj/mongoframework)
+[![AppVeyor](https://img.shields.io/appveyor/ci/Turnerj/mongoframework.svg)](https://ci.appveyor.com/project/Turnerj/mongoframework)
+[![NuGet](https://img.shields.io/nuget/v/MongoFramework.svg)](https://www.nuget.org/packages/MongoFramework/)
 
 ## Overview
 MongoFramework tries to bring some of the nice features from Entity Framework into the world of MongoDB.
@@ -12,12 +13,6 @@ Some of the major features include:
 - Changeset support (allowing for queuing multiple DB updates to run at once)
 - Diff-updates (only _changes_ to an entity to be written)
 - Entity mutation (allowing automatic changes on properties during select/insert/update calls)
-
-## Installation
-MongoFramework is available [as a NuGet package](https://www.nuget.org/packages/MongoFramework/). You can install it using the NuGet Package Console window:
-```
-PM> Install-Package MongoFramework
-```
 
 ## Entity Attributes
 Through attributes on entities and their properties, you have control over various aspects of how the entities are saved or processed.
