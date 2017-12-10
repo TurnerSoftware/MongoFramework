@@ -14,6 +14,11 @@ namespace MongoFramework
 		void SaveChanges();
 	}
 
+	public interface IAsyncMongoDbSet : IMongoDbSet
+	{
+		Task SaveChangesAsync();
+	}
+
 	public interface IMongoDbSet<TEntity> : IMongoDbSet, IQueryable<TEntity>
 	{
 		void Add(TEntity entity);

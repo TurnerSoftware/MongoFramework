@@ -9,6 +9,7 @@ using System.ComponentModel.DataAnnotations;
 using MongoDB.Driver.Linq;
 using MongoFramework.Infrastructure.Linq;
 using MongoFramework.Infrastructure.Linq.Processors;
+using System.Threading.Tasks;
 
 namespace MongoFramework
 {
@@ -16,12 +17,12 @@ namespace MongoFramework
 	/// Basic Mongo "DbSet", providing changeset support and attribute validation
 	/// </summary>
 	/// <typeparam name="TEntity"></typeparam>
-	public class MongoDbSet<TEntity> : IMongoDbSet<TEntity>
+	public class MongoDbSet<TEntity> : IMongoDbSet<TEntity>, IAsyncMongoDbSet
 	{
 		public IDbChangeTracker<TEntity> ChangeTracker { get; private set; } = new DbChangeTracker<TEntity>();
 
-		private IDbEntityChangeWriter<TEntity> dbWriter { get; set; }
-		private IDbEntityReader<TEntity> dbReader { get; set; }
+		private IAsyncDbEntityChangeWriter<TEntity> DbWriter { get; set; }
+		private IDbEntityReader<TEntity> DbReader { get; set; }
 
 		/// <summary>
 		/// Whether any entity validation is performed prior to saving changes. (Default is true)
@@ -61,10 +62,10 @@ namespace MongoFramework
 		/// </summary>
 		/// <param name="reader">The reader to use for querying the database.</param>
 		/// <param name="writer">The writer to use for writing to the database.</param>
-		public MongoDbSet(IDbEntityReader<TEntity> reader, IDbEntityChangeWriter<TEntity> writer)
+		public MongoDbSet(IDbEntityReader<TEntity> reader, IAsyncDbEntityChangeWriter<TEntity> writer)
 		{
-			dbReader = reader;
-			dbWriter = writer;
+			DbReader = reader;
+			DbWriter = writer;
 		}
 		
 		/// <summary>
@@ -74,8 +75,8 @@ namespace MongoFramework
 		public void SetDatabase(IMongoDatabase database)
 		{
 			var entityMapper = new DbEntityMapper<TEntity>();
-			dbWriter = new DbEntityWriter<TEntity>(database, entityMapper);
-			dbReader = new DbEntityReader<TEntity>(database, entityMapper);
+			DbWriter = new AsyncDbEntityWriter<TEntity>(database, entityMapper);
+			DbReader = new DbEntityReader<TEntity>(database, entityMapper);
 		}
 
 		/// <summary>
@@ -159,18 +160,8 @@ namespace MongoFramework
 			ChangeTracker.UpdateRange(entities, DbEntityEntryState.Deleted);
 		}
 
-		/// <summary>
-		/// Writes all of the items in the changeset to the database.
-		/// </summary>
-		public virtual void SaveChanges()
+		private void CheckEntityValidation()
 		{
-			if (dbWriter == null)
-			{
-				throw new InvalidOperationException("No IDbEntityWriter has been set.");
-			}
-
-			ChangeTracker.DetectChanges();
-
 			if (PerformEntityValidation)
 			{
 				var savingEntities = ChangeTracker.GetEntries()
@@ -183,20 +174,50 @@ namespace MongoFramework
 					Validator.ValidateObject(savingEntity, validationContext);
 				}
 			}
+		}
 
-			dbWriter.WriteChanges(ChangeTracker);
+		/// <summary>
+		/// Writes all of the items in the changeset to the database.
+		/// </summary>
+		/// <returns></returns>
+		public virtual void SaveChanges()
+		{
+			if (DbWriter == null)
+			{
+				throw new InvalidOperationException("No IDbEntityWriter has been set.");
+			}
+
+			ChangeTracker.DetectChanges();
+			CheckEntityValidation();
+			DbWriter.WriteChanges(ChangeTracker);
+		}
+
+		/// <summary>
+		/// Writes all of the items in the changeset to the database.
+		/// </summary>
+		/// <returns></returns>
+		public async Task SaveChangesAsync()
+		{
+			if (DbWriter == null)
+			{
+				throw new InvalidOperationException("No IDbEntityWriter has been set.");
+			}
+
+			ChangeTracker.DetectChanges();
+			CheckEntityValidation();
+			await DbWriter.WriteChangesAsync(ChangeTracker);
 		}
 
 		#region IQueryable Implementation
 
 		private IQueryable<TEntity> GetQueryable()
 		{
-			if (dbReader == null)
+			if (DbReader == null)
 			{
 				throw new InvalidOperationException("No IDbEntityReader has been set.");
 			}
 
-			var queryable = dbReader.AsQueryable() as IMongoFrameworkQueryable<TEntity, TEntity>;
+			var queryable = DbReader.AsQueryable() as IMongoFrameworkQueryable<TEntity, TEntity>;
 			queryable.EntityProcessors.Add(new EntityTrackingProcessor<TEntity>(ChangeTracker));
 			return queryable;
 		}

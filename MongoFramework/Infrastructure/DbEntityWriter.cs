@@ -16,7 +16,7 @@ namespace MongoFramework.Infrastructure
 	public class DbEntityWriter<TEntity> : IDbEntityChangeWriter<TEntity>
 	{
 		public IMongoDatabase Database { get; set; }
-		private IDbEntityMapper EntityMapper { get; set; }
+		protected IDbEntityMapper EntityMapper { get; set; }
 
 		public DbEntityWriter(IMongoDatabase database) : this(database, new DbEntityMapper(typeof(TEntity))) { }
 		
@@ -42,18 +42,11 @@ namespace MongoFramework.Infrastructure
 			DbEntityMutator<TEntity>.MutateEntities(entities, DbEntityMutatorType.Insert);
 			GetCollection().InsertMany(entities);
 		}
-		
-		public void Update(TEntity entity)
-		{
-			UpdateRange(new[] { entity });
-		}
 
-		public void UpdateRange(IEnumerable<TEntity> entities)
+		protected IEnumerable<WriteModel<TEntity>> GenerateWriteOperations(IEnumerable<TEntity> entities)
 		{
 			var idFieldName = EntityMapper.GetIdName();
 			var operations = new List<WriteModel<TEntity>>();
-
-			DbEntityMutator<TEntity>.MutateEntities(entities, DbEntityMutatorType.Update);
 
 			foreach (var entity in entities)
 			{
@@ -63,23 +56,29 @@ namespace MongoFramework.Infrastructure
 				operations.Add(operation);
 			}
 
+			return operations;
+		}
+
+		public void Update(TEntity entity)
+		{
+			UpdateRange(new[] { entity });
+		}
+
+		public void UpdateRange(IEnumerable<TEntity> entities)
+		{
+			DbEntityMutator<TEntity>.MutateEntities(entities, DbEntityMutatorType.Update);
+			var operations = GenerateWriteOperations(entities);
+
 			if (operations.Any())
 			{
 				GetCollection().BulkWrite(operations);
 			}
 		}
 
-		public void Update(DbEntityEntry<TEntity> entry)
-		{
-			UpdateRange(new[] { entry });
-		}
-
-		public void UpdateRange(IEnumerable<DbEntityEntry<TEntity>> entries)
+		protected IEnumerable<WriteModel<TEntity>> GenerateWriteOperations(IEnumerable<DbEntityEntry<TEntity>> entries)
 		{
 			var idFieldName = EntityMapper.GetIdName();
 			var operations = new List<WriteModel<TEntity>>();
-
-			DbEntityMutator<TEntity>.MutateEntities(entries.Select(e => e.Entity), DbEntityMutatorType.Update);
 
 			foreach (var entry in entries)
 			{
@@ -93,22 +92,30 @@ namespace MongoFramework.Infrastructure
 				}
 			}
 
+			return operations;
+		}
+
+		public void Update(DbEntityEntry<TEntity> entry)
+		{
+			UpdateRange(new[] { entry });
+		}
+
+		public void UpdateRange(IEnumerable<DbEntityEntry<TEntity>> entries)
+		{
+			DbEntityMutator<TEntity>.MutateEntities(entries.Select(e => e.Entity), DbEntityMutatorType.Update);
+			var operations = GenerateWriteOperations(entries);
+
 			if (operations.Any())
 			{
 				GetCollection().BulkWrite(operations);
 			}
 		}
 
-		public void Remove(TEntity entity)
-		{
-			RemoveRange(new[] { entity });
-		}
-
-		public void RemoveRange(IEnumerable<TEntity> entities)
+		protected FilterDefinition<TEntity> GenerateIdFilter(IEnumerable<TEntity> entities)
 		{
 			var idFieldName = EntityMapper.GetIdName();
 			FilterDefinition<TEntity> filter = null;
-			
+
 			foreach (var entity in entities)
 			{
 				var idFieldValue = EntityMapper.GetIdValue(entity);
@@ -121,9 +128,20 @@ namespace MongoFramework.Infrastructure
 				{
 					filter = Builders<TEntity>.Filter.Eq(idFieldName, idFieldValue);
 				}
-
-				GetCollection().DeleteMany(filter);
 			}
+
+			return filter;
+		}
+
+		public void Remove(TEntity entity)
+		{
+			RemoveRange(new[] { entity });
+		}
+
+		public void RemoveRange(IEnumerable<TEntity> entities)
+		{
+			var filter = GenerateIdFilter(entities);
+			GetCollection().DeleteMany(filter);
 		}
 	}
 }
