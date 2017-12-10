@@ -99,16 +99,16 @@ namespace MongoFramework.Tests
 		}
 
 		[TestMethod]
-		public void DeleteEntity()
+		public void RemoveEntity()
 		{
 			var database = TestConfiguration.GetDatabase();
 			var writer = new DbEntityWriter<CommonEntity>(database);
 			var reader = new DbEntityReader<CommonEntity>(database);
 
-			//Get entity initially into the DB so we can delete it
+			//Get entity initially into the DB so we can remove it
 			var entity = new CommonEntity
 			{
-				Description = "DbEntityWriterTests.DeleteEntity"
+				Description = "DbEntityWriterTests.RemoveEntity"
 			};
 			writer.Add(entity);
 
