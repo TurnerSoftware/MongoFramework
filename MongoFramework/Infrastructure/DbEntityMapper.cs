@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using MongoFramework.Attributes;
+using System.Collections.Concurrent;
 
 namespace MongoFramework.Infrastructure
 {
@@ -18,7 +19,12 @@ namespace MongoFramework.Infrastructure
 		public Type EntityType { get; private set; }
 		private BsonClassMap ClassMap { get; set; }
 		
-		private IEnumerable<IDbEntityPropertyMap> EntityPropertyMapCache { get; set; }
+		private static ConcurrentDictionary<Type, IEnumerable<IDbEntityPropertyMap>> EntityMapCache { get; set; }
+
+		static DbEntityMapper()
+		{
+			EntityMapCache = new ConcurrentDictionary<Type, IEnumerable<IDbEntityPropertyMap>>();
+		}
 
 		public DbEntityMapper(Type entityType)
 		{
@@ -156,7 +162,7 @@ namespace MongoFramework.Infrastructure
 				}
 			}
 		}
-		
+
 		public string GetCollectionName()
 		{
 			var tableAttribute = EntityType.GetCustomAttribute<TableAttribute>();
@@ -190,15 +196,7 @@ namespace MongoFramework.Infrastructure
 
 		public IEnumerable<IDbEntityPropertyMap> GetEntityMapping()
 		{
-			if (EntityPropertyMapCache != null)
-			{
-				return EntityPropertyMapCache;
-			}
-			else
-			{
-				EntityPropertyMapCache = GetEntityMapping(true);
-				return EntityPropertyMapCache;
-			}
+			return GetEntityMapping(true);
 		}
 
 		public IEnumerable<IDbEntityPropertyMap> GetEntityMapping(bool includeInherited)
@@ -211,11 +209,14 @@ namespace MongoFramework.Infrastructure
 			}
 			else
 			{
-				return ClassMap.DeclaredMemberMaps.Select(m => new EntityPropertyMap
+				return EntityMapCache.GetOrAdd(EntityType, t =>
 				{
-					IsKey = m == ClassMap.IdMemberMap,
-					ElementName = m.ElementName,
-					Property = m.MemberInfo as PropertyInfo
+					return ClassMap.DeclaredMemberMaps.Select(m => new EntityPropertyMap
+					{
+						IsKey = m == ClassMap.IdMemberMap,
+						ElementName = m.ElementName,
+						Property = m.MemberInfo as PropertyInfo
+					});
 				});
 			}
 		}
