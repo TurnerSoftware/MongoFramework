@@ -1,4 +1,5 @@
 ﻿using MongoFramework.Attributes;
+using MongoFramework.Infrastructure.Mapping;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace MongoFramework.Infrastructure.Mutation.Mutators
 {
-	public class EntityAttributeMutator<TEntity> : IDbEntityMutator<TEntity>
+	public class EntityAttributeMutator<TEntity> : IEntityMutator<TEntity>
 	{
-		public void MutateEntity(TEntity entity, MutatorType mutationType, IDbEntityMapper entityMapper)
+		public void MutateEntity(TEntity entity, MutatorType mutationType, IEntityMapper entityMapper)
 		{
 			var mutateProperties = entityMapper.GetEntityMapping().Select(m => new
 			{

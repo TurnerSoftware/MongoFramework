@@ -2,6 +2,7 @@
 using MongoDB.Driver;
 using MongoFramework.Attributes;
 using MongoFramework.Bson;
+using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mutation;
 using System;
 using System.Collections.Generic;
@@ -16,11 +17,11 @@ namespace MongoFramework.Infrastructure
 	public class DbEntityWriter<TEntity> : IDbEntityChangeWriter<TEntity>
 	{
 		public IMongoDatabase Database { get; set; }
-		protected IDbEntityMapper EntityMapper { get; set; }
+		protected IEntityMapper EntityMapper { get; set; }
 
-		public DbEntityWriter(IMongoDatabase database) : this(database, new DbEntityMapper(typeof(TEntity))) { }
+		public DbEntityWriter(IMongoDatabase database) : this(database, new EntityMapper(typeof(TEntity))) { }
 		
-		public DbEntityWriter(IMongoDatabase database, IDbEntityMapper mapper)
+		public DbEntityWriter(IMongoDatabase database, IEntityMapper mapper)
 		{
 			Database = database ?? throw new ArgumentNullException("database");
 			EntityMapper = mapper ?? throw new ArgumentNullException("mapper");
@@ -39,7 +40,7 @@ namespace MongoFramework.Infrastructure
 
 		public void AddRange(IEnumerable<TEntity> entities)
 		{
-			DbEntityMutation<TEntity>.MutateEntities(entities, MutatorType.Insert);
+			EntityMutation<TEntity>.MutateEntities(entities, MutatorType.Insert);
 			GetCollection().InsertMany(entities);
 		}
 
@@ -66,7 +67,7 @@ namespace MongoFramework.Infrastructure
 
 		public void UpdateRange(IEnumerable<TEntity> entities)
 		{
-			DbEntityMutation<TEntity>.MutateEntities(entities, MutatorType.Update);
+			EntityMutation<TEntity>.MutateEntities(entities, MutatorType.Update);
 			var operations = GenerateWriteOperations(entities);
 
 			if (operations.Any())
@@ -102,7 +103,7 @@ namespace MongoFramework.Infrastructure
 
 		public void UpdateRange(IEnumerable<DbEntityEntry<TEntity>> entries)
 		{
-			DbEntityMutation<TEntity>.MutateEntities(entries.Select(e => e.Entity), MutatorType.Update);
+			EntityMutation<TEntity>.MutateEntities(entries.Select(e => e.Entity), MutatorType.Update);
 			var operations = GenerateWriteOperations(entries);
 
 			if (operations.Any())

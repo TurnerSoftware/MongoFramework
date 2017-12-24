@@ -9,17 +9,18 @@ using System.Collections;
 using MongoDB.Driver.Linq;
 using MongoFramework.Infrastructure.Linq;
 using MongoFramework.Infrastructure.Linq.Processors;
+using MongoFramework.Infrastructure.Mapping;
 
 namespace MongoFramework.Infrastructure
 {
 	public class DbEntityReader<TEntity> : IDbEntityReader<TEntity>
 	{
 		public IMongoDatabase Database { get; set; }
-		private IDbEntityMapper EntityMapper { get; set; }
+		private IEntityMapper EntityMapper { get; set; }
 
-		public DbEntityReader(IMongoDatabase database) : this(database, new DbEntityMapper(typeof(TEntity))) { }
+		public DbEntityReader(IMongoDatabase database) : this(database, new EntityMapper(typeof(TEntity))) { }
 
-		public DbEntityReader(IMongoDatabase database, IDbEntityMapper mapper)
+		public DbEntityReader(IMongoDatabase database, IEntityMapper mapper)
 		{
 			Database = database;
 			EntityMapper = mapper;

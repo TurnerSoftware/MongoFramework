@@ -1,4 +1,5 @@
-﻿using MongoFramework.Infrastructure.Mutation.Mutators;
+﻿using MongoFramework.Infrastructure.Mapping;
+using MongoFramework.Infrastructure.Mutation.Mutators;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace MongoFramework.Infrastructure.Mutation
 {
-	public static class DbEntityMutation<TEntity>
+	public static class EntityMutation<TEntity>
 	{
-		public static List<IDbEntityMutator<TEntity>> MutationDrivers { get; }
+		public static List<IEntityMutator<TEntity>> MutationDrivers { get; }
 
-		static DbEntityMutation()
+		static EntityMutation()
 		{
-			MutationDrivers = new List<IDbEntityMutator<TEntity>>
+			MutationDrivers = new List<IEntityMutator<TEntity>>
 			{
 				new EntityAttributeMutator<TEntity>()
 			};
@@ -26,7 +27,7 @@ namespace MongoFramework.Infrastructure.Mutation
 
 		public static void MutateEntities(IEnumerable<TEntity> entities, MutatorType mutationType)
 		{
-			var entityMapper = new DbEntityMapper<TEntity>();
+			var entityMapper = new EntityMapper<TEntity>();
 
 			foreach (var entity in entities)
 			{

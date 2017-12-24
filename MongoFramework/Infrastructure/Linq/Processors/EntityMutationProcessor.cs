@@ -11,7 +11,7 @@ namespace MongoFramework.Infrastructure.Linq.Processors
 	{
 		public void ProcessEntity(TEntity entity)
 		{
-			DbEntityMutation<TEntity>.MutateEntity(entity, MutatorType.Select);
+			EntityMutation<TEntity>.MutateEntity(entity, MutatorType.Select);
 		}
 	}
 }

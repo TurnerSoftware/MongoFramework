@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MongoFramework.Infrastructure.Mapping;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,7 @@ namespace MongoFramework.Infrastructure
 		
 		public DbEntityEntry<TEntity> GetEntry(TEntity entity)
 		{
-			var entityMapper = new DbEntityMapper<TEntity>();
+			var entityMapper = new EntityMapper<TEntity>();
 			var entityId = entityMapper.GetIdValue(entity);
 
 			foreach (var entry in Entries)

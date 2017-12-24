@@ -10,6 +10,7 @@ using MongoDB.Driver.Linq;
 using MongoFramework.Infrastructure.Linq;
 using MongoFramework.Infrastructure.Linq.Processors;
 using System.Threading.Tasks;
+using MongoFramework.Infrastructure.Mapping;
 
 namespace MongoFramework
 {
@@ -63,7 +64,7 @@ namespace MongoFramework
 		/// <param name="database"></param>
 		public void SetDatabase(IMongoDatabase database)
 		{
-			var entityMapper = new DbEntityMapper<TEntity>();
+			var entityMapper = new EntityMapper<TEntity>();
 			DbEntityWriter = new AsyncDbEntityWriter<TEntity>(database, entityMapper);
 			DbEntityReader = new DbEntityReader<TEntity>(database, entityMapper);
 		}

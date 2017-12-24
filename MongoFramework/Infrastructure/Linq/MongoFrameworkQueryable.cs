@@ -10,6 +10,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using MongoFramework.Infrastructure.Linq.Processors;
 using MongoDB.Bson;
+using MongoFramework.Infrastructure.Mapping;
 
 namespace MongoFramework.Infrastructure.Linq
 {
@@ -67,7 +68,7 @@ namespace MongoFramework.Infrastructure.Linq
 		public string ToQuery()
 		{
 			var executionModel = InternalProvider.UnderlyingQueryable.GetExecutionModel();
-			var entityMapper = new DbEntityMapper<TEntity>();
+			var entityMapper = new EntityMapper<TEntity>();
 			return $"db.{entityMapper.GetCollectionName()}.{executionModel}";
 		}
 	}

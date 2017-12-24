@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Infrastructure;
+using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mutation;
 using MongoFramework.Infrastructure.Mutation.Mutators;
 using MongoFramework.Tests.Models;
@@ -18,7 +19,7 @@ namespace MongoFramework.Tests.Mutators
 		public void OnInsert()
 		{
 			var entity = new AttributeEntity();
-			var entityMapper = new DbEntityMapper<AttributeEntity>();
+			var entityMapper = new EntityMapper<AttributeEntity>();
 			var mutator = new EntityAttributeMutator<AttributeEntity>();
 
 			mutator.MutateEntity(entity, MutatorType.Insert, entityMapper);
@@ -30,7 +31,7 @@ namespace MongoFramework.Tests.Mutators
 		public void OnUpdate()
 		{
 			var entity = new AttributeEntity();
-			var entityMapper = new DbEntityMapper<AttributeEntity>();
+			var entityMapper = new EntityMapper<AttributeEntity>();
 			var mutator = new EntityAttributeMutator<AttributeEntity>();
 
 			mutator.MutateEntity(entity, MutatorType.Update, entityMapper);
