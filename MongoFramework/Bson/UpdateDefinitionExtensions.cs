@@ -20,8 +20,7 @@ namespace MongoFramework.Bson
 
 			if (valueType == null && reflectedValueType == null)
 			{
-				var message = string.Format("Unable to determine value type for field \"{0}\"", fieldName);
-				throw new Exception(message);
+				throw new Exception($"Unable to determine value type for field \"{fieldName}\"");
 			}
 
 			if (valueType == null || (reflectedValueType != null && valueType != reflectedValueType))

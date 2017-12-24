@@ -2,7 +2,7 @@
 using MongoDB.Driver;
 using MongoFramework.Attributes;
 using MongoFramework.Bson;
-using MongoFramework.Infrastructure.Mutators;
+using MongoFramework.Infrastructure.Mutation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +32,7 @@ namespace MongoFramework.Infrastructure
 
 		public async Task AddRangeAsync(IEnumerable<TEntity> entities)
 		{
-			DbEntityMutator<TEntity>.MutateEntities(entities, DbEntityMutatorType.Insert);
+			DbEntityMutation<TEntity>.MutateEntities(entities, MutatorType.Insert);
 			await GetCollection().InsertManyAsync(entities);
 		}
 
@@ -43,7 +43,7 @@ namespace MongoFramework.Infrastructure
 
 		public async Task UpdateRangeAsync(IEnumerable<TEntity> entities)
 		{
-			DbEntityMutator<TEntity>.MutateEntities(entities, DbEntityMutatorType.Update);
+			DbEntityMutation<TEntity>.MutateEntities(entities, MutatorType.Update);
 			var operations = GenerateWriteOperations(entities);
 
 			if (operations.Any())
@@ -59,7 +59,7 @@ namespace MongoFramework.Infrastructure
 
 		public async Task UpdateRangeAsync(IEnumerable<DbEntityEntry<TEntity>> entries)
 		{
-			DbEntityMutator<TEntity>.MutateEntities(entries.Select(e => e.Entity), DbEntityMutatorType.Update);
+			DbEntityMutation<TEntity>.MutateEntities(entries.Select(e => e.Entity), MutatorType.Update);
 			var operations = GenerateWriteOperations(entries);
 
 			if (operations.Any())

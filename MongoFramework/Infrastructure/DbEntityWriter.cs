@@ -2,7 +2,7 @@
 using MongoDB.Driver;
 using MongoFramework.Attributes;
 using MongoFramework.Bson;
-using MongoFramework.Infrastructure.Mutators;
+using MongoFramework.Infrastructure.Mutation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,8 +22,8 @@ namespace MongoFramework.Infrastructure
 		
 		public DbEntityWriter(IMongoDatabase database, IDbEntityMapper mapper)
 		{
-			Database = database;
-			EntityMapper = mapper;
+			Database = database ?? throw new ArgumentNullException("database");
+			EntityMapper = mapper ?? throw new ArgumentNullException("mapper");
 		}
 
 		private IMongoCollection<TEntity> GetCollection()
@@ -39,7 +39,7 @@ namespace MongoFramework.Infrastructure
 
 		public void AddRange(IEnumerable<TEntity> entities)
 		{
-			DbEntityMutator<TEntity>.MutateEntities(entities, DbEntityMutatorType.Insert);
+			DbEntityMutation<TEntity>.MutateEntities(entities, MutatorType.Insert);
 			GetCollection().InsertMany(entities);
 		}
 
@@ -66,7 +66,7 @@ namespace MongoFramework.Infrastructure
 
 		public void UpdateRange(IEnumerable<TEntity> entities)
 		{
-			DbEntityMutator<TEntity>.MutateEntities(entities, DbEntityMutatorType.Update);
+			DbEntityMutation<TEntity>.MutateEntities(entities, MutatorType.Update);
 			var operations = GenerateWriteOperations(entities);
 
 			if (operations.Any())
@@ -102,7 +102,7 @@ namespace MongoFramework.Infrastructure
 
 		public void UpdateRange(IEnumerable<DbEntityEntry<TEntity>> entries)
 		{
-			DbEntityMutator<TEntity>.MutateEntities(entries.Select(e => e.Entity), DbEntityMutatorType.Update);
+			DbEntityMutation<TEntity>.MutateEntities(entries.Select(e => e.Entity), MutatorType.Update);
 			var operations = GenerateWriteOperations(entries);
 
 			if (operations.Any())

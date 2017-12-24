@@ -9,9 +9,9 @@ namespace MongoFramework
 {
 	public class MongoDbContext : IMongoDbContext, IDisposable
 	{
-		protected IMongoDatabase database { get; set; }
+		protected IMongoDatabase Database { get; set; }
 
-		private IList<IMongoDbSet> dbSets { get; set; }
+		private IList<IMongoDbSet> DbSets { get; set; }
 
 		public MongoDbContext(string connectionName)
 		{
@@ -22,19 +22,19 @@ namespace MongoFramework
 				throw new MongoConfigurationException("No connection string found with the name \'" + connectionName + "\'");
 			}
 
-			database = MongoDbUtility.GetDatabase(mongoUrl);
+			Database = MongoDbUtility.GetDatabase(mongoUrl);
 			InitialiseDbSets();
 		}
 
 		public MongoDbContext(string connectionString, string databaseName)
 		{
-			database = MongoDbUtility.GetDatabase(connectionString, databaseName);
+			Database = MongoDbUtility.GetDatabase(connectionString, databaseName);
 			InitialiseDbSets();
 		}
 
 		internal MongoDbContext(IMongoDatabase database)
 		{
-			this.database = database;
+			this.Database = database;
 			InitialiseDbSets();
 		}
 		public static MongoDbContext CreateWithDatabase(IMongoDatabase database)
@@ -44,7 +44,7 @@ namespace MongoFramework
 
 		private void InitialiseDbSets()
 		{
-			dbSets = new List<IMongoDbSet>();
+			DbSets = new List<IMongoDbSet>();
 
 			//Construct the MongoDbSet properties
 			var properties = GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
@@ -55,8 +55,8 @@ namespace MongoFramework
 				if (propertyType.IsGenericType && mongoDbSetType.IsAssignableFrom(propertyType))
 				{
 					var dbSet = Activator.CreateInstance(propertyType) as IMongoDbSet;
-					dbSet.SetDatabase(database);
-					dbSets.Add(dbSet);
+					dbSet.SetDatabase(Database);
+					DbSets.Add(dbSet);
 					property.SetValue(this, dbSet);
 				}
 			}
@@ -64,7 +64,7 @@ namespace MongoFramework
 		
 		public virtual void SaveChanges()
 		{
-			foreach (var dbSet in dbSets)
+			foreach (var dbSet in DbSets)
 			{
 				dbSet.SaveChanges();
 			}
@@ -80,8 +80,8 @@ namespace MongoFramework
 		{
 			if (disposing)
 			{
-				database = null;
-				dbSets = null;
+				Database = null;
+				DbSets = null;
 			}
 		}
 

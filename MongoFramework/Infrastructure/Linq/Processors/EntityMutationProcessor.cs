@@ -1,4 +1,4 @@
-﻿using MongoFramework.Infrastructure.Mutators;
+﻿using MongoFramework.Infrastructure.Mutation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,7 @@ namespace MongoFramework.Infrastructure.Linq.Processors
 	{
 		public void ProcessEntity(TEntity entity)
 		{
-			DbEntityMutator<TEntity>.MutateEntity(entity, DbEntityMutatorType.Select);
+			DbEntityMutation<TEntity>.MutateEntity(entity, MutatorType.Select);
 		}
 	}
 }

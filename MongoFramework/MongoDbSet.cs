@@ -21,8 +21,8 @@ namespace MongoFramework
 	{
 		public IDbChangeTracker<TEntity> ChangeTracker { get; private set; } = new DbChangeTracker<TEntity>();
 
-		private IAsyncDbEntityChangeWriter<TEntity> DbWriter { get; set; }
-		private IDbEntityReader<TEntity> DbReader { get; set; }
+		private IAsyncDbEntityChangeWriter<TEntity> DbEntityWriter { get; set; }
+		private IDbEntityReader<TEntity> DbEntityReader { get; set; }
 
 		/// <summary>
 		/// Whether any entity validation is performed prior to saving changes. (Default is true)
@@ -56,17 +56,6 @@ namespace MongoFramework
 		{
 			SetDatabase(MongoDbUtility.GetDatabase(connectionString, databaseName));
 		}
-
-		/// <summary>
-		/// Creates a new MongoDbSet with the specified entity reader and writer.
-		/// </summary>
-		/// <param name="reader">The reader to use for querying the database.</param>
-		/// <param name="writer">The writer to use for writing to the database.</param>
-		public MongoDbSet(IDbEntityReader<TEntity> reader, IAsyncDbEntityChangeWriter<TEntity> writer)
-		{
-			DbReader = reader;
-			DbWriter = writer;
-		}
 		
 		/// <summary>
 		/// Initialise a new entity reader and writer to the specified database.
@@ -75,8 +64,8 @@ namespace MongoFramework
 		public void SetDatabase(IMongoDatabase database)
 		{
 			var entityMapper = new DbEntityMapper<TEntity>();
-			DbWriter = new AsyncDbEntityWriter<TEntity>(database, entityMapper);
-			DbReader = new DbEntityReader<TEntity>(database, entityMapper);
+			DbEntityWriter = new AsyncDbEntityWriter<TEntity>(database, entityMapper);
+			DbEntityReader = new DbEntityReader<TEntity>(database, entityMapper);
 		}
 
 		/// <summary>
@@ -182,14 +171,14 @@ namespace MongoFramework
 		/// <returns></returns>
 		public virtual void SaveChanges()
 		{
-			if (DbWriter == null)
+			if (DbEntityWriter == null)
 			{
 				throw new InvalidOperationException("No IDbEntityWriter has been set.");
 			}
 
 			ChangeTracker.DetectChanges();
 			CheckEntityValidation();
-			DbWriter.WriteChanges(ChangeTracker);
+			DbEntityWriter.WriteChanges(ChangeTracker);
 		}
 
 		/// <summary>
@@ -198,26 +187,26 @@ namespace MongoFramework
 		/// <returns></returns>
 		public async Task SaveChangesAsync()
 		{
-			if (DbWriter == null)
+			if (DbEntityWriter == null)
 			{
 				throw new InvalidOperationException("No IDbEntityWriter has been set.");
 			}
 
 			ChangeTracker.DetectChanges();
 			CheckEntityValidation();
-			await DbWriter.WriteChangesAsync(ChangeTracker);
+			await DbEntityWriter.WriteChangesAsync(ChangeTracker);
 		}
 
 		#region IQueryable Implementation
 
 		private IQueryable<TEntity> GetQueryable()
 		{
-			if (DbReader == null)
+			if (DbEntityReader == null)
 			{
 				throw new InvalidOperationException("No IDbEntityReader has been set.");
 			}
 
-			var queryable = DbReader.AsQueryable() as IMongoFrameworkQueryable<TEntity, TEntity>;
+			var queryable = DbEntityReader.AsQueryable() as IMongoFrameworkQueryable<TEntity, TEntity>;
 			queryable.EntityProcessors.Add(new EntityTrackingProcessor<TEntity>(ChangeTracker));
 			return queryable;
 		}

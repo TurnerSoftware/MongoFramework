@@ -9,17 +9,16 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using MongoFramework.Infrastructure.Mutators;
 using MongoFramework.Attributes;
 
 namespace MongoFramework.Infrastructure
 {
 	public class DbEntityMapper : IDbEntityMapper
 	{
-		private Type EntityType { get; set; }
+		public Type EntityType { get; private set; }
 		private BsonClassMap ClassMap { get; set; }
-
-		private IEnumerable<BsonClassMap> ClassMapHierarchyCache { get; set; }
+		
+		private IEnumerable<IDbEntityPropertyMap> EntityPropertyMapCache { get; set; }
 
 		public DbEntityMapper(Type entityType)
 		{
@@ -70,11 +69,6 @@ namespace MongoFramework.Infrastructure
 
 		private void ConfigureEntityId()
 		{
-			if (ClassMap.IsFrozen)
-			{
-				return;
-			}
-
 			//If no Id member map exists, find the first property with the "Key" attribute or is named "Id" and use that
 			if (ClassMap.IdMemberMap == null)
 			{
@@ -108,11 +102,6 @@ namespace MongoFramework.Infrastructure
 
 		private void ConfigureMappedProperties()
 		{
-			if (ClassMap.IsFrozen)
-			{
-				return;
-			}
-
 			var properties = EntityType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
 			foreach (var property in properties)
@@ -134,7 +123,7 @@ namespace MongoFramework.Infrastructure
 					memberMap.SetElementName(mappedName);
 				}
 
-				//Map the DeclaredType of any properties where the PropertyType is a class
+				//Maps the property type for handling property nesting
 				if (property.PropertyType.IsClass && property.PropertyType != EntityType)
 				{
 					new DbEntityMapper(property.PropertyType);
@@ -144,11 +133,6 @@ namespace MongoFramework.Infrastructure
 
 		private void ConfigureExtraElements()
 		{
-			if (ClassMap.IsFrozen)
-			{
-				return;
-			}
-
 			//Ignore extra elements when the "IgnoreExtraElementsAttribute" is on the Entity
 			var ignoreExtraElements = EntityType.GetCustomAttribute<IgnoreExtraElementsAttribute>();
 			if (ignoreExtraElements != null)
@@ -172,29 +156,7 @@ namespace MongoFramework.Infrastructure
 				}
 			}
 		}
-
-		private IEnumerable<BsonClassMap> GetClassMapChain()
-		{
-			if (ClassMapHierarchyCache != null)
-			{
-				return ClassMapHierarchyCache;
-			}
-			else
-			{
-				var results = new List<BsonClassMap> { ClassMap };
-				var classMaps = BsonClassMap.GetRegisteredClassMaps();
-				var currentType = EntityType.BaseType;
-				while (currentType != typeof(object))
-				{
-					var currentClassMap = classMaps.Where(c => c.ClassType == currentType).FirstOrDefault();
-					results.Add(currentClassMap);
-					currentType = currentType.BaseType;
-				}
-				ClassMapHierarchyCache = results;
-				return results;
-			}
-		}
-
+		
 		public string GetCollectionName()
 		{
 			var tableAttribute = EntityType.GetCustomAttribute<TableAttribute>();
@@ -217,43 +179,44 @@ namespace MongoFramework.Infrastructure
 
 		public string GetIdName()
 		{
-			var idMemberMap = GetClassMapChain().Where(c => c.IdMemberMap != null).Select(c => c.IdMemberMap).FirstOrDefault();
-			if (idMemberMap != null)
-			{
-				return idMemberMap.MemberName;
-			}
-			return null;
+			return GetEntityMapping().Where(m => m.IsKey).Select(m => m.ElementName).FirstOrDefault();
 		}
 
 		public object GetIdValue(object entity)
 		{
-			var idMemberMap = GetClassMapChain().Where(c => c.IdMemberMap != null).Select(c => c.IdMemberMap).FirstOrDefault();
-			if (idMemberMap != null)
-			{
-				if (idMemberMap.MemberInfo is PropertyInfo propertyInfo)
-				{
-					return propertyInfo.GetValue(entity);
-				}
-			}
-			return null;
+			var idProperty = GetEntityMapping().Where(m => m.IsKey).Select(m => m.Property).FirstOrDefault();
+			return idProperty?.GetValue(entity);
 		}
 
-		public IEnumerable<PropertyInfo> GetMappedProperties()
+		public IEnumerable<IDbEntityPropertyMap> GetEntityMapping()
 		{
-			return GetMappedProperties(true);
+			if (EntityPropertyMapCache != null)
+			{
+				return EntityPropertyMapCache;
+			}
+			else
+			{
+				EntityPropertyMapCache = GetEntityMapping(true);
+				return EntityPropertyMapCache;
+			}
 		}
 
-		public IEnumerable<PropertyInfo> GetMappedProperties(bool includeInherited)
+		public IEnumerable<IDbEntityPropertyMap> GetEntityMapping(bool includeInherited)
 		{
 			if (includeInherited && EntityType.BaseType != typeof(object))
 			{
-				var declaredProperties = GetMappedProperties(false);
-				var inheritedProperties = new DbEntityMapper(EntityType.BaseType).GetMappedProperties();
+				var declaredProperties = GetEntityMapping(false);
+				var inheritedProperties = new DbEntityMapper(EntityType.BaseType).GetEntityMapping();
 				return declaredProperties.Concat(inheritedProperties);
 			}
 			else
 			{
-				return ClassMap.DeclaredMemberMaps.Select(m => m.MemberInfo as PropertyInfo);
+				return ClassMap.DeclaredMemberMaps.Select(m => new EntityPropertyMap
+				{
+					IsKey = m == ClassMap.IdMemberMap,
+					ElementName = m.ElementName,
+					Property = m.MemberInfo as PropertyInfo
+				});
 			}
 		}
 	}

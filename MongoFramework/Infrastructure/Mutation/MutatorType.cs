@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MongoFramework.Infrastructure.Mutators
+namespace MongoFramework.Infrastructure.Mutation
 {
 	[Flags]
-	public enum DbEntityMutatorType
+	public enum MutatorType
 	{
 		Select = 1,
 		Insert = 2,

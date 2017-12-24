@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Infrastructure;
-using MongoFramework.Infrastructure.Mutators;
+using MongoFramework.Infrastructure.Mutation;
+using MongoFramework.Infrastructure.Mutation.Mutators;
 using MongoFramework.Tests.Models;
 using System;
 using System.Collections.Generic;
@@ -11,9 +12,9 @@ using System.Threading.Tasks;
 namespace MongoFramework.Tests.Mutators
 {
 	[TestClass]
-	public class EntityAttributeMutatorTests
+	public class EntityAttributeMutationDriverTests
 	{
-		private IncrementalEntity Mutate(DbEntityMutatorType type, IncrementalEntity entity = null)
+		private IncrementalEntity Mutate(MutatorType type, IncrementalEntity entity = null)
 		{
 			entity = entity ?? new IncrementalEntity();
 			var entityMapper = new DbEntityMapper<IncrementalEntity>();
@@ -26,40 +27,40 @@ namespace MongoFramework.Tests.Mutators
 		[TestMethod]
 		public void OnDefaultInsert()
 		{
-			var entity = Mutate(DbEntityMutatorType.Insert);
+			var entity = Mutate(MutatorType.Insert);
 			Assert.AreEqual(1, entity.ByDefault);
 		}
 
 		[TestMethod]
 		public void OnDefaultUpdate()
 		{
-			var entity = Mutate(DbEntityMutatorType.Update);
+			var entity = Mutate(MutatorType.Update);
 			Assert.AreEqual(1, entity.ByDefault);
 		}
 
 		[TestMethod]
 		public void OnUpdateMultipleTimes()
 		{
-			var entity = Mutate(DbEntityMutatorType.Update);
+			var entity = Mutate(MutatorType.Update);
 			Assert.AreEqual(1, entity.ByDefault);
-			entity = Mutate(DbEntityMutatorType.Update, entity);
+			entity = Mutate(MutatorType.Update, entity);
 			Assert.AreEqual(2, entity.ByDefault);
-			entity = Mutate(DbEntityMutatorType.Update, entity);
+			entity = Mutate(MutatorType.Update, entity);
 			Assert.AreEqual(3, entity.ByDefault);
 		}
 
 		[TestMethod]
 		public void IncrementOnUpdateOnly()
 		{
-			var entity = Mutate(DbEntityMutatorType.Insert);
+			var entity = Mutate(MutatorType.Insert);
 			Assert.AreEqual(0, entity.ByUpdateOnly);
-			entity = Mutate(DbEntityMutatorType.Update);
+			entity = Mutate(MutatorType.Update);
 			Assert.AreEqual(1, entity.ByUpdateOnly);
 		}
 
 		public void IncrementByTen()
 		{
-			var entity = Mutate(DbEntityMutatorType.Insert);
+			var entity = Mutate(MutatorType.Insert);
 			Assert.AreEqual(10, entity.ByTen);
 		}
 	}

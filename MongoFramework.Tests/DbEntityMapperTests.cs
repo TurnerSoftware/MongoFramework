@@ -27,7 +27,7 @@ namespace MongoFramework.Tests
 		public void IdMapsOnName()
 		{
 			var mapper = new DbEntityMapper<CommonEntity>();
-			Assert.AreEqual("Id", mapper.GetIdName());
+			Assert.AreEqual("_id", mapper.GetIdName());
 		}
 
 		[TestMethod]
@@ -41,24 +41,24 @@ namespace MongoFramework.Tests
 		public void PropertyUnmaps()
 		{
 			var mapper = new DbEntityMapper<AttributeEntity>();
-			var mappedProperties = mapper.GetMappedProperties();
-			Assert.IsFalse(mappedProperties.Any(p => p.Name == "MyUnmappedField"));
+			var mappedProperties = mapper.GetEntityMapping();
+			Assert.IsFalse(mappedProperties.Any(p => p.ElementName == "MyUnmappedField"));
 		}
 
 		[TestMethod]
 		public void AccessToInheritedProperty()
 		{
 			var mapper = new DbEntityMapper<ExtendedEntity>();
-			var mappedProperties = mapper.GetMappedProperties();
-			Assert.IsTrue(mappedProperties.Any(p => p.Name == "Id"));
+			var mappedProperties = mapper.GetEntityMapping();
+			Assert.IsTrue(mappedProperties.Any(p => p.ElementName == "_id"));
 		}
 
 		[TestMethod]
 		public void AccessToDeclaredProperty()
 		{
 			var mapper = new DbEntityMapper<ExtendedEntity>();
-			var mappedProperties = mapper.GetMappedProperties();
-			Assert.IsTrue(mappedProperties.Any(p => p.Name == "IsDisabled"));
+			var mappedProperties = mapper.GetEntityMapping();
+			Assert.IsTrue(mappedProperties.Any(p => p.ElementName == "IsDisabled"));
 		}
 	}
 }

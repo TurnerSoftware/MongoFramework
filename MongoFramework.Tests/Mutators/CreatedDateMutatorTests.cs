@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Infrastructure;
-using MongoFramework.Infrastructure.Mutators;
+using MongoFramework.Infrastructure.Mutation;
+using MongoFramework.Infrastructure.Mutation.Mutators;
 using MongoFramework.Tests.Models;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ namespace MongoFramework.Tests.Mutators
 			var entityMapper = new DbEntityMapper<AttributeEntity>();
 			var mutator = new EntityAttributeMutator<AttributeEntity>();
 
-			mutator.MutateEntity(entity, DbEntityMutatorType.Insert, entityMapper);
+			mutator.MutateEntity(entity, MutatorType.Insert, entityMapper);
 
 			Assert.IsTrue(DateTime.MinValue < entity.CreatedDate);
 		}
@@ -32,7 +33,7 @@ namespace MongoFramework.Tests.Mutators
 			var entityMapper = new DbEntityMapper<AttributeEntity>();
 			var mutator = new EntityAttributeMutator<AttributeEntity>();
 
-			mutator.MutateEntity(entity, DbEntityMutatorType.Update, entityMapper);
+			mutator.MutateEntity(entity, MutatorType.Update, entityMapper);
 
 			Assert.AreEqual(DateTime.MinValue, entity.CreatedDate);
 		}
