@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MongoFramework.Infrastructure.Linq.Processors
 {
-	public class EntityTrackingProcessor<TEntity> : IEntityProcessor<TEntity>
+	public class EntityTrackingProcessor<TEntity> : ILinqProcessor<TEntity>
 	{
 		public IDbChangeTracker<TEntity> ChangeTracker { get; private set; }
 

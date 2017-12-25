@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MongoFramework.Infrastructure.Linq.Processors
 {
-	public class EntityMutationProcessor<TEntity> : IEntityProcessor<TEntity>
+	public class EntityMutationProcessor<TEntity> : ILinqProcessor<TEntity>
 	{
 		public void ProcessEntity(TEntity entity)
 		{

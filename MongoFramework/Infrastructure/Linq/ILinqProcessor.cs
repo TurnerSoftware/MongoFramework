@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MongoFramework.Infrastructure.Linq.Processors
+namespace MongoFramework.Infrastructure.Linq
 {
-	public interface IEntityProcessor<TEntity>
+	public interface ILinqProcessor<TEntity>
 	{
 		void ProcessEntity(TEntity entity);
 	}
