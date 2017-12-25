@@ -17,7 +17,7 @@ namespace MongoFramework.Infrastructure.Mutation.Mutators
 			{
 				PropertyInfo = m.Property,
 				MutateAttribute = m.Property.GetCustomAttribute<MutatePropertyAttribute>(true)
-			}).Where(p => p.MutateAttribute != null).ToList();
+			}).Where(p => p.MutateAttribute != null).ToArray();
 
 			foreach (var property in mutateProperties)
 			{

@@ -29,7 +29,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 						ExtraElementsAttribute = p.GetCustomAttribute<ExtraElementsAttribute>()
 					}).Where(p => p.ExtraElementsAttribute != null).FirstOrDefault();
 
-				if (extraElementsProperty != null && typeof(IDictionary<object, object>).IsAssignableFrom(extraElementsProperty.PropertyInfo.PropertyType))
+				if (extraElementsProperty != null && typeof(IDictionary<string, object>).IsAssignableFrom(extraElementsProperty.PropertyInfo.PropertyType))
 				{
 					classMap.SetExtraElementsMember(new BsonMemberMap(classMap, extraElementsProperty.PropertyInfo));
 				}

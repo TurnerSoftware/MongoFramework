@@ -18,7 +18,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 			if (classMap.IdMemberMap == null)
 			{
 				var properties = entityType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-				var idProperty = properties.Where(p => p.GetCustomAttribute<KeyAttribute>() != null || p.Name == "Id").FirstOrDefault();
+				var idProperty = properties.Where(p => p.GetCustomAttribute<KeyAttribute>() != null).FirstOrDefault();
 				if (idProperty != null)
 				{
 					classMap.MapIdMember(idProperty);

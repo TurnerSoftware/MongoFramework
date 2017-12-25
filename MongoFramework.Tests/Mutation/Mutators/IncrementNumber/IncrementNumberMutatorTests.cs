@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MongoFramework.Attributes;
 using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mutation;
@@ -10,10 +11,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MongoFramework.Tests.Mutators
+namespace MongoFramework.Tests.Mutation.Mutators.IncrementNumber
 {
+	public class IncrementalEntity
+	{
+		[IncrementNumber]
+		public int ByDefault { get; set; }
+		[IncrementNumber(true)]
+		public int ByUpdateOnly { get; set; }
+		[IncrementNumber(10)]
+		public int ByTen { get; set; }
+	}
+
 	[TestClass]
-	public class EntityAttributeMutationDriverTests
+	public class IncrementNumberMutatorTests
 	{
 		private IncrementalEntity Mutate(MutatorType type, IncrementalEntity entity = null)
 		{

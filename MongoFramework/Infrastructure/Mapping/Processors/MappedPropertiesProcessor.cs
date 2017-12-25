@@ -29,7 +29,10 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 				{
 					var mappedName = columnAttribute.Name;
 					var memberMap = classMap.GetMemberMap(property.Name);
-					memberMap.SetElementName(mappedName);
+					if (memberMap != null)
+					{
+						memberMap.SetElementName(mappedName);
+					}
 				}
 			}
 		}

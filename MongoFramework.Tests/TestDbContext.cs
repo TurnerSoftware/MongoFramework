@@ -11,8 +11,7 @@ namespace MongoFramework.Tests
 	{
 		public TestDbContext(string connectionName) : base(connectionName) { }
 		public TestDbContext(string connectionString, string databaseName) : base(connectionString, databaseName) { }
-
-		public MongoDbSet<AttributeEntity> AttributeEntities { get; set; }
+		
 		public MongoDbSet<CommonEntity> CommonEntities { get; set; }
 		public MongoDbSet<ExtendedEntity> ExtendEntities { get; set; }
 	}
