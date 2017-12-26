@@ -37,7 +37,15 @@ Unmaps the property from the entity when reading/writing.
 Remaps the property with the specified name when reading/writing.
 
 ### MongoFramework-specific Attributes
-There are additional attributes defined by MongoFramework that allow for more advanced functionality. These include controlling how "extra elements" are handled as well as entity mutation.
+There are additional attributes defined by MongoFramework that allow for more advanced functionality. These include indexing, controlling how "extra elements" are handled as well as entity mutation.
+
+`[Index(IndexSortOrder sortOrder)]` / `[Index(string name, IndexSortOrder sortOrder)]`
+
+Optional Parameters: `bool IsUnique`, `int IndexPriority`
+
+Allows adding indexes to the collection. Can be defined by just the sort direction however has additional options for more advanced use.
+
+To support [compound indexes](https://docs.mongodb.com/manual/core/index-compound/#compound-indexes), define indexes with the same name. To control the order of the indexes in the compound index, use the `IndexPriority` property (lower values are ordered first). 
 
 `[IgnoreExtraElements]` and `[ExtraElements]`
 
