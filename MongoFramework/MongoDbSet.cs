@@ -11,6 +11,7 @@ using MongoFramework.Infrastructure.Linq;
 using MongoFramework.Infrastructure.Linq.Processors;
 using System.Threading.Tasks;
 using MongoFramework.Infrastructure.Mapping;
+using MongoFramework.Infrastructure.Indexing;
 
 namespace MongoFramework
 {
@@ -22,8 +23,9 @@ namespace MongoFramework
 	{
 		public IDbChangeTracker<TEntity> ChangeTracker { get; private set; } = new DbChangeTracker<TEntity>();
 
-		private IAsyncDbEntityChangeWriter<TEntity> DbEntityWriter { get; set; }
-		private IDbEntityReader<TEntity> DbEntityReader { get; set; }
+		private IAsyncDbEntityChangeWriter<TEntity> EntityWriter { get; set; }
+		private IDbEntityReader<TEntity> EntityReader { get; set; }
+		private IEntityIndexWriter<TEntity> EntityIndexWriter { get; set; }
 
 		/// <summary>
 		/// Whether any entity validation is performed prior to saving changes. (Default is true)
@@ -65,8 +67,8 @@ namespace MongoFramework
 		public void SetDatabase(IMongoDatabase database)
 		{
 			var entityMapper = new EntityMapper<TEntity>();
-			DbEntityWriter = new AsyncDbEntityWriter<TEntity>(database, entityMapper);
-			DbEntityReader = new DbEntityReader<TEntity>(database, entityMapper);
+			EntityWriter = new AsyncDbEntityWriter<TEntity>(database, entityMapper);
+			EntityReader = new DbEntityReader<TEntity>(database, entityMapper);
 		}
 
 		/// <summary>
@@ -172,14 +174,10 @@ namespace MongoFramework
 		/// <returns></returns>
 		public virtual void SaveChanges()
 		{
-			if (DbEntityWriter == null)
-			{
-				throw new InvalidOperationException("No IDbEntityWriter has been set.");
-			}
-
+			EntityIndexWriter.ApplyIndexing();
 			ChangeTracker.DetectChanges();
 			CheckEntityValidation();
-			DbEntityWriter.WriteChanges(ChangeTracker);
+			EntityWriter.WriteChanges(ChangeTracker);
 		}
 
 		/// <summary>
@@ -188,26 +186,22 @@ namespace MongoFramework
 		/// <returns></returns>
 		public async Task SaveChangesAsync()
 		{
-			if (DbEntityWriter == null)
-			{
-				throw new InvalidOperationException("No IDbEntityWriter has been set.");
-			}
-
+			await EntityIndexWriter.ApplyIndexingAsync();
 			ChangeTracker.DetectChanges();
 			CheckEntityValidation();
-			await DbEntityWriter.WriteChangesAsync(ChangeTracker);
+			await EntityWriter.WriteChangesAsync(ChangeTracker);
 		}
 
 		#region IQueryable Implementation
 
 		private IQueryable<TEntity> GetQueryable()
 		{
-			if (DbEntityReader == null)
+			if (EntityReader == null)
 			{
 				throw new InvalidOperationException("No IDbEntityReader has been set.");
 			}
 
-			var queryable = DbEntityReader.AsQueryable() as IMongoFrameworkQueryable<TEntity, TEntity>;
+			var queryable = EntityReader.AsQueryable() as IMongoFrameworkQueryable<TEntity, TEntity>;
 			queryable.EntityProcessors.Add(new EntityTrackingProcessor<TEntity>(ChangeTracker));
 			return queryable;
 		}

@@ -86,12 +86,12 @@ namespace MongoFramework.Infrastructure.Mapping
 			return GetEntityMapping(true);
 		}
 
-		public IEnumerable<IEntityPropertyMap> GetEntityMapping(bool includeInherited)
+		private IEnumerable<IEntityPropertyMap> GetEntityMapping(bool includeInherited)
 		{
 			if (includeInherited && EntityType.BaseType != typeof(object))
 			{
 				var declaredProperties = GetEntityMapping(false);
-				var inheritedProperties = new EntityMapper(EntityType.BaseType).GetEntityMapping();
+				var inheritedProperties = new EntityMapper(EntityType.BaseType).GetEntityMapping(true);
 				return declaredProperties.Concat(inheritedProperties);
 			}
 			else
@@ -100,12 +100,64 @@ namespace MongoFramework.Infrastructure.Mapping
 				{
 					return ClassMap.DeclaredMemberMaps.Select(m => new EntityPropertyMap
 					{
+						EntityType = t,
 						IsKey = m == ClassMap.IdMemberMap,
 						ElementName = m.ElementName,
+						FullPath = m.ElementName,
+						PropertyType = (m.MemberInfo as PropertyInfo).PropertyType,
 						Property = m.MemberInfo as PropertyInfo
 					});
 				});
 			}
+		}
+
+		public IEnumerable<IEntityPropertyMap> TraverseMapping()
+		{
+			var stack = new Stack<TraversalState>();
+			stack.Push(new TraversalState
+			{
+				TypeHierarchy = new HashSet<Type> { EntityType },
+				CurrentMap = GetEntityMapping()
+			});
+
+			while (stack.Count > 0)
+			{
+				var state = stack.Pop();
+				foreach (var map in state.CurrentMap)
+				{
+					yield return map;
+
+					if (map.PropertyType.IsClass && !state.TypeHierarchy.Contains(map.PropertyType))
+					{
+						var nestedMapping = new EntityMapper(map.PropertyType)
+							.GetEntityMapping()
+							.Select(m => new EntityPropertyMap
+							{
+								EntityType = m.EntityType,
+								IsKey = m.IsKey,
+								ElementName = m.ElementName,
+								FullPath = $"{map.FullPath}.{m.ElementName}",
+								PropertyType = m.PropertyType,
+								Property = m.Property
+							});
+						
+						stack.Push(new TraversalState
+						{
+							TypeHierarchy = new HashSet<Type>(state.TypeHierarchy)
+							{
+								map.PropertyType
+							},
+							CurrentMap = nestedMapping
+						});
+					}
+				}
+			}
+		}
+
+		private class TraversalState
+		{
+			public HashSet<Type> TypeHierarchy { get; set; }
+			public IEnumerable<IEntityPropertyMap> CurrentMap { get; set; }
 		}
 	}
 

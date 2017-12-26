@@ -25,25 +25,12 @@ namespace MongoFramework.Tests
 
 			return DatabaseName;
 		}
-		
-		public static TestDbContext GetContext()
-		{
-			return new TestDbContext(ConnectionString, GetDatabaseName());
-		}
 
 		public static IMongoDatabase GetDatabase()
 		{
 			var client = new MongoClient(ConnectionString);
 			var database = client.GetDatabase(GetDatabaseName());
 			return database;
-		}
-
-		public static MongoDbSet<TEntity> GetDbSet<TEntity>()
-		{
-			var dbSet = new MongoDbSet<TEntity>();
-			var database = GetDatabase();
-			dbSet.SetDatabase(database);
-			return dbSet;
 		}
 	}
 }

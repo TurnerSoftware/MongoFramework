@@ -15,5 +15,6 @@ namespace MongoFramework.Infrastructure.Mapping
 		object GetIdValue(object entity);
 		string GetCollectionName();
 		IEnumerable<IEntityPropertyMap> GetEntityMapping();
+		IEnumerable<IEntityPropertyMap> TraverseMapping();
 	}
 }

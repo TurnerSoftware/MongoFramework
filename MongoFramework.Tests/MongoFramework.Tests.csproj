@@ -63,6 +63,8 @@
   <ItemGroup>
     <Compile Include="BsonDiffTests.cs" />
     <Compile Include="AsyncDbEntityWriterTests.cs" />
+    <Compile Include="Indexing\EntityIndexWriterTests.cs" />
+    <Compile Include="Indexing\Processors\BasicIndex\BasicIndexProcessorTests.cs" />
     <Compile Include="Mapping\Processors\EntityId\EntityIdProcessorTests.cs" />
     <Compile Include="Mapping\Processors\ExtraElements\ExtraElementsProcessorTests.cs" />
     <Compile Include="Mapping\Processors\Hierarchy\HierarchyProcessorTests.cs" />
@@ -78,7 +80,6 @@
     <Compile Include="Mutation\Mutators\CreatedDate\CreatedDateMutatorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestConfiguration.cs" />
-    <Compile Include="TestDbContext.cs" />
     <Compile Include="TestSetup.cs" />
     <Compile Include="DbEntityWriterTests.cs" />
     <Compile Include="DbChangeTrackerTests.cs" />
