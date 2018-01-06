@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
+using System.Threading;
 
 namespace MongoFramework.Infrastructure.Mapping
 {
@@ -16,8 +17,10 @@ namespace MongoFramework.Infrastructure.Mapping
 	{
 		public Type EntityType { get; private set; }
 		private BsonClassMap ClassMap { get; set; }
-		
+
+		private static ReaderWriterLockSlim MappingLock { get; set; } = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 		private static ConcurrentDictionary<Type, IEnumerable<IEntityPropertyMap>> EntityMapCache { get; set; }
+
 
 		static EntityMapper()
 		{
@@ -32,21 +35,37 @@ namespace MongoFramework.Infrastructure.Mapping
 
 		private void InitialiseClassMap()
 		{
-			//For reasons unknown to me, you can't just call "BsonClassMap.LookupClassMap" as that "freezes" the class map
-			//Instead, you must do the lookup and initial creation yourself.
-			var classMaps = BsonClassMap.GetRegisteredClassMaps();
-			ClassMap = classMaps.Where(cm => cm.ClassType == EntityType).FirstOrDefault() as BsonClassMap;
-
-			if (ClassMap == null)
+			MappingLock.EnterUpgradeableReadLock();
+			try
 			{
-				ClassMap = new BsonClassMap(EntityType);
-				ClassMap.AutoMap();
-				BsonClassMap.RegisterClassMap(ClassMap);
+				//For reasons unknown to me, you can't just call "BsonClassMap.LookupClassMap" as that "freezes" the class map
+				//Instead, you must do the lookup and initial creation yourself.
+				var classMaps = BsonClassMap.GetRegisteredClassMaps();
+				ClassMap = classMaps.Where(cm => cm.ClassType == EntityType).FirstOrDefault() as BsonClassMap;
 
-				foreach (var processor in DefaultMappingPack.Instance.Processors)
+				if (ClassMap == null)
 				{
-					processor.ApplyMapping(EntityType, ClassMap);
+					MappingLock.EnterWriteLock();
+					try
+					{
+						ClassMap = new BsonClassMap(EntityType);
+						ClassMap.AutoMap();
+						BsonClassMap.RegisterClassMap(ClassMap);
+
+						foreach (var processor in DefaultMappingPack.Instance.Processors)
+						{
+							processor.ApplyMapping(EntityType, ClassMap);
+						}
+					}
+					finally
+					{
+						MappingLock.ExitWriteLock();
+					}
 				}
+			}
+			finally
+			{
+				MappingLock.ExitUpgradeableReadLock();
 			}
 		}
 

@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using MongoFramework.Infrastructure.Mapping;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Threading.Tasks;
 
 namespace MongoFramework.Tests
 {
@@ -39,6 +40,11 @@ namespace MongoFramework.Tests
 	{
 		public string InnerMostProperty { get; set; }
 		public TraverseMappingModel NestedRecursionType { get; set; }
+	}
+
+	public class MappingLockModel
+	{
+		public string Id { get; set; }
 	}
 
 	[TestClass]
@@ -87,6 +93,24 @@ namespace MongoFramework.Tests
 			Assert.IsTrue(result.Any(m => m.FullPath == "RepeatedType.InnerModel"));
 			Assert.IsTrue(result.Any(m => m.FullPath == "RepeatedType.InnerModel.InnerMostProperty"));
 			Assert.IsTrue(result.Any(m => m.FullPath == "RepeatedType.InnerModel.NestedRecursionType"));
+		}
+
+		/// <summary>
+		/// A potentially common issue for web application startup, this tests that multiple threads
+		/// can map a class at the same time without concurrency issues.
+		/// 
+		/// Relates to: https://github.com/TurnerSoftware/MongoFramework/issues/7
+		/// </summary>
+		[TestMethod]
+		public void MappingLocks()
+		{
+			AssertExtensions.DoesNotThrow<Exception>(() =>
+			{
+				Parallel.For(1, 10, i =>
+				{
+					new EntityMapper<MappingLockModel>();
+				});
+			});
 		}
 	}
 }

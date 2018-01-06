@@ -61,6 +61,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssertExtensions.cs" />
     <Compile Include="BsonDiffTests.cs" />
     <Compile Include="AsyncDbEntityWriterTests.cs" />
     <Compile Include="Indexing\EntityIndexWriterTests.cs" />
