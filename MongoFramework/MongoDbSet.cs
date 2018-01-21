@@ -69,6 +69,11 @@ namespace MongoFramework
 			var entityMapper = new EntityMapper<TEntity>();
 			EntityWriter = new AsyncDbEntityWriter<TEntity>(database, entityMapper);
 			EntityReader = new DbEntityReader<TEntity>(database, entityMapper);
+
+			//TODO: Look at this again in the future, this seems unnecessarily complex
+			var indexMapper = new EntityIndexMapper<TEntity>(entityMapper);
+			var collection = database.GetCollection<TEntity>(entityMapper.GetCollectionName());
+			EntityIndexWriter = new EntityIndexWriter<TEntity>(collection, indexMapper);
 		}
 
 		/// <summary>
