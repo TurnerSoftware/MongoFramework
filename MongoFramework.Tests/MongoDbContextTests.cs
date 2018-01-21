@@ -22,6 +22,7 @@ namespace MongoFramework.Tests
 	[TestClass]
 	public class MongoDbContextTests
 	{
+		[TestMethod]
 		public void ContextCreatesDbSets()
 		{
 			var connectionString = TestConfiguration.ConnectionString;
@@ -32,6 +33,7 @@ namespace MongoFramework.Tests
 			}
 		}
 
+		[TestMethod]
 		public void ContextSavesDbSets()
 		{
 			var connectionString = TestConfiguration.ConnectionString;
