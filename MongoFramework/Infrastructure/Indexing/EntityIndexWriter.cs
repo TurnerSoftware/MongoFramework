@@ -27,17 +27,23 @@ namespace MongoFramework.Infrastructure.Indexing
 			var processors = DefaultIndexingPack.Instance.Processors;
 			return processors.SelectMany(d => d.BuildIndexModel<TEntity>(indexMapping));
 		}
-		
+
 		public void ApplyIndexing()
 		{
 			var indexModel = GenerateIndexModel();
-			Collection.Indexes.CreateMany(indexModel);
+			if (indexModel.Any())
+			{
+				Collection.Indexes.CreateMany(indexModel);
+			}
 		}
-		
+
 		public async Task ApplyIndexingAsync()
 		{
 			var indexModel = GenerateIndexModel();
-			await Collection.Indexes.CreateManyAsync(indexModel);
+			if (indexModel.Any())
+			{
+				await Collection.Indexes.CreateManyAsync(indexModel);
+			}
 		}
 	}
 }

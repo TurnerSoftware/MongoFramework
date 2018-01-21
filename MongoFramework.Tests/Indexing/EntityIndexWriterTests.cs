@@ -22,6 +22,11 @@ namespace MongoFramework.Tests.Indexing
 			public string IndexedPropertyTwo { get; set; }
 		}
 
+		public class NoIndexModel
+		{
+			public string Id { get; set; }
+		}
+
 		[TestMethod]
 		public void WriteIndexSync()
 		{
@@ -48,6 +53,28 @@ namespace MongoFramework.Tests.Indexing
 
 			var dbIndexes = await collection.Indexes.List().ToListAsync();
 			Assert.AreEqual(3, dbIndexes.Count);
+		}
+
+		[TestMethod]
+		public void NoIndexSync()
+		{
+			var database = TestConfiguration.GetDatabase();
+			var collection = database.GetCollection<NoIndexModel>("EntityIndexWriterTests.NoIndexModelSync");
+			var indexMapper = new EntityIndexMapper<NoIndexModel>();
+			var indexWriter = new EntityIndexWriter<NoIndexModel>(collection, indexMapper);
+			
+			AssertExtensions.DoesNotThrow<Exception>(() => indexWriter.ApplyIndexing());
+		}
+
+		[TestMethod]
+		public async Task NoIndexAsync()
+		{
+			var database = TestConfiguration.GetDatabase();
+			var collection = database.GetCollection<NoIndexModel>("EntityIndexWriterTests.NoIndexModelAsync");
+			var indexMapper = new EntityIndexMapper<NoIndexModel>();
+			var indexWriter = new EntityIndexWriter<NoIndexModel>(collection, indexMapper);
+
+			await AssertExtensions.DoesNotThrowAsync<Exception>(async () => await indexWriter.ApplyIndexingAsync());
 		}
 	}
 }
