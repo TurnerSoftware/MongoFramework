@@ -178,6 +178,40 @@ namespace MongoFramework.Tests
 		}
 
 		[TestMethod]
+		public void UpdatedRangeViaChangeTracker()
+		{
+			var database = TestConfiguration.GetDatabase();
+			var writer = new DbEntityWriter<EntityWriterModel>(database);
+			var reader = new DbEntityReader<EntityWriterModel>(database);
+			var changeTracker = new DbChangeTracker<EntityWriterModel>();
+
+			var entities = new[] {
+				new EntityWriterModel
+				{
+					Title = "DbEntityWriterTests.UpdatedRangeViaChangeTracker"
+				},
+				new EntityWriterModel
+				{
+					Title = "DbEntityWriterTests.UpdatedRangeViaChangeTracker"
+				},
+				new EntityWriterModel
+				{
+					Title = "DbEntityWriterTests.UpdatedRangeViaChangeTracker"
+				}
+			};
+			changeTracker.UpdateRange(entities, DbEntityEntryState.Added);
+
+			writer.WriteChanges(changeTracker);
+
+			entities[0].Title = "DbEntityWriterTests.UpdatedRangeViaChangeTracker-Updated";
+			changeTracker.DetectChanges();
+
+			writer.WriteChanges(changeTracker);
+
+			Assert.IsTrue(reader.AsQueryable().Any(e => e.Title == "DbEntityWriterTests.UpdatedRangeViaChangeTracker-Updated"));
+		}
+
+		[TestMethod]
 		public void RemovedViaChangeTracker()
 		{
 			var database = TestConfiguration.GetDatabase();
@@ -199,6 +233,41 @@ namespace MongoFramework.Tests
 			writer.WriteChanges(changeTracker);
 			
 			Assert.IsFalse(reader.AsQueryable().Any(e => e.Id == entity.Id));
+		}
+
+		[TestMethod]
+		public void RemovedRangeViaChangeTracker()
+		{
+			var database = TestConfiguration.GetDatabase();
+			var writer = new DbEntityWriter<EntityWriterModel>(database);
+			var reader = new DbEntityReader<EntityWriterModel>(database);
+			var changeTracker = new DbChangeTracker<EntityWriterModel>();
+
+			var entities = new[] {
+				new EntityWriterModel
+				{
+					Title = "DbEntityWriterTests.RemovedRangeViaChangeTracker"
+				},
+				new EntityWriterModel
+				{
+					Title = "DbEntityWriterTests.RemovedRangeViaChangeTracker"
+				},
+				new EntityWriterModel
+				{
+					Title = "DbEntityWriterTests.RemovedRangeViaChangeTracker"
+				}
+			};
+			changeTracker.UpdateRange(entities, DbEntityEntryState.Added);
+
+			writer.WriteChanges(changeTracker);
+
+			changeTracker.UpdateRange(entities, DbEntityEntryState.Deleted);
+			changeTracker.DetectChanges();
+
+			writer.WriteChanges(changeTracker);
+
+			var addedEntityIds = entities.Select(e => e.Id);
+			Assert.IsFalse(reader.AsQueryable().Any(e => addedEntityIds.Contains(e.Id)));
 		}
 	}
 }
