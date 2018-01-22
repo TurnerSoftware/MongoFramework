@@ -6,6 +6,16 @@ using System.Linq;
 
 namespace MongoFramework.Tests
 {
+	public class EntityWriterModel
+	{
+		public string Id { get; set; }
+		public string Title { get; set; }
+	}
+	public class ExtendedEntityWriterModel : EntityWriterModel
+	{
+		public string AdditionalField { get; set; }
+	}
+
 	[TestClass]
 	public class DbEntityWriterTests
 	{
@@ -13,10 +23,10 @@ namespace MongoFramework.Tests
 		public void AddEntity()
 		{
 			var database = TestConfiguration.GetDatabase();
-			var writer = new DbEntityWriter<CommonEntity>(database);
-			var entity = new CommonEntity
+			var writer = new DbEntityWriter<EntityWriterModel>(database);
+			var entity = new EntityWriterModel
 			{
-				Description = "DbEntityWriterTests.AddEntity"
+				Title = "DbEntityWriterTests.AddEntity"
 			};
 
 			writer.Add(entity);
@@ -28,19 +38,19 @@ namespace MongoFramework.Tests
 		public void AddEntities()
 		{
 			var database = TestConfiguration.GetDatabase();
-			var writer = new DbEntityWriter<CommonEntity>(database);
+			var writer = new DbEntityWriter<EntityWriterModel>(database);
 			var entities = new[] {
-				new CommonEntity
+				new EntityWriterModel
 				{
-					Description = "DbEntityWriterTests.AddEntities"
+					Title = "DbEntityWriterTests.AddEntities"
 				},
-				new CommonEntity
+				new EntityWriterModel
 				{
-					Description = "DbEntityWriterTests.AddEntities"
+					Title = "DbEntityWriterTests.AddEntities"
 				},
-				new CommonEntity
+				new EntityWriterModel
 				{
-					Description = "DbEntityWriterTests.AddEntities"
+					Title = "DbEntityWriterTests.AddEntities"
 				}
 			};
 
@@ -53,70 +63,142 @@ namespace MongoFramework.Tests
 		public void AddMixedEntities()
 		{
 			var database = TestConfiguration.GetDatabase();
-			var writer = new DbEntityWriter<CommonEntity>(database);
+			var writer = new DbEntityWriter<EntityWriterModel>(database);
 			var entities = new[]
 			{
-				new CommonEntity
+				new EntityWriterModel
 				{
-					Description = "DbEntityWriterTests.AddMixedEntities"
+					Title = "DbEntityWriterTests.AddMixedEntities"
 				},
-				new ExtendedEntity
+				new ExtendedEntityWriterModel
 				{
-					IsDisabled = true,
-					Description = "DbEntityWriterTests.AddMixedEntities"
+					Title = "DbEntityWriterTests.AddMixedEntities",
+					AdditionalField = "AdditionalFieldSet"
 				}
 			};
 
 			writer.AddRange(entities);
 
-			Assert.IsTrue(entities.All(e => e.Id != null));
+			Assert.IsTrue(entities.OfType<EntityWriterModel>().Any(e => e.Title == "DbEntityWriterTests.AddMixedEntities"));
+			Assert.IsTrue(entities.OfType<ExtendedEntityWriterModel>().Any(e => e.AdditionalField == "AdditionalFieldSet"));
 		}
 
 		[TestMethod]
 		public void UpdateEntity()
 		{
 			var database = TestConfiguration.GetDatabase();
-			var writer = new DbEntityWriter<CommonEntity>(database);
-			var reader = new DbEntityReader<CommonEntity>(database);
+			var writer = new DbEntityWriter<EntityWriterModel>(database);
+			var reader = new DbEntityReader<EntityWriterModel>(database);
 
 			//Get entity initially into the DB so we can update it
-			var entity = new CommonEntity
+			var entity = new EntityWriterModel
 			{
-				Description = "DbEntityWriterTests.UpdateEntity"
+				Title = "DbEntityWriterTests.UpdateEntity"
 			};
 			writer.Add(entity);
 
 			//Our updated entity with the same ID
-			var updatedEntity = new CommonEntity
+			var updatedEntity = new EntityWriterModel
 			{
 				Id = entity.Id,
-				Description = "DbEntityWriterTests.UpdateEntity-Updated"
+				Title = "DbEntityWriterTests.UpdateEntity-Updated"
 			};
 			writer.Update(updatedEntity);
 
 			var dbEntity = reader.AsQueryable().Where(e => e.Id == entity.Id).FirstOrDefault();
-			Assert.AreEqual("DbEntityWriterTests.UpdateEntity-Updated", dbEntity.Description);
+			Assert.AreEqual("DbEntityWriterTests.UpdateEntity-Updated", dbEntity.Title);
 		}
 
 		[TestMethod]
 		public void RemoveEntity()
 		{
 			var database = TestConfiguration.GetDatabase();
-			var writer = new DbEntityWriter<CommonEntity>(database);
-			var reader = new DbEntityReader<CommonEntity>(database);
+			var writer = new DbEntityWriter<EntityWriterModel>(database);
+			var reader = new DbEntityReader<EntityWriterModel>(database);
 
 			//Get entity initially into the DB so we can remove it
-			var entity = new CommonEntity
+			var entity = new EntityWriterModel
 			{
-				Description = "DbEntityWriterTests.RemoveEntity"
+				Title = "DbEntityWriterTests.RemoveEntity"
 			};
 			writer.Add(entity);
 
 			//Remove the entity
 			writer.Remove(entity);
+			
+			Assert.IsFalse(reader.AsQueryable().Any(e => e.Id == entity.Id));
+		}
 
+		[TestMethod]
+		public void AddViaChangeTracker()
+		{
+			var database = TestConfiguration.GetDatabase();
+			var writer = new DbEntityWriter<EntityWriterModel>(database);
+			var reader = new DbEntityReader<EntityWriterModel>(database);
+			var changeTracker = new DbChangeTracker<EntityWriterModel>();
+
+			var entity = new EntityWriterModel
+			{
+				Title = "DbEntityWriterTests.AddViaChangeTracker"
+			};
+			changeTracker.Update(entity, DbEntityEntryState.Added);
+
+			writer.WriteChanges(changeTracker);
+			
+			Assert.IsTrue(reader.AsQueryable().Any(e => e.Id == entity.Id));
+			Assert.AreEqual(DbEntityEntryState.NoChanges, changeTracker.GetEntry(entity).State);
+		}
+		
+		[TestMethod]
+		public void UpdatedViaChangeTracker()
+		{
+			var database = TestConfiguration.GetDatabase();
+			var writer = new DbEntityWriter<EntityWriterModel>(database);
+			var reader = new DbEntityReader<EntityWriterModel>(database);
+			var changeTracker = new DbChangeTracker<EntityWriterModel>();
+			
+			var entity = new EntityWriterModel
+			{
+				Title = "DbEntityWriterTests.UpdatedViaChangeTracker"
+			};
+			changeTracker.Update(entity, DbEntityEntryState.Added);
+
+			writer.WriteChanges(changeTracker);
+
+			entity.Title = "DbEntityWriterTests.UpdatedViaChangeTracker-Updated";
+			changeTracker.DetectChanges();
+
+			Assert.AreEqual(DbEntityEntryState.Updated, changeTracker.GetEntry(entity).State);
+
+			writer.WriteChanges(changeTracker);
+			
 			var dbEntity = reader.AsQueryable().Where(e => e.Id == entity.Id).FirstOrDefault();
-			Assert.IsNull(dbEntity);
+			Assert.AreEqual("DbEntityWriterTests.UpdatedViaChangeTracker-Updated", dbEntity.Title);
+			Assert.AreEqual(DbEntityEntryState.NoChanges, changeTracker.GetEntry(entity).State);
+		}
+
+		[TestMethod]
+		public void RemovedViaChangeTracker()
+		{
+			var database = TestConfiguration.GetDatabase();
+			var writer = new DbEntityWriter<EntityWriterModel>(database);
+			var reader = new DbEntityReader<EntityWriterModel>(database);
+			var changeTracker = new DbChangeTracker<EntityWriterModel>();
+
+			var entity = new EntityWriterModel
+			{
+				Title = "DbEntityWriterTests.UpdatedViaChangeTracker"
+			};
+			changeTracker.Update(entity, DbEntityEntryState.Added);
+
+			writer.WriteChanges(changeTracker);
+
+			changeTracker.Update(entity, DbEntityEntryState.Deleted);
+			changeTracker.DetectChanges();
+
+			writer.WriteChanges(changeTracker);
+			
+			Assert.IsFalse(reader.AsQueryable().Any(e => e.Id == entity.Id));
 		}
 	}
 }
