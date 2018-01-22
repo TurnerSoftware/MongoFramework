@@ -18,10 +18,17 @@ namespace MongoFramework.Infrastructure
 
 			foreach (var entry in Entries)
 			{
-				var entryEntityId = entityMapper.GetIdValue(entry.Entity);
-				if (entryEntityId.Equals(entityId))
+				if (entityId == null && entry.Entity.Equals(entity))
 				{
 					return entry;
+				}
+				else
+				{
+					var entryEntityId = entityMapper.GetIdValue(entry.Entity);
+					if (entryEntityId != null && entryEntityId.Equals(entityId))
+					{
+						return entry;
+					}
 				}
 			}
 
