@@ -103,6 +103,25 @@ namespace MongoFramework.Tests.Bson
 			Assert.IsTrue(BsonDiff.HasDifferences(documentA, documentB));
 			Assert.IsTrue(BsonDiff.HasDifferences(documentB, documentA));
 		}
+		
+		[TestMethod]
+		public void DocumentHasSamePropertyCountButDifferentNames()
+		{
+			var documentA = new BsonDocument(new Dictionary<string, object>
+			{
+				{ "Age", 20 },
+				{ "Name", "Peter" }
+			});
+
+			var documentB = new BsonDocument(new Dictionary<string, object>
+			{
+				{ "YearsOld", 20 },
+				{ "Name", "Peter" }
+			});
+
+			Assert.IsTrue(BsonDiff.HasDifferences(documentA, documentB));
+			Assert.IsTrue(BsonDiff.HasDifferences(documentB, documentA));
+		}
 
 		[TestMethod]
 		public void NullArray()
@@ -152,6 +171,71 @@ namespace MongoFramework.Tests.Bson
 
 			Assert.IsTrue(BsonDiff.HasDifferences(arrayA, arrayB));
 			Assert.IsTrue(BsonDiff.HasDifferences(arrayB, arrayA));
+		}
+
+		[TestMethod]
+		public void NullValue()
+		{
+			var valueA = (BsonValue)new BsonDocument(new Dictionary<string, object>
+			{
+				{ "Age", 20 },
+				{ "Name", "Peter" },
+				{ "RegisteredDate", new DateTime(2017, 10, 1) },
+				{ "IsActive", true }
+			});
+
+			Assert.IsTrue(BsonDiff.HasDifferences(valueA, null));
+			Assert.IsTrue(BsonDiff.HasDifferences(null, valueA));
+			Assert.IsFalse(BsonDiff.HasDifferences((BsonValue)null, null));
+		}
+
+		[TestMethod]
+		public void MismatchedValueType()
+		{
+			var valueA = (BsonValue)new BsonDocument(new Dictionary<string, object>
+			{
+				{ "Age", 20 },
+				{ "Name", "Peter" },
+				{ "RegisteredDate", new DateTime(2017, 10, 1) },
+				{ "IsActive", true }
+			});
+			var valueB = BsonValue.Create(123);
+
+			Assert.IsTrue(BsonDiff.HasDifferences(valueA, valueB));
+			Assert.IsTrue(BsonDiff.HasDifferences(valueB, valueA));
+		}
+
+		[TestMethod]
+		public void DocumentBsonValue()
+		{
+			var documentA = new BsonDocument(new Dictionary<string, object>
+			{
+				{ "Age", 20 },
+				{ "Name", "Peter" },
+				{ "RegisteredDate", new DateTime(2017, 10, 1) },
+				{ "IsActive", true }
+			});
+
+			var documentB = new BsonDocument(new Dictionary<string, object>
+			{
+				{ "Age", 20 },
+				{ "Name", "Peter" },
+				{ "RegisteredDate", new DateTime(2017, 10, 1) },
+				{ "IsActive", true }
+			});
+
+			Assert.IsFalse(BsonDiff.HasDifferences((BsonValue)documentA, documentB));
+			Assert.IsFalse(BsonDiff.HasDifferences((BsonValue)documentB, documentA));
+		}
+
+		[TestMethod]
+		public void ArrayBsonValue()
+		{
+			var arrayA = new BsonArray(Enumerable.Range(1, 5));
+			var arrayB = new BsonArray(Enumerable.Range(1, 5));
+
+			Assert.IsFalse(BsonDiff.HasDifferences((BsonValue)arrayA, arrayB));
+			Assert.IsFalse(BsonDiff.HasDifferences((BsonValue)arrayB, arrayA));
 		}
 	}
 }
