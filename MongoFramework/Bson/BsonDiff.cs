@@ -46,7 +46,11 @@ namespace MongoFramework.Bson
 		}
 		public static bool HasDifferences(BsonValue valueA, BsonValue valueB)
 		{
-			if (valueA != valueB || valueA.BsonType != valueB.BsonType)
+			if (valueA == null && valueB == null)
+			{
+				return false;
+			}
+			else if (valueA != valueB || valueA.BsonType != valueB.BsonType)
 			{
 				return true;
 			}
@@ -65,7 +69,11 @@ namespace MongoFramework.Bson
 		}
 		public static bool HasDifferences(BsonArray arrayA, BsonArray arrayB)
 		{
-			if (arrayA.Count != arrayB.Count)
+			if (arrayA == null && arrayB == null)
+			{
+				return false;
+			}
+			else if (arrayA == null || arrayB == null || arrayA.Count != arrayB.Count)
 			{
 				return true;
 			}
