@@ -13,6 +13,7 @@ namespace MongoFramework.Infrastructure.Mapping
 		{
 			Processors = new List<IMappingProcessor>
 			{
+				new HierarchyProcessor(),
 				new EntityIdProcessor(),
 				new MappedPropertiesProcessor(),
 				new NestedPropertyProcessor(),
