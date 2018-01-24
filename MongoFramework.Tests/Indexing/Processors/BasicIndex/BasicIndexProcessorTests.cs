@@ -1,39 +1,30 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using MongoDB.Driver;
+﻿using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Attributes;
-using MongoFramework.Bson;
 using MongoFramework.Infrastructure.Indexing;
 using MongoFramework.Infrastructure.Indexing.Processors;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MongoFramework.Tests.Indexing.Processors.BasicIndex
 {
 	public class IndexNamingModel
 	{
-		[Index(IndexSortOrder.Ascending)]
-		public string NoNameIndex { get; set; }
+		[Index(IndexSortOrder.Ascending)] public string NoNameIndex { get; set; }
+
 		[Index("MyCustomIndexName", IndexSortOrder.Ascending)]
 		public string NamedIndex { get; set; }
 	}
 
 	public class IndexSortOrderModel
 	{
-		[Index(IndexSortOrder.Ascending)]
-		public string AscendingIndex { get; set; }
-		[Index(IndexSortOrder.Descending)]
-		public string DescendingIndex { get; set; }
+		[Index(IndexSortOrder.Ascending)] public string AscendingIndex { get; set; }
+		[Index(IndexSortOrder.Descending)] public string DescendingIndex { get; set; }
 	}
 
 	public class UniqueConstraintModel
 	{
 		[Index("UniqueIndex", IndexSortOrder.Ascending, IsUnique = true)]
 		public string UniqueIndex { get; set; }
+
 		[Index("NonUniqueIndex", IndexSortOrder.Ascending, IsUnique = false)]
 		public string NotUniqueIndex { get; set; }
 	}
@@ -42,8 +33,10 @@ namespace MongoFramework.Tests.Indexing.Processors.BasicIndex
 	{
 		[Index("MyCompoundIndex", IndexSortOrder.Ascending, IndexPriority = 1)]
 		public string FirstPriority { get; set; }
+
 		[Index("MyCompoundIndex", IndexSortOrder.Ascending, IndexPriority = 3)]
 		public string ThirdPriority { get; set; }
+
 		[Index("MyCompoundIndex", IndexSortOrder.Ascending, IndexPriority = 2)]
 		public string SecondPriority { get; set; }
 	}
@@ -52,6 +45,7 @@ namespace MongoFramework.Tests.Indexing.Processors.BasicIndex
 	{
 		[Index("MyCompoundIndex", IndexSortOrder.Ascending, IndexPriority = 2)]
 		public string SecondPriority { get; set; }
+
 		public NestedIndexChildModel ChildModel { get; set; }
 	}
 

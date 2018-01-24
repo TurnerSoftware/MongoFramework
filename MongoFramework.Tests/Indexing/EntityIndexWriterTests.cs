@@ -1,12 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Driver;
 using MongoFramework.Attributes;
 using MongoFramework.Infrastructure.Indexing;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MongoFramework.Tests.Indexing
 {
@@ -16,8 +13,8 @@ namespace MongoFramework.Tests.Indexing
 		public class IndexModel
 		{
 			public string Id { get; set; }
-			[Index(IndexSortOrder.Ascending)]
-			public string IndexedPropertyOne { get; set; }
+			[Index(IndexSortOrder.Ascending)] public string IndexedPropertyOne { get; set; }
+
 			[Index("MyIndexedProperty", IndexSortOrder.Descending)]
 			public string IndexedPropertyTwo { get; set; }
 		}
@@ -40,7 +37,7 @@ namespace MongoFramework.Tests.Indexing
 			var dbIndexes = collection.Indexes.List().ToList();
 			Assert.AreEqual(3, dbIndexes.Count);
 		}
-		
+
 		[TestMethod]
 		public async Task WriteIndexAsync()
 		{
@@ -62,7 +59,7 @@ namespace MongoFramework.Tests.Indexing
 			var collection = database.GetCollection<NoIndexModel>("EntityIndexWriterTests.NoIndexModelSync");
 			var indexMapper = new EntityIndexMapper<NoIndexModel>();
 			var indexWriter = new EntityIndexWriter<NoIndexModel>(collection, indexMapper);
-			
+
 			AssertExtensions.DoesNotThrow<Exception>(() => indexWriter.ApplyIndexing());
 		}
 

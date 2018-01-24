@@ -1,15 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Attributes;
-using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mutation;
 using MongoFramework.Infrastructure.Mutation.Mutators;
-using MongoFramework.Tests.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MongoFramework.Tests.Mutation.Mutators.UpdatedDate
 {
@@ -17,16 +11,14 @@ namespace MongoFramework.Tests.Mutation.Mutators.UpdatedDate
 	{
 		public string Id { get; set; }
 
-		[UpdatedDate]
-		public DateTime UpdatedDate { get; set; }
+		[UpdatedDate] public DateTime UpdatedDate { get; set; }
 	}
 
 	public class InvalidAttributeUseModel
 	{
 		public string Id { get; set; }
 
-		[UpdatedDate]
-		public string UpdatedDate { get; set; }
+		[UpdatedDate] public string UpdatedDate { get; set; }
 	}
 
 	[TestClass]

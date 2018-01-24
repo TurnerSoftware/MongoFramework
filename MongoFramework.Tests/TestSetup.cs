@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MongoFramework.Tests.Models;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Driver;
 
 namespace MongoFramework.Tests

@@ -1,8 +1,7 @@
-﻿using System;
+﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Infrastructure;
 using MongoFramework.Tests.Models;
-using System.Linq;
 
 namespace MongoFramework.Tests
 {
@@ -30,8 +29,9 @@ namespace MongoFramework.Tests
 			};
 
 			writer.AddRange(entities);
-			
-			var readMixedEntitiesQuery = reader.AsQueryable().Where(e => e.Description == "DbEntityReaderTests.ReadMixedEntities");
+
+			var readMixedEntitiesQuery =
+				reader.AsQueryable().Where(e => e.Description == "DbEntityReaderTests.ReadMixedEntities");
 
 			Assert.AreEqual(2, readMixedEntitiesQuery.Count());
 			Assert.AreEqual(2, readMixedEntitiesQuery.OfType<CommonEntity>().Count());

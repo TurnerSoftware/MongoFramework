@@ -1,11 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson.Serialization;
 using MongoFramework.Infrastructure.Mapping.Processors;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MongoFramework.Tests.Mapping.Processors.NestedProperty
 {
@@ -34,7 +30,7 @@ namespace MongoFramework.Tests.Mapping.Processors.NestedProperty
 			Assert.IsFalse(registeredClassMaps.Any(m => m.ClassType == typeof(NestedModel)));
 
 			processor.ApplyMapping(typeof(ParentModel), classMap);
-			
+
 			registeredClassMaps = BsonClassMap.GetRegisteredClassMaps();
 			Assert.IsTrue(registeredClassMaps.Any(m => m.ClassType == typeof(NestedModel)));
 		}
