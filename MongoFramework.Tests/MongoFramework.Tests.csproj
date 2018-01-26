@@ -83,6 +83,9 @@
     <Compile Include="Models\ChangeTrackerModel.cs" />
     <Compile Include="Models\EntityWriterModel.cs" />
     <Compile Include="Models\ExtendedEntityWriterModel.cs" />
+    <Compile Include="Models\MongoDbContextModel.cs" />
+    <Compile Include="Models\MongoDbSetValidationModel.cs" />
+    <Compile Include="MongoDbContextTestContext.cs" />
     <Compile Include="MongoDbContextTests.cs" />
     <Compile Include="MongoDbSetTests.cs" />
     <Compile Include="Mutation\Mutators\IncrementNumber\IncrementNumberMutatorTests.cs" />

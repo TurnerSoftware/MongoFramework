@@ -3,16 +3,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MongoFramework.Tests.Models;
 
 namespace MongoFramework.Tests
 {
-	public class MongoDbSetValidationModel
-	{
-		public string Id { get; set; }
-
-		[Required] public string RequiredField { get; set; }
-	}
-
 	[TestClass]
 	public class MongoDbSetTests
 	{
