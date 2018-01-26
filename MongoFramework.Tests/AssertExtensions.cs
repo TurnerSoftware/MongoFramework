@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace MongoFramework.Tests
 {
-	public class AssertExtensions
+	public static class AssertExtensions
 	{
 		/// <summary>
 		/// Author: Gilles Leblanc
