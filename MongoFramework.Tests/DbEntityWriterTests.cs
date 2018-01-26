@@ -95,7 +95,8 @@ namespace MongoFramework.Tests
 			};
 			writer.Update(updatedEntity);
 
-			var dbEntity = reader.AsQueryable().Where(e => e.Id == entity.Id).FirstOrDefault();
+			var dbEntity = reader.AsQueryable().FirstOrDefault(e => e.Id == entity.Id);
+			Assert.IsNotNull(dbEntity);
 			Assert.AreEqual("DbEntityWriterTests.UpdateEntity-Updated", dbEntity.Title);
 		}
 
