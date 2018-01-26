@@ -3,23 +3,15 @@ using MongoDB.Driver;
 
 namespace MongoFramework.Tests
 {
-	static class TestConfiguration
+	internal static class TestConfiguration
 	{
-		public static string ConnectionString
-		{
-			get => Environment.GetEnvironmentVariable("MONGODB_URI") ?? "mongodb://localhost";
-		}
+		public static string ConnectionString => Environment.GetEnvironmentVariable("MONGODB_URI") ?? "mongodb://localhost";
 
 		private static string DatabaseName { get; set; }
 
 		public static string GetDatabaseName()
 		{
-			if (DatabaseName == null)
-			{
-				DatabaseName = "MongoFrameworkTests-" + DateTime.Now.ToString("ddMMHHmm");
-			}
-
-			return DatabaseName;
+			return DatabaseName ?? (DatabaseName = "MongoFrameworkTests-" + DateTime.Now.ToString("ddMMHHmm"));
 		}
 
 		public static IMongoDatabase GetDatabase()
