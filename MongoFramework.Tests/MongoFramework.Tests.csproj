@@ -66,7 +66,12 @@
       <HintPath>..\packages\System.ComponentModel.Annotations.4.4.1\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
     </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Configuration.ConfigurationManager, Version=4.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Configuration.ConfigurationManager.4.4.1\lib\net461\System.Configuration.ConfigurationManager.dll</HintPath>
+    </Reference>
     <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssertExtensions.cs" />
@@ -89,6 +94,7 @@
     <Compile Include="MongoDbContextTestContext.cs" />
     <Compile Include="MongoDbContextTests.cs" />
     <Compile Include="MongoDbSetTests.cs" />
+    <Compile Include="MongoDbUtilityTests.cs" />
     <Compile Include="Mutation\Mutators\IncrementNumber\IncrementNumberMutatorTests.cs" />
     <Compile Include="Mutation\Mutators\UpdatedDate\UpdatedDateMutatorTests.cs" />
     <Compile Include="Models\ExtendedEntity.cs" />
