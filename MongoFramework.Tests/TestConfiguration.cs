@@ -11,7 +11,7 @@ namespace MongoFramework.Tests
 
 		public static string GetDatabaseName()
 		{
-			return DatabaseName ?? (DatabaseName = "MongoFrameworkTests-" + DateTime.Now.ToString("ddMMHHmm"));
+			return DatabaseName ?? (DatabaseName = $"MongoFrameworkTests-{DateTime.Now:ddMMHHmm}");
 		}
 
 		public static IMongoDatabase GetDatabase()
