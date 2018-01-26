@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace MongoFramework.Tests
 {
-	public class AssertExtensions
+	public static class AssertExtensions
 	{
 		/// <summary>
 		/// Author: Gilles Leblanc
@@ -13,7 +13,8 @@ namespace MongoFramework.Tests
 		/// <typeparam name="T"></typeparam>
 		/// <param name="expressionUnderTest"></param>
 		/// <param name="exceptionMessage"></param>
-		public static void DoesNotThrow<T>(Action expressionUnderTest, string exceptionMessage = "Expected exception was thrown by target of invocation.") where T : Exception
+		public static void DoesNotThrow<T>(Action expressionUnderTest,
+			string exceptionMessage = "Expected exception was thrown by target of invocation.") where T : Exception
 		{
 			try
 			{
@@ -38,7 +39,8 @@ namespace MongoFramework.Tests
 		/// <typeparam name="T"></typeparam>
 		/// <param name="expressionUnderTest"></param>
 		/// <param name="exceptionMessage"></param>
-		public static async Task DoesNotThrowAsync<T>(Func<Task> expressionUnderTest, string exceptionMessage = "Expected exception was thrown by target of invocation.") where T : Exception
+		public static async Task DoesNotThrowAsync<T>(Func<Task> expressionUnderTest,
+			string exceptionMessage = "Expected exception was thrown by target of invocation.") where T : Exception
 		{
 			try
 			{

@@ -11,16 +11,14 @@ namespace MongoFramework.Tests.Mutation.Mutators.UpdatedDate
 	{
 		public string Id { get; set; }
 
-		[UpdatedDate]
-		public DateTime UpdatedDate { get; set; }
+		[UpdatedDate] public DateTime UpdatedDate { get; set; }
 	}
 
 	public class InvalidAttributeUseModel
 	{
 		public string Id { get; set; }
 
-		[UpdatedDate]
-		public string UpdatedDate { get; set; }
+		[UpdatedDate] public string UpdatedDate { get; set; }
 	}
 
 	[TestClass]

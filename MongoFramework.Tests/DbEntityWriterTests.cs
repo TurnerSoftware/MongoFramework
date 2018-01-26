@@ -1,20 +1,10 @@
 ﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Infrastructure;
+using MongoFramework.Tests.Models;
 
 namespace MongoFramework.Tests
 {
-	public class EntityWriterModel
-	{
-		public string Id { get; set; }
-		public string Title { get; set; }
-	}
-
-	public class ExtendedEntityWriterModel : EntityWriterModel
-	{
-		public string AdditionalField { get; set; }
-	}
-
 	[TestClass]
 	public class DbEntityWriterTests
 	{
@@ -105,7 +95,8 @@ namespace MongoFramework.Tests
 			};
 			writer.Update(updatedEntity);
 
-			var dbEntity = reader.AsQueryable().Where(e => e.Id == entity.Id).FirstOrDefault();
+			var dbEntity = reader.AsQueryable().FirstOrDefault(e => e.Id == entity.Id);
+			Assert.IsNotNull(dbEntity);
 			Assert.AreEqual("DbEntityWriterTests.UpdateEntity-Updated", dbEntity.Title);
 		}
 
@@ -172,7 +163,8 @@ namespace MongoFramework.Tests
 
 			writer.WriteChanges(changeTracker);
 
-			var dbEntity = reader.AsQueryable().Where(e => e.Id == entity.Id).FirstOrDefault();
+			var dbEntity = reader.AsQueryable().FirstOrDefault(e => e.Id == entity.Id);
+			Assert.IsNotNull(dbEntity);
 			Assert.AreEqual("DbEntityWriterTests.UpdatedViaChangeTracker-Updated", dbEntity.Title);
 			Assert.AreEqual(DbEntityEntryState.NoChanges, changeTracker.GetEntry(entity).State);
 		}

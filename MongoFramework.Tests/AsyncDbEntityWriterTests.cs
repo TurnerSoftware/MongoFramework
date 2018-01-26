@@ -57,7 +57,8 @@ namespace MongoFramework.Tests
 			};
 			await writer.UpdateAsync(updatedEntity);
 
-			var dbEntity = reader.AsQueryable().Where(e => e.Id == entity.Id).FirstOrDefault();
+			var dbEntity = reader.AsQueryable().FirstOrDefault(e => e.Id == entity.Id);
+			Assert.IsNotNull(dbEntity);
 			Assert.AreEqual("AsyncDbEntityWriterTests.UpdateEntity-Updated", dbEntity.Description);
 		}
 
