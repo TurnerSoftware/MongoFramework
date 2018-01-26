@@ -73,6 +73,7 @@
     <Compile Include="AsyncDbEntityWriterTests.cs" />
     <Compile Include="Bson\GetDifferencesTests.cs" />
     <Compile Include="Bson\HasDifferencesTests.cs" />
+    <Compile Include="DefaultMappingPackTests.cs" />
     <Compile Include="Indexing\EntityIndexWriterTests.cs" />
     <Compile Include="Indexing\Processors\BasicIndex\BasicIndexProcessorTests.cs" />
     <Compile Include="Mapping\Processors\EntityId\EntityIdProcessorTests.cs" />
