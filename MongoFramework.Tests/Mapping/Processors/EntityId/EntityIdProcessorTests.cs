@@ -11,22 +11,26 @@ namespace MongoFramework.Tests.Mapping.Processors.EntityId
 {
 	public class IdByAttributeTestModel
 	{
-		[Key] public string MyCustomId { get; set; }
+		[Key]
+		public string MyCustomId { get; set; }
 	}
 
 	public class StringIdGeneratorTestModel
 	{
-		[Key] public string MyCustomId { get; set; }
+		[Key]
+		public string MyCustomId { get; set; }
 	}
 
 	public class GuidIdGeneratorTestModel
 	{
-		[Key] public Guid MyCustomId { get; set; }
+		[Key]
+		public Guid MyCustomId { get; set; }
 	}
 
 	public class ObjectIdGeneratorTestModel
 	{
-		[Key] public ObjectId MyCustomId { get; set; }
+		[Key]
+		public ObjectId MyCustomId { get; set; }
 	}
 
 	[TestClass]

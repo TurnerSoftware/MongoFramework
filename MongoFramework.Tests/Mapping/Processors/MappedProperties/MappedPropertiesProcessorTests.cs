@@ -10,13 +10,15 @@ namespace MongoFramework.Tests.Mapping.Processors.MappedProperties
 	public class NotMappedPropertiesModel
 	{
 		public string Id { get; set; }
-		[NotMapped] public string NotMapped { get; set; }
+		[NotMapped]
+		public string NotMapped { get; set; }
 	}
 
 	public class ColumnAttributePropertyModel
 	{
 		public string Id { get; set; }
-		[Column("CustomPropertyName")] public string MyProperty { get; set; }
+		[Column("CustomPropertyName")]
+		public string MyProperty { get; set; }
 	}
 
 	[TestClass]

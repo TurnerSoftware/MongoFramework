@@ -11,14 +11,16 @@ namespace MongoFramework.Tests.Mutation.Mutators.CreatedDate
 	{
 		public string Id { get; set; }
 
-		[CreatedDate] public DateTime CreatedDate { get; set; }
+		[CreatedDate]
+		public DateTime CreatedDate { get; set; }
 	}
 
 	public class InvalidAttributeUseModel
 	{
 		public string Id { get; set; }
 
-		[CreatedDate] public string CreatedDate { get; set; }
+		[CreatedDate]
+		public string CreatedDate { get; set; }
 	}
 
 	[TestClass]

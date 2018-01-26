@@ -10,7 +10,8 @@ namespace MongoFramework.Tests
 	{
 		public string Id { get; set; }
 
-		[Required] public string RequiredField { get; set; }
+		[Required]
+		public string RequiredField { get; set; }
 	}
 
 	[TestClass]
