@@ -1,8 +1,6 @@
-﻿using System;
+﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Infrastructure;
-using MongoFramework.Tests.Models;
-using System.Linq;
 
 namespace MongoFramework.Tests
 {
@@ -11,6 +9,7 @@ namespace MongoFramework.Tests
 		public string Id { get; set; }
 		public string Title { get; set; }
 	}
+
 	public class ExtendedEntityWriterModel : EntityWriterModel
 	{
 		public string AdditionalField { get; set; }
@@ -39,7 +38,8 @@ namespace MongoFramework.Tests
 		{
 			var database = TestConfiguration.GetDatabase();
 			var writer = new DbEntityWriter<EntityWriterModel>(database);
-			var entities = new[] {
+			var entities = new[]
+			{
 				new EntityWriterModel
 				{
 					Title = "DbEntityWriterTests.AddEntities"
@@ -125,7 +125,7 @@ namespace MongoFramework.Tests
 
 			//Remove the entity
 			writer.Remove(entity);
-			
+
 			Assert.IsFalse(reader.AsQueryable().Any(e => e.Id == entity.Id));
 		}
 
@@ -144,11 +144,11 @@ namespace MongoFramework.Tests
 			changeTracker.Update(entity, DbEntityEntryState.Added);
 
 			writer.WriteChanges(changeTracker);
-			
+
 			Assert.IsTrue(reader.AsQueryable().Any(e => e.Id == entity.Id));
 			Assert.AreEqual(DbEntityEntryState.NoChanges, changeTracker.GetEntry(entity).State);
 		}
-		
+
 		[TestMethod]
 		public void UpdatedViaChangeTracker()
 		{
@@ -156,7 +156,7 @@ namespace MongoFramework.Tests
 			var writer = new DbEntityWriter<EntityWriterModel>(database);
 			var reader = new DbEntityReader<EntityWriterModel>(database);
 			var changeTracker = new DbChangeTracker<EntityWriterModel>();
-			
+
 			var entity = new EntityWriterModel
 			{
 				Title = "DbEntityWriterTests.UpdatedViaChangeTracker"
@@ -171,7 +171,7 @@ namespace MongoFramework.Tests
 			Assert.AreEqual(DbEntityEntryState.Updated, changeTracker.GetEntry(entity).State);
 
 			writer.WriteChanges(changeTracker);
-			
+
 			var dbEntity = reader.AsQueryable().Where(e => e.Id == entity.Id).FirstOrDefault();
 			Assert.AreEqual("DbEntityWriterTests.UpdatedViaChangeTracker-Updated", dbEntity.Title);
 			Assert.AreEqual(DbEntityEntryState.NoChanges, changeTracker.GetEntry(entity).State);
@@ -185,7 +185,8 @@ namespace MongoFramework.Tests
 			var reader = new DbEntityReader<EntityWriterModel>(database);
 			var changeTracker = new DbChangeTracker<EntityWriterModel>();
 
-			var entities = new[] {
+			var entities = new[]
+			{
 				new EntityWriterModel
 				{
 					Title = "DbEntityWriterTests.UpdatedRangeViaChangeTracker"
@@ -231,7 +232,7 @@ namespace MongoFramework.Tests
 			changeTracker.DetectChanges();
 
 			writer.WriteChanges(changeTracker);
-			
+
 			Assert.IsFalse(reader.AsQueryable().Any(e => e.Id == entity.Id));
 		}
 
@@ -243,7 +244,8 @@ namespace MongoFramework.Tests
 			var reader = new DbEntityReader<EntityWriterModel>(database);
 			var changeTracker = new DbChangeTracker<EntityWriterModel>();
 
-			var entities = new[] {
+			var entities = new[]
+			{
 				new EntityWriterModel
 				{
 					Title = "DbEntityWriterTests.RemovedRangeViaChangeTracker"

@@ -1,13 +1,8 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Collections.Generic;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson.Serialization;
 using MongoFramework.Attributes;
-using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mapping.Processors;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MongoFramework.Tests.Mapping.Processors.ExtraElements
 {
@@ -20,8 +15,7 @@ namespace MongoFramework.Tests.Mapping.Processors.ExtraElements
 	public class ExtraElementsModel
 	{
 		public string Id { get; set; }
-		[ExtraElements]
-		public IDictionary<string, object> AdditionalElements { get; set; }
+		[ExtraElements] public IDictionary<string, object> AdditionalElements { get; set; }
 	}
 
 	[TestClass]

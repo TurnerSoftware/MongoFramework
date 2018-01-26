@@ -1,8 +1,6 @@
-﻿using System;
+﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Infrastructure;
-using MongoFramework.Tests.Models;
-using System.Linq;
 
 namespace MongoFramework.Tests
 {
@@ -32,7 +30,8 @@ namespace MongoFramework.Tests
 		public void AddNewEntries()
 		{
 			var changeTracker = new DbChangeTracker<ChangeTrackerModel>();
-			var entities = new[] {
+			var entities = new[]
+			{
 				new ChangeTrackerModel
 				{
 					Title = "DbChangeTrackerTests.AddNewEntries-1"
@@ -72,7 +71,8 @@ namespace MongoFramework.Tests
 			};
 			changeTracker.Update(updatedEntity, DbEntityEntryState.Updated);
 			Assert.IsFalse(changeTracker.GetEntries().Any(e => e.Entity == entity));
-			Assert.IsTrue(changeTracker.GetEntries().Any(e => e.Entity == updatedEntity && e.Entity.Title == "UpdateExistingEntryWithId-2"));
+			Assert.IsTrue(changeTracker.GetEntries()
+				.Any(e => e.Entity == updatedEntity && e.Entity.Title == "UpdateExistingEntryWithId-2"));
 		}
 
 		[TestMethod]
@@ -147,7 +147,8 @@ namespace MongoFramework.Tests
 		public void RemoveRange()
 		{
 			var changeTracker = new DbChangeTracker<ChangeTrackerModel>();
-			var entities = new[] {
+			var entities = new[]
+			{
 				new ChangeTrackerModel
 				{
 					Title = "DbChangeTrackerTests.RemoveRange-1"

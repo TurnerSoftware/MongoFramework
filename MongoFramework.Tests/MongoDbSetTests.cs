@@ -1,10 +1,8 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace MongoFramework.Tests
 {
@@ -12,8 +10,7 @@ namespace MongoFramework.Tests
 	{
 		public string Id { get; set; }
 
-		[Required]
-		public string RequiredField { get; set; }
+		[Required] public string RequiredField { get; set; }
 	}
 
 	[TestClass]
@@ -24,7 +21,8 @@ namespace MongoFramework.Tests
 		{
 			var connectionString = TestConfiguration.ConnectionString;
 			var databaseName = TestConfiguration.GetDatabaseName();
-			AssertExtensions.DoesNotThrow<Exception>(() => new MongoDbSet<MongoDbSetValidationModel>(connectionString, databaseName));
+			AssertExtensions.DoesNotThrow<Exception>(() =>
+				new MongoDbSet<MongoDbSetValidationModel>(connectionString, databaseName));
 		}
 
 		[TestMethod, ExpectedException(typeof(ValidationException))]
@@ -33,7 +31,7 @@ namespace MongoFramework.Tests
 			var database = TestConfiguration.GetDatabase();
 			var dbSet = new MongoDbSet<MongoDbSetValidationModel>();
 			dbSet.SetDatabase(database);
-			
+
 			dbSet.Add(new MongoDbSetValidationModel());
 			dbSet.SaveChanges();
 		}

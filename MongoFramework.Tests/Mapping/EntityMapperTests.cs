@@ -1,9 +1,9 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Linq;
-using MongoFramework.Infrastructure.Mapping;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MongoFramework.Infrastructure.Mapping;
 
 namespace MongoFramework.Tests
 {
@@ -106,10 +106,7 @@ namespace MongoFramework.Tests
 		{
 			AssertExtensions.DoesNotThrow<Exception>(() =>
 			{
-				Parallel.For(1, 10, i =>
-				{
-					new EntityMapper<MappingLockModel>();
-				});
+				Parallel.For(1, 10, i => { new EntityMapper<MappingLockModel>(); });
 			});
 		}
 	}

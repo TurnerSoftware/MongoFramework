@@ -1,9 +1,8 @@
-﻿using System;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Infrastructure;
 using MongoFramework.Tests.Models;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MongoFramework.Tests
 {
@@ -15,7 +14,8 @@ namespace MongoFramework.Tests
 		{
 			var database = TestConfiguration.GetDatabase();
 			var writer = new AsyncDbEntityWriter<CommonEntity>(database);
-			var entities = new[] {
+			var entities = new[]
+			{
 				new CommonEntity
 				{
 					Description = "AsyncDbEntityWriterTests.AddEntities"
@@ -34,7 +34,7 @@ namespace MongoFramework.Tests
 
 			Assert.IsTrue(entities.All(e => e.Id != null));
 		}
-		
+
 		[TestMethod]
 		public async Task UpdateEntityAsync()
 		{
