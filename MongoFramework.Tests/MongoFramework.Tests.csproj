@@ -81,6 +81,8 @@
     <Compile Include="Mapping\Processors\MappedProperties\MappedPropertiesProcessorTests.cs" />
     <Compile Include="Mapping\Processors\NestedProperty\NestedPropertyProcessorTests.cs" />
     <Compile Include="Models\ChangeTrackerModel.cs" />
+    <Compile Include="Models\EntityWriterModel.cs" />
+    <Compile Include="Models\ExtendedEntityWriterModel.cs" />
     <Compile Include="MongoDbContextTests.cs" />
     <Compile Include="MongoDbSetTests.cs" />
     <Compile Include="Mutation\Mutators\IncrementNumber\IncrementNumberMutatorTests.cs" />
