@@ -163,7 +163,8 @@ namespace MongoFramework.Tests
 
 			writer.WriteChanges(changeTracker);
 
-			var dbEntity = reader.AsQueryable().Where(e => e.Id == entity.Id).FirstOrDefault();
+			var dbEntity = reader.AsQueryable().FirstOrDefault(e => e.Id == entity.Id);
+			Assert.IsNotNull(dbEntity);
 			Assert.AreEqual("DbEntityWriterTests.UpdatedViaChangeTracker-Updated", dbEntity.Title);
 			Assert.AreEqual(DbEntityEntryState.NoChanges, changeTracker.GetEntry(entity).State);
 		}
