@@ -29,10 +29,6 @@ namespace MongoFramework.Bson
 				{
 					return true;
 				}
-				else if (!documentA.Contains(propertyName))
-				{
-					return true;
-				}
 				else
 				{
 					var propertyHasDifference = HasDifferences(documentA[propertyName], documentB[propertyName]);
@@ -77,7 +73,7 @@ namespace MongoFramework.Bson
 			{
 				return true;
 			}
-			
+
 			for (int i = 0, l = arrayA.Count; i < l; i++)
 			{
 				var itemHasDifference = HasDifferences(arrayA[i], arrayB[i]);
@@ -126,11 +122,6 @@ namespace MongoFramework.Bson
 		}
 		public static DiffResult GetDifferences(BsonValue valueA, BsonValue valueB)
 		{
-			if (valueA == valueB)
-			{
-				return new DiffResult();
-			}
-
 			if (valueA == null || valueB == null || valueA.BsonType != valueB.BsonType)
 			{
 				return new DiffResult(valueB);
@@ -158,25 +149,25 @@ namespace MongoFramework.Bson
 		{
 			var result = new BsonDocument();
 
-			var arrayACount = arrayA.Count;
-			var arrayBCount = arrayB.Count;
+			var arrayACount = arrayA?.Count ?? 0;
+			var arrayBCount = arrayB?.Count ?? 0;
 
 			for (int i = 0, l = Math.Max(arrayACount, arrayBCount); i < l; i++)
 			{
 				if (i >= arrayACount)
 				{
-					result[i] = arrayB[i];
+					result[i.ToString()] = arrayB[i];
 				}
 				else if (i >= arrayBCount)
 				{
-					result[i] = BsonUndefined.Value;
+					result[i.ToString()] = BsonUndefined.Value;
 				}
 				else
 				{
 					var diffResult = GetDifferences(arrayA[i], arrayB[i]);
 					if (diffResult.HasDifference)
 					{
-						result[i] = diffResult.Difference;
+						result[i.ToString()] = diffResult.Difference;
 					}
 				}
 			}
@@ -223,7 +214,7 @@ namespace MongoFramework.Bson
 					definition = GetUpdateDefinition(definition, fullName, documentA[propertyName], documentB[propertyName]);
 				}
 			}
-			
+
 			return definition;
 		}
 		private static UpdateDefinition<TEntity> GetUpdateDefinition<TEntity>(UpdateDefinition<TEntity> definition, string name, BsonValue valueA, BsonValue valueB)
@@ -237,7 +228,7 @@ namespace MongoFramework.Bson
 			{
 				definition = definition.Set(new StringFieldDefinition<TEntity, object>(name), valueB);
 			}
-			
+
 			var bsonType = valueA.BsonType;
 			if (bsonType == BsonType.Array)
 			{
