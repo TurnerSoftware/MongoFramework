@@ -33,7 +33,7 @@ namespace MongoFramework.Bson
 
 			var specificDefinitionType = typeof(StringFieldDefinition<,>).MakeGenericType(typeArgs);
 			var specificDefinition = Activator.CreateInstance(specificDefinitionType, fieldName, null);
-			
+
 			var expressionType = typeof(Expression);
 			var setMethod = typeof(MongoDB.Driver.UpdateDefinitionExtensions)
 				.GetMethods()

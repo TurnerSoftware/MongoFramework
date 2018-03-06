@@ -61,7 +61,7 @@ namespace MongoFramework
 				}
 			}
 		}
-		
+
 		public virtual void SaveChanges()
 		{
 			foreach (var dbSet in DbSets)

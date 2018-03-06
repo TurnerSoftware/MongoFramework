@@ -19,7 +19,7 @@ namespace MongoFramework.Infrastructure.Mutation
 				new EntityAttributeMutator<TEntity>()
 			};
 		}
-		
+
 		public static void MutateEntity(TEntity entity, MutatorType mutationType)
 		{
 			MutateEntities(new[] { entity }, mutationType);

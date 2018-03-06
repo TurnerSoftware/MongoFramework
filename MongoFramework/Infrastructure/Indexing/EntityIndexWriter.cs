@@ -14,7 +14,7 @@ namespace MongoFramework.Infrastructure.Indexing
 	{
 		private IMongoCollection<TEntity> Collection { get; set; }
 		private IEntityIndexMapper IndexMapper { get; set; }
-		
+
 		public EntityIndexWriter(IMongoCollection<TEntity> collection, IEntityIndexMapper indexMapper)
 		{
 			Collection = collection;

@@ -20,7 +20,7 @@ namespace MongoFramework.Infrastructure
 		protected IEntityMapper EntityMapper { get; set; }
 
 		public DbEntityWriter(IMongoDatabase database) : this(database, new EntityMapper(typeof(TEntity))) { }
-		
+
 		public DbEntityWriter(IMongoDatabase database, IEntityMapper mapper)
 		{
 			Database = database ?? throw new ArgumentNullException("database");

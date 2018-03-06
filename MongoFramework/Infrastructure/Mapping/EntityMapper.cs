@@ -159,7 +159,7 @@ namespace MongoFramework.Infrastructure.Mapping
 								PropertyType = m.PropertyType,
 								Property = m.Property
 							});
-						
+
 						stack.Push(new TraversalState
 						{
 							TypeHierarchy = new HashSet<Type>(state.TypeHierarchy)

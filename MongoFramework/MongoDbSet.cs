@@ -41,7 +41,7 @@ namespace MongoFramework
 		public MongoDbSet(string connectionName)
 		{
 			var mongoUrl = MongoDbUtility.GetMongoUrlFromConfig(connectionName);
-			
+
 			if (mongoUrl == null)
 			{
 				throw new MongoConfigurationException("No connection string found with the name \'" + connectionName + "\'");
@@ -59,7 +59,7 @@ namespace MongoFramework
 		{
 			SetDatabase(MongoDbUtility.GetDatabase(connectionString, databaseName));
 		}
-		
+
 		/// <summary>
 		/// Initialise a new entity reader and writer to the specified database.
 		/// </summary>

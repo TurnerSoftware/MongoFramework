@@ -23,7 +23,7 @@ namespace MongoFramework.Tests.Bson
 
 			Assert.IsTrue(BsonDiff.HasDifferences(documentA, null));
 			Assert.IsTrue(BsonDiff.HasDifferences(null, documentA));
-			Assert.IsFalse(BsonDiff.HasDifferences((BsonDocument) null, null));
+			Assert.IsFalse(BsonDiff.HasDifferences((BsonDocument)null, null));
 		}
 
 		[TestMethod]
@@ -128,7 +128,7 @@ namespace MongoFramework.Tests.Bson
 
 			Assert.IsTrue(BsonDiff.HasDifferences(arrayA, null));
 			Assert.IsTrue(BsonDiff.HasDifferences(null, arrayA));
-			Assert.IsFalse(BsonDiff.HasDifferences((BsonArray) null, null));
+			Assert.IsFalse(BsonDiff.HasDifferences((BsonArray)null, null));
 		}
 
 		[TestMethod]
@@ -174,7 +174,7 @@ namespace MongoFramework.Tests.Bson
 		[TestMethod]
 		public void NullValue()
 		{
-			var valueA = (BsonValue) new BsonDocument(new Dictionary<string, object>
+			var valueA = (BsonValue)new BsonDocument(new Dictionary<string, object>
 			{
 				{"Age", 20},
 				{"Name", "Peter"},
@@ -184,13 +184,13 @@ namespace MongoFramework.Tests.Bson
 
 			Assert.IsTrue(BsonDiff.HasDifferences(valueA, null));
 			Assert.IsTrue(BsonDiff.HasDifferences(null, valueA));
-			Assert.IsFalse(BsonDiff.HasDifferences((BsonValue) null, null));
+			Assert.IsFalse(BsonDiff.HasDifferences((BsonValue)null, null));
 		}
 
 		[TestMethod]
 		public void MismatchedValueType()
 		{
-			var valueA = (BsonValue) new BsonDocument(new Dictionary<string, object>
+			var valueA = (BsonValue)new BsonDocument(new Dictionary<string, object>
 			{
 				{"Age", 20},
 				{"Name", "Peter"},
@@ -222,8 +222,8 @@ namespace MongoFramework.Tests.Bson
 				{"IsActive", true}
 			});
 
-			Assert.IsFalse(BsonDiff.HasDifferences((BsonValue) documentA, documentB));
-			Assert.IsFalse(BsonDiff.HasDifferences((BsonValue) documentB, documentA));
+			Assert.IsFalse(BsonDiff.HasDifferences((BsonValue)documentA, documentB));
+			Assert.IsFalse(BsonDiff.HasDifferences((BsonValue)documentB, documentA));
 		}
 
 		[TestMethod]
@@ -232,8 +232,8 @@ namespace MongoFramework.Tests.Bson
 			var arrayA = new BsonArray(Enumerable.Range(1, 5));
 			var arrayB = new BsonArray(Enumerable.Range(1, 5));
 
-			Assert.IsFalse(BsonDiff.HasDifferences((BsonValue) arrayA, arrayB));
-			Assert.IsFalse(BsonDiff.HasDifferences((BsonValue) arrayB, arrayA));
+			Assert.IsFalse(BsonDiff.HasDifferences((BsonValue)arrayA, arrayB));
+			Assert.IsFalse(BsonDiff.HasDifferences((BsonValue)arrayB, arrayA));
 		}
 	}
 }

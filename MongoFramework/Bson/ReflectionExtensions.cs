@@ -15,7 +15,7 @@ namespace MongoFramework.Bson
 			{
 				return null;
 			}
-			
+
 			var namesPieces = new Stack<string>(name.Split('.'));
 			return parentType.GetNestedPropertyType(namesPieces);
 		}
@@ -26,7 +26,7 @@ namespace MongoFramework.Bson
 			{
 				return parentType;
 			}
-			
+
 			var currentName = namePieces.Pop();
 
 			//Remove details of array item - we don't know instance-specific information so it doesn't help

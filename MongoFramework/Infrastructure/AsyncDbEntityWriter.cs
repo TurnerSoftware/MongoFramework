@@ -68,7 +68,7 @@ namespace MongoFramework.Infrastructure
 				await GetCollection().BulkWriteAsync(operations);
 			}
 		}
-		
+
 		public async Task RemoveAsync(TEntity entity)
 		{
 			await RemoveRangeAsync(new[] { entity });

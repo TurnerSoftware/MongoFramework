@@ -32,7 +32,7 @@ namespace MongoFramework.Infrastructure.Indexing
 			EntityMapper = entityMapper ?? throw new ArgumentNullException(nameof(entityMapper));
 			EntityType = entityMapper?.EntityType;
 		}
-		
+
 		public IEnumerable<IEntityIndexMap> GetIndexMapping()
 		{
 			return EntityIndexCache.GetOrAdd(EntityType, t =>

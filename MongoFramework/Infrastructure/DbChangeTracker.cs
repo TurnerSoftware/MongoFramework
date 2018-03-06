@@ -10,7 +10,7 @@ namespace MongoFramework.Infrastructure
 	public class DbChangeTracker<TEntity> : IDbChangeTracker<TEntity>
 	{
 		private List<DbEntityEntry<TEntity>> Entries { get; set; } = new List<DbEntityEntry<TEntity>>();
-		
+
 		public DbEntityEntry<TEntity> GetEntry(TEntity entity)
 		{
 			var entityMapper = new EntityMapper<TEntity>();
@@ -100,7 +100,7 @@ namespace MongoFramework.Infrastructure
 				}
 			}
 		}
-		
+
 		public void Clear()
 		{
 			Entries.Clear();

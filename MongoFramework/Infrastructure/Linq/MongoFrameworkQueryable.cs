@@ -17,7 +17,7 @@ namespace MongoFramework.Infrastructure.Linq
 	public class MongoFrameworkQueryable<TEntity, TOutput> : IMongoFrameworkQueryable<TEntity, TOutput>
 	{
 		private IMongoFrameworkQueryProvider<TEntity, TOutput> InternalProvider { get; set; }
-		
+
 		public Type ElementType => typeof(TOutput);
 		public Expression Expression { get; }
 		public IQueryProvider Provider => InternalProvider;

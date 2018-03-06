@@ -36,7 +36,7 @@ namespace MongoFramework.Infrastructure.Linq
 		public virtual object Execute(Expression expression)
 		{
 			var result = UnderlyingQueryable.Provider.Execute(expression);
-			
+
 			if (result is TEntity)
 			{
 				EntityProcessors.ProcessEntity((TEntity)result);
