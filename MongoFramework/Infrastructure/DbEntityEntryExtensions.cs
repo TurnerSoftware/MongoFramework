@@ -1,6 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoFramework.Bson;
+using MongoFramework.Infrastructure.DefinitionHelpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,7 +49,7 @@ namespace MongoFramework.Infrastructure
 		{
 			if (entry.HasChanges())
 			{
-				return BsonDiff.GetUpdateDefinition<TEntity>(entry.OriginalValues, entry.CurrentValues);
+				return UpdateDefinitionHelper.CreateFromDiff<TEntity>(entry.OriginalValues, entry.CurrentValues);
 			}
 			return null;
 		}

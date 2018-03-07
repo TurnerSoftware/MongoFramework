@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MongoFramework.Bson
+namespace MongoFramework.Infrastructure
 {
 	internal static class ReflectionExtensions
 	{

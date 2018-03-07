@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MongoFramework.Bson
+namespace MongoFramework.Infrastructure.DefinitionHelpers
 {
 	public static class UpdateDefinitionExtensions
 	{
