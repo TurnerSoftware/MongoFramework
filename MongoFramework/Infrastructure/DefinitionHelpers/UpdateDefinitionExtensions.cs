@@ -20,7 +20,7 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 
 			if (valueType == null && reflectedValueType == null)
 			{
-				throw new Exception($"Unable to determine value type for field \"{fieldName}\"");
+				reflectedValueType = typeof(object);
 			}
 
 			if (valueType == null || (reflectedValueType != null && valueType != reflectedValueType))

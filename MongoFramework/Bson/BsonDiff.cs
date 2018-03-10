@@ -136,10 +136,8 @@ namespace MongoFramework.Bson
 			{
 				return new DiffResult(valueB);
 			}
-			else
-			{
-				return new DiffResult();
-			}
+
+			return new DiffResult();
 		}
 		public static DiffResult GetDifferences(BsonArray arrayA, BsonArray arrayB)
 		{

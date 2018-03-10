@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoFramework.Bson;
 
 namespace MongoFramework.Infrastructure.DefinitionHelpers
 {
@@ -16,7 +17,6 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 		}
 		private static UpdateDefinition<TEntity> CreateFromDiff<TEntity>(UpdateDefinition<TEntity> definition, string name, BsonDocument documentA, BsonDocument documentB)
 		{
-			var result = new BsonDocument();
 			var documentAProperties = documentA?.Names ?? Enumerable.Empty<string>();
 			var documentBProperties = documentB?.Names ?? Enumerable.Empty<string>();
 			var propertyNames = documentAProperties.Union(documentBProperties);
@@ -48,17 +48,12 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 		}
 		private static UpdateDefinition<TEntity> CreateFromDiff<TEntity>(UpdateDefinition<TEntity> definition, string name, BsonValue valueA, BsonValue valueB)
 		{
-			if (valueA == valueB)
+			if (valueA?.BsonType != valueB?.BsonType)
 			{
-				return definition;
+				return definition.Set(name, valueB);
 			}
 
-			if (valueA == null || valueB == null || valueA.BsonType != valueB.BsonType)
-			{
-				definition = definition.Set(new StringFieldDefinition<TEntity, object>(name), valueB);
-			}
-
-			var bsonType = valueA.BsonType;
+			var bsonType = valueA?.BsonType;
 			if (bsonType == BsonType.Array)
 			{
 				return CreateFromDiff(definition, name, valueA.AsBsonArray, valueB.AsBsonArray);
@@ -71,32 +66,32 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 			{
 				definition = definition.Set(name, valueB);
 			}
-
+			
 			return definition;
 		}
 		private static UpdateDefinition<TEntity> CreateFromDiff<TEntity>(UpdateDefinition<TEntity> definition, string name, BsonArray arrayA, BsonArray arrayB)
 		{
-			var result = new BsonDocument();
-
 			var arrayACount = arrayA.Count;
 			var arrayBCount = arrayB.Count;
 
-			for (int i = 0, l = Math.Max(arrayACount, arrayBCount); i < l; i++)
-			{
-				var fullName = name + "." + i;
+			//Due to limitations of MongoDB, we can't pull/push at the same time.
+			//As highlighted on task SERVER-1014 (MongoDB Jira), you can't pull at an index, only at a value match.
+			//You could avoid the pull by simply pop-ing items off the list for the length difference between "arrayA" and "arrayB".
+			//That said, we can't run "conflicting" updates on the same path (eg. pull and push) at the same time.
+			//Instead, if the arrays are the same length, we check differences per index.
+			//If the arrays are different lengths, we set the whole array in the update.
 
-				if (i >= arrayACount)
+			if (arrayACount == arrayBCount)
+			{
+				for (int i = 0, l = arrayBCount; i < l; i++)
 				{
-					definition = definition.Push(new StringFieldDefinition<TEntity>(fullName), arrayB[i]);
-				}
-				else if (i >= arrayBCount)
-				{
-					definition = definition.Pull(new StringFieldDefinition<TEntity>(fullName), BsonString.Empty);
-				}
-				else
-				{
+					var fullName = name + "." + i;
 					definition = CreateFromDiff(definition, fullName, arrayA[i], arrayB[i]);
 				}
+			}
+			else
+			{
+				definition = definition.Set(name, arrayB);
 			}
 
 			return definition;
