@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace MongoFramework.Bson
 {
-	public class BsonDiff
+	public static class BsonDiff
 	{
 		public static bool HasDifferences(BsonDocument documentA, BsonDocument documentB)
 		{
