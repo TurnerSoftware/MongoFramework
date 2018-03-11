@@ -11,11 +11,23 @@ using MongoFramework.Infrastructure.DefinitionHelpers;
 
 namespace MongoFramework.Tests.DefinitionHelpers.UpdateDefinition
 {
-	public class UpdateDefinitionEntity { }
-
 	[TestClass]
 	public class UpdateDefinitionHelperTests
 	{
+		private BsonDocument PerformUpdateAgainstServer(BsonDocument original, UpdateDefinition<BsonDocument> updateDefinition)
+		{
+			var collection = TestConfiguration.GetDatabase().GetCollection<BsonDocument>("UpdateDefinitionHelperTests");
+			collection.InsertOne(original);
+
+			var idFilter = Builders<BsonDocument>.Filter.Eq("_id", original["_id"]);
+			collection.UpdateOne(idFilter, updateDefinition);
+
+			var result = collection.Find(idFilter).FirstOrDefault();
+			result.Remove("_id");
+
+			return result;
+		}
+
 		private BsonDocument RenderDefinition<TEntity>(UpdateDefinition<TEntity> definition)
 		{
 			var serializerRegistry = BsonSerializer.SerializerRegistry;
@@ -46,7 +58,7 @@ namespace MongoFramework.Tests.DefinitionHelpers.UpdateDefinition
 
 			var expectedResult = new BsonDocument();
 
-			var rawResult = UpdateDefinitionHelper.CreateFromDiff<UpdateDefinitionEntity>(documentA, documentB);
+			var rawResult = UpdateDefinitionHelper.CreateFromDiff<BsonDocument>(documentA, documentB);
 			var renderedResult = RenderDefinition(rawResult);
 
 			Assert.AreEqual(expectedResult, renderedResult);
@@ -96,10 +108,11 @@ namespace MongoFramework.Tests.DefinitionHelpers.UpdateDefinition
 				}
 			});
 
-			var rawResult = UpdateDefinitionHelper.CreateFromDiff<UpdateDefinitionEntity>(documentA, documentB);
+			var rawResult = UpdateDefinitionHelper.CreateFromDiff<BsonDocument>(documentA, documentB);
 			var renderedResult = RenderDefinition(rawResult);
 
 			Assert.AreEqual(expectedResult, renderedResult);
+			Assert.AreEqual(documentB, PerformUpdateAgainstServer(documentA, rawResult));
 		}
 
 		[TestMethod]
@@ -141,10 +154,11 @@ namespace MongoFramework.Tests.DefinitionHelpers.UpdateDefinition
 				}
 			});
 
-			var rawResult = UpdateDefinitionHelper.CreateFromDiff<UpdateDefinitionEntity>(documentA, documentB);
+			var rawResult = UpdateDefinitionHelper.CreateFromDiff<BsonDocument>(documentA, documentB);
 			var renderedResult = RenderDefinition(rawResult);
 
 			Assert.AreEqual(expectedResult, renderedResult);
+			Assert.AreEqual(documentB, PerformUpdateAgainstServer(documentA, rawResult));
 		}
 
 		[TestMethod]
@@ -160,14 +174,14 @@ namespace MongoFramework.Tests.DefinitionHelpers.UpdateDefinition
 			{
 				{"Age", 20},
 				{"Name", "Peter"},
-				{"RegisteredDate", new DateTime(2018, 3, 10)},
 				{
 					"Address", new Dictionary<string, object>
 					{
 						{"Street", "My Test Road"},
 						{"Suburb", "Other Suburb"}
 					}
-				}
+				},
+				{"RegisteredDate", new DateTime(2018, 3, 10)}
 			});
 
 			var expectedResult = new BsonDocument(new Dictionary<string, object>
@@ -175,22 +189,24 @@ namespace MongoFramework.Tests.DefinitionHelpers.UpdateDefinition
 				{
 					"$set", new Dictionary<string, object>
 					{
-						{"RegisteredDate", new DateTime(2018, 3, 10)},
+
 						{
 							"Address", new Dictionary<string, object>
 							{
 								{"Street", "My Test Road"},
 								{"Suburb", "Other Suburb"}
 							}
-						}
+						},
+						{"RegisteredDate", new DateTime(2018, 3, 10)}
 					}
 				}
 			});
 
-			var rawResult = UpdateDefinitionHelper.CreateFromDiff<UpdateDefinitionEntity>(documentA, documentB);
+			var rawResult = UpdateDefinitionHelper.CreateFromDiff<BsonDocument>(documentA, documentB);
 			var renderedResult = RenderDefinition(rawResult);
 
 			Assert.AreEqual(expectedResult, renderedResult);
+			Assert.AreEqual(documentB, PerformUpdateAgainstServer(documentA, rawResult));
 		}
 
 		[TestMethod]
@@ -227,10 +243,11 @@ namespace MongoFramework.Tests.DefinitionHelpers.UpdateDefinition
 				}
 			});
 
-			var rawResult = UpdateDefinitionHelper.CreateFromDiff<UpdateDefinitionEntity>(documentA, documentB);
+			var rawResult = UpdateDefinitionHelper.CreateFromDiff<BsonDocument>(documentA, documentB);
 			var renderedResult = RenderDefinition(rawResult);
 
 			Assert.AreEqual(expectedResult, renderedResult);
+			Assert.AreEqual(documentB, PerformUpdateAgainstServer(documentA, rawResult));
 		}
 
 		[TestMethod]
@@ -260,10 +277,11 @@ namespace MongoFramework.Tests.DefinitionHelpers.UpdateDefinition
 				}
 			});
 
-			var rawResult = UpdateDefinitionHelper.CreateFromDiff<UpdateDefinitionEntity>(documentA, documentB);
+			var rawResult = UpdateDefinitionHelper.CreateFromDiff<BsonDocument>(documentA, documentB);
 			var renderedResult = RenderDefinition(rawResult);
 
 			Assert.AreEqual(expectedResult, renderedResult);
+			Assert.AreEqual(documentB, PerformUpdateAgainstServer(documentA, rawResult));
 		}
 
 		[TestMethod]
@@ -293,10 +311,11 @@ namespace MongoFramework.Tests.DefinitionHelpers.UpdateDefinition
 				}
 			});
 
-			var rawResult = UpdateDefinitionHelper.CreateFromDiff<UpdateDefinitionEntity>(documentA, documentB);
+			var rawResult = UpdateDefinitionHelper.CreateFromDiff<BsonDocument>(documentA, documentB);
 			var renderedResult = RenderDefinition(rawResult);
 
 			Assert.AreEqual(expectedResult, renderedResult);
+			Assert.AreEqual(documentB, PerformUpdateAgainstServer(documentA, rawResult));
 		}
 
 		[TestMethod]
@@ -328,10 +347,11 @@ namespace MongoFramework.Tests.DefinitionHelpers.UpdateDefinition
 				}
 			});
 
-			var rawResult = UpdateDefinitionHelper.CreateFromDiff<UpdateDefinitionEntity>(documentA, documentB);
+			var rawResult = UpdateDefinitionHelper.CreateFromDiff<BsonDocument>(documentA, documentB);
 			var renderedResult = RenderDefinition(rawResult);
 
 			Assert.AreEqual(expectedResult, renderedResult);
+			Assert.AreEqual(documentB, PerformUpdateAgainstServer(documentA, rawResult));
 		}
 	}
 }
