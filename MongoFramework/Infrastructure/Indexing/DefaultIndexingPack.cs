@@ -17,6 +17,6 @@ namespace MongoFramework.Infrastructure.Indexing
 			};
 		}
 
-		public static IIndexingProcessorPack Instance { get; private set; } = new DefaultIndexingPack();
+		public static IIndexingProcessorPack Instance { get; } = new DefaultIndexingPack();
 	}
 }

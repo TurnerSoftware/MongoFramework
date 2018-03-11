@@ -74,6 +74,7 @@
     <Compile Include="Bson\GetDifferencesTests.cs" />
     <Compile Include="Bson\HasDifferencesTests.cs" />
     <Compile Include="DefinitionHelpers\UpdateDefinition\UpdateDefinitionHelperTests.cs" />
+    <Compile Include="Indexing\EntityIndexMapperTests.cs" />
     <Compile Include="Indexing\EntityIndexWriterTests.cs" />
     <Compile Include="Indexing\Processors\BasicIndex\BasicIndexProcessorTests.cs" />
     <Compile Include="Mapping\Processors\EntityId\EntityIdProcessorTests.cs" />
