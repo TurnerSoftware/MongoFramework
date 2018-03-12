@@ -74,12 +74,6 @@ namespace MongoFramework.Infrastructure
 		/// <summary>
 		/// The current values of the entity.
 		/// </summary>
-		public BsonDocument CurrentValues
-		{
-			get
-			{
-				return Entity.ToBsonDocument();
-			}
-		}
+		public BsonDocument CurrentValues => Entity.ToBsonDocument();
 	}
 }

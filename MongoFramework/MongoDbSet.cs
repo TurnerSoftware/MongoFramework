@@ -211,29 +211,11 @@ namespace MongoFramework
 			return queryable;
 		}
 
-		public Expression Expression
-		{
-			get
-			{
-				return GetQueryable().Expression;
-			}
-		}
+		public Expression Expression => GetQueryable().Expression;
 
-		public Type ElementType
-		{
-			get
-			{
-				return GetQueryable().ElementType;
-			}
-		}
+		public Type ElementType => GetQueryable().ElementType;
 
-		public IQueryProvider Provider
-		{
-			get
-			{
-				return GetQueryable().Provider;
-			}
-		}
+		public IQueryProvider Provider => GetQueryable().Provider;
 
 		public IEnumerator<TEntity> GetEnumerator()
 		{
