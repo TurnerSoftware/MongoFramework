@@ -1,15 +1,10 @@
 ﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Infrastructure;
+using MongoFramework.Tests.Models;
 
 namespace MongoFramework.Tests
 {
-	public class ChangeTrackerModel
-	{
-		public string Id { get; set; }
-		public string Title { get; set; }
-	}
-
 	[TestClass]
 	public class DbChangeTrackerTests
 	{

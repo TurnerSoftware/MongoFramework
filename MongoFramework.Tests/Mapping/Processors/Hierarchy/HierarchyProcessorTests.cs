@@ -3,19 +3,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson.Serialization;
 using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mapping.Processors;
+using MongoFramework.Tests.Models;
 
 namespace MongoFramework.Tests.Mapping.Processors.Hierarchy
 {
-	public class ParentTestModel
-	{
-		public string Id { get; set; }
-	}
-
-	public class ChildTestModel : ParentTestModel
-	{
-		public string DeclaredProperty { get; set; }
-	}
-
 	[TestClass]
 	public class HierarchyProcessorTests
 	{

@@ -1,38 +1,12 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MongoDB.Bson;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.IdGenerators;
 using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mapping.Processors;
+using MongoFramework.Tests.Models;
 
 namespace MongoFramework.Tests.Mapping.Processors.EntityId
 {
-	public class IdByAttributeTestModel
-	{
-		[Key]
-		public string MyCustomId { get; set; }
-	}
-
-	public class StringIdGeneratorTestModel
-	{
-		[Key]
-		public string MyCustomId { get; set; }
-	}
-
-	public class GuidIdGeneratorTestModel
-	{
-		[Key]
-		public Guid MyCustomId { get; set; }
-	}
-
-	public class ObjectIdGeneratorTestModel
-	{
-		[Key]
-		public ObjectId MyCustomId { get; set; }
-	}
-
 	[TestClass]
 	public class EntityIdProcessorTests
 	{

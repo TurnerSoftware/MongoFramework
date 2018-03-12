@@ -1,52 +1,12 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Infrastructure.Mapping;
+using MongoFramework.Tests.Models;
 
 namespace MongoFramework.Tests
 {
-	public class DefaultCollectionNameModel
-	{
-	}
-
-	[Table("CustomCollection")]
-	public class CustomCollectionModel
-	{
-	}
-
-	[Table("CustomCollection", Schema = "CustomSchema")]
-	public class CustomCollectionAndSchemaModel
-	{
-	}
-
-	public class TraverseMappingModel
-	{
-		public string Id { get; set; }
-		public NestedTraverseMappingModel NestedModel { get; set; }
-		public NestedTraverseMappingModel RepeatedType { get; set; }
-		public TraverseMappingModel RecursionType { get; set; }
-	}
-
-	public class NestedTraverseMappingModel
-	{
-		public string PropertyOne { get; set; }
-		public int PropertyTwo { get; set; }
-		public InnerNestedTraverseMappingModel InnerModel { get; set; }
-	}
-
-	public class InnerNestedTraverseMappingModel
-	{
-		public string InnerMostProperty { get; set; }
-		public TraverseMappingModel NestedRecursionType { get; set; }
-	}
-
-	public class MappingLockModel
-	{
-		public string Id { get; set; }
-	}
-
 	[TestClass]
 	public class EntityMapperTests
 	{
