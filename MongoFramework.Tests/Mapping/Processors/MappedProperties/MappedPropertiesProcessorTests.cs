@@ -1,26 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson.Serialization;
 using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mapping.Processors;
+using MongoFramework.Tests.Models;
 
 namespace MongoFramework.Tests.Mapping.Processors.MappedProperties
 {
-	public class NotMappedPropertiesModel
-	{
-		public string Id { get; set; }
-		[NotMapped]
-		public string NotMapped { get; set; }
-	}
-
-	public class ColumnAttributePropertyModel
-	{
-		public string Id { get; set; }
-		[Column("CustomPropertyName")]
-		public string MyProperty { get; set; }
-	}
-
 	[TestClass]
 	public class MappedPropertiesProcessorTests
 	{

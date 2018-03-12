@@ -1,62 +1,11 @@
 ﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MongoFramework.Attributes;
 using MongoFramework.Infrastructure.Indexing;
 using MongoFramework.Infrastructure.Indexing.Processors;
+using MongoFramework.Tests.Models;
 
 namespace MongoFramework.Tests.Indexing.Processors.BasicIndex
 {
-	public class IndexNamingModel
-	{
-		[Index(IndexSortOrder.Ascending)]
-		public string NoNameIndex { get; set; }
-		[Index("MyCustomIndexName", IndexSortOrder.Ascending)]
-		public string NamedIndex { get; set; }
-	}
-
-	public class IndexSortOrderModel
-	{
-		[Index(IndexSortOrder.Ascending)]
-		public string AscendingIndex { get; set; }
-		[Index(IndexSortOrder.Descending)]
-		public string DescendingIndex { get; set; }
-	}
-
-	public class UniqueConstraintModel
-	{
-		[Index("UniqueIndex", IndexSortOrder.Ascending, IsUnique = true)]
-		public string UniqueIndex { get; set; }
-
-		[Index("NonUniqueIndex", IndexSortOrder.Ascending, IsUnique = false)]
-		public string NotUniqueIndex { get; set; }
-	}
-
-	public class CompoundIndexModel
-	{
-		[Index("MyCompoundIndex", IndexSortOrder.Ascending, IndexPriority = 1)]
-		public string FirstPriority { get; set; }
-
-		[Index("MyCompoundIndex", IndexSortOrder.Ascending, IndexPriority = 3)]
-		public string ThirdPriority { get; set; }
-
-		[Index("MyCompoundIndex", IndexSortOrder.Ascending, IndexPriority = 2)]
-		public string SecondPriority { get; set; }
-	}
-
-	public class NestedIndexBaseModel
-	{
-		[Index("MyCompoundIndex", IndexSortOrder.Ascending, IndexPriority = 2)]
-		public string SecondPriority { get; set; }
-
-		public NestedIndexChildModel ChildModel { get; set; }
-	}
-
-	public class NestedIndexChildModel
-	{
-		[Index("MyCompoundIndex", IndexSortOrder.Ascending, IndexPriority = 1)]
-		public string FirstPriority { get; set; }
-	}
-
 	[TestClass]
 	public class BasicIndexProcessorTests
 	{

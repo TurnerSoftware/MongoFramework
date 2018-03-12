@@ -1,28 +1,11 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MongoFramework.Attributes;
 using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mutation;
 using MongoFramework.Infrastructure.Mutation.Mutators;
 
 namespace MongoFramework.Tests.Mutation.Mutators.CreatedDate
 {
-	public class ValidAttributeUseModel
-	{
-		public string Id { get; set; }
-
-		[CreatedDate]
-		public DateTime CreatedDate { get; set; }
-	}
-
-	public class InvalidAttributeUseModel
-	{
-		public string Id { get; set; }
-
-		[CreatedDate]
-		public string CreatedDate { get; set; }
-	}
-
 	[TestClass]
 	public class CreatedDateMutatorTests
 	{
