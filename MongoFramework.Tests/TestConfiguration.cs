@@ -5,10 +5,7 @@ namespace MongoFramework.Tests
 {
 	static class TestConfiguration
 	{
-		public static string ConnectionString
-		{
-			get => Environment.GetEnvironmentVariable("MONGODB_URI") ?? "mongodb://localhost";
-		}
+		public static string ConnectionString => Environment.GetEnvironmentVariable("MONGODB_URI") ?? "mongodb://localhost";
 
 		private static string DatabaseName { get; set; }
 
