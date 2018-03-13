@@ -1,9 +1,6 @@
-﻿using MongoFramework.Infrastructure.Mapping;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using MongoFramework.Infrastructure.Mapping;
 
 namespace MongoFramework.Infrastructure
 {
@@ -90,14 +87,7 @@ namespace MongoFramework.Infrastructure
 
 			foreach (var entry in entries)
 			{
-				if (entry.HasChanges())
-				{
-					entry.State = DbEntityEntryState.Updated;
-				}
-				else
-				{
-					entry.State = DbEntityEntryState.NoChanges;
-				}
+				entry.State = entry.HasChanges() ? DbEntityEntryState.Updated : DbEntityEntryState.NoChanges;
 			}
 		}
 

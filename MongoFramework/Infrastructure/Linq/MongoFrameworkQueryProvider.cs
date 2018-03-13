@@ -1,11 +1,8 @@
-﻿using MongoDB.Driver.Linq;
-using MongoFramework.Infrastructure.Linq.Processors;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+using MongoDB.Driver.Linq;
+using MongoFramework.Infrastructure.Linq.Processors;
 
 namespace MongoFramework.Infrastructure.Linq
 {

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using MongoDB.Driver;
 using System.Reflection;
+using MongoDB.Driver;
 using MongoFramework.Infrastructure;
-using System.Linq;
 
 namespace MongoFramework
 {
@@ -34,7 +33,7 @@ namespace MongoFramework
 
 		internal MongoDbContext(IMongoDatabase database)
 		{
-			this.Database = database;
+			Database = database;
 			InitialiseDbSets();
 		}
 		public static MongoDbContext CreateWithDatabase(IMongoDatabase database)

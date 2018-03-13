@@ -1,7 +1,5 @@
-﻿using MongoFramework.Infrastructure.Indexing;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
+using MongoFramework.Infrastructure.Indexing;
 
 namespace MongoFramework.Attributes
 {

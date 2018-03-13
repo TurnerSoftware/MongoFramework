@@ -1,9 +1,5 @@
-﻿using MongoFramework.Infrastructure.Linq.Processors;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
+using MongoFramework.Infrastructure.Linq.Processors;
 
 namespace MongoFramework.Infrastructure.Linq
 {

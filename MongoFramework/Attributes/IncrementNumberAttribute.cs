@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MongoFramework.Attributes
 {
@@ -15,8 +11,8 @@ namespace MongoFramework.Attributes
 
 		public IncrementNumberAttribute() : this(false) { }
 		public IncrementNumberAttribute(bool onUpdateOnly) : this(1, onUpdateOnly) { }
-		public IncrementNumberAttribute(int incrementAmount) : this(incrementAmount, false) { }
-		public IncrementNumberAttribute(int incrementAmount, bool onUpdateOnly)
+
+		public IncrementNumberAttribute(int incrementAmount, bool onUpdateOnly = false)
 		{
 			IncrementAmount = incrementAmount;
 			OnUpdateOnly = onUpdateOnly;

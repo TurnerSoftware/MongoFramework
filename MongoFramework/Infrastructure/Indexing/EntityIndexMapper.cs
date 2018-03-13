@@ -1,11 +1,8 @@
-﻿using MongoDB.Driver;
-using System;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using System.Linq;
 using MongoFramework.Infrastructure.Mapping;
-using System.Collections.Concurrent;
 
 namespace MongoFramework.Infrastructure.Indexing
 {
