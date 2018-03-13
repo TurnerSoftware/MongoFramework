@@ -1,7 +1,5 @@
-﻿using MongoDB.Bson.Serialization;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
+using MongoDB.Bson.Serialization;
 
 namespace MongoFramework.Infrastructure.Mapping
 {

@@ -1,11 +1,4 @@
 ﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using MongoFramework.Bson;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MongoFramework.Infrastructure
 {
@@ -60,14 +53,7 @@ namespace MongoFramework.Infrastructure
 
 			if (State == DbEntityEntryState.Updated || State == DbEntityEntryState.NoChanges)
 			{
-				if (this.HasChanges())
-				{
-					State = DbEntityEntryState.Updated;
-				}
-				else
-				{
-					State = DbEntityEntryState.NoChanges;
-				}
+				State = this.HasChanges() ? DbEntityEntryState.Updated : DbEntityEntryState.NoChanges;
 			}
 		}
 

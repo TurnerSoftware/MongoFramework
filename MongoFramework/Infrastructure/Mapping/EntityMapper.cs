@@ -1,15 +1,11 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.IdGenerators;
-using System;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Collections.Concurrent;
 using System.Threading;
+using MongoDB.Bson.Serialization;
 
 namespace MongoFramework.Infrastructure.Mapping
 {

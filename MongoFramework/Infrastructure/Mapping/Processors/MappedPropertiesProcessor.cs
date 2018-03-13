@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
-using System.Text;
 using MongoDB.Bson.Serialization;
 
 namespace MongoFramework.Infrastructure.Mapping.Processors
@@ -29,10 +27,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 				{
 					var mappedName = columnAttribute.Name;
 					var memberMap = classMap.GetMemberMap(property.Name);
-					if (memberMap != null)
-					{
-						memberMap.SetElementName(mappedName);
-					}
+					memberMap?.SetElementName(mappedName);
 				}
 			}
 		}
