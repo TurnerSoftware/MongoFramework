@@ -66,7 +66,12 @@
       <HintPath>..\packages\System.ComponentModel.Annotations.4.4.1\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
     </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Configuration.ConfigurationManager, Version=4.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Configuration.ConfigurationManager.4.4.1\lib\net461\System.Configuration.ConfigurationManager.dll</HintPath>
+    </Reference>
     <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssertExtensions.cs" />
@@ -76,6 +81,7 @@
     <Compile Include="Models\EntityContainerModel.cs" />
     <Compile Include="Models\GuidIdGeneratorTestModel.cs" />
     <Compile Include="Models\IdByAttributeTestModel.cs" />
+    <Compile Include="Models\MongoDbUtilityModel.cs" />
     <Compile Include="Models\ObjectIdGeneratorTestModel.cs" />
     <Compile Include="Models\StringIdGeneratorTestModel.cs" />
     <Compile Include="Models\ExtraElementsModel.cs" />
@@ -118,6 +124,7 @@
     <Compile Include="MongoDbContextTests.cs" />
     <Compile Include="MongoDbSetTests.cs" />
     <Compile Include="Models\MongoDbSetValidationModel.cs" />
+    <Compile Include="MongoDbUtilityTests.cs" />
     <Compile Include="Mutation\Mutators\CreatedDate\InvalidAttributeUseModel.cs" />
     <Compile Include="Mutation\Mutators\CreatedDate\ValidAttributeUseModel.cs" />
     <Compile Include="Mutation\Mutators\IncrementNumber\IncrementalEntity.cs" />

@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using System;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace MongoFramework.Infrastructure
@@ -19,6 +20,11 @@ namespace MongoFramework.Infrastructure
 
 		public static IMongoDatabase GetDatabase(MongoUrl mongoUrl)
 		{
+			if (mongoUrl == null)
+			{
+				throw new ArgumentNullException(nameof(mongoUrl));
+			}
+
 			return GetDatabase(mongoUrl.Url, mongoUrl.DatabaseName);
 		}
 
