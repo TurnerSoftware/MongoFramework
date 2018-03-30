@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson;
 using MongoFramework.Bson;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MongoFramework.Tests.Bson
 {
@@ -41,7 +41,7 @@ namespace MongoFramework.Tests.Bson
 				{"Name", "Peter"},
 				{"RegisteredDate", new DateTime(2017, 10, 1)},
 				{"IsActive", true},
-				{"Comment", ""},
+				{"Comment", string.Empty},
 				{"Moderator", false},
 				{"ModerationDate", null},
 				{"Level", 5},
@@ -61,7 +61,7 @@ namespace MongoFramework.Tests.Bson
 				{"Name", "Sam"},
 				{"RegisteredDate", new DateTime(2017, 10, 1)},
 				{"IsActive", true},
-				{"Comment", ""},
+				{"Comment", string.Empty},
 				{"Moderator", true},
 				{"ModerationDate", new DateTime(2017, 10, 5)},
 				{"Level", 5},

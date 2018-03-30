@@ -1,8 +1,8 @@
-﻿using System;
+﻿using MongoDB.Driver;
+using MongoFramework.Infrastructure;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
-using MongoDB.Driver;
-using MongoFramework.Infrastructure;
 
 namespace MongoFramework
 {

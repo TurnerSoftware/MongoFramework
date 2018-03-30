@@ -1,6 +1,6 @@
-﻿using System.Linq;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Driver;
+using System.Linq;
 
 namespace MongoFramework.Infrastructure.DefinitionHelpers
 {
@@ -62,7 +62,7 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 			{
 				definition = definition.Set(name, valueB);
 			}
-			
+
 			return definition;
 		}
 		private static UpdateDefinition<TEntity> CreateFromDiff<TEntity>(UpdateDefinition<TEntity> definition, string name, BsonArray arrayA, BsonArray arrayB)

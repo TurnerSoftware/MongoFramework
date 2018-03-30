@@ -1,6 +1,6 @@
-﻿using System;
+﻿using MongoFramework.Infrastructure.Linq;
+using System;
 using System.Linq;
-using MongoFramework.Infrastructure.Linq;
 
 namespace MongoFramework.Linq
 {

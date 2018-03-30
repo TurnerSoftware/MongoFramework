@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using MongoFramework.Infrastructure.Mapping;
+﻿using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mutation.Mutators;
+using System.Collections.Generic;
 
 namespace MongoFramework.Infrastructure.Mutation
 {

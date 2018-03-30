@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MongoFramework.Tests.Models;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MongoFramework.Tests.Models;
 
 namespace MongoFramework.Tests
 {

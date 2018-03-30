@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mutation;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MongoFramework.Infrastructure
 {

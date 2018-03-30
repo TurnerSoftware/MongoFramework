@@ -1,7 +1,7 @@
-﻿using System.Linq;
-using System.Reflection;
-using MongoFramework.Attributes;
+﻿using MongoFramework.Attributes;
 using MongoFramework.Infrastructure.Mapping;
+using System.Linq;
+using System.Reflection;
 
 namespace MongoFramework.Infrastructure.Mutation.Mutators
 {

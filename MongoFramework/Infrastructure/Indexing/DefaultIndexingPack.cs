@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using MongoFramework.Infrastructure.Indexing.Processors;
+﻿using MongoFramework.Infrastructure.Indexing.Processors;
+using System.Collections.Generic;
 
 namespace MongoFramework.Infrastructure.Indexing
 {

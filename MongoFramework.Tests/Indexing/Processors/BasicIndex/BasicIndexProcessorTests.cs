@@ -1,8 +1,8 @@
-﻿using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Infrastructure.Indexing;
 using MongoFramework.Infrastructure.Indexing.Processors;
 using MongoFramework.Tests.Models;
+using System.Linq;
 
 namespace MongoFramework.Tests.Indexing.Processors.BasicIndex
 {

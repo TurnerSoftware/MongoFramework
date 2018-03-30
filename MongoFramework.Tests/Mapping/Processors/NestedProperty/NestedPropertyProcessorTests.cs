@@ -1,8 +1,8 @@
-﻿using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson.Serialization;
 using MongoFramework.Infrastructure.Mapping.Processors;
 using MongoFramework.Tests.Models;
+using System.Linq;
 
 namespace MongoFramework.Tests.Mapping.Processors.NestedProperty
 {

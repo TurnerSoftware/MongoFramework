@@ -1,8 +1,8 @@
-﻿using System.Linq;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using MongoFramework.Infrastructure.Linq;
 using MongoFramework.Infrastructure.Linq.Processors;
 using MongoFramework.Infrastructure.Mapping;
+using System.Linq;
 
 namespace MongoFramework.Infrastructure
 {

@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using MongoFramework.Attributes;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MongoFramework.Infrastructure.Indexing.Processors
 {

@@ -1,5 +1,5 @@
-﻿using System.Linq;
-using MongoFramework.Infrastructure.Linq.Processors;
+﻿using MongoFramework.Infrastructure.Linq.Processors;
+using System.Linq;
 
 namespace MongoFramework.Infrastructure.Linq
 {

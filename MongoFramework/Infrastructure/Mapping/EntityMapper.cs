@@ -1,11 +1,11 @@
-﻿using System;
+﻿using MongoDB.Bson.Serialization;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using MongoDB.Bson.Serialization;
 
 namespace MongoFramework.Infrastructure.Mapping
 {
@@ -37,7 +37,7 @@ namespace MongoFramework.Infrastructure.Mapping
 				//For reasons unknown to me, you can't just call "BsonClassMap.LookupClassMap" as that "freezes" the class map
 				//Instead, you must do the lookup and initial creation yourself.
 				var classMaps = BsonClassMap.GetRegisteredClassMaps();
-				ClassMap = classMaps.Where(cm => cm.ClassType == EntityType).FirstOrDefault() as BsonClassMap;
+				ClassMap = classMaps.Where(cm => cm.ClassType == EntityType).FirstOrDefault();
 
 				if (ClassMap == null)
 				{

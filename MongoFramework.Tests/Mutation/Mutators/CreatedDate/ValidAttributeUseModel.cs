@@ -1,5 +1,5 @@
-﻿using System;
-using MongoFramework.Attributes;
+﻿using MongoFramework.Attributes;
+using System;
 
 namespace MongoFramework.Tests.Mutation.Mutators.CreatedDate
 {

@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
+using System.Collections.Generic;
 
 namespace MongoFramework.Infrastructure.Indexing
 {

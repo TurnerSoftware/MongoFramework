@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using MongoFramework.Infrastructure.Mapping;
+using System.Collections.Generic;
 using System.Linq;
-using MongoFramework.Infrastructure.Mapping;
 
 namespace MongoFramework.Infrastructure
 {

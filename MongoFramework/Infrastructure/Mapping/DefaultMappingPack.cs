@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using MongoFramework.Infrastructure.Mapping.Processors;
+﻿using MongoFramework.Infrastructure.Mapping.Processors;
+using System.Collections.Generic;
 
 namespace MongoFramework.Infrastructure.Mapping
 {

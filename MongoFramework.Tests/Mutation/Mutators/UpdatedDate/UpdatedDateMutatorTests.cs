@@ -1,9 +1,9 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Attributes;
 using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mutation;
 using MongoFramework.Infrastructure.Mutation.Mutators;
+using System;
 
 namespace MongoFramework.Tests.Mutation.Mutators.UpdatedDate
 {

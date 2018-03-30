@@ -1,5 +1,5 @@
-﻿using System;
-using MongoDB.Bson.Serialization;
+﻿using MongoDB.Bson.Serialization;
+using System;
 
 namespace MongoFramework.Infrastructure.Mapping
 {

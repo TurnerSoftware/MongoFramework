@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using MongoFramework.Attributes;
+﻿using MongoFramework.Attributes;
+using System.Collections.Generic;
 
 namespace MongoFramework.Tests.Models
 {

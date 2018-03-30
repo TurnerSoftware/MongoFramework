@@ -1,5 +1,5 @@
-﻿using System;
-using MongoFramework.Infrastructure.Indexing;
+﻿using MongoFramework.Infrastructure.Indexing;
+using System;
 
 namespace MongoFramework.Attributes
 {

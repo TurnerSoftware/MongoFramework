@@ -1,6 +1,4 @@
-﻿using MongoFramework.Tests.Mapping.Processors.Hierarchy;
-
-namespace MongoFramework.Tests.Models
+﻿namespace MongoFramework.Tests.Models
 {
 	public class ChildTestModel : ParentTestModel
 	{
