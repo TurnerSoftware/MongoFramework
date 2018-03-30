@@ -3,8 +3,9 @@ using System.Linq;
 
 namespace MongoFramework.Tests.Models
 {
-	public class MongoDbUtilityModel
+	public class MongoFrameworkQueryableModel
 	{
 		public string Id { get; set; }
+		public string Title { get; set; }
 	}
 }

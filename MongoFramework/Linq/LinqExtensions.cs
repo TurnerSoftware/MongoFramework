@@ -10,7 +10,7 @@ namespace MongoFramework.Linq
 		{
 			if (!(queryable is IMongoFrameworkQueryable))
 			{
-				throw new ArgumentException("Queryable must implement interface IMongoFrameworkQueryable", "queryable");
+				throw new ArgumentException("Queryable must implement interface IMongoFrameworkQueryable", nameof(queryable));
 			}
 
 			return (queryable as IMongoFrameworkQueryable).ToQuery();

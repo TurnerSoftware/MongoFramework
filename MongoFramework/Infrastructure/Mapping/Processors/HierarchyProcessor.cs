@@ -7,7 +7,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 	{
 		public void ApplyMapping(Type entityType, BsonClassMap classMap)
 		{
-			if (entityType.BaseType != typeof(object))
+			if (entityType != typeof(object) && entityType.BaseType != typeof(object))
 			{
 				new EntityMapper(entityType.BaseType);
 			}

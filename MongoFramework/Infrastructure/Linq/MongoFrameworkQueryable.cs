@@ -31,13 +31,6 @@ namespace MongoFramework.Infrastructure.Linq
 			Expression = expression;
 		}
 
-		public MongoFrameworkQueryable(IMongoQueryable<TOutput> underlyingQueryable, Expression expression, EntityProcessorCollection<TEntity> queryableProcessor)
-		{
-			InternalProvider = new MongoFrameworkQueryProvider<TEntity, TOutput>(underlyingQueryable);
-			InternalProvider.EntityProcessors.AddRange(queryableProcessor);
-			Expression = expression;
-		}
-
 		public IEnumerator<TOutput> GetEnumerator()
 		{
 			var result = (IEnumerable<TOutput>)InternalProvider.Execute(Expression);

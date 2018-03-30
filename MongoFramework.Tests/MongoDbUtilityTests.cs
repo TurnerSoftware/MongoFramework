@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Infrastructure;
 using MongoFramework.Tests.Models;
+using System;
+using System.Linq;
 
 namespace MongoFramework.Tests
 {
@@ -58,7 +55,7 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public void InvalidObjectId()
 		{
-			Assert.IsFalse(MongoDbUtility.IsValidObjectId(""));
+			Assert.IsFalse(MongoDbUtility.IsValidObjectId(string.Empty));
 			Assert.IsFalse(MongoDbUtility.IsValidObjectId("0"));
 			Assert.IsFalse(MongoDbUtility.IsValidObjectId("a"));
 			Assert.IsFalse(MongoDbUtility.IsValidObjectId("0123456789ABCDEFGHIJKLMN"));

@@ -78,10 +78,15 @@
     <Compile Include="Bson\GetDifferencesTests.cs" />
     <Compile Include="Bson\HasDifferencesTests.cs" />
     <Compile Include="DbEntityContainerTests.cs" />
+    <Compile Include="Linq\LinqExtensionsTests.cs" />
+    <Compile Include="Linq\MongoFrameworkQueryableTestProcessor.cs" />
+    <Compile Include="Linq\MongoFrameworkQueryableTests.cs" />
     <Compile Include="Models\EntityContainerModel.cs" />
     <Compile Include="Models\GuidIdGeneratorTestModel.cs" />
     <Compile Include="Models\IdByAttributeTestModel.cs" />
+    <Compile Include="Models\LinqExtensionsModel.cs" />
     <Compile Include="Models\MongoDbUtilityModel.cs" />
+    <Compile Include="Models\MongoFrameworkQueryableModel.cs" />
     <Compile Include="Models\ObjectIdGeneratorTestModel.cs" />
     <Compile Include="Models\StringIdGeneratorTestModel.cs" />
     <Compile Include="Models\ExtraElementsModel.cs" />

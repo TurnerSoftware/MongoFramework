@@ -1,6 +1,6 @@
-﻿using System;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Driver;
+using System;
 
 namespace MongoFramework.Infrastructure
 {

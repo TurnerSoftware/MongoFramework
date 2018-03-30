@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace MongoFramework.Tests.Models
 {
-	public class MongoDbUtilityModel
+	public class LinqExtensionsModel
 	{
 		public string Id { get; set; }
 	}

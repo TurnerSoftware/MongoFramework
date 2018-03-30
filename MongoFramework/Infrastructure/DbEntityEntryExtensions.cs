@@ -1,7 +1,5 @@
 ﻿using MongoDB.Bson;
-using MongoDB.Driver;
 using MongoFramework.Bson;
-using MongoFramework.Infrastructure.DefinitionHelpers;
 
 namespace MongoFramework.Infrastructure
 {
