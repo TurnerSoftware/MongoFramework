@@ -9,10 +9,6 @@ namespace MongoFramework
 	{
 		void SetDatabase(IMongoDatabase database);
 		void SaveChanges();
-	}
-
-	public interface IAsyncMongoDbSet : IMongoDbSet
-	{
 		Task SaveChangesAsync();
 	}
 

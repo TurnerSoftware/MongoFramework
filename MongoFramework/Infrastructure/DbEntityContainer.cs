@@ -1,12 +1,11 @@
 ﻿using MongoFramework.Infrastructure.Mapping;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MongoFramework.Infrastructure
 {
-	public class DbChangeTracker<TEntity> : IDbChangeTracker<TEntity>
+	public class DbEntityContainer<TEntity> : IDbEntityContainer<TEntity>
 	{
-		private List<DbEntityEntry<TEntity>> Entries { get; set; } = new List<DbEntityEntry<TEntity>>();
+		protected List<DbEntityEntry<TEntity>> Entries { get; } = new List<DbEntityEntry<TEntity>>();
 
 		public DbEntityEntry<TEntity> GetEntry(TEntity entity)
 		{
@@ -57,13 +56,6 @@ namespace MongoFramework.Infrastructure
 				Entries.Add(new DbEntityEntry<TEntity>(entity, state));
 			}
 		}
-		public void UpdateRange(IEnumerable<TEntity> entities, DbEntityEntryState state)
-		{
-			foreach (var entity in entities)
-			{
-				Update(entity, state);
-			}
-		}
 
 		public void Remove(TEntity entity)
 		{
@@ -71,23 +63,6 @@ namespace MongoFramework.Infrastructure
 			if (entry != null)
 			{
 				Entries.Remove(entry);
-			}
-		}
-		public void RemoveRange(IEnumerable<TEntity> entities)
-		{
-			foreach (var entity in entities)
-			{
-				Remove(entity);
-			}
-		}
-
-		public void DetectChanges()
-		{
-			var entries = Entries.Where((DbEntityEntry<TEntity> e) => e.State == DbEntityEntryState.NoChanges || e.State == DbEntityEntryState.Updated);
-
-			foreach (var entry in entries)
-			{
-				entry.State = entry.HasChanges() ? DbEntityEntryState.Updated : DbEntityEntryState.NoChanges;
 			}
 		}
 

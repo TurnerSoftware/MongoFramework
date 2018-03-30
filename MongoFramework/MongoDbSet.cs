@@ -18,11 +18,11 @@ namespace MongoFramework
 	/// Basic Mongo "DbSet", providing changeset support and attribute validation
 	/// </summary>
 	/// <typeparam name="TEntity"></typeparam>
-	public class MongoDbSet<TEntity> : IMongoDbSet<TEntity>, IAsyncMongoDbSet
+	public class MongoDbSet<TEntity> : IMongoDbSet<TEntity>
 	{
-		public IDbChangeTracker<TEntity> ChangeTracker { get; private set; } = new DbChangeTracker<TEntity>();
+		public IDbEntityChangeTracker<TEntity> ChangeTracker { get; private set; } = new DbEntityChangeTracker<TEntity>();
 
-		private IAsyncDbEntityChangeWriter<TEntity> EntityWriter { get; set; }
+		private IDbEntityWriter<TEntity> EntityWriter { get; set; }
 		private IDbEntityReader<TEntity> EntityReader { get; set; }
 		private IEntityIndexWriter<TEntity> EntityIndexWriter { get; set; }
 
@@ -66,7 +66,7 @@ namespace MongoFramework
 		public void SetDatabase(IMongoDatabase database)
 		{
 			var entityMapper = new EntityMapper<TEntity>();
-			EntityWriter = new AsyncDbEntityWriter<TEntity>(database, entityMapper);
+			EntityWriter = new DbEntityWriter<TEntity>(database, entityMapper);
 			EntityReader = new DbEntityReader<TEntity>(database, entityMapper);
 
 			//TODO: Look at this again in the future, this seems unnecessarily complex
@@ -99,7 +99,10 @@ namespace MongoFramework
 				throw new ArgumentNullException("entities");
 			}
 
-			ChangeTracker.UpdateRange(entities, DbEntityEntryState.Added);
+			foreach (var entity in entities)
+			{
+				ChangeTracker.Update(entity, DbEntityEntryState.Added);
+			}
 		}
 
 		/// <summary>
@@ -126,7 +129,10 @@ namespace MongoFramework
 				throw new ArgumentNullException("entities");
 			}
 
-			ChangeTracker.UpdateRange(entities, DbEntityEntryState.Updated);
+			foreach (var entity in entities)
+			{
+				ChangeTracker.Update(entity, DbEntityEntryState.Updated);
+			}
 		}
 
 		/// <summary>
@@ -153,7 +159,10 @@ namespace MongoFramework
 				throw new ArgumentNullException("entities");
 			}
 
-			ChangeTracker.UpdateRange(entities, DbEntityEntryState.Deleted);
+			foreach (var entity in entities)
+			{
+				ChangeTracker.Update(entity, DbEntityEntryState.Deleted);
+			}
 		}
 
 		private void CheckEntityValidation()
@@ -181,30 +190,27 @@ namespace MongoFramework
 			EntityIndexWriter.ApplyIndexing();
 			ChangeTracker.DetectChanges();
 			CheckEntityValidation();
-			EntityWriter.WriteChanges(ChangeTracker);
+			EntityWriter.Write(ChangeTracker);
+			ChangeTracker.CommitChanges();
 		}
 
 		/// <summary>
 		/// Writes all of the items in the changeset to the database.
 		/// </summary>
 		/// <returns></returns>
-		public async Task SaveChangesAsync()
+		public virtual async Task SaveChangesAsync()
 		{
 			await EntityIndexWriter.ApplyIndexingAsync();
 			ChangeTracker.DetectChanges();
 			CheckEntityValidation();
-			await EntityWriter.WriteChangesAsync(ChangeTracker);
+			await EntityWriter.WriteAsync(ChangeTracker);
+			ChangeTracker.CommitChanges();
 		}
 
 		#region IQueryable Implementation
 
 		private IQueryable<TEntity> GetQueryable()
 		{
-			if (EntityReader == null)
-			{
-				throw new InvalidOperationException("No IDbEntityReader has been set.");
-			}
-
 			var queryable = EntityReader.AsQueryable() as IMongoFrameworkQueryable<TEntity, TEntity>;
 			queryable.EntityProcessors.Add(new EntityTrackingProcessor<TEntity>(ChangeTracker));
 			return queryable;

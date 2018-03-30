@@ -2,9 +2,9 @@
 {
 	public class EntityTrackingProcessor<TEntity> : ILinqProcessor<TEntity>
 	{
-		public IDbChangeTracker<TEntity> ChangeTracker { get; private set; }
+		public IDbEntityChangeTracker<TEntity> ChangeTracker { get; private set; }
 
-		public EntityTrackingProcessor(IDbChangeTracker<TEntity> changeSet)
+		public EntityTrackingProcessor(IDbEntityChangeTracker<TEntity> changeSet)
 		{
 			ChangeTracker = changeSet;
 		}

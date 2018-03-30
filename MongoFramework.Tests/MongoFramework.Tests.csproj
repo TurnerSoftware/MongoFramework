@@ -70,9 +70,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssertExtensions.cs" />
-    <Compile Include="AsyncDbEntityWriterTests.cs" />
     <Compile Include="Bson\GetDifferencesTests.cs" />
     <Compile Include="Bson\HasDifferencesTests.cs" />
+    <Compile Include="DbEntityContainerTests.cs" />
+    <Compile Include="Models\EntityContainerModel.cs" />
     <Compile Include="Models\GuidIdGeneratorTestModel.cs" />
     <Compile Include="Models\IdByAttributeTestModel.cs" />
     <Compile Include="Models\ObjectIdGeneratorTestModel.cs" />
@@ -133,7 +134,7 @@
     <Compile Include="TestConfiguration.cs" />
     <Compile Include="TestSetup.cs" />
     <Compile Include="DbEntityWriterTests.cs" />
-    <Compile Include="DbChangeTrackerTests.cs" />
+    <Compile Include="DbEntityChangeTrackerTests.cs" />
     <Compile Include="DbEntityReaderTests.cs" />
   </ItemGroup>
   <ItemGroup>

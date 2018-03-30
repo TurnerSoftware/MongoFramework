@@ -12,23 +12,23 @@ namespace MongoFramework.Tests
 		public void ReadMixedEntities()
 		{
 			var database = TestConfiguration.GetDatabase();
+			var entityContainer = new DbEntityContainer<CommonEntity>();
 			var reader = new DbEntityReader<CommonEntity>(database);
 			var writer = new DbEntityWriter<CommonEntity>(database);
 
-			var entities = new[]
+			entityContainer.Update(new CommonEntity
 			{
-				new CommonEntity
-				{
-					Description = "DbEntityReaderTests.ReadMixedEntities"
-				},
-				new ExtendedEntity
-				{
-					IsDisabled = true,
-					Description = "DbEntityReaderTests.ReadMixedEntities"
-				}
-			};
+				Description = "DbEntityReaderTests.ReadMixedEntities"
+			}, DbEntityEntryState.Added);
 
-			writer.AddRange(entities);
+			entityContainer.Update(new ExtendedEntity
+			{
+				IsDisabled = true,
+				Description = "DbEntityReaderTests.ReadMixedEntities"
+			}, DbEntityEntryState.Added);
+
+
+			writer.Write(entityContainer);
 
 			var readMixedEntitiesQuery =
 				reader.AsQueryable().Where(e => e.Description == "DbEntityReaderTests.ReadMixedEntities");

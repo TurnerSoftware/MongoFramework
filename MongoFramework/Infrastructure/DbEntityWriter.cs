@@ -1,13 +1,15 @@
 ﻿using MongoDB.Driver;
+using MongoFramework.Infrastructure.DefinitionHelpers;
 using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mutation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MongoFramework.Infrastructure
 {
-	public class DbEntityWriter<TEntity> : IDbEntityChangeWriter<TEntity>
+	public class DbEntityWriter<TEntity> : IDbEntityWriter<TEntity>
 	{
 		public IMongoDatabase Database { get; set; }
 		protected IEntityMapper EntityMapper { get; set; }
@@ -26,116 +28,49 @@ namespace MongoFramework.Infrastructure
 			return Database.GetCollection<TEntity>(collectionName);
 		}
 
-		public void Add(TEntity entity)
-		{
-			AddRange(new[] { entity });
-		}
-
-		public void AddRange(IEnumerable<TEntity> entities)
-		{
-			EntityMutation<TEntity>.MutateEntities(entities, MutatorType.Insert);
-			GetCollection().InsertMany(entities);
-		}
-
-		protected IEnumerable<WriteModel<TEntity>> GenerateWriteOperations(IEnumerable<TEntity> entities)
+		private IEnumerable<WriteModel<TEntity>> BuildWriteModel(IDbEntityContainer<TEntity> entityContainer)
 		{
 			var idFieldName = EntityMapper.GetIdName();
-			var operations = new List<WriteModel<TEntity>>();
+			var writeModel = new List<WriteModel<TEntity>>();
 
-			foreach (var entity in entities)
+			foreach (var entry in entityContainer.GetEntries())
 			{
-				var idFieldValue = EntityMapper.GetIdValue(entity);
-				var filter = Builders<TEntity>.Filter.Eq(idFieldName, idFieldValue);
-				var operation = new ReplaceOneModel<TEntity>(filter, entity);
-				operations.Add(operation);
-			}
-
-			return operations;
-		}
-
-		public void Update(TEntity entity)
-		{
-			UpdateRange(new[] { entity });
-		}
-
-		public void UpdateRange(IEnumerable<TEntity> entities)
-		{
-			EntityMutation<TEntity>.MutateEntities(entities, MutatorType.Update);
-			var operations = GenerateWriteOperations(entities);
-
-			if (operations.Any())
-			{
-				GetCollection().BulkWrite(operations);
-			}
-		}
-
-		protected IEnumerable<WriteModel<TEntity>> GenerateWriteOperations(IEnumerable<DbEntityEntry<TEntity>> entries)
-		{
-			var idFieldName = EntityMapper.GetIdName();
-			var operations = new List<WriteModel<TEntity>>();
-
-			foreach (var entry in entries)
-			{
-				if (entry.HasChanges())
+				if (entry.State == DbEntityEntryState.Added)
+				{
+					EntityMutation<TEntity>.MutateEntity(entry.Entity, MutatorType.Insert);
+					writeModel.Add(new InsertOneModel<TEntity>(entry.Entity));
+				}
+				else if (entry.State == DbEntityEntryState.Updated)
+				{
+					EntityMutation<TEntity>.MutateEntity(entry.Entity, MutatorType.Update);
+					var idFieldValue = EntityMapper.GetIdValue(entry.Entity);
+					var filter = Builders<TEntity>.Filter.Eq(idFieldName, idFieldValue);
+					var updateDefintion = UpdateDefinitionHelper.CreateFromDiff<TEntity>(entry.OriginalValues, entry.CurrentValues);
+					writeModel.Add(new UpdateOneModel<TEntity>(filter, updateDefintion));
+				}
+				else if (entry.State == DbEntityEntryState.Deleted)
 				{
 					var idFieldValue = EntityMapper.GetIdValue(entry.Entity);
 					var filter = Builders<TEntity>.Filter.Eq(idFieldName, idFieldValue);
-					var updateDefintion = entry.GetUpdateDefinition();
-					var operation = new UpdateOneModel<TEntity>(filter, updateDefintion);
-					operations.Add(operation);
+					writeModel.Add(new DeleteOneModel<TEntity>(filter));
 				}
 			}
 
-			return operations;
+			return writeModel;
 		}
 
-		public void Update(DbEntityEntry<TEntity> entry)
+		public void Write(IDbEntityContainer<TEntity> entityContainer)
 		{
-			UpdateRange(new[] { entry });
+			var writeModel = BuildWriteModel(entityContainer);
+			//TODO: Add support for Transactions with MongoDB Server 4.0
+			GetCollection().BulkWrite(writeModel);
 		}
 
-		public void UpdateRange(IEnumerable<DbEntityEntry<TEntity>> entries)
+		public async Task WriteAsync(IDbEntityContainer<TEntity> entityContainer)
 		{
-			EntityMutation<TEntity>.MutateEntities(entries.Select(e => e.Entity), MutatorType.Update);
-			var operations = GenerateWriteOperations(entries);
-
-			if (operations.Any())
-			{
-				GetCollection().BulkWrite(operations);
-			}
-		}
-
-		protected FilterDefinition<TEntity> GenerateIdFilter(IEnumerable<TEntity> entities)
-		{
-			var idFieldName = EntityMapper.GetIdName();
-			FilterDefinition<TEntity> filter = null;
-
-			foreach (var entity in entities)
-			{
-				var idFieldValue = EntityMapper.GetIdValue(entity);
-
-				if (filter != null)
-				{
-					filter = filter | Builders<TEntity>.Filter.Eq(idFieldName, idFieldValue);
-				}
-				else
-				{
-					filter = Builders<TEntity>.Filter.Eq(idFieldName, idFieldValue);
-				}
-			}
-
-			return filter;
-		}
-
-		public void Remove(TEntity entity)
-		{
-			RemoveRange(new[] { entity });
-		}
-
-		public void RemoveRange(IEnumerable<TEntity> entities)
-		{
-			var filter = GenerateIdFilter(entities);
-			GetCollection().DeleteMany(filter);
+			var writeModel = BuildWriteModel(entityContainer);
+			//TODO: Add support for Transactions with MongoDB Server 4.0
+			await GetCollection().BulkWriteAsync(writeModel);
 		}
 	}
 }

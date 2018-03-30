@@ -33,20 +33,5 @@ namespace MongoFramework.Infrastructure
 		{
 			return BsonDiff.HasDifferences(entry.OriginalValues, entry.CurrentValues);
 		}
-
-		/// <summary>
-		/// Get the changes between the originan and current values of the entity as an update definition.
-		/// </summary>
-		/// <typeparam name="TEntity"></typeparam>
-		/// <param name="entry"></param>
-		/// <returns></returns>
-		public static UpdateDefinition<TEntity> GetUpdateDefinition<TEntity>(this DbEntityEntry<TEntity> entry)
-		{
-			if (entry.HasChanges())
-			{
-				return UpdateDefinitionHelper.CreateFromDiff<TEntity>(entry.OriginalValues, entry.CurrentValues);
-			}
-			return null;
-		}
 	}
 }

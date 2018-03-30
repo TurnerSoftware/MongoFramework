@@ -2,6 +2,7 @@
 using MongoFramework.Infrastructure;
 using MongoFramework.Tests.Models;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MongoFramework.Tests
 {
@@ -12,64 +13,47 @@ namespace MongoFramework.Tests
 		public void AddEntity()
 		{
 			var database = TestConfiguration.GetDatabase();
+			var entityContainer = new DbEntityContainer<EntityWriterModel>();
 			var writer = new DbEntityWriter<EntityWriterModel>(database);
+
 			var entity = new EntityWriterModel
 			{
 				Title = "DbEntityWriterTests.AddEntity"
 			};
 
-			writer.Add(entity);
+			entityContainer.Update(entity, DbEntityEntryState.Added);
+			writer.Write(entityContainer);
 
 			Assert.IsNotNull(entity.Id);
 		}
 
 		[TestMethod]
-		public void AddEntities()
+		public void AddMixedTypeEntities()
 		{
 			var database = TestConfiguration.GetDatabase();
+			var entityContainer = new DbEntityContainer<EntityWriterModel>();
 			var writer = new DbEntityWriter<EntityWriterModel>(database);
 			var entities = new[]
 			{
 				new EntityWriterModel
 				{
-					Title = "DbEntityWriterTests.AddEntities"
-				},
-				new EntityWriterModel
-				{
-					Title = "DbEntityWriterTests.AddEntities"
-				},
-				new EntityWriterModel
-				{
-					Title = "DbEntityWriterTests.AddEntities"
-				}
-			};
-
-			writer.AddRange(entities);
-
-			Assert.IsTrue(entities.All(e => e.Id != null));
-		}
-
-		[TestMethod]
-		public void AddMixedEntities()
-		{
-			var database = TestConfiguration.GetDatabase();
-			var writer = new DbEntityWriter<EntityWriterModel>(database);
-			var entities = new[]
-			{
-				new EntityWriterModel
-				{
-					Title = "DbEntityWriterTests.AddMixedEntities"
+					Title = "DbEntityWriterTests.AddMixedTypeEntities"
 				},
 				new ExtendedEntityWriterModel
 				{
-					Title = "DbEntityWriterTests.AddMixedEntities",
+					Title = "DbEntityWriterTests.AddMixedTypeEntities",
 					AdditionalField = "AdditionalFieldSet"
 				}
 			};
 
-			writer.AddRange(entities);
+			foreach (var entity in entities)
+			{
+				entityContainer.Update(entity, DbEntityEntryState.Added);
+			}
 
-			Assert.IsTrue(entities.OfType<EntityWriterModel>().Any(e => e.Title == "DbEntityWriterTests.AddMixedEntities"));
+			writer.Write(entityContainer);
+
+			Assert.IsTrue(entities.OfType<EntityWriterModel>().Any(e => e.Title == "DbEntityWriterTests.AddMixedTypeEntities"));
 			Assert.IsTrue(entities.OfType<ExtendedEntityWriterModel>().Any(e => e.AdditionalField == "AdditionalFieldSet"));
 		}
 
@@ -77,6 +61,7 @@ namespace MongoFramework.Tests
 		public void UpdateEntity()
 		{
 			var database = TestConfiguration.GetDatabase();
+			var entityContainer = new DbEntityContainer<EntityWriterModel>();
 			var writer = new DbEntityWriter<EntityWriterModel>(database);
 			var reader = new DbEntityReader<EntityWriterModel>(database);
 
@@ -85,7 +70,10 @@ namespace MongoFramework.Tests
 			{
 				Title = "DbEntityWriterTests.UpdateEntity"
 			};
-			writer.Add(entity);
+
+			entityContainer.Update(entity, DbEntityEntryState.Added);
+			writer.Write(entityContainer);
+			entityContainer.Clear();
 
 			//Our updated entity with the same ID
 			var updatedEntity = new EntityWriterModel
@@ -93,7 +81,9 @@ namespace MongoFramework.Tests
 				Id = entity.Id,
 				Title = "DbEntityWriterTests.UpdateEntity-Updated"
 			};
-			writer.Update(updatedEntity);
+
+			entityContainer.Update(updatedEntity, DbEntityEntryState.Updated);
+			writer.Write(entityContainer);
 
 			var dbEntity = reader.AsQueryable().Where(e => e.Id == entity.Id).FirstOrDefault();
 			Assert.AreEqual("DbEntityWriterTests.UpdateEntity-Updated", dbEntity.Title);
@@ -103,6 +93,7 @@ namespace MongoFramework.Tests
 		public void RemoveEntity()
 		{
 			var database = TestConfiguration.GetDatabase();
+			var entityContainer = new DbEntityContainer<EntityWriterModel>();
 			var writer = new DbEntityWriter<EntityWriterModel>(database);
 			var reader = new DbEntityReader<EntityWriterModel>(database);
 
@@ -111,155 +102,92 @@ namespace MongoFramework.Tests
 			{
 				Title = "DbEntityWriterTests.RemoveEntity"
 			};
-			writer.Add(entity);
+
+			entityContainer.Update(entity, DbEntityEntryState.Added);
+			writer.Write(entityContainer);
+			entityContainer.Clear();
 
 			//Remove the entity
-			writer.Remove(entity);
+			entityContainer.Update(entity, DbEntityEntryState.Deleted);
+			writer.Write(entityContainer);
 
 			Assert.IsFalse(reader.AsQueryable().Any(e => e.Id == entity.Id));
 		}
 
 		[TestMethod]
-		public void AddViaChangeTracker()
+		public void MixedActionWrite()
 		{
 			var database = TestConfiguration.GetDatabase();
+			var entityContainer = new DbEntityContainer<EntityWriterModel>();
 			var writer = new DbEntityWriter<EntityWriterModel>(database);
 			var reader = new DbEntityReader<EntityWriterModel>(database);
-			var changeTracker = new DbChangeTracker<EntityWriterModel>();
 
-			var entity = new EntityWriterModel
+			var updateEntity = new EntityWriterModel
 			{
-				Title = "DbEntityWriterTests.AddViaChangeTracker"
+				Title = "DbEntityWriterTests.MixedActionWrite-UpdateEntity"
 			};
-			changeTracker.Update(entity, DbEntityEntryState.Added);
+			var deleteEntity = new EntityWriterModel
+			{
+				Title = "DbEntityWriterTests.MixedActionWrite-DeleteEntity"
+			};
+			entityContainer.Update(updateEntity, DbEntityEntryState.Added);
+			entityContainer.Update(deleteEntity, DbEntityEntryState.Added);
+			writer.Write(entityContainer);
+			entityContainer.Clear();
 
-			writer.WriteChanges(changeTracker);
+			var addedEntity = new EntityWriterModel
+			{
+				Title = "DbEntityWriterTests.MixedActionWrite-AddEntity"
+			};
+			updateEntity.Title = "DbEntityWriterTests.MixedActionWrite-UpdateEntity-Updated";
+			entityContainer.Update(addedEntity, DbEntityEntryState.Added);
+			entityContainer.Update(updateEntity, DbEntityEntryState.Updated);
+			entityContainer.Update(deleteEntity, DbEntityEntryState.Deleted);
+			writer.Write(entityContainer);
 
-			Assert.IsTrue(reader.AsQueryable().Any(e => e.Id == entity.Id));
-			Assert.AreEqual(DbEntityEntryState.NoChanges, changeTracker.GetEntry(entity).State);
+			Assert.IsTrue(reader.AsQueryable().Where(e => e.Id == addedEntity.Id).Any());
+			Assert.IsFalse(reader.AsQueryable().Where(e => e.Id == deleteEntity.Id).Any());
+
+			var dbEntity = reader.AsQueryable().Where(e => e.Id == updateEntity.Id).FirstOrDefault();
+			Assert.AreEqual("DbEntityWriterTests.MixedActionWrite-UpdateEntity-Updated", dbEntity.Title);
 		}
 
 		[TestMethod]
-		public void UpdatedViaChangeTracker()
+		public async Task MixedActionWriteAsync()
 		{
 			var database = TestConfiguration.GetDatabase();
+			var entityContainer = new DbEntityContainer<EntityWriterModel>();
 			var writer = new DbEntityWriter<EntityWriterModel>(database);
 			var reader = new DbEntityReader<EntityWriterModel>(database);
-			var changeTracker = new DbChangeTracker<EntityWriterModel>();
 
-			var entity = new EntityWriterModel
+			var updateEntity = new EntityWriterModel
 			{
-				Title = "DbEntityWriterTests.UpdatedViaChangeTracker"
+				Title = "DbEntityWriterTests.MixedActionWriteAsync-UpdateEntity"
 			};
-			changeTracker.Update(entity, DbEntityEntryState.Added);
-
-			writer.WriteChanges(changeTracker);
-
-			entity.Title = "DbEntityWriterTests.UpdatedViaChangeTracker-Updated";
-			changeTracker.DetectChanges();
-
-			Assert.AreEqual(DbEntityEntryState.Updated, changeTracker.GetEntry(entity).State);
-
-			writer.WriteChanges(changeTracker);
-
-			var dbEntity = reader.AsQueryable().Where(e => e.Id == entity.Id).FirstOrDefault();
-			Assert.AreEqual("DbEntityWriterTests.UpdatedViaChangeTracker-Updated", dbEntity.Title);
-			Assert.AreEqual(DbEntityEntryState.NoChanges, changeTracker.GetEntry(entity).State);
-		}
-
-		[TestMethod]
-		public void UpdatedRangeViaChangeTracker()
-		{
-			var database = TestConfiguration.GetDatabase();
-			var writer = new DbEntityWriter<EntityWriterModel>(database);
-			var reader = new DbEntityReader<EntityWriterModel>(database);
-			var changeTracker = new DbChangeTracker<EntityWriterModel>();
-
-			var entities = new[]
+			var deleteEntity = new EntityWriterModel
 			{
-				new EntityWriterModel
-				{
-					Title = "DbEntityWriterTests.UpdatedRangeViaChangeTracker"
-				},
-				new EntityWriterModel
-				{
-					Title = "DbEntityWriterTests.UpdatedRangeViaChangeTracker"
-				},
-				new EntityWriterModel
-				{
-					Title = "DbEntityWriterTests.UpdatedRangeViaChangeTracker"
-				}
+				Title = "DbEntityWriterTests.MixedActionWriteAsync-DeleteEntity"
 			};
-			changeTracker.UpdateRange(entities, DbEntityEntryState.Added);
+			entityContainer.Update(updateEntity, DbEntityEntryState.Added);
+			entityContainer.Update(deleteEntity, DbEntityEntryState.Added);
+			await writer.WriteAsync(entityContainer);
+			entityContainer.Clear();
 
-			writer.WriteChanges(changeTracker);
-
-			entities[0].Title = "DbEntityWriterTests.UpdatedRangeViaChangeTracker-Updated";
-			changeTracker.DetectChanges();
-
-			writer.WriteChanges(changeTracker);
-
-			Assert.IsTrue(reader.AsQueryable().Any(e => e.Title == "DbEntityWriterTests.UpdatedRangeViaChangeTracker-Updated"));
-		}
-
-		[TestMethod]
-		public void RemovedViaChangeTracker()
-		{
-			var database = TestConfiguration.GetDatabase();
-			var writer = new DbEntityWriter<EntityWriterModel>(database);
-			var reader = new DbEntityReader<EntityWriterModel>(database);
-			var changeTracker = new DbChangeTracker<EntityWriterModel>();
-
-			var entity = new EntityWriterModel
+			var addedEntity = new EntityWriterModel
 			{
-				Title = "DbEntityWriterTests.UpdatedViaChangeTracker"
+				Title = "DbEntityWriterTests.MixedActionWriteAsync-AddEntity"
 			};
-			changeTracker.Update(entity, DbEntityEntryState.Added);
+			updateEntity.Title = "DbEntityWriterTests.MixedActionWriteAsync-UpdateEntity-Updated";
+			entityContainer.Update(addedEntity, DbEntityEntryState.Added);
+			entityContainer.Update(updateEntity, DbEntityEntryState.Updated);
+			entityContainer.Update(deleteEntity, DbEntityEntryState.Deleted);
+			await writer.WriteAsync(entityContainer);
 
-			writer.WriteChanges(changeTracker);
+			Assert.IsTrue(reader.AsQueryable().Where(e => e.Id == addedEntity.Id).Any());
+			Assert.IsFalse(reader.AsQueryable().Where(e => e.Id == deleteEntity.Id).Any());
 
-			changeTracker.Update(entity, DbEntityEntryState.Deleted);
-			changeTracker.DetectChanges();
-
-			writer.WriteChanges(changeTracker);
-
-			Assert.IsFalse(reader.AsQueryable().Any(e => e.Id == entity.Id));
-		}
-
-		[TestMethod]
-		public void RemovedRangeViaChangeTracker()
-		{
-			var database = TestConfiguration.GetDatabase();
-			var writer = new DbEntityWriter<EntityWriterModel>(database);
-			var reader = new DbEntityReader<EntityWriterModel>(database);
-			var changeTracker = new DbChangeTracker<EntityWriterModel>();
-
-			var entities = new[]
-			{
-				new EntityWriterModel
-				{
-					Title = "DbEntityWriterTests.RemovedRangeViaChangeTracker"
-				},
-				new EntityWriterModel
-				{
-					Title = "DbEntityWriterTests.RemovedRangeViaChangeTracker"
-				},
-				new EntityWriterModel
-				{
-					Title = "DbEntityWriterTests.RemovedRangeViaChangeTracker"
-				}
-			};
-			changeTracker.UpdateRange(entities, DbEntityEntryState.Added);
-
-			writer.WriteChanges(changeTracker);
-
-			changeTracker.UpdateRange(entities, DbEntityEntryState.Deleted);
-			changeTracker.DetectChanges();
-
-			writer.WriteChanges(changeTracker);
-
-			var addedEntityIds = entities.Select(e => e.Id);
-			Assert.IsFalse(reader.AsQueryable().Any(e => addedEntityIds.Contains(e.Id)));
+			var dbEntity = reader.AsQueryable().Where(e => e.Id == updateEntity.Id).FirstOrDefault();
+			Assert.AreEqual("DbEntityWriterTests.MixedActionWriteAsync-UpdateEntity-Updated", dbEntity.Title);
 		}
 	}
 }
