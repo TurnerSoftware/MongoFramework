@@ -14,7 +14,7 @@ namespace MongoFramework.Tests.Mutation.Mutators.IncrementNumber
 			var entityMapper = new EntityMapper<IncrementalEntity>();
 			var mutator = new EntityAttributeMutator<IncrementalEntity>();
 
-			mutator.MutateEntity(entity, type, entityMapper);
+			mutator.MutateEntity(entity, type, entityMapper, null);
 			return entity;
 		}
 
