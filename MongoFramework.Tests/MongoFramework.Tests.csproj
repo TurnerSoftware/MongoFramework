@@ -78,6 +78,9 @@
     <Compile Include="Bson\GetDifferencesTests.cs" />
     <Compile Include="Bson\HasDifferencesTests.cs" />
     <Compile Include="DbEntityContainerTests.cs" />
+    <Compile Include="EntityRelationships\SingleEntity\BaseEntityModel.cs" />
+    <Compile Include="EntityRelationships\SingleEntity\SingleEntityHelperTests.cs" />
+    <Compile Include="EntityRelationships\SingleEntity\UserEntityModel.cs" />
     <Compile Include="Linq\LinqExtensionsTests.cs" />
     <Compile Include="Linq\MongoFrameworkQueryableTestProcessor.cs" />
     <Compile Include="Linq\MongoFrameworkQueryableTests.cs" />

@@ -9,7 +9,7 @@ using MongoFramework.Linq;
 
 namespace MongoFramework.Infrastructure.EntityRelationships
 {
-	public class EntityCollectionRelationship<TEntity> : ICollection<TEntity>
+	public class EntityCollectionRelationship<TEntity> : ICollection<TEntity>, IEntityCollectionRelationship
 	{
 		private DbEntityContainer<TEntity> Container { get; } = new DbEntityContainer<TEntity>();
 		private IEnumerable<string> ImportEntityIds { get; set; }

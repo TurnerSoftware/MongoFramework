@@ -31,7 +31,20 @@ namespace MongoFramework.Infrastructure.Mutation.Mutators
 
 		private void ProcessRead(TEntity entity, IEntityMapper entityMapper, IMongoDatabase database)
 		{
-			EntityRelationshipHelper.GetRelationshipsForType(typeof(TEntity));
+			var relationships = EntityRelationshipHelper.GetRelationshipsForType(typeof(TEntity));
+
+			foreach (var relationship in relationships)
+			{
+				if (relationship.IsCollection)
+				{
+					var collection = relationship.NavigationProperty.GetValue(entity) as IEntityCollectionRelationship;
+					collection.FinaliseImport(database);
+				}
+				else
+				{
+
+				}
+			}
 
 			var completeMapping = entityMapper.TraverseMapping().ToArray();
 
