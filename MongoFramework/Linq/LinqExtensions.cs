@@ -1,6 +1,9 @@
 ﻿using MongoFramework.Infrastructure.Linq;
+using MongoFramework.Infrastructure.Mapping;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace MongoFramework.Linq
 {
@@ -14,6 +17,24 @@ namespace MongoFramework.Linq
 			}
 
 			return (queryable as IMongoFrameworkQueryable).ToQuery();
+		}
+
+		public static IQueryable<TEntity> WhereIdMatches<TEntity>(this IQueryable<TEntity> queryable, IEnumerable<object> entityIds)
+		{
+			var entityMapper = new EntityMapper<TEntity>();
+			var idPropertyName = entityMapper.GetEntityMapping().Where(m => m.IsKey).Select(m => m.Property.Name).FirstOrDefault();
+			
+			//Dynamically build the LINQ query, it looks something like: e => entityIds.Contains(e.{idPropertyName})
+			var entityParameter = Expression.Parameter(typeof(TEntity), "e");
+			var idPropertyExpression = Expression.Property(entityParameter, idPropertyName);
+			var entityIdsExpression = Expression.Constant(entityIds);
+			var callExpression = Expression.Call(typeof(Enumerable), "Contains", new[] { typeof(object) }, entityIdsExpression, idPropertyExpression);
+			var expression = Expression.Lambda<Func<TEntity, bool>>(
+				Expression.Call(typeof(Enumerable), "Contains", new[] { typeof(object) }, entityIdsExpression, idPropertyExpression),
+				entityParameter
+			);
+			
+			return queryable.Where(expression);
 		}
 	}
 }

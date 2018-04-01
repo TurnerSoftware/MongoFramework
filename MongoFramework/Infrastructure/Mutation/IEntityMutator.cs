@@ -5,6 +5,6 @@ namespace MongoFramework.Infrastructure.Mutation
 {
 	public interface IEntityMutator<TEntity>
 	{
-		void MutateEntity(TEntity entity, MutatorType mutationType, IEntityMapper entityMapper, IMongoDatabase database = null);
+		void MutateEntity(TEntity entity, MutatorType mutationType, IEntityMapper entityMapper, IMongoDatabase database);
 	}
 }

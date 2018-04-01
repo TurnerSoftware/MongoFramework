@@ -37,12 +37,12 @@ namespace MongoFramework.Infrastructure
 			{
 				if (entry.State == DbEntityEntryState.Added)
 				{
-					EntityMutation<TEntity>.MutateEntity(entry.Entity, MutatorType.Insert);
+					EntityMutation<TEntity>.MutateEntity(entry.Entity, MutatorType.Insert, Database);
 					writeModel.Add(new InsertOneModel<TEntity>(entry.Entity));
 				}
 				else if (entry.State == DbEntityEntryState.Updated)
 				{
-					EntityMutation<TEntity>.MutateEntity(entry.Entity, MutatorType.Update);
+					EntityMutation<TEntity>.MutateEntity(entry.Entity, MutatorType.Update, Database);
 					var idFieldValue = EntityMapper.GetIdValue(entry.Entity);
 					var filter = Builders<TEntity>.Filter.Eq(idFieldName, idFieldValue);
 					var updateDefintion = UpdateDefinitionHelper.CreateFromDiff<TEntity>(entry.OriginalValues, entry.CurrentValues);

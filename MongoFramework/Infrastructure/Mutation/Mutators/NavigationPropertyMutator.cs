@@ -6,17 +6,17 @@ using MongoDB.Driver;
 using MongoFramework.Infrastructure.Mapping;
 using System.Reflection;
 using System.ComponentModel.DataAnnotations.Schema;
+using MongoFramework.Infrastructure.EntityRelationships;
 
 namespace MongoFramework.Infrastructure.Mutation.Mutators
 {
 	public class NavigationPropertyMutator<TEntity> : IEntityMutator<TEntity>
 	{
-		public void MutateEntity(TEntity entity, MutatorType mutationType, IEntityMapper entityMapper, IMongoDatabase database = null)
+		public void MutateEntity(TEntity entity, MutatorType mutationType, IEntityMapper entityMapper, IMongoDatabase database)
 		{
 			if (database == null)
 			{
-				//Can't add navigation properties 
-				return;
+				throw new ArgumentNullException(nameof(database));
 			}
 
 			if (mutationType == MutatorType.Select)
@@ -31,7 +31,11 @@ namespace MongoFramework.Infrastructure.Mutation.Mutators
 
 		private void ProcessRead(TEntity entity, IEntityMapper entityMapper, IMongoDatabase database)
 		{
+			EntityRelationshipHelper.GetRelationshipsForType(typeof(TEntity));
+
 			var completeMapping = entityMapper.TraverseMapping().ToArray();
+
+
 
 			foreach (var mapping in completeMapping)
 			{

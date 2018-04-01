@@ -17,12 +17,12 @@ namespace MongoFramework.Infrastructure.Mutation
 			};
 		}
 
-		public static void MutateEntity(TEntity entity, MutatorType mutationType, IMongoDatabase database = null)
+		public static void MutateEntity(TEntity entity, MutatorType mutationType, IMongoDatabase database)
 		{
 			MutateEntities(new[] { entity }, mutationType, database);
 		}
 
-		public static void MutateEntities(IEnumerable<TEntity> entities, MutatorType mutationType, IMongoDatabase database = null)
+		public static void MutateEntities(IEnumerable<TEntity> entities, MutatorType mutationType, IMongoDatabase database)
 		{
 			var entityMapper = new EntityMapper<TEntity>();
 

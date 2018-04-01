@@ -5,6 +5,7 @@ using MongoDB.Bson.Serialization;
 using System.Reflection;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using MongoFramework.Infrastructure.EntityRelationships;
 
 namespace MongoFramework.Infrastructure.Mapping.Processors
 {
@@ -12,25 +13,20 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 	{
 		public void ApplyMapping(Type entityType, BsonClassMap classMap)
 		{
-			var propertyMap = entityType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToDictionary(p => p.Name);
+			var relationships = EntityRelationshipHelper.GetRelationshipsForType(entityType);
 
-			foreach (var mapping in propertyMap)
+			foreach (var relationship in relationships)
 			{
-				var property = mapping.Value;
-				var foreignKeyName = property.Name;
-				var foreignKeyAttr = property.GetCustomAttribute<ForeignKeyAttribute>();
-
-				if (foreignKeyName.EndsWith("Id") || foreignKeyAttr != null)
+				if (relationship.IsCollection)
 				{
-					var navigationPropertyName = foreignKeyAttr?.Name ?? foreignKeyName.Substring(0, foreignKeyName.Length - 2);
-
-					if (!propertyMap.ContainsKey(navigationPropertyName))
-					{
-						throw new MongoFrameworkMappingException($"Can't find property ${navigationPropertyName} on ${entityType.Name} for navigation property mapping.");
-					}
-
-					var navigationProperty = propertyMap[navigationPropertyName];
-					classMap.UnmapMember(navigationProperty);
+					var memberMap = classMap.MapMember(relationship.NavigationProperty);
+					var serializerType = typeof(EntityCollectionRelationshipSerializer<>).MakeGenericType(relationship.CollectionEntityType);
+					var entitySpecificSerializer = Activator.CreateInstance(serializerType) as IBsonSerializer;
+					memberMap.SetSerializer(entitySpecificSerializer);
+				}
+				else
+				{
+					classMap.UnmapMember(relationship.NavigationProperty);
 				}
 			}
 		}
