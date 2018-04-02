@@ -71,6 +71,13 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 
 					if (inversePropertyAttr != null)
 					{
+						throw new NotImplementedException("InversePropertyAttribute not supported");
+						//While the logic below is correct, the EntityNavigationCollection doesn't support loading entities by arbitary properties
+						//Really what needs to change is a method like "WhereIdMatches" but takes in the property to look at
+						//This means `BeginImport` needs to know the relationship details
+						//This means `NavigationPropertyProcessor` needs to pass it to the serializer on creation
+						//All doable but not right now...
+
 						idProperty = relatedEntityMapping.Where(m => m.Property.Name == inversePropertyAttr.Property).Select(m => m.Property).FirstOrDefault();
 
 						if (idProperty == null)
