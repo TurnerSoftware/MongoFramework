@@ -19,7 +19,7 @@ namespace MongoFramework.Linq
 			return (queryable as IMongoFrameworkQueryable).ToQuery();
 		}
 
-		public static IQueryable<TEntity> WhereIdMatches<TEntity>(this IQueryable<TEntity> queryable, IEnumerable<object> entityIds)
+		public static IQueryable<TEntity> WhereIdMatches<TEntity, TIdentifierType>(this IQueryable<TEntity> queryable, IEnumerable<TIdentifierType> entityIds)
 		{
 			var entityMapper = new EntityMapper<TEntity>();
 			var idPropertyName = entityMapper.GetEntityMapping().Where(m => m.IsKey).Select(m => m.Property.Name).FirstOrDefault();
@@ -28,9 +28,8 @@ namespace MongoFramework.Linq
 			var entityParameter = Expression.Parameter(typeof(TEntity), "e");
 			var idPropertyExpression = Expression.Property(entityParameter, idPropertyName);
 			var entityIdsExpression = Expression.Constant(entityIds);
-			var callExpression = Expression.Call(typeof(Enumerable), "Contains", new[] { typeof(object) }, entityIdsExpression, idPropertyExpression);
 			var expression = Expression.Lambda<Func<TEntity, bool>>(
-				Expression.Call(typeof(Enumerable), "Contains", new[] { typeof(object) }, entityIdsExpression, idPropertyExpression),
+				Expression.Call(typeof(Enumerable), "Contains", new[] { typeof(TIdentifierType) }, entityIdsExpression, idPropertyExpression),
 				entityParameter
 			);
 			

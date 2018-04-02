@@ -10,25 +10,27 @@ namespace MongoFramework.Infrastructure
 	{
 		protected List<DbEntityEntry<TEntity>> Entries { get; } = new List<DbEntityEntry<TEntity>>();
 
+		private EntityMapper<TEntity> EntityMapper { get; } = new EntityMapper<TEntity>();
+
 		public int Count => Entries.Count;
 
 		public bool IsReadOnly => false;
-
+		
 		public DbEntityEntry<TEntity> GetEntry(TEntity entity)
 		{
-			var entityMapper = new EntityMapper<TEntity>();
-			var entityId = entityMapper.GetIdValue(entity);
-
+			var entityId = EntityMapper.GetIdValue(entity);
+			var defaultIdValue = entityId != null ? Activator.CreateInstance(entityId.GetType()) : null;
+			
 			foreach (var entry in Entries)
 			{
-				if (entityId == null && entry.Entity.Equals(entity))
+				if ((entityId == null || entityId.Equals(defaultIdValue)) && entry.Entity.Equals(entity))
 				{
 					return entry;
 				}
 				else
 				{
-					var entryEntityId = entityMapper.GetIdValue(entry.Entity);
-					if (entryEntityId != null && entryEntityId.Equals(entityId))
+					var entryEntityId = EntityMapper.GetIdValue(entry.Entity);
+					if (entryEntityId != null && !entryEntityId.Equals(defaultIdValue) && entryEntityId.Equals(entityId))
 					{
 						return entry;
 					}
