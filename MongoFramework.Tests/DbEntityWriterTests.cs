@@ -13,7 +13,7 @@ namespace MongoFramework.Tests
 		public void AddEntity()
 		{
 			var database = TestConfiguration.GetDatabase();
-			var entityContainer = new DbEntityContainer<EntityWriterModel>();
+			var entityContainer = new DbEntityCollection<EntityWriterModel>();
 			var writer = new DbEntityWriter<EntityWriterModel>(database);
 
 			var entity = new EntityWriterModel
@@ -31,7 +31,7 @@ namespace MongoFramework.Tests
 		public void AddMixedTypeEntities()
 		{
 			var database = TestConfiguration.GetDatabase();
-			var entityContainer = new DbEntityContainer<EntityWriterModel>();
+			var entityContainer = new DbEntityCollection<EntityWriterModel>();
 			var writer = new DbEntityWriter<EntityWriterModel>(database);
 			var entities = new[]
 			{
@@ -61,7 +61,7 @@ namespace MongoFramework.Tests
 		public void UpdateEntity()
 		{
 			var database = TestConfiguration.GetDatabase();
-			var entityContainer = new DbEntityContainer<EntityWriterModel>();
+			var entityContainer = new DbEntityCollection<EntityWriterModel>();
 			var writer = new DbEntityWriter<EntityWriterModel>(database);
 			var reader = new DbEntityReader<EntityWriterModel>(database);
 
@@ -93,7 +93,7 @@ namespace MongoFramework.Tests
 		public void RemoveEntity()
 		{
 			var database = TestConfiguration.GetDatabase();
-			var entityContainer = new DbEntityContainer<EntityWriterModel>();
+			var entityContainer = new DbEntityCollection<EntityWriterModel>();
 			var writer = new DbEntityWriter<EntityWriterModel>(database);
 			var reader = new DbEntityReader<EntityWriterModel>(database);
 
@@ -118,7 +118,7 @@ namespace MongoFramework.Tests
 		public void MixedActionWrite()
 		{
 			var database = TestConfiguration.GetDatabase();
-			var entityContainer = new DbEntityContainer<EntityWriterModel>();
+			var entityContainer = new DbEntityCollection<EntityWriterModel>();
 			var writer = new DbEntityWriter<EntityWriterModel>(database);
 			var reader = new DbEntityReader<EntityWriterModel>(database);
 
@@ -156,7 +156,7 @@ namespace MongoFramework.Tests
 		public async Task MixedActionWriteAsync()
 		{
 			var database = TestConfiguration.GetDatabase();
-			var entityContainer = new DbEntityContainer<EntityWriterModel>();
+			var entityContainer = new DbEntityCollection<EntityWriterModel>();
 			var writer = new DbEntityWriter<EntityWriterModel>(database);
 			var reader = new DbEntityReader<EntityWriterModel>(database);
 

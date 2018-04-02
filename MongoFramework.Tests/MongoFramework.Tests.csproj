@@ -77,7 +77,7 @@
     <Compile Include="AssertExtensions.cs" />
     <Compile Include="Bson\GetDifferencesTests.cs" />
     <Compile Include="Bson\HasDifferencesTests.cs" />
-    <Compile Include="DbEntityContainerTests.cs" />
+    <Compile Include="DbEntityCollectionTests.cs" />
     <Compile Include="EntityRelationships\SingleEntity\BaseEntityModel.cs" />
     <Compile Include="EntityRelationships\SingleEntity\SingleEntityHelperTests.cs" />
     <Compile Include="EntityRelationships\SingleEntity\UserEntityModel.cs" />

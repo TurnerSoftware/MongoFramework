@@ -1,6 +1,6 @@
 ﻿namespace MongoFramework.Infrastructure
 {
-	public interface IDbEntityChangeTracker<TEntity> : IDbEntityContainer<TEntity>
+	public interface IDbEntityChangeTracker<TEntity> : IDbEntityCollection<TEntity>
 	{
 		void DetectChanges();
 		void CommitChanges();

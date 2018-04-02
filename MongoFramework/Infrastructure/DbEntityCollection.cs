@@ -1,11 +1,18 @@
 ﻿using MongoFramework.Infrastructure.Mapping;
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MongoFramework.Infrastructure
 {
-	public class DbEntityContainer<TEntity> : IDbEntityContainer<TEntity>
+	public class DbEntityCollection<TEntity> : IDbEntityCollection<TEntity>
 	{
 		protected List<DbEntityEntry<TEntity>> Entries { get; } = new List<DbEntityEntry<TEntity>>();
+
+		public int Count => Entries.Count;
+
+		public bool IsReadOnly => false;
 
 		public DbEntityEntry<TEntity> GetEntry(TEntity entity)
 		{
@@ -57,18 +64,65 @@ namespace MongoFramework.Infrastructure
 			}
 		}
 
-		public void Remove(TEntity entity)
+		public bool Remove(TEntity entity)
 		{
 			var entry = GetEntry(entity);
 			if (entry != null)
 			{
 				Entries.Remove(entry);
+				return true;
 			}
+			return false;
 		}
 
 		public void Clear()
 		{
 			Entries.Clear();
+		}
+
+		public void Add(TEntity item)
+		{
+			Update(item, DbEntityEntryState.Added);
+		}
+
+		public bool Contains(TEntity item)
+		{
+			return GetEntry(item) != null;
+		}
+
+		public void CopyTo(TEntity[] array, int arrayIndex)
+		{
+			if (array == null)
+			{
+				throw new ArgumentNullException(nameof(array));
+			}
+
+			if (arrayIndex < 0 || array.Length - arrayIndex < Count)
+			{
+				throw new IndexOutOfRangeException();
+			}
+
+			for (var i = 0; i < Count; i++)
+			{
+				array[i + arrayIndex] = Entries[i].Entity;
+			}
+		}
+		
+		public IEnumerator<TEntity> GetEnumerator()
+		{
+			var result = Entries.Select(e => e.Entity);
+			using (var enumerator = result.GetEnumerator())
+			{
+				while (enumerator.MoveNext())
+				{
+					yield return enumerator.Current;
+				}
+			}
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
 		}
 	}
 }

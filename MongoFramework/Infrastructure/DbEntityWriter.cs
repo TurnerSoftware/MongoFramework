@@ -28,12 +28,12 @@ namespace MongoFramework.Infrastructure
 			return Database.GetCollection<TEntity>(collectionName);
 		}
 
-		private IEnumerable<WriteModel<TEntity>> BuildWriteModel(IDbEntityContainer<TEntity> entityContainer)
+		private IEnumerable<WriteModel<TEntity>> BuildWriteModel(IDbEntityCollection<TEntity> entityCollection)
 		{
 			var idFieldName = EntityMapper.GetIdName();
 			var writeModel = new List<WriteModel<TEntity>>();
 
-			foreach (var entry in entityContainer.GetEntries())
+			foreach (var entry in entityCollection.GetEntries())
 			{
 				if (entry.State == DbEntityEntryState.Added)
 				{
@@ -59,16 +59,16 @@ namespace MongoFramework.Infrastructure
 			return writeModel;
 		}
 
-		public void Write(IDbEntityContainer<TEntity> entityContainer)
+		public void Write(IDbEntityCollection<TEntity> entityCollection)
 		{
-			var writeModel = BuildWriteModel(entityContainer);
+			var writeModel = BuildWriteModel(entityCollection);
 			//TODO: Add support for Transactions with MongoDB Server 4.0
 			GetCollection().BulkWrite(writeModel);
 		}
 
-		public async Task WriteAsync(IDbEntityContainer<TEntity> entityContainer)
+		public async Task WriteAsync(IDbEntityCollection<TEntity> entityCollection)
 		{
-			var writeModel = BuildWriteModel(entityContainer);
+			var writeModel = BuildWriteModel(entityCollection);
 			//TODO: Add support for Transactions with MongoDB Server 4.0
 			await GetCollection().BulkWriteAsync(writeModel);
 		}

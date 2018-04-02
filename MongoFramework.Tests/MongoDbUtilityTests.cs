@@ -42,7 +42,7 @@ namespace MongoFramework.Tests
 		public void ValidObjectId()
 		{
 			var database = TestConfiguration.GetDatabase();
-			var entityContainer = new DbEntityContainer<MongoDbUtilityModel>();
+			var entityContainer = new DbEntityCollection<MongoDbUtilityModel>();
 			var writer = new DbEntityWriter<MongoDbUtilityModel>(database);
 
 			var entity = new MongoDbUtilityModel();

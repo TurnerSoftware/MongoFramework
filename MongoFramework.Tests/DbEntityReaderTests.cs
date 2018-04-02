@@ -12,7 +12,7 @@ namespace MongoFramework.Tests
 		public void ReadMixedEntities()
 		{
 			var database = TestConfiguration.GetDatabase();
-			var entityContainer = new DbEntityContainer<CommonEntity>();
+			var entityContainer = new DbEntityCollection<CommonEntity>();
 			var reader = new DbEntityReader<CommonEntity>(database);
 			var writer = new DbEntityWriter<CommonEntity>(database);
 

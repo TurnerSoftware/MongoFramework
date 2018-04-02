@@ -4,7 +4,7 @@ namespace MongoFramework.Infrastructure
 {
 	public interface IDbEntityWriter<TEntity>
 	{
-		void Write(IDbEntityContainer<TEntity> entityContainer);
-		Task WriteAsync(IDbEntityContainer<TEntity> entityContainer);
+		void Write(IDbEntityCollection<TEntity> entityCollection);
+		Task WriteAsync(IDbEntityCollection<TEntity> entityCollection);
 	}
 }

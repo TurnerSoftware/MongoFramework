@@ -11,7 +11,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 {
 	public class EntityCollectionRelationship<TEntity> : ICollection<TEntity>, IEntityCollectionRelationship
 	{
-		private DbEntityContainer<TEntity> Container { get; } = new DbEntityContainer<TEntity>();
+		private DbEntityCollection<TEntity> Container { get; } = new DbEntityCollection<TEntity>();
 		private IEnumerable<string> ImportEntityIds { get; set; }
 
 		public int Count => Container.GetEntries().Count();
