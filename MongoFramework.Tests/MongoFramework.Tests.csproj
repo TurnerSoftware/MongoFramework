@@ -79,7 +79,10 @@
     <Compile Include="Bson\HasDifferencesTests.cs" />
     <Compile Include="DbEntityCollectionTests.cs" />
     <Compile Include="EntityRelationships\SingleEntity\BaseEntityModel.cs" />
-    <Compile Include="EntityRelationships\SingleEntity\SingleEntityHelperTests.cs" />
+    <Compile Include="EntityRelationships\SingleEntity\BaseVariedIdModel.cs" />
+    <Compile Include="EntityRelationships\GuidIdModel.cs" />
+    <Compile Include="EntityRelationships\ObjectIdIdModel.cs" />
+    <Compile Include="EntityRelationships\SingleEntity\SingleEntityTests.cs" />
     <Compile Include="EntityRelationships\SingleEntity\UserEntityModel.cs" />
     <Compile Include="Linq\LinqExtensionsTests.cs" />
     <Compile Include="Linq\MongoFrameworkQueryableTestProcessor.cs" />
@@ -147,7 +150,7 @@
     <Compile Include="Mutation\Mutators\UpdatedDate\ValidAttributeUseModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestConfiguration.cs" />
-    <Compile Include="TestSetup.cs" />
+    <Compile Include="TestBase.cs" />
     <Compile Include="DbEntityWriterTests.cs" />
     <Compile Include="DbEntityChangeTrackerTests.cs" />
     <Compile Include="DbEntityReaderTests.cs" />

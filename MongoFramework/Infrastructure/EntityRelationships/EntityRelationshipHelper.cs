@@ -107,7 +107,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			}
 			else
 			{
-				var loadSingleEntityMethod = typeof(EntityRelationshipHelper).GetMethod("LoadSingleEntityProperty").MakeGenericMethod(relationship.EntityType);
+				var loadSingleEntityMethod = typeof(EntityRelationshipHelper).GetMethod("LoadSingleEntityProperty", BindingFlags.NonPublic | BindingFlags.Static).MakeGenericMethod(relationship.EntityType);
 				loadSingleEntityMethod.Invoke(targetEntity, new[] { targetEntity, relationship, database });
 			}
 		}
@@ -131,8 +131,8 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			}
 			else
 			{
-				var loadSingleEntityMethod = typeof(EntityRelationshipHelper).GetMethod("SaveSingleEntityProperty").MakeGenericMethod(relationship.EntityType);
-				loadSingleEntityMethod.Invoke(targetEntity, new[] { targetEntity, relationship, database });
+				var saveSingleEntityMethod = typeof(EntityRelationshipHelper).GetMethod("SaveSingleEntityProperty", BindingFlags.NonPublic | BindingFlags.Static).MakeGenericMethod(relationship.EntityType);
+				saveSingleEntityMethod.Invoke(targetEntity, new[] { targetEntity, relationship, database });
 			}
 		}
 
@@ -147,6 +147,9 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			collection.Update(navigationEntity, entityState);
 
 			dbEntityWriter.Write(collection);
+
+			var idValue = dbEntityWriter.EntityMapper.GetIdValue(navigationEntity);
+			relationship.IdProperty.SetValue(targetEntity, idValue);
 		}
 #pragma warning restore CRR0026 // Unused member - called through Reflection
 	}

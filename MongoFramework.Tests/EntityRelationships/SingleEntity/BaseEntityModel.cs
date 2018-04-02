@@ -10,6 +10,7 @@ namespace MongoFramework.Tests.EntityRelationships.SingleEntity
 	public class BaseEntityModel
 	{
 		public string Id { get; set; }
+		public string Description { get; set; }
 
 		[ForeignKey("CreatedBy")]
 		public string CreatedById { get; set; }
