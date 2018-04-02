@@ -19,7 +19,7 @@ namespace MongoFramework.Infrastructure
 		public DbEntityEntry<TEntity> GetEntry(TEntity entity)
 		{
 			var entityId = EntityMapper.GetIdValue(entity);
-			var defaultIdValue = entityId != null ? Activator.CreateInstance(entityId.GetType()) : null;
+			var defaultIdValue = entityId != null && entityId.GetType().IsValueType ? Activator.CreateInstance(entityId.GetType()) : null;
 			
 			foreach (var entry in Entries)
 			{
