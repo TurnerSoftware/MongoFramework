@@ -21,7 +21,7 @@ namespace MongoFramework.Infrastructure.Mutation.Mutators
 
 			if (mutationType == MutatorType.Select)
 			{
-				ProcessRead(entity, entityMapper, database);
+				ProcessRead(entity, database);
 			}
 			else
 			{
@@ -29,44 +29,12 @@ namespace MongoFramework.Infrastructure.Mutation.Mutators
 			}
 		}
 
-		private void ProcessRead(TEntity entity, IEntityMapper entityMapper, IMongoDatabase database)
+		private void ProcessRead(TEntity entity, IMongoDatabase database)
 		{
 			var relationships = EntityRelationshipHelper.GetRelationshipsForType(typeof(TEntity));
-
 			foreach (var relationship in relationships)
 			{
-				if (relationship.IsCollection)
-				{
-					var collection = relationship.NavigationProperty.GetValue(entity) as IEntityNavigationCollection;
-					collection.FinaliseImport(database);
-				}
-				else
-				{
-
-				}
-			}
-
-			var completeMapping = entityMapper.TraverseMapping().ToArray();
-
-
-
-			foreach (var mapping in completeMapping)
-			{
-				var foreignKeyName = mapping.Property.Name;
-				var foreignKeyAttr = mapping.Property.GetCustomAttribute<ForeignKeyAttribute>();
-
-				if (foreignKeyName.EndsWith("Id") || foreignKeyAttr != null)
-				{
-					var navigationPropertyName = foreignKeyAttr?.Name ?? foreignKeyName.Substring(0, foreignKeyName.Length - 2);
-
-					//if (!propertyMap.ContainsKey(navigationPropertyName))
-					//{
-					//	throw new MongoFrameworkMappingException($"Can't find property ${navigationPropertyName} on ${entityType.Name} for navigation property mapping.");
-					//}
-
-					//var navigationProperty = propertyMap[navigationPropertyName];
-					//classMap.UnmapMember(navigationProperty);
-				}
+				EntityRelationshipHelper.LoadNavigationProperty(entity, relationship, database);
 			}
 		}
 

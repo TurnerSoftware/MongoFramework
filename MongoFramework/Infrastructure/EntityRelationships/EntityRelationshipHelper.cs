@@ -5,7 +5,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using MongoDB.Bson;
+using MongoDB.Driver;
 using MongoFramework.Infrastructure.Mapping;
+using MongoFramework.Linq;
 
 namespace MongoFramework.Infrastructure.EntityRelationships
 {
@@ -36,7 +38,8 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 						yield return new EntityRelationshipPropertyPair
 						{
 							IdProperty = currentProperty,
-							NavigationProperty = linkedProperty
+							NavigationProperty = linkedProperty,
+							EntityType = linkedProperty.PropertyType
 						};
 					}
 					else if (IdTypes.Contains(linkedProperty.PropertyType))
@@ -44,7 +47,8 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 						yield return new EntityRelationshipPropertyPair
 						{
 							IdProperty = linkedProperty,
-							NavigationProperty = currentProperty
+							NavigationProperty = currentProperty,
+							EntityType = currentProperty.PropertyType
 						};
 					}
 					else
@@ -87,11 +91,35 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 					{
 						IdProperty = idProperty,
 						NavigationProperty = currentProperty,
-						IsCollection = true,
-						CollectionEntityType = collectionEntityType
+						EntityType = collectionEntityType,
+						IsCollection = true
 					};
 				}
 			}
 		}
+
+		public static void LoadNavigationProperty(object targetEntity, EntityRelationshipPropertyPair relationship, IMongoDatabase database)
+		{
+			if (relationship.IsCollection)
+			{
+				var collection = relationship.NavigationProperty.GetValue(targetEntity) as IEntityNavigationCollection;
+				collection.FinaliseImport(database);
+			}
+			else
+			{
+				var loadSingleEntityMethod = typeof(EntityRelationshipHelper).GetMethod("LoadSingleEntityProperty").MakeGenericMethod(relationship.EntityType);
+				loadSingleEntityMethod.Invoke(targetEntity, new[] { targetEntity, relationship, database });
+			}
+		}
+
+#pragma warning disable CRR0026 // Unused member - called through Reflection
+		private static void LoadSingleEntityProperty<TEntity>(object targetEntity, EntityRelationshipPropertyPair relationship, IMongoDatabase database)
+		{
+			var dbEntityReader = new DbEntityReader<TEntity>(database);
+			var relationshipIdValue = relationship.IdProperty.GetValue(targetEntity);
+			var loadedEntity = dbEntityReader.AsQueryable().WhereIdMatches(new[] { relationshipIdValue }).FirstOrDefault();
+			relationship.NavigationProperty.SetValue(targetEntity, loadedEntity);
+		}
+#pragma warning restore CRR0026 // Unused member - called through Reflection
 	}
 }
