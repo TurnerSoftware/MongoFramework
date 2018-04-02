@@ -20,7 +20,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 				if (relationship.IsCollection)
 				{
 					var memberMap = classMap.MapMember(relationship.NavigationProperty);
-					var serializerType = typeof(EntityCollectionRelationshipSerializer<>).MakeGenericType(relationship.CollectionEntityType);
+					var serializerType = typeof(EntityNavigationCollectionSerializer<>).MakeGenericType(relationship.CollectionEntityType);
 					var entitySpecificSerializer = Activator.CreateInstance(serializerType) as IBsonSerializer;
 					memberMap.SetSerializer(entitySpecificSerializer);
 				}

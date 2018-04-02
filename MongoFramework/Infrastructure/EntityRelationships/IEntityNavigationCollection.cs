@@ -5,7 +5,7 @@ using MongoDB.Driver;
 
 namespace MongoFramework.Infrastructure.EntityRelationships
 {
-	public interface IEntityCollectionRelationship
+	public interface IEntityNavigationCollection
 	{
 		void BeginImport(IEnumerable<string> entityIds);
 		void FinaliseImport(IMongoDatabase database);

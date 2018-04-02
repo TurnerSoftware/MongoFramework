@@ -37,7 +37,7 @@ namespace MongoFramework.Infrastructure.Mutation.Mutators
 			{
 				if (relationship.IsCollection)
 				{
-					var collection = relationship.NavigationProperty.GetValue(entity) as IEntityCollectionRelationship;
+					var collection = relationship.NavigationProperty.GetValue(entity) as IEntityNavigationCollection;
 					collection.FinaliseImport(database);
 				}
 				else

@@ -7,16 +7,16 @@ using MongoFramework.Infrastructure.Mapping;
 
 namespace MongoFramework.Infrastructure.EntityRelationships
 {
-	public class EntityCollectionRelationshipSerializer<TEntity> : IBsonSerializer, IBsonArraySerializer
+	public class EntityNavigationCollectionSerializer<TEntity> : IBsonSerializer, IBsonArraySerializer
 	{
-		public Type ValueType => typeof(EntityCollectionRelationship<TEntity>);
+		public Type ValueType => typeof(EntityNavigationCollection<TEntity>);
 
 		public object Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
 		{
 			var type = context.Reader.GetCurrentBsonType();
 			if (type == BsonType.Array)
 			{
-				var collection = new EntityCollectionRelationship<TEntity>();
+				var collection = new EntityNavigationCollection<TEntity>();
 				var importIds = new List<string>();
 				context.Reader.ReadStartArray();
 
@@ -38,7 +38,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 
 		public void Serialize(BsonSerializationContext context, BsonSerializationArgs args, object value)
 		{
-			if (value is EntityCollectionRelationship<TEntity> collection)
+			if (value is EntityNavigationCollection<TEntity> collection)
 			{
 				var entityMapper = new EntityMapper<TEntity>();
 				context.Writer.WriteStartArray();
