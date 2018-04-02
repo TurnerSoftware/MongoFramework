@@ -2,6 +2,7 @@
 using MongoFramework.Infrastructure.Linq;
 using MongoFramework.Infrastructure.Linq.Processors;
 using MongoFramework.Infrastructure.Mapping;
+using System;
 using System.Linq;
 
 namespace MongoFramework.Infrastructure
@@ -15,8 +16,8 @@ namespace MongoFramework.Infrastructure
 
 		public DbEntityReader(IMongoDatabase database, IEntityMapper mapper)
 		{
-			Database = database;
-			EntityMapper = mapper;
+			Database = database ?? throw new ArgumentNullException(nameof(database));
+			EntityMapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 		}
 
 		private IMongoCollection<TEntity> GetCollection()

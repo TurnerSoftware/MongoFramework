@@ -11,15 +11,15 @@ namespace MongoFramework.Infrastructure
 {
 	public class DbEntityWriter<TEntity> : IDbEntityWriter<TEntity>
 	{
-		public IMongoDatabase Database { get; set; }
-		protected IEntityMapper EntityMapper { get; set; }
+		public IMongoDatabase Database { get; private set; }
+		public IEntityMapper EntityMapper { get; private set; }
 
 		public DbEntityWriter(IMongoDatabase database) : this(database, new EntityMapper(typeof(TEntity))) { }
 
 		public DbEntityWriter(IMongoDatabase database, IEntityMapper mapper)
 		{
-			Database = database ?? throw new ArgumentNullException("database");
-			EntityMapper = mapper ?? throw new ArgumentNullException("mapper");
+			Database = database ?? throw new ArgumentNullException(nameof(database));
+			EntityMapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 		}
 
 		private IMongoCollection<TEntity> GetCollection()

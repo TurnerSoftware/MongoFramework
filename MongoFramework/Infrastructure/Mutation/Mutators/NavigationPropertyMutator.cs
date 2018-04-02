@@ -19,28 +19,21 @@ namespace MongoFramework.Infrastructure.Mutation.Mutators
 				throw new ArgumentNullException(nameof(database));
 			}
 
+			var relationships = EntityRelationshipHelper.GetRelationshipsForType(typeof(TEntity));
 			if (mutationType == MutatorType.Select)
 			{
-				ProcessRead(entity, database);
+				foreach (var relationship in relationships)
+				{
+					EntityRelationshipHelper.LoadNavigationProperty(entity, relationship, database);
+				}
 			}
 			else
 			{
-				ProcessWrite(entity, entityMapper, database);
+				foreach (var relationship in relationships)
+				{
+					EntityRelationshipHelper.SaveNavigationProperty(entity, relationship, database);
+				}
 			}
-		}
-
-		private void ProcessRead(TEntity entity, IMongoDatabase database)
-		{
-			var relationships = EntityRelationshipHelper.GetRelationshipsForType(typeof(TEntity));
-			foreach (var relationship in relationships)
-			{
-				EntityRelationshipHelper.LoadNavigationProperty(entity, relationship, database);
-			}
-		}
-
-		private void ProcessWrite(TEntity entity, IEntityMapper entityMapper, IMongoDatabase database)
-		{
-			var completeMapping = entityMapper.TraverseMapping().ToArray();
 		}
 	}
 }

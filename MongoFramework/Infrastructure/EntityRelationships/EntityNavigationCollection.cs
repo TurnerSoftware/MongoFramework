@@ -9,7 +9,7 @@ using MongoFramework.Linq;
 
 namespace MongoFramework.Infrastructure.EntityRelationships
 {
-	public class EntityNavigationCollection<TEntity> : DbEntityCollection<TEntity>, IEntityNavigationCollection
+	public class EntityNavigationCollection<TEntity> : DbEntityChangeTracker<TEntity>, IEntityNavigationCollection<TEntity>
 	{
 		private IEnumerable<string> ImportEntityIds { get; set; }
 
@@ -34,6 +34,16 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			}
 
 			ImportEntityIds = Enumerable.Empty<string>();
+		}
+
+		public void WriteChanges(IMongoDatabase database)
+		{
+			DetectChanges();
+
+			var dbEntityWriter = new DbEntityWriter<TEntity>(database);
+			dbEntityWriter.Write(this);
+
+			CommitChanges();
 		}
 	}
 }

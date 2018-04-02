@@ -121,5 +121,33 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			relationship.NavigationProperty.SetValue(targetEntity, loadedEntity);
 		}
 #pragma warning restore CRR0026 // Unused member - called through Reflection
+
+		public static void SaveNavigationProperty(object targetEntity, EntityRelationshipPropertyPair relationship, IMongoDatabase database)
+		{
+			if (relationship.IsCollection)
+			{
+				var collection = relationship.NavigationProperty.GetValue(targetEntity) as IEntityNavigationCollection;
+				collection.WriteChanges(database);
+			}
+			else
+			{
+				var loadSingleEntityMethod = typeof(EntityRelationshipHelper).GetMethod("SaveSingleEntityProperty").MakeGenericMethod(relationship.EntityType);
+				loadSingleEntityMethod.Invoke(targetEntity, new[] { targetEntity, relationship, database });
+			}
+		}
+
+#pragma warning disable CRR0026 // Unused member - called through Reflection
+		private static void SaveSingleEntityProperty<TEntity>(object targetEntity, EntityRelationshipPropertyPair relationship, IMongoDatabase database)
+		{
+			var dbEntityWriter = new DbEntityWriter<TEntity>(database);
+			var navigationEntity = (TEntity)relationship.NavigationProperty.GetValue(targetEntity);
+
+			var collection = new DbEntityCollection<TEntity>();
+			var entityState = dbEntityWriter.EntityMapper.GetIdValue(navigationEntity) == null ? DbEntityEntryState.Added : DbEntityEntryState.Updated;
+			collection.Update(navigationEntity, entityState);
+
+			dbEntityWriter.Write(collection);
+		}
+#pragma warning restore CRR0026 // Unused member - called through Reflection
 	}
 }
