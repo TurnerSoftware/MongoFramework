@@ -9,7 +9,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 {
 	public class EntityNavigationCollectionSerializer<TEntity> : IBsonSerializer, IBsonArraySerializer
 	{
-		public Type ValueType => typeof(EntityNavigationCollection<TEntity>);
+		public Type ValueType => typeof(ICollection<TEntity>);
 
 		public object Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
 		{
@@ -50,6 +50,10 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 				}
 
 				context.Writer.WriteEndArray();
+			}
+			else
+			{
+				context.Writer.WriteNull();
 			}
 		}
 
