@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -7,7 +8,7 @@ using MongoFramework.Infrastructure.Mapping;
 
 namespace MongoFramework.Infrastructure.EntityRelationships
 {
-	public class EntityNavigationCollectionSerializer<TEntity> : IBsonSerializer, IBsonArraySerializer
+	public class EntityNavigationCollectionSerializer<TEntity> : IBsonSerializer<ICollection<TEntity>>, IBsonArraySerializer
 	{
 		public Type ValueType => typeof(ICollection<TEntity>);
 
@@ -30,6 +31,11 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 				collection.BeginImport(importIds);
 				return collection;
 			}
+			else if (type == BsonType.Null)
+			{
+				context.Reader.ReadNull();
+				return new EntityNavigationCollection<TEntity>();
+			}
 			else
 			{
 				throw new NotImplementedException($"Unable to deserialize {type} into an ICollection<{typeof(TEntity).Name}>");
@@ -46,7 +52,20 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 				foreach (var entity in collection)
 				{
 					var idValue = entityMapper.GetIdValue(entity);
-					context.Writer.WriteString(idValue.ToString());
+					if (idValue != null)
+					{
+						context.Writer.WriteString(idValue.ToString());
+					}
+					else
+					{
+						context.Writer.WriteNull();
+					}
+				}
+
+				foreach (var importId in collection.ImportIds)
+				{
+					//Quick hack to work around that back/forth serialization of EntityNavigationCollection loses data
+					context.Writer.WriteString(importId);
 				}
 
 				context.Writer.WriteEndArray();
@@ -57,12 +76,22 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			}
 		}
 
+		public void Serialize(BsonSerializationContext context, BsonSerializationArgs args, ICollection<TEntity> value)
+		{
+			Serialize(context, args, (object)value);
+		}
+
 		public bool TryGetItemSerializationInfo(out BsonSerializationInfo serializationInfo)
 		{
 			var serializer = BsonSerializer.LookupSerializer(typeof(string));
 			var nominalType = typeof(string);
 			serializationInfo = new BsonSerializationInfo(null, serializer, nominalType);
 			return true;
+		}
+
+		ICollection<TEntity> IBsonSerializer<ICollection<TEntity>>.Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
+		{
+			return Deserialize(context, args) as ICollection<TEntity>;
 		}
 	}
 }
