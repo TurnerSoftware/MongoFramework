@@ -13,7 +13,8 @@ namespace MongoFramework.Infrastructure.Mutation
 		{
 			MutationDrivers = new List<IEntityMutator<TEntity>>
 			{
-				new EntityAttributeMutator<TEntity>()
+				new EntityAttributeMutator<TEntity>(),
+				new NavigationPropertyMutator<TEntity>()
 			};
 		}
 
