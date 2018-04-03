@@ -30,7 +30,7 @@ namespace MongoFramework.Infrastructure
 		{
 			var underlyingQueryable = GetCollection().AsQueryable();
 			var queryable = new MongoFrameworkQueryable<TEntity, TEntity>(underlyingQueryable);
-			queryable.EntityProcessors.Add(new EntityMutationProcessor<TEntity>());
+			queryable.EntityProcessors.Add(new EntityMutationProcessor<TEntity>(Database));
 			return queryable;
 		}
 	}
