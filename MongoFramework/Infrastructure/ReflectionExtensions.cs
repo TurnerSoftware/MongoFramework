@@ -1,50 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace MongoFramework.Infrastructure
 {
 	internal static class ReflectionExtensions
 	{
-		public static Type GetNestedPropertyType(this Type parentType, string name)
+		public static PropertyInfo GetNestedProperty(this Type parentType, string name)
 		{
 			if (name == null)
 			{
 				return null;
 			}
 
-			var namesPieces = new Stack<string>(name.Split('.'));
-			return parentType.GetNestedPropertyType(namesPieces);
-		}
+			var namePieces = new Stack<string>(name.Split('.'));
+			var currentType = parentType;
 
-		private static Type GetNestedPropertyType(this Type parentType, Stack<string> namePieces)
-		{
-			if (!namePieces.Any())
+			while (namePieces.Any())
 			{
-				return parentType;
+				var currentName = namePieces.Pop();
+
+				//Remove details of array item - we don't know instance-specific information so it doesn't help
+				if (currentName.Contains('[') && currentName.Contains(']'))
+				{
+					currentName = currentName.Substring(0, currentName.IndexOf('['));
+				}
+
+				var property = currentType.GetProperty(currentName);
+				if (property == null)
+				{
+					return null;
+				}
+				else if (!namePieces.Any())
+				{
+					return property;
+				}
+
+				var propertyType = property.PropertyType;
+				if (namePieces.Any() && propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+				{
+					propertyType = propertyType.GetGenericArguments()[0];
+				}
+
+				currentType = propertyType;
 			}
 
-			var currentName = namePieces.Pop();
 
-			//Remove details of array item - we don't know instance-specific information so it doesn't help
-			if (currentName.Contains('[') && currentName.Contains(']'))
-			{
-				currentName = currentName.Substring(0, currentName.IndexOf('['));
-			}
-
-			var property = parentType.GetProperty(currentName);
-			if (property == null)
-			{
-				return null;
-			}
-
-			var propertyType = property.PropertyType;
-			if (namePieces.Any() && propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-			{
-				propertyType = propertyType.GetGenericArguments()[0];
-			}
-
-			return propertyType.GetNestedPropertyType(namePieces);
+			return null;
 		}
 	}
 }

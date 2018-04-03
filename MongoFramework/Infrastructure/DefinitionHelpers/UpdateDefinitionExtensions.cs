@@ -1,6 +1,9 @@
 ﻿using MongoDB.Bson;
+using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
+using MongoFramework.Infrastructure.Mapping;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
@@ -13,7 +16,8 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 		{
 			var dotNetValue = BsonTypeMapper.MapToDotNetValue(value);
 			var valueType = dotNetValue?.GetType();
-			var reflectedValueType = typeof(TEntity).GetNestedPropertyType(fieldName);
+			var reflectedProperty = typeof(TEntity).GetNestedProperty(fieldName);
+			var reflectedValueType = reflectedProperty?.PropertyType;
 
 			if (valueType == null && reflectedValueType == null)
 			{
@@ -23,7 +27,29 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 			if (valueType == null || (reflectedValueType != null && valueType != reflectedValueType))
 			{
 				valueType = reflectedValueType;
-				dotNetValue = BsonSerializer.Deserialize(value.ToJson(), valueType);
+
+				//Yes, this is a bit overkill
+				//Basically, custom serializers weren't handled. This is problem when the actual value doesn't
+				//remotely match the property type like the EntityNavigationCollection.
+				//This section probably needs a bit of an overhaul anyway...
+				//TODO: Cleanup this section!
+
+				var classMap = BsonClassMap.LookupClassMap(reflectedProperty.DeclaringType);
+				var memberMap = classMap.GetMemberMap(reflectedProperty.Name);
+				var serializer = memberMap.GetSerializer();
+
+				if (serializer != null)
+				{
+					using (var reader = new JsonReader(value.ToJson()))
+					{
+						var context = BsonDeserializationContext.CreateRoot(reader);
+						dotNetValue = serializer.Deserialize(context);
+					}
+				}
+				else
+				{
+					dotNetValue = BsonSerializer.Deserialize(value.ToJson(), valueType);
+				}
 			}
 
 			var typeArgs = new[] { typeof(TEntity), valueType };
