@@ -78,7 +78,9 @@
     <Compile Include="Bson\GetDifferencesTests.cs" />
     <Compile Include="Bson\HasDifferencesTests.cs" />
     <Compile Include="DbEntityCollectionTests.cs" />
+    <Compile Include="EntityRelationships\EntityCollection\BaseEntityModel.cs" />
     <Compile Include="EntityRelationships\EntityCollection\EntityCollectionTests.cs" />
+    <Compile Include="EntityRelationships\EntityCollection\RelatedEntityModel.cs" />
     <Compile Include="EntityRelationships\SingleEntity\BaseEntityModel.cs" />
     <Compile Include="EntityRelationships\SingleEntity\BaseVariedIdModel.cs" />
     <Compile Include="EntityRelationships\GuidIdModel.cs" />

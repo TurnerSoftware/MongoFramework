@@ -7,7 +7,8 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 {
 	public interface IEntityNavigationCollection
 	{
-		void BeginImport(IEnumerable<string> entityIds);
+		IEnumerable<string> ImportIds { get; }
+		void BeginImport(IEnumerable<string> importIds);
 		void FinaliseImport(IMongoDatabase database);
 		void WriteChanges(IMongoDatabase database);
 	}
