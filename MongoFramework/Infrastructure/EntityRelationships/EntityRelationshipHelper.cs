@@ -134,7 +134,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			if (relationship.IsCollection)
 			{
 				var collection = relationship.NavigationProperty.GetValue(targetEntity) as IEntityNavigationCollection;
-				collection.WriteChanges(database);
+				collection?.WriteChanges(database);
 			}
 			else
 			{
