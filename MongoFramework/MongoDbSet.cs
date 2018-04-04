@@ -4,6 +4,7 @@ using MongoFramework.Infrastructure.Indexing;
 using MongoFramework.Infrastructure.Linq;
 using MongoFramework.Infrastructure.Linq.Processors;
 using MongoFramework.Infrastructure.Mapping;
+using MongoFramework.Infrastructure.Mutation;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -22,6 +23,7 @@ namespace MongoFramework
 	{
 		public IDbEntityChangeTracker<TEntity> ChangeTracker { get; private set; } = new DbEntityChangeTracker<TEntity>();
 
+		private IMongoDatabase Database { get; set; }
 		private IDbEntityWriter<TEntity> EntityWriter { get; set; }
 		private IDbEntityReader<TEntity> EntityReader { get; set; }
 		private IEntityIndexWriter<TEntity> EntityIndexWriter { get; set; }
@@ -65,6 +67,8 @@ namespace MongoFramework
 		/// <param name="database"></param>
 		public void SetDatabase(IMongoDatabase database)
 		{
+			Database = database;
+
 			var entityMapper = new EntityMapper<TEntity>();
 			EntityWriter = new DbEntityWriter<TEntity>(database, entityMapper);
 			EntityReader = new DbEntityReader<TEntity>(database, entityMapper);
@@ -73,6 +77,14 @@ namespace MongoFramework
 			var indexMapper = new EntityIndexMapper<TEntity>(entityMapper);
 			var collection = database.GetCollection<TEntity>(entityMapper.GetCollectionName());
 			EntityIndexWriter = new EntityIndexWriter<TEntity>(collection, indexMapper);
+		}
+
+		public virtual TEntity Create()
+		{
+			var entity = Activator.CreateInstance<TEntity>();
+			EntityMutation<TEntity>.MutateEntity(entity, MutatorType.Create, Database);
+			Add(entity);
+			return entity;
 		}
 
 		/// <summary>
