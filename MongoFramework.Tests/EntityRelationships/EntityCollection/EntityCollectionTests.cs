@@ -13,37 +13,79 @@ namespace MongoFramework.Tests.EntityRelationships.EntityCollection
 	public class EntityCollectionTests : TestBase
 	{
 		[TestMethod]
+		public void AddItemsToNewEntity()
+		{
+			var database = TestConfiguration.GetDatabase();
+			var dbSet = new MongoDbSet<BaseEntityModel>();
+			dbSet.SetDatabase(database);
+
+			var entity = dbSet.Create();
+			entity.Description = "AddItemsToNewEntity";
+
+			entity.RelatedEntities.Add(new RelatedEntityModel
+			{
+				Description = "AddItemsToNewEntity-RelatedEntityModel-1"
+			});
+			entity.RelatedEntities.Add(new RelatedEntityModel
+			{
+				Description = "AddItemsToNewEntity-RelatedEntityModel-2"
+			});
+
+			dbSet.SaveChanges();
+
+			var dbEntity = dbSet.Where(e => e.Id == entity.Id).FirstOrDefault();
+
+			Assert.AreEqual(2, dbEntity.RelatedEntities.Count);
+			Assert.IsTrue(dbEntity.RelatedEntities.All(e => e.Id != null));
+		}
+
+		[TestMethod]
 		public void AddItemsToExistingEntity()
 		{
 			var database = TestConfiguration.GetDatabase();
-			var baseEntity = new BaseEntityModel
-			{
-				Description = "1"
-			};
+			var dbSet = new MongoDbSet<BaseEntityModel>();
+			dbSet.SetDatabase(database);
 
-			var dbEntityWriter = new DbEntityWriter<BaseEntityModel>(database);
-			var collection = new DbEntityCollection<BaseEntityModel>
-			{
-				baseEntity
-			};
-			dbEntityWriter.Write(collection);
+			var entity = dbSet.Create();
+			entity.Description = "AddItemsToExistingEntity";
 
-			var dbEntityReader = new DbEntityReader<BaseEntityModel>(database);
-			var dbEntity = dbEntityReader.AsQueryable().Where(e => e.Id == baseEntity.Id).FirstOrDefault();
+			dbSet.SaveChanges();
+
+			var dbEntity = dbSet.Where(e => e.Id == entity.Id).FirstOrDefault();
 
 			dbEntity.RelatedEntities.Add(new RelatedEntityModel
 			{
 				Description = "AddItemsToExistingEntity-RelatedEntityModel-1"
 			});
+			dbEntity.RelatedEntities.Add(new RelatedEntityModel
+			{
+				Description = "AddItemsToExistingEntity-RelatedEntityModel-2"
+			});
 
-			collection.Clear();
-			collection.Update(dbEntity, DbEntityEntryState.Updated);
-			dbEntityWriter.Write(collection);
+			dbSet.SaveChanges();
 
-			Assert.IsNotNull(dbEntity.RelatedEntities.FirstOrDefault().Id);
-			
+			Assert.AreEqual(2, dbEntity.RelatedEntities.Count);
+			Assert.IsTrue(dbEntity.RelatedEntities.All(e => e.Id != null));
+		}
 
-			var relationships = EntityRelationshipHelper.GetRelationshipsForType(typeof(BaseEntityModel));
+		[TestMethod]
+		public void SaveWithNullNavigationProperty()
+		{
+			var database = TestConfiguration.GetDatabase();
+			var dbSet = new MongoDbSet<BaseEntityModel>();
+			dbSet.SetDatabase(database);
+
+			var entity = new BaseEntityModel
+			{
+				Description = "SaveWithNullNavigationProperty"
+			};
+
+			dbSet.Add(entity);
+			dbSet.SaveChanges();
+
+			var dbEntity = dbSet.Where(e => e.Id == entity.Id).FirstOrDefault();
+
+			Assert.AreEqual(0, dbEntity.RelatedEntities.Count);
 		}
 	}
 }
