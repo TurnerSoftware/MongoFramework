@@ -50,11 +50,7 @@ namespace MongoFramework.Infrastructure
 		public void Refresh(TEntity entity)
 		{
 			OriginalValues = entity.ToBsonDocument();
-
-			if (State == DbEntityEntryState.Updated || State == DbEntityEntryState.NoChanges)
-			{
-				State = this.HasChanges() ? DbEntityEntryState.Updated : DbEntityEntryState.NoChanges;
-			}
+			State = this.HasChanges() ? DbEntityEntryState.Updated : DbEntityEntryState.NoChanges;
 		}
 
 		/// <summary>

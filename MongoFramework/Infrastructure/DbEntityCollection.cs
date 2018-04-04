@@ -85,6 +85,7 @@ namespace MongoFramework.Infrastructure
 
 		public void Add(TEntity item)
 		{
+			//TODO: Check the ID value is a default value - if not, mark it as non-changed
 			Update(item, DbEntityEntryState.Added);
 		}
 

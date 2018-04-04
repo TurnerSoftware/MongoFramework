@@ -18,11 +18,7 @@ namespace MongoFramework.Infrastructure
 		{
 			foreach (var entry in Entries.ToArray())
 			{
-				if (entry.State == DbEntityEntryState.Added)
-				{
-					entry.State = DbEntityEntryState.NoChanges;
-				}
-				else if (entry.State == DbEntityEntryState.Updated)
+				if (entry.State == DbEntityEntryState.Added || entry.State == DbEntityEntryState.Updated)
 				{
 					entry.Refresh();
 				}
