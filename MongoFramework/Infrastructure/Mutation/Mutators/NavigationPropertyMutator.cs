@@ -20,16 +20,18 @@ namespace MongoFramework.Infrastructure.Mutation.Mutators
 			}
 
 			var relationships = EntityRelationshipHelper.GetRelationshipsForType(typeof(TEntity));
-			if (mutationType == MutatorType.Select)
+
+			foreach (var relationship in relationships)
 			{
-				foreach (var relationship in relationships)
+				if (mutationType == MutatorType.Select)
 				{
 					EntityRelationshipHelper.LoadNavigationProperty(entity, relationship, database);
 				}
-			}
-			else
-			{
-				foreach (var relationship in relationships)
+				else if (mutationType == MutatorType.Create)
+				{
+					EntityRelationshipHelper.InitialiseNavigationProperty(entity, relationship);
+				}
+				else
 				{
 					EntityRelationshipHelper.SaveNavigationProperty(entity, relationship, database);
 				}

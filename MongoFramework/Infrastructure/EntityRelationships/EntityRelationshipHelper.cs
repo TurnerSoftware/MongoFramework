@@ -105,6 +105,16 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			}
 		}
 
+		public static void InitialiseNavigationProperty(object targetEntity, EntityRelationshipPropertyPair relationship)
+		{
+			if (relationship.IsCollection)
+			{
+				var navigationPropertyType = typeof(EntityNavigationCollection<>).MakeGenericType(relationship.EntityType);
+				var navigationProperty = Activator.CreateInstance(navigationPropertyType);
+				relationship.NavigationProperty.SetValue(targetEntity, navigationProperty);
+			}
+		}
+
 		public static void LoadNavigationProperty(object targetEntity, EntityRelationshipPropertyPair relationship, IMongoDatabase database)
 		{
 			if (relationship.IsCollection)
@@ -148,6 +158,11 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 		{
 			var dbEntityWriter = new DbEntityWriter<TEntity>(database);
 			var navigationEntity = (TEntity)relationship.NavigationProperty.GetValue(targetEntity);
+
+			if (navigationEntity == null)
+			{
+				return;
+			}
 
 			var collection = new DbEntityCollection<TEntity>();
 			var entityState = dbEntityWriter.EntityMapper.GetIdValue(navigationEntity) == null ? DbEntityEntryState.Added : DbEntityEntryState.Updated;
