@@ -62,15 +62,23 @@ namespace MongoFramework.Infrastructure
 		public void Write(IDbEntityCollection<TEntity> entityCollection)
 		{
 			var writeModel = BuildWriteModel(entityCollection);
-			//TODO: Add support for Transactions with MongoDB Server 4.0
-			GetCollection().BulkWrite(writeModel);
+
+			if (writeModel.Any())
+			{
+				//TODO: Add support for Transactions with MongoDB Server 4.0
+				GetCollection().BulkWrite(writeModel);
+			}
 		}
 
 		public async Task WriteAsync(IDbEntityCollection<TEntity> entityCollection)
 		{
 			var writeModel = BuildWriteModel(entityCollection);
-			//TODO: Add support for Transactions with MongoDB Server 4.0
-			await GetCollection().BulkWriteAsync(writeModel);
+
+			if (writeModel.Any())
+			{
+				//TODO: Add support for Transactions with MongoDB Server 4.0
+				await GetCollection().BulkWriteAsync(writeModel);
+			}
 		}
 	}
 }
