@@ -49,16 +49,19 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 				var entityMapper = new EntityMapper<TEntity>();
 				context.Writer.WriteStartArray();
 
-				foreach (var entity in collection)
+				foreach (var entry in collection.GetEntries())
 				{
-					var idValue = entityMapper.GetIdValue(entity);
-					if (idValue != null)
+					if (entry.State != DbEntityEntryState.Deleted)
 					{
-						context.Writer.WriteString(idValue.ToString());
-					}
-					else
-					{
-						context.Writer.WriteNull();
+						var idValue = entityMapper.GetIdValue(entry.Entity);
+						if (idValue != null)
+						{
+							context.Writer.WriteString(idValue.ToString());
+						}
+						else
+						{
+							context.Writer.WriteNull();
+						}
 					}
 				}
 
