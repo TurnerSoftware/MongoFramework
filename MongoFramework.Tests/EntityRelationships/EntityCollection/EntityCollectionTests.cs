@@ -69,6 +69,65 @@ namespace MongoFramework.Tests.EntityRelationships.EntityCollection
 		}
 
 		[TestMethod]
+		public void UpdateCollectionItem()
+		{
+			var database = TestConfiguration.GetDatabase();
+			var dbSet = new MongoDbSet<BaseEntityModel>();
+			dbSet.SetDatabase(database);
+
+			var entity = dbSet.Create();
+			entity.Description = "UpdateCollectionItem";
+
+			var item = new RelatedEntityModel
+			{
+				Description = "UpdateCollectionItem-RelatedEntityModel-1"
+			};
+			entity.RelatedEntities.Add(item);
+
+			dbSet.SaveChanges();
+
+			item.Description = "UpdateCollectionItem-RelatedEntityModel-1-Updated";
+
+			dbSet.SaveChanges();
+
+			var dbEntity = dbSet.Where(e => e.Id == entity.Id).FirstOrDefault();
+
+			Assert.AreEqual("UpdateCollectionItem-RelatedEntityModel-1-Updated", dbEntity.RelatedEntities.FirstOrDefault().Description);
+		}
+
+		[TestMethod]
+		public void RemoveCollectionItem()
+		{
+			var database = TestConfiguration.GetDatabase();
+			var dbSet = new MongoDbSet<BaseEntityModel>();
+			dbSet.SetDatabase(database);
+
+			var entity = dbSet.Create();
+			entity.Description = "RemoveCollectionItem";
+
+			var item = new RelatedEntityModel
+			{
+				Description = "RemoveCollectionItem-RelatedEntityModel-1"
+			};
+			entity.RelatedEntities.Add(item);
+
+			dbSet.SaveChanges();
+
+			entity.RelatedEntities.Remove(item);
+
+			dbSet.SaveChanges();
+
+			var dbEntity = dbSet.Where(e => e.Id == entity.Id).FirstOrDefault();
+			Assert.AreEqual(0, dbEntity.RelatedEntities.Count);
+
+			var collectionDbSet = new MongoDbSet<RelatedEntityModel>();
+			collectionDbSet.SetDatabase(database);
+			var itemDbEntity = collectionDbSet.Where(e => e.Id == item.Id).FirstOrDefault();
+
+			Assert.IsNotNull(itemDbEntity);
+		}
+
+		[TestMethod]
 		public void SaveWithNullNavigationProperty()
 		{
 			var database = TestConfiguration.GetDatabase();
