@@ -46,7 +46,15 @@ namespace MongoFramework.Infrastructure
 					var idFieldValue = EntityMapper.GetIdValue(entry.Entity);
 					var filter = Builders<TEntity>.Filter.Eq(idFieldName, idFieldValue);
 					var updateDefintion = UpdateDefinitionHelper.CreateFromDiff<TEntity>(entry.OriginalValues, entry.CurrentValues);
-					writeModel.Add(new UpdateOneModel<TEntity>(filter, updateDefintion));
+
+					//This additional check here really is a workaround for how we detect changes to navigation properties
+					//More specificly, how the change tracker uses a BsonDocument to check changes but navigation properties aren't fully serialized
+					//One option: Full serialize navigation properties in some contexts
+					//Another option: Have the change tracker treat navigation properties as a first-class feature
+					if (updateDefintion.HasChanges())
+					{
+						writeModel.Add(new UpdateOneModel<TEntity>(filter, updateDefintion));
+					}
 				}
 				else if (entry.State == DbEntityEntryState.Deleted)
 				{

@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoFramework.Bson;
+using MongoFramework.Infrastructure.EntityRelationships;
 
 namespace MongoFramework.Infrastructure
 {
@@ -29,7 +30,14 @@ namespace MongoFramework.Infrastructure
 		/// <returns></returns>
 		public static bool HasChanges<TEntity>(this DbEntityEntry<TEntity> entry)
 		{
-			return BsonDiff.HasDifferences(entry.OriginalValues, entry.CurrentValues);
+			if (BsonDiff.HasDifferences(entry.OriginalValues, entry.CurrentValues))
+			{
+				return true;
+			}
+			else
+			{
+				return EntityRelationshipHelper.CheckForNavigationPropertyChanges(entry.Entity);
+			}
 		}
 	}
 }
