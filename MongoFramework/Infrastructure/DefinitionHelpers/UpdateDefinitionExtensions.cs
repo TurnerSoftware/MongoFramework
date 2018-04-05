@@ -21,10 +21,9 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 
 			if (valueType == null && reflectedValueType == null)
 			{
-				reflectedValueType = typeof(object);
+				valueType = typeof(object);
 			}
-
-			if (valueType == null || (reflectedValueType != null && valueType != reflectedValueType))
+			else if (valueType == null || (reflectedValueType != null && valueType != reflectedValueType))
 			{
 				valueType = reflectedValueType;
 
