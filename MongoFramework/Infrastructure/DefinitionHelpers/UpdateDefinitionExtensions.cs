@@ -66,5 +66,13 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 			var result = setMethod.Invoke(null, new[] { definition, specificDefinition, dotNetValue });
 			return result as UpdateDefinition<TEntity>;
 		}
+
+		public static bool HasChanges<TEntity>(this UpdateDefinition<TEntity> definition)
+		{
+			var serializerRegistry = BsonSerializer.SerializerRegistry;
+			var documentSerializer = serializerRegistry.GetSerializer<TEntity>();
+			var renderedDefinition = definition.Render(documentSerializer, serializerRegistry);
+			return !renderedDefinition.Equals(new BsonDocument());
+		}
 	}
 }
