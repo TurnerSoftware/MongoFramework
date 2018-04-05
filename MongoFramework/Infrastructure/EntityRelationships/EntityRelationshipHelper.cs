@@ -105,6 +105,46 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			}
 		}
 
+		public static bool CheckForNavigationPropertyChanges<TEntity>(TEntity entity)
+		{
+			var relationships = GetRelationshipsForType(typeof(TEntity));
+
+			foreach (var relationship in relationships)
+			{
+				if (relationship.IsCollection)
+				{
+					var checkForNavigationCollectionPropertyChangesMethod = typeof(EntityRelationshipHelper).GetMethod("CheckForNavigationCollectionPropertyChanges", BindingFlags.NonPublic | BindingFlags.Static).MakeGenericMethod(relationship.EntityType);
+					var hasChanges = (bool)checkForNavigationCollectionPropertyChangesMethod.Invoke(entity, new object[] { entity, relationship });
+					if (hasChanges)
+					{
+						return true;
+					}
+				}
+				else
+				{
+					//Can't detect if changes exist on non-collection relationships
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+#pragma warning disable CRR0026 // Unused member - called through Reflection
+		private static bool CheckForNavigationCollectionPropertyChanges<TEntity>(object targetEntity, EntityRelationshipPropertyPair relationship)
+		{
+			var navigationCollection = relationship.NavigationProperty.GetValue(targetEntity) as EntityNavigationCollection<TEntity>;
+			if (navigationCollection != null)
+			{
+				if (navigationCollection.GetEntries().Any(e => e.HasChanges()))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+#pragma warning restore CRR0026 // Unused member - called through Reflection
+
 		public static void InitialiseNavigationProperty(object targetEntity, EntityRelationshipPropertyPair relationship)
 		{
 			if (relationship.IsCollection)
