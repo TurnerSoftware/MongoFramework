@@ -43,7 +43,6 @@ namespace MongoFramework.Infrastructure
 				currentType = propertyType;
 			}
 
-
 			return null;
 		}
 	}

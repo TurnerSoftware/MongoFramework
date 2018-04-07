@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.EntityRelationships;
+using MongoFramework.Infrastructure.Mapping;
 
 namespace MongoFramework.Tests.EntityRelationships.SingleEntity
 {
@@ -18,11 +19,11 @@ namespace MongoFramework.Tests.EntityRelationships.SingleEntity
 			var relationships = EntityRelationshipHelper.GetRelationshipsForType(typeof(BaseEntityModel));
 
 			var createdByIdProperty = typeof(BaseEntityModel).GetProperty("CreatedById");
-			var createdByNavigationProperty = typeof(BaseEntityModel).GetProperty("CreatedBy");
 			var attributeOnIdRelationship = relationships.Where(r => r.IdProperty == createdByIdProperty).FirstOrDefault();
 
-			Assert.AreEqual(createdByNavigationProperty, attributeOnIdRelationship.NavigationProperty);
 			Assert.IsFalse(attributeOnIdRelationship.IsCollection);
+			Assert.AreEqual(typeof(UserEntityModel), attributeOnIdRelationship.EntityType);
+			Assert.AreEqual(typeof(BaseEntityModel).GetProperty("CreatedBy"), attributeOnIdRelationship.NavigationProperty);
 		}
 
 		[TestMethod]
@@ -31,11 +32,11 @@ namespace MongoFramework.Tests.EntityRelationships.SingleEntity
 			var relationships = EntityRelationshipHelper.GetRelationshipsForType(typeof(BaseEntityModel));
 
 			var updatedByIdProperty = typeof(BaseEntityModel).GetProperty("UpdatedById");
-			var updatedByNavigationProperty = typeof(BaseEntityModel).GetProperty("UpdatedBy");
 			var attributeOnIdRelationship = relationships.Where(r => r.IdProperty == updatedByIdProperty).FirstOrDefault();
 
-			Assert.AreEqual(updatedByNavigationProperty, attributeOnIdRelationship.NavigationProperty);
 			Assert.IsFalse(attributeOnIdRelationship.IsCollection);
+			Assert.AreEqual(typeof(UserEntityModel), attributeOnIdRelationship.EntityType);
+			Assert.AreEqual(typeof(BaseEntityModel).GetProperty("UpdatedBy"), attributeOnIdRelationship.NavigationProperty);
 		}
 
 		[TestMethod]
@@ -43,6 +44,15 @@ namespace MongoFramework.Tests.EntityRelationships.SingleEntity
 		{
 			var relationships = EntityRelationshipHelper.GetRelationshipsForType(typeof(BaseVariedIdModel));
 			Assert.AreEqual(2, relationships.Count());
+		}
+
+		[TestMethod]
+		public void NavigationPropertiesUnmap()
+		{
+			var relationships = EntityRelationshipHelper.GetRelationshipsForType(typeof(BaseEntityModel));
+			var entityMapper = new EntityMapper<BaseEntityModel>();
+
+			Assert.IsFalse(entityMapper.GetEntityMapping().Any(e => e.FullPath == "CreatedBy" || e.FullPath == "UpdatedBy"));
 		}
 
 		[TestMethod]

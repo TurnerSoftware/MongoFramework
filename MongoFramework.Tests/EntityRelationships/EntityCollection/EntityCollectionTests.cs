@@ -13,6 +13,18 @@ namespace MongoFramework.Tests.EntityRelationships.EntityCollection
 	public class EntityCollectionTests : TestBase
 	{
 		[TestMethod]
+		public void IdentifyCollectionRelationships()
+		{
+			var relationships = EntityRelationshipHelper.GetRelationshipsForType(typeof(BaseEntityModel));
+			var relationship = relationships.FirstOrDefault();
+
+			Assert.IsTrue(relationship.IsCollection);
+			Assert.AreEqual(typeof(RelatedEntityModel), relationship.EntityType);
+			Assert.AreEqual(typeof(RelatedEntityModel).GetProperty("Id"), relationship.IdProperty);
+			Assert.AreEqual(typeof(BaseEntityModel).GetProperty("RelatedEntities"), relationship.NavigationProperty);
+		}
+
+		[TestMethod]
 		public void AddItemsToNewEntity()
 		{
 			var database = TestConfiguration.GetDatabase();
