@@ -10,7 +10,7 @@ using System.Linq;
 namespace MongoFramework.Tests.DefinitionHelpers.UpdateDefinition
 {
 	[TestClass]
-	public class UpdateDefinitionHelperTests
+	public class UpdateDefinitionHelperTests : DbTest
 	{
 		private BsonDocument PerformUpdateAgainstServer(BsonDocument original, UpdateDefinition<BsonDocument> updateDefinition)
 		{

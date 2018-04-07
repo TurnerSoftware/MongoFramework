@@ -10,7 +10,7 @@ using MongoFramework.Infrastructure.EntityRelationships;
 namespace MongoFramework.Tests.EntityRelationships.EntityCollection
 {
 	[TestClass]
-	public class EntityCollectionTests : TestBase
+	public class EntityCollectionTests : DbTest
 	{
 		[TestMethod]
 		public void IdentifyCollectionRelationships()

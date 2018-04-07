@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace MongoFramework.Tests
 {
 	[TestClass]
-	public class DbEntityWriterTests
+	public class DbEntityWriterTests : DbTest
 	{
 		[TestMethod]
 		public void AddEntity()

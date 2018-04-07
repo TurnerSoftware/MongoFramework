@@ -6,7 +6,7 @@ using System.Linq;
 namespace MongoFramework.Tests
 {
 	[TestClass]
-	public class DbEntityReaderTests
+	public class DbEntityReaderTests : DbTest
 	{
 		[TestMethod]
 		public void ReadMixedEntities()

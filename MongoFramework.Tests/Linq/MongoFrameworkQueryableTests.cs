@@ -10,7 +10,7 @@ using System.Linq;
 namespace MongoFramework.Tests.Linq
 {
 	[TestClass]
-	public class MongoFrameworkQueryableTests
+	public class MongoFrameworkQueryableTests : DbTest
 	{
 		[TestMethod]
 		public void EnumerateQueryable()

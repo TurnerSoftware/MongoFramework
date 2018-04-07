@@ -11,7 +11,7 @@ using MongoFramework.Infrastructure.Mapping;
 namespace MongoFramework.Tests.EntityRelationships.SingleEntity
 {
 	[TestClass]
-	public class SingleEntityTests : TestBase
+	public class SingleEntityTests : DbTest
 	{
 		[TestMethod]
 		public void ForeignKeyAttributeOnId()

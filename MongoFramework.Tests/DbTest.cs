@@ -4,7 +4,7 @@ using MongoDB.Driver;
 namespace MongoFramework.Tests
 {
 	[TestClass]
-	public abstract class TestBase
+	public abstract class DbTest
 	{
 		private static void ClearDatabase()
 		{

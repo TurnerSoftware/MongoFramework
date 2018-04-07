@@ -6,7 +6,7 @@ using System.Linq;
 namespace MongoFramework.Tests
 {
 	[TestClass]
-	public class DbEntityCollectionTests
+	public class DbEntityCollectionTests : DbTest
 	{
 		[TestMethod]
 		public void AddNewEntry()

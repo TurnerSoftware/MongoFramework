@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace MongoFramework.Tests
 {
 	[TestClass]
-	public class MongoDbSetTests
+	public class MongoDbSetTests : DbTest
 	{
 		[TestMethod]
 		public void InitialiseDbSet()
