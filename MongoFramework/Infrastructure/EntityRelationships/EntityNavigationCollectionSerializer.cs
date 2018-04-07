@@ -87,9 +87,10 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 
 		public bool TryGetItemSerializationInfo(out BsonSerializationInfo serializationInfo)
 		{
-			var serializer = BsonSerializer.LookupSerializer(typeof(string));
-			var nominalType = typeof(string);
-			serializationInfo = new BsonSerializationInfo(null, serializer, nominalType);
+			var entityMapper = new EntityMapper<TEntity>();
+			var idType = entityMapper.GetEntityMapping().Where(m => m.IsKey).Select(m => m.PropertyType).FirstOrDefault();
+			var serializer = BsonSerializer.LookupSerializer(idType);
+			serializationInfo = new BsonSerializationInfo(null, serializer, idType);
 			return true;
 		}
 
