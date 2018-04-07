@@ -47,6 +47,20 @@ namespace MongoFramework.Tests.EntityRelationships.SingleEntity
 		}
 
 		[TestMethod]
+		[ExpectedException(typeof(MongoFrameworkMappingException))]
+		public void UnsupportedIdTypeOnRelationship()
+		{
+			EntityRelationshipHelper.GetRelationshipsForType(typeof(UnsupportedIdModel)).ToArray();
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(MongoFrameworkMappingException))]
+		public void InvalidForeignKeyOnRelationship()
+		{
+			EntityRelationshipHelper.GetRelationshipsForType(typeof(InvalidForeignKeyModel)).ToArray();
+		}
+
+		[TestMethod]
 		public void NavigationPropertiesUnmap()
 		{
 			var relationships = EntityRelationshipHelper.GetRelationshipsForType(typeof(BaseEntityModel));

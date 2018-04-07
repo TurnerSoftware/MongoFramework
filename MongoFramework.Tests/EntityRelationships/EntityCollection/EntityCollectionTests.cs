@@ -158,5 +158,12 @@ namespace MongoFramework.Tests.EntityRelationships.EntityCollection
 
 			Assert.AreEqual(0, dbEntity.RelatedEntities.Count);
 		}
+
+		[TestMethod]
+		[ExpectedException(typeof(NotImplementedException))]
+		public void InversePropertyMapping()
+		{
+			EntityRelationshipHelper.GetRelationshipsForType(typeof(InversePropertyModel)).ToArray();
+		}
 	}
 }

@@ -27,7 +27,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 				var foreignKeyAttr = currentProperty.GetCustomAttribute<ForeignKeyAttribute>();
 				if (foreignKeyAttr != null)
 				{
-					var linkedProperty = propertyMap[foreignKeyAttr.Name];
+					var linkedProperty = propertyMap.ContainsKey(foreignKeyAttr.Name) ? propertyMap[foreignKeyAttr.Name] : null;
 
 					if (linkedProperty == null)
 					{

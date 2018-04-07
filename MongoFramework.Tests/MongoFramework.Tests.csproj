@@ -80,8 +80,11 @@
     <Compile Include="DbEntityCollectionTests.cs" />
     <Compile Include="EntityRelationships\EntityCollection\BaseEntityModel.cs" />
     <Compile Include="EntityRelationships\EntityCollection\EntityCollectionTests.cs" />
+    <Compile Include="EntityRelationships\EntityCollection\InversePropertyModel.cs" />
     <Compile Include="EntityRelationships\EntityCollection\RelatedEntityModel.cs" />
     <Compile Include="EntityRelationships\Serializer\EntityNavigationCollectionSerializerTests.cs" />
+    <Compile Include="EntityRelationships\SingleEntity\InvalidForeignKeyModel.cs" />
+    <Compile Include="EntityRelationships\SingleEntity\UnsupportedIdModel.cs" />
     <Compile Include="EntityRelationships\StringIdModel.cs" />
     <Compile Include="EntityRelationships\SingleEntity\BaseEntityModel.cs" />
     <Compile Include="EntityRelationships\SingleEntity\BaseVariedIdModel.cs" />

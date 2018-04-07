@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Infrastructure;
 using MongoFramework.Tests.Models;
+using System;
 using System.Linq;
 
 namespace MongoFramework.Tests
@@ -102,6 +103,79 @@ namespace MongoFramework.Tests
 			entityCollection.Clear();
 
 			Assert.IsFalse(entityCollection.GetEntries().Any());
+		}
+
+		[TestMethod]
+		public void RemoveNonExistentEntities()
+		{
+			var entityCollection = new DbEntityCollection<EntityContainerModel>();
+			Assert.IsFalse(entityCollection.Remove(new EntityContainerModel { }));
+		}
+
+		[TestMethod]
+		public void ContainsExactEntity()
+		{
+			var entityCollection = new DbEntityCollection<EntityContainerModel>();
+			var entity = new EntityContainerModel
+			{
+				Id = "ABC"
+			};
+			entityCollection.Add(entity);
+
+			Assert.IsTrue(entityCollection.Contains(entity));
+		}
+
+		[TestMethod]
+		public void ContainsEntityById()
+		{
+			var entityCollection = new DbEntityCollection<EntityContainerModel>();
+			var entity = new EntityContainerModel
+			{
+				Id = "ABC",
+				Title = "1"
+			};
+			entityCollection.Add(entity);
+
+			var idMatchingEntity = new EntityContainerModel
+			{
+				Id = "ABC"
+			};
+
+			Assert.IsTrue(entityCollection.Contains(idMatchingEntity));
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(ArgumentNullException))]
+		public void CopyToInvalidArray()
+		{
+			var entityCollection = new DbEntityCollection<EntityContainerModel>();
+			EntityContainerModel[] array = null;
+			entityCollection.CopyTo(array, 0);
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(IndexOutOfRangeException))]
+		public void CopyToIndexOutOfRangeLow()
+		{
+			var entityCollection = new DbEntityCollection<EntityContainerModel>();
+			var array = new EntityContainerModel[4];
+			entityCollection.CopyTo(array, -1);
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(IndexOutOfRangeException))]
+		public void CopyToIndexOutOfRangeHigh()
+		{
+			var entityCollection = new DbEntityCollection<EntityContainerModel>
+			{
+				new EntityContainerModel { },
+				new EntityContainerModel { },
+				new EntityContainerModel { },
+				new EntityContainerModel { }
+			};
+
+			var array = new EntityContainerModel[2];
+			entityCollection.CopyTo(array, 1);
 		}
 	}
 }
