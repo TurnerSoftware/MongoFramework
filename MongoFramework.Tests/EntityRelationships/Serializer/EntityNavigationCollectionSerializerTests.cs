@@ -63,7 +63,7 @@ namespace MongoFramework.Tests.EntityRelationships.Serializer
 		}
 
 		[TestMethod]
-		public void ReserializingMaintainsState()
+		public void ReserializingStringIdEntityMaintainsState()
 		{
 			var serializer = new EntityNavigationCollectionSerializer<StringIdModel>();
 
@@ -101,6 +101,52 @@ namespace MongoFramework.Tests.EntityRelationships.Serializer
 
 				var context = BsonDeserializationContext.CreateRoot(reader);
 				deserializedCollection = serializer.Deserialize(context) as EntityNavigationCollection<StringIdModel>;
+			}
+
+			Assert.AreEqual(2, initialCollection.PersistingEntityIds.Count());
+			Assert.AreEqual(2, deserializedCollection.PersistingEntityIds.Count());
+			Assert.IsTrue(initialCollection.PersistingEntityIds.All(id => deserializedCollection.PersistingEntityIds.Contains(id)));
+		}
+
+		[TestMethod]
+		public void ReserializingObjectIdIdEntityMaintainsState()
+		{
+			var serializer = new EntityNavigationCollectionSerializer<ObjectIdIdModel>();
+
+			var initialCollection = new EntityNavigationCollection<ObjectIdIdModel>
+			{
+				new ObjectIdIdModel
+				{
+					Id = ObjectId.GenerateNewId(),
+					Description = "1"
+				}
+			};
+			EntityNavigationCollection<ObjectIdIdModel> deserializedCollection = null;
+
+			initialCollection.BeginImport(new [] { (object)ObjectId.GenerateNewId() });
+
+			var document = new BsonDocument();
+
+			using (var writer = new BsonDocumentWriter(document))
+			{
+				writer.WriteStartDocument();
+				writer.WriteName("Items");
+
+				var context = BsonSerializationContext.CreateRoot(writer);
+				serializer.Serialize(context, initialCollection);
+
+				writer.WriteEndDocument();
+			}
+
+			using (var reader = new BsonDocumentReader(document))
+			{
+				reader.ReadBsonType();
+				reader.ReadStartDocument();
+				reader.ReadBsonType();
+				reader.SkipName();
+
+				var context = BsonDeserializationContext.CreateRoot(reader);
+				deserializedCollection = serializer.Deserialize(context) as EntityNavigationCollection<ObjectIdIdModel>;
 			}
 
 			Assert.AreEqual(2, initialCollection.PersistingEntityIds.Count());
