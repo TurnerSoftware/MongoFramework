@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\MSTest.TestAdapter.1.2.0\build\net45\MSTest.TestAdapter.props" Condition="Exists('..\packages\MSTest.TestAdapter.1.2.0\build\net45\MSTest.TestAdapter.props')" />
   <PropertyGroup>
@@ -81,6 +81,8 @@
     <Compile Include="EntityRelationships\EntityCollection\BaseEntityModel.cs" />
     <Compile Include="EntityRelationships\EntityCollection\EntityCollectionTests.cs" />
     <Compile Include="EntityRelationships\EntityCollection\RelatedEntityModel.cs" />
+    <Compile Include="EntityRelationships\Serializer\EntityNavigationCollectionSerializerTests.cs" />
+    <Compile Include="EntityRelationships\StringIdModel.cs" />
     <Compile Include="EntityRelationships\SingleEntity\BaseEntityModel.cs" />
     <Compile Include="EntityRelationships\SingleEntity\BaseVariedIdModel.cs" />
     <Compile Include="EntityRelationships\GuidIdModel.cs" />

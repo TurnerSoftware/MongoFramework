@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace MongoFramework.Tests.EntityRelationships
 {
-	public class GuidIdModel
+	public class StringIdModel
 	{
-		public Guid Id { get; set; }
+		public string Id { get; set; }
 		public string Description { get; set; }
 	}
 }

@@ -38,7 +38,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			}
 			else
 			{
-				throw new NotImplementedException($"Unable to deserialize {type} into an ICollection<{typeof(TEntity).Name}>");
+				throw new NotSupportedException($"Unable to deserialize {type} into an ICollection<{typeof(TEntity).Name}>");
 			}
 		}
 
