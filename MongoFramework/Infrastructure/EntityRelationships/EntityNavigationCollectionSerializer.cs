@@ -18,17 +18,25 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			if (type == BsonType.Array)
 			{
 				var collection = new EntityNavigationCollection<TEntity>();
-				var importIds = new List<string>();
+				var entityIds = new List<object>();
 				context.Reader.ReadStartArray();
 
 				while (context.Reader.ReadBsonType() != BsonType.EndOfDocument)
 				{
-					var entityId = context.Reader.ReadString();
-					importIds.Add(entityId);
+					if (context.Reader.CurrentBsonType == BsonType.ObjectId)
+					{
+						var entityId = context.Reader.ReadObjectId();
+						entityIds.Add(entityId);
+					}
+					else
+					{
+						var entityId = context.Reader.ReadString();
+						entityIds.Add(entityId);
+					}
 				}
 
 				context.Reader.ReadEndArray();
-				collection.BeginImport(importIds);
+				collection.BeginImport(entityIds);
 				return collection;
 			}
 			else if (type == BsonType.Null)
@@ -46,29 +54,22 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 		{
 			if (value is EntityNavigationCollection<TEntity> collection)
 			{
-				var entityMapper = new EntityMapper<TEntity>();
 				context.Writer.WriteStartArray();
 
-				foreach (var entry in collection.GetEntries())
+				foreach (var entityId in collection.PersistingEntityIds)
 				{
-					if (entry.State != DbEntityEntryState.Deleted)
+					if (entityId == null)
 					{
-						var idValue = entityMapper.GetIdValue(entry.Entity);
-						if (idValue != null)
-						{
-							context.Writer.WriteString(idValue.ToString());
-						}
-						else
-						{
-							context.Writer.WriteNull();
-						}
+						context.Writer.WriteNull();
 					}
-				}
-
-				foreach (var importId in collection.ImportIds)
-				{
-					//Quick hack to work around that back/forth serialization of EntityNavigationCollection loses data
-					context.Writer.WriteString(importId);
+					else if (entityId is ObjectId objectId)
+					{
+						context.Writer.WriteObjectId(objectId);
+					}
+					else
+					{
+						context.Writer.WriteString(entityId.ToString());
+					}
 				}
 
 				context.Writer.WriteEndArray();

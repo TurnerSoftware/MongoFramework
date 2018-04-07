@@ -103,12 +103,9 @@ namespace MongoFramework.Tests.EntityRelationships.Serializer
 				deserializedCollection = serializer.Deserialize(context) as EntityNavigationCollection<StringIdModel>;
 			}
 
-			Assert.AreEqual(1, initialCollection.ImportIds.Count());
-			Assert.AreEqual(1, initialCollection.Count);
-			Assert.IsTrue(initialCollection.All(e => deserializedCollection.ImportIds.Contains(e.Id)));
-			Assert.IsTrue(initialCollection.ImportIds.All(id => deserializedCollection.ImportIds.Contains(id)));
-			Assert.AreEqual(2, deserializedCollection.ImportIds.Count());
-			Assert.AreEqual(0, deserializedCollection.Count);
+			Assert.AreEqual(2, initialCollection.PersistingEntityIds.Count());
+			Assert.AreEqual(2, deserializedCollection.PersistingEntityIds.Count());
+			Assert.IsTrue(initialCollection.PersistingEntityIds.All(id => deserializedCollection.PersistingEntityIds.Contains(id)));
 		}
 	}
 }

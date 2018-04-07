@@ -12,29 +12,39 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 {
 	public class EntityNavigationCollection<TEntity> : DbEntityChangeTracker<TEntity>, IEntityNavigationCollection<TEntity>
 	{
-		public IEnumerable<string> ImportIds { get; private set; } = Enumerable.Empty<string>();
+		private IEnumerable<object> UnloadedEntityIds { get; set; } = Enumerable.Empty<object>();
 
-		public void BeginImport(IEnumerable<string> importIds)
+		public IEnumerable<object> PersistingEntityIds
 		{
-			ImportIds = importIds;
+			get
+			{
+				var entityMapper = new EntityMapper<TEntity>();
+				var loadedEntityIds = Entries.Where(e => e.State != DbEntityEntryState.Deleted).Select(e => entityMapper.GetIdValue(e.Entity));
+				return loadedEntityIds.Concat(UnloadedEntityIds);
+			}
+		}
+
+		public void BeginImport(IEnumerable<object> entityIds)
+		{
+			UnloadedEntityIds = entityIds;
 		}
 
 		public void FinaliseImport(IMongoDatabase database)
 		{
-			if (!ImportIds.Any())
+			if (!UnloadedEntityIds.Any())
 			{
 				return;
 			}
 
 			var dbEntityReader = new DbEntityReader<TEntity>(database);
-			var entities = dbEntityReader.AsQueryable().WhereIdMatches(ImportIds);
+			var entities = dbEntityReader.AsQueryable().WhereIdMatches(UnloadedEntityIds);
 
 			foreach (var entity in entities)
 			{
 				Update(entity, DbEntityEntryState.NoChanges);
 			}
 
-			ImportIds = Enumerable.Empty<string>();
+			UnloadedEntityIds = Enumerable.Empty<object>();
 		}
 
 		public void WriteChanges(IMongoDatabase database)
