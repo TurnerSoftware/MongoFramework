@@ -1,20 +1,19 @@
-﻿using System;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
+using MongoFramework.Infrastructure.Mapping;
+using MongoFramework.Linq;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using MongoDB.Bson;
-using MongoDB.Driver;
-using MongoFramework.Infrastructure.Mapping;
-using MongoFramework.Linq;
 
 namespace MongoFramework.Infrastructure.EntityRelationships
 {
 	public static class EntityRelationshipHelper
 	{
 		public static readonly Type[] IdTypes = new[] { typeof(string), typeof(Guid), typeof(ObjectId) };
-		
+
 		public static IEnumerable<EntityRelationshipPropertyPair> GetRelationshipsForType(Type entityType)
 		{
 			var propertyMap = entityType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToDictionary(p => p.Name);

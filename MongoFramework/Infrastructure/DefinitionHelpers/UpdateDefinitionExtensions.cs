@@ -1,9 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
-using MongoFramework.Infrastructure.Mapping;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
@@ -60,7 +58,7 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 
 			var specificDefinitionType = typeof(StringFieldDefinition<,>).MakeGenericType(typeArgs);
 			var specificDefinition = Activator.CreateInstance(specificDefinitionType, fieldName, null); //ie. StringFieldDefintion<TEntity, valueType>
-			
+
 			var expressionType = typeof(Expression);
 			var setMethod = typeof(MongoDB.Driver.UpdateDefinitionExtensions)
 				.GetMethods()

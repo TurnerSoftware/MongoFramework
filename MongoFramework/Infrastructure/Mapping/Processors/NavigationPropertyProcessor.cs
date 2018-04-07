@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using MongoDB.Bson.Serialization;
-using System.Reflection;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
+﻿using MongoDB.Bson.Serialization;
 using MongoFramework.Infrastructure.EntityRelationships;
+using System;
+using System.Linq;
 
 namespace MongoFramework.Infrastructure.Mapping.Processors
 {

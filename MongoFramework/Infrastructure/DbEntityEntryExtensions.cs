@@ -1,5 +1,4 @@
-﻿using MongoDB.Bson;
-using MongoFramework.Bson;
+﻿using MongoFramework.Bson;
 using MongoFramework.Infrastructure.EntityRelationships;
 
 namespace MongoFramework.Infrastructure

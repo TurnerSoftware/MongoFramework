@@ -15,13 +15,13 @@ namespace MongoFramework.Infrastructure
 		public int Count => Entries.Count;
 
 		public bool IsReadOnly => false;
-		
+
 		public DbEntityEntry<TEntity> GetEntry(TEntity entity)
 		{
 			var entityId = EntityMapper.GetIdValue(entity);
 			var idType = EntityMapper.GetEntityMapping().Where(m => m.IsKey).Select(m => m.PropertyType).FirstOrDefault();
 			var defaultIdValue = idType.IsValueType ? Activator.CreateInstance(idType) : null;
-			
+
 			foreach (var entry in Entries)
 			{
 				if ((entityId == null || entityId.Equals(defaultIdValue)) && entry.Entity.Equals(entity))
@@ -111,7 +111,7 @@ namespace MongoFramework.Infrastructure
 				array[i + arrayIndex] = Entries[i].Entity;
 			}
 		}
-		
+
 		public IEnumerator<TEntity> GetEnumerator()
 		{
 			var result = Entries.Select(e => e.Entity);
