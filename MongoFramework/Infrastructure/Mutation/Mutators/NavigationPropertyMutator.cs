@@ -14,11 +14,6 @@ namespace MongoFramework.Infrastructure.Mutation.Mutators
 	{
 		public void MutateEntity(TEntity entity, MutatorType mutationType, IEntityMapper entityMapper, IMongoDatabase database)
 		{
-			if (database == null)
-			{
-				throw new ArgumentNullException(nameof(database));
-			}
-
 			var relationships = EntityRelationshipHelper.GetRelationshipsForType(typeof(TEntity));
 
 			foreach (var relationship in relationships)

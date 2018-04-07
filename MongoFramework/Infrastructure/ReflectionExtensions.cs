@@ -21,12 +21,6 @@ namespace MongoFramework.Infrastructure
 			{
 				var currentName = namePieces.Pop();
 
-				//Remove details of array item - we don't know instance-specific information so it doesn't help
-				if (currentName.Contains('[') && currentName.Contains(']'))
-				{
-					currentName = currentName.Substring(0, currentName.IndexOf('['));
-				}
-
 				var property = currentType.GetProperty(currentName);
 				if (property == null)
 				{
@@ -38,10 +32,13 @@ namespace MongoFramework.Infrastructure
 				}
 
 				var propertyType = property.PropertyType;
-				if (namePieces.Any() && propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+				if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
 				{
 					propertyType = propertyType.GetGenericArguments()[0];
 				}
+
+				//TODO: Add support to check all interfaces to find generic type definition
+				//		See: https://stackoverflow.com/a/1121864/1676444
 
 				currentType = propertyType;
 			}

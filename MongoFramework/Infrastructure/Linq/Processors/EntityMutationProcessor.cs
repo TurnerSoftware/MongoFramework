@@ -7,7 +7,6 @@ namespace MongoFramework.Infrastructure.Linq.Processors
 	{
 		public IMongoDatabase Database { get; private set; }
 
-		public EntityMutationProcessor() { }
 		public EntityMutationProcessor(IMongoDatabase database)
 		{
 			Database = database;
