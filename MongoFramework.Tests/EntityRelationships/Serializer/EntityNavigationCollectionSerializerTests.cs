@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoFramework.Infrastructure.EntityRelationships;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MongoFramework.Tests.EntityRelationships.Serializer
 {
@@ -91,7 +89,7 @@ namespace MongoFramework.Tests.EntityRelationships.Serializer
 
 				writer.WriteEndDocument();
 			}
-			
+
 			using (var reader = new BsonDocumentReader(document))
 			{
 				reader.ReadBsonType();
@@ -123,7 +121,7 @@ namespace MongoFramework.Tests.EntityRelationships.Serializer
 			};
 			EntityNavigationCollection<ObjectIdIdModel> deserializedCollection = null;
 
-			initialCollection.BeginImport(new [] { (object)ObjectId.GenerateNewId() });
+			initialCollection.BeginImport(new[] { (object)ObjectId.GenerateNewId() });
 
 			var document = new BsonDocument();
 

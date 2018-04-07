@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using MongoDB.Bson;
+using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MongoDB.Bson;
 
 namespace MongoFramework.Tests.EntityRelationships.SingleEntity
 {
