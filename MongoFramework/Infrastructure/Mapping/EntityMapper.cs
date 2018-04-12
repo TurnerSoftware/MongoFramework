@@ -96,6 +96,16 @@ namespace MongoFramework.Infrastructure.Mapping
 			return idProperty?.GetValue(entity);
 		}
 
+		public object GetDefaultId()
+		{
+			var idPropertyType = GetEntityMapping().Where(m => m.IsKey).Select(m => m.PropertyType).FirstOrDefault();
+			if (idPropertyType.IsValueType)
+			{
+				return Activator.CreateInstance(idPropertyType);
+			}
+			return null;
+		}
+
 		public IEnumerable<IEntityPropertyMap> GetEntityMapping()
 		{
 			return GetEntityMapping(true);

@@ -8,6 +8,7 @@ namespace MongoFramework.Infrastructure.Mapping
 		Type EntityType { get; }
 		string GetIdName();
 		object GetIdValue(object entity);
+		object GetDefaultId();
 		string GetCollectionName();
 		IEnumerable<IEntityPropertyMap> GetEntityMapping();
 		IEnumerable<IEntityPropertyMap> TraverseMapping();

@@ -19,19 +19,18 @@ namespace MongoFramework.Infrastructure
 		public DbEntityEntry<TEntity> GetEntry(TEntity entity)
 		{
 			var entityId = EntityMapper.GetIdValue(entity);
-			var idType = EntityMapper.GetEntityMapping().Where(m => m.IsKey).Select(m => m.PropertyType).FirstOrDefault();
-			var defaultIdValue = idType.IsValueType ? Activator.CreateInstance(idType) : null;
+			var defaultIdValue = EntityMapper.GetDefaultId();
 
 			foreach (var entry in Entries)
 			{
-				if ((entityId == null || entityId.Equals(defaultIdValue)) && entry.Entity.Equals(entity))
+				if (Equals(entityId, defaultIdValue) && entry.Entity.Equals(entity))
 				{
 					return entry;
 				}
 				else
 				{
 					var entryEntityId = EntityMapper.GetIdValue(entry.Entity);
-					if (entryEntityId != null && !entryEntityId.Equals(defaultIdValue) && entryEntityId.Equals(entityId))
+					if (!Equals(entryEntityId, defaultIdValue) && entryEntityId.Equals(entityId))
 					{
 						return entry;
 					}
