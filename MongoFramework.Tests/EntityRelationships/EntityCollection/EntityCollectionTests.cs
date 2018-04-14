@@ -131,11 +131,12 @@ namespace MongoFramework.Tests.EntityRelationships.EntityCollection
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(NotImplementedException))]
 		public void InversePropertyMapping()
 		{
 			var entityMapper = new EntityMapper<InversePropertyModel>();
 			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper);
+
+			Assert.IsTrue(relationships.Any(r => r.IsCollection && r.IdProperty.Name == "RelatedId"));
 		}
 	}
 }

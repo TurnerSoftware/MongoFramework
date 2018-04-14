@@ -31,7 +31,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 
 					if (linkedProperty == null)
 					{
-						throw new MongoFrameworkMappingException($"Can't find property {foreignKeyAttr.Name} on {entityType.Name} as indicated by the ForeignKeyAttribute.");
+						throw new MongoFrameworkMappingException($"Can't find property {foreignKeyAttr.Name} in {entityType.Name} as indicated by the ForeignKeyAttribute.");
 					}
 					else if (IdTypes.Contains(currentProperty.PropertyType))
 					{
@@ -53,7 +53,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 					}
 					else
 					{
-						throw new MongoFrameworkMappingException($"Unable to determine the Id property between {currentProperty.Name} and {linkedProperty.Name}. Check that the types for these properties is correct.");
+						throw new MongoFrameworkMappingException($"Unable to determine the Id property between {currentProperty.Name} and {linkedProperty.Name}. Check the types for these properties are correct.");
 					}
 
 					continue;
@@ -71,26 +71,20 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 
 					if (inversePropertyAttr != null)
 					{
-						throw new NotImplementedException("InversePropertyAttribute not supported");
-						//While the logic below is correct, the EntityNavigationCollection doesn't support loading entities by arbitary properties
-						//Really what needs to change is a method like "WhereIdMatches" but takes in the property to look at
-						//This means `BeginImport` needs to know the relationship details
-						//This means `NavigationPropertyProcessor` needs to pass it to the serializer on creation
-						//All doable but not right now...
-
 						idProperty = relatedEntityMapping.Where(m => m.Property.Name == inversePropertyAttr.Property).Select(m => m.Property).FirstOrDefault();
 
 						if (idProperty == null)
 						{
-							throw new MongoFrameworkMappingException($"Can't find property {inversePropertyAttr.Property} on {collectionEntityType.Name} as indicated by the InversePropertyAttribute on {currentProperty.Name} in {entityType.Name}");
+							throw new MongoFrameworkMappingException($"Can't find property {inversePropertyAttr.Property} in {collectionEntityType} as indicated by the InversePropertyAttribute on {currentProperty.Name} in {entityType}");
 						}
 						else if (!IdTypes.Contains(idProperty.PropertyType))
 						{
-							throw new MongoFrameworkMappingException($"For the navigation property {currentProperty.Name}, the Id property {inversePropertyAttr.Property} on {collectionEntityType.Name} isn't of a compatible type.");
+							throw new MongoFrameworkMappingException($"The Id property {inversePropertyAttr.Property} in {collectionEntityType.Name} isn't of a compatible type.");
 						}
 					}
 					else
 					{
+						//Default to the Id when no specific foreign key is found
 						idProperty = relatedEntityMapping.Where(m => m.IsKey).Select(m => m.Property).FirstOrDefault();
 					}
 
