@@ -6,6 +6,7 @@ namespace MongoFramework.Tests.EntityRelationships.Mapping.EntityCollection
 	public class RelatedEntityModel
 	{
 		public string Id { get; set; }
+		public DateTime CreatedDate { get; set; }
 		public string RelatedId { get; set; }
 		public string Description { get; set; }
 	}

@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace MongoFramework.Tests.EntityRelationships.Mapping.EntityCollection
 {
-	public class InversePropertyModel
+	public class ValidInversePropertyModel
 	{
 		public string Id { get; set; }
 

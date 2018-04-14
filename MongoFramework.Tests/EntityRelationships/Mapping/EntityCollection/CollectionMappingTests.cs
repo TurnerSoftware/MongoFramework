@@ -23,12 +23,28 @@ namespace MongoFramework.Tests.EntityRelationships.Mapping.EntityCollection
 		}
 
 		[TestMethod]
-		public void InversePropertyMapping()
+		public void ValidInversePropertyMapping()
 		{
-			var entityMapper = new EntityMapper<InversePropertyModel>();
+			var entityMapper = new EntityMapper<ValidInversePropertyModel>();
 			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper);
 
 			Assert.IsTrue(relationships.Any(r => r.IsCollection && r.IdProperty.Name == "RelatedId"));
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(MongoFrameworkMappingException))]
+		public void InversePropertyMappingNonExistantProperty()
+		{
+			var entityMapper = new EntityMapper<InversePropertyNonExistantPropertyModel>();
+			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper);
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(MongoFrameworkMappingException))]
+		public void InversePropertyMappingInvalidPropertyType()
+		{
+			var entityMapper = new EntityMapper<InversePropertyMappingInvalidPropertyTypeModel>();
+			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper);
 		}
 	}
 }
