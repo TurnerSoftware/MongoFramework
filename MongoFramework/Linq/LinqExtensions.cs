@@ -24,12 +24,17 @@ namespace MongoFramework.Linq
 			var entityMapper = new EntityMapper<TEntity>();
 			var idPropertyName = entityMapper.GetEntityMapping().Where(m => m.IsKey).Select(m => m.Property.Name).FirstOrDefault();
 
-			//Dynamically build the LINQ query, it looks something like: e => entityIds.Contains(e.{idPropertyName})
+			return queryable.WherePropertyMatches(idPropertyName, entityIds);
+		}
+
+		public static IQueryable<TEntity> WherePropertyMatches<TEntity, TIdentifierType>(this IQueryable<TEntity> queryable, string propertyName, IEnumerable<TIdentifierType> identifiers)
+		{
+			//Dynamically build the LINQ query, it looks something like: e => identifiers.Contains(e.{propertyName})
 			var entityParameter = Expression.Parameter(typeof(TEntity), "e");
-			var idPropertyExpression = Expression.Property(entityParameter, idPropertyName);
-			var entityIdsExpression = Expression.Constant(entityIds);
+			var propertyExpression = Expression.Property(entityParameter, propertyName);
+			var entityIdsExpression = Expression.Constant(identifiers);
 			var expression = Expression.Lambda<Func<TEntity, bool>>(
-				Expression.Call(typeof(Enumerable), "Contains", new[] { typeof(TIdentifierType) }, entityIdsExpression, idPropertyExpression),
+				Expression.Call(typeof(Enumerable), "Contains", new[] { typeof(TIdentifierType) }, entityIdsExpression, propertyExpression),
 				entityParameter
 			);
 
