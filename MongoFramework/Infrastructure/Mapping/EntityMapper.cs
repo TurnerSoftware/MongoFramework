@@ -14,9 +14,8 @@ namespace MongoFramework.Infrastructure.Mapping
 		public Type EntityType { get; private set; }
 		private BsonClassMap ClassMap { get; set; }
 
-		private static ReaderWriterLockSlim MappingLock { get; set; } = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+		private static ReaderWriterLockSlim MappingLock { get; } = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 		private static ConcurrentDictionary<Type, IEnumerable<IEntityPropertyMap>> EntityMapCache { get; set; }
-
 
 		static EntityMapper()
 		{
