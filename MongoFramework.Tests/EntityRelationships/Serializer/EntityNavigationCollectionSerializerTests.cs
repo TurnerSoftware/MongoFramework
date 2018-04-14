@@ -75,7 +75,7 @@ namespace MongoFramework.Tests.EntityRelationships.Serializer
 			};
 			EntityNavigationCollection<StringIdModel> deserializedCollection = null;
 
-			initialCollection.BeginImport(new[] { "5ac383379a5f1303784400f9" });
+			initialCollection.AddEntityById("5ac383379a5f1303784400f9");
 
 			var document = new BsonDocument();
 
@@ -101,9 +101,9 @@ namespace MongoFramework.Tests.EntityRelationships.Serializer
 				deserializedCollection = serializer.Deserialize(context) as EntityNavigationCollection<StringIdModel>;
 			}
 
-			Assert.AreEqual(2, initialCollection.PersistingEntityIds.Count());
-			Assert.AreEqual(2, deserializedCollection.PersistingEntityIds.Count());
-			Assert.IsTrue(initialCollection.PersistingEntityIds.All(id => deserializedCollection.PersistingEntityIds.Contains(id)));
+			Assert.AreEqual(2, initialCollection.GetEntityIds().Count());
+			Assert.AreEqual(2, deserializedCollection.GetEntityIds().Count());
+			Assert.IsTrue(initialCollection.GetEntityIds().All(id => deserializedCollection.GetEntityIds().Contains(id)));
 		}
 
 		[TestMethod]
@@ -121,7 +121,7 @@ namespace MongoFramework.Tests.EntityRelationships.Serializer
 			};
 			EntityNavigationCollection<ObjectIdIdModel> deserializedCollection = null;
 
-			initialCollection.BeginImport(new[] { (object)ObjectId.GenerateNewId() });
+			initialCollection.AddEntityById(ObjectId.GenerateNewId());
 
 			var document = new BsonDocument();
 
@@ -147,9 +147,9 @@ namespace MongoFramework.Tests.EntityRelationships.Serializer
 				deserializedCollection = serializer.Deserialize(context) as EntityNavigationCollection<ObjectIdIdModel>;
 			}
 
-			Assert.AreEqual(2, initialCollection.PersistingEntityIds.Count());
-			Assert.AreEqual(2, deserializedCollection.PersistingEntityIds.Count());
-			Assert.IsTrue(initialCollection.PersistingEntityIds.All(id => deserializedCollection.PersistingEntityIds.Contains(id)));
+			Assert.AreEqual(2, initialCollection.GetEntityIds().Count());
+			Assert.AreEqual(2, deserializedCollection.GetEntityIds().Count());
+			Assert.IsTrue(initialCollection.GetEntityIds().All(id => deserializedCollection.GetEntityIds().Contains(id)));
 		}
 	}
 }

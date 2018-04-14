@@ -2,6 +2,8 @@
 using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.EntityRelationships;
 using MongoFramework.Infrastructure.Mapping;
+using MongoFramework.Infrastructure.Mutation.Mutators;
+using MongoFramework.Infrastructure.Mutation;
 using System;
 using System.Linq;
 
@@ -13,7 +15,8 @@ namespace MongoFramework.Tests.EntityRelationships.SingleEntity
 		[TestMethod]
 		public void ForeignKeyAttributeOnId()
 		{
-			var relationships = EntityRelationshipHelper.GetRelationshipsForType(typeof(BaseEntityModel));
+			var entityMapper = new EntityMapper<BaseEntityModel>();
+			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper);
 
 			var createdByIdProperty = typeof(BaseEntityModel).GetProperty("CreatedById");
 			var attributeOnIdRelationship = relationships.Where(r => r.IdProperty == createdByIdProperty).FirstOrDefault();
@@ -26,7 +29,8 @@ namespace MongoFramework.Tests.EntityRelationships.SingleEntity
 		[TestMethod]
 		public void ForeignKeyAttributeOnNavigationProperty()
 		{
-			var relationships = EntityRelationshipHelper.GetRelationshipsForType(typeof(BaseEntityModel));
+			var entityMapper = new EntityMapper<BaseEntityModel>();
+			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper);
 
 			var updatedByIdProperty = typeof(BaseEntityModel).GetProperty("UpdatedById");
 			var attributeOnIdRelationship = relationships.Where(r => r.IdProperty == updatedByIdProperty).FirstOrDefault();
@@ -39,7 +43,8 @@ namespace MongoFramework.Tests.EntityRelationships.SingleEntity
 		[TestMethod]
 		public void IdentifyRelationshipsWithOtherIdTypes()
 		{
-			var relationships = EntityRelationshipHelper.GetRelationshipsForType(typeof(BaseVariedIdModel));
+			var entityMapper = new EntityMapper<BaseVariedIdModel>();
+			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper);
 			Assert.AreEqual(2, relationships.Count());
 		}
 
@@ -47,22 +52,22 @@ namespace MongoFramework.Tests.EntityRelationships.SingleEntity
 		[ExpectedException(typeof(MongoFrameworkMappingException))]
 		public void UnsupportedIdTypeOnRelationship()
 		{
-			EntityRelationshipHelper.GetRelationshipsForType(typeof(UnsupportedIdModel)).ToArray();
+			var entityMapper = new EntityMapper<UnsupportedIdModel>();
+			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper).ToArray();
 		}
 
 		[TestMethod]
 		[ExpectedException(typeof(MongoFrameworkMappingException))]
 		public void InvalidForeignKeyOnRelationship()
 		{
-			EntityRelationshipHelper.GetRelationshipsForType(typeof(InvalidForeignKeyModel)).ToArray();
+			var entityMapper = new EntityMapper<InvalidForeignKeyModel>();
+			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper).ToArray();
 		}
 
 		[TestMethod]
 		public void NavigationPropertiesUnmap()
 		{
-			var relationships = EntityRelationshipHelper.GetRelationshipsForType(typeof(BaseEntityModel));
 			var entityMapper = new EntityMapper<BaseEntityModel>();
-
 			Assert.IsFalse(entityMapper.GetEntityMapping().Any(e => e.FullPath == "CreatedBy" || e.FullPath == "UpdatedBy"));
 		}
 
@@ -78,36 +83,13 @@ namespace MongoFramework.Tests.EntityRelationships.SingleEntity
 				}
 			};
 
-			var createdByRelationship = EntityRelationshipHelper.GetRelationshipsForType(typeof(BaseEntityModel)).Where(r => r.IdProperty.Name == "CreatedById").FirstOrDefault();
-			EntityRelationshipHelper.SaveNavigationProperty(baseEntity, createdByRelationship, database);
+			var entityMapper = new EntityMapper<BaseEntityModel>();
+			var entityRelationshipWriter = new EntityRelationshipWriter<BaseEntityModel>(database, entityMapper);
+
+			entityRelationshipWriter.CommitEntityRelationships(new[] { baseEntity });
 
 			Assert.IsNotNull(baseEntity.CreatedById);
 			Assert.IsTrue(baseEntity.CreatedById == baseEntity.CreatedBy.Id);
-		}
-
-		[TestMethod]
-		public void SaveUpdatedEntity()
-		{
-			var database = TestConfiguration.GetDatabase();
-			var baseEntity = new BaseEntityModel
-			{
-				CreatedBy = new UserEntityModel
-				{
-					Username = "SaveUpdatedEntity-CreatedBy"
-				}
-			};
-
-			var createdByRelationship = EntityRelationshipHelper.GetRelationshipsForType(typeof(BaseEntityModel)).Where(r => r.IdProperty.Name == "CreatedById").FirstOrDefault();
-			EntityRelationshipHelper.SaveNavigationProperty(baseEntity, createdByRelationship, database);
-
-			baseEntity.CreatedBy.Username = "SaveUpdatedEntity-CreatedBy-Updated";
-
-			EntityRelationshipHelper.SaveNavigationProperty(baseEntity, createdByRelationship, database);
-
-			var dbEntityReader = new DbEntityReader<UserEntityModel>(database);
-			var dbEntity = dbEntityReader.AsQueryable().Where(e => e.Id == baseEntity.CreatedBy.Id).FirstOrDefault();
-
-			Assert.AreEqual("SaveUpdatedEntity-CreatedBy-Updated", dbEntity.Username);
 		}
 
 		[TestMethod]
@@ -131,8 +113,8 @@ namespace MongoFramework.Tests.EntityRelationships.SingleEntity
 				UpdatedById = userEntity.Id
 			};
 
-			var updatedByRelationship = EntityRelationshipHelper.GetRelationshipsForType(typeof(BaseEntityModel)).Where(r => r.IdProperty.Name == "UpdatedById").FirstOrDefault();
-			EntityRelationshipHelper.LoadNavigationProperty(baseEntity, updatedByRelationship, database);
+			var entityMapper = new EntityMapper<BaseEntityModel>();
+			new NavigationPropertyMutator<BaseEntityModel>().MutateEntity(baseEntity, MutatorType.Select, entityMapper, database);
 
 			Assert.AreEqual("LoadEntity-UpdatedBy", baseEntity.UpdatedBy.Username);
 		}

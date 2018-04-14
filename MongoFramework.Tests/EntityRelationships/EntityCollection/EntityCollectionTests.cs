@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Infrastructure.EntityRelationships;
+using MongoFramework.Infrastructure.Mapping;
 using System;
 using System.Linq;
 
@@ -11,7 +12,8 @@ namespace MongoFramework.Tests.EntityRelationships.EntityCollection
 		[TestMethod]
 		public void IdentifyCollectionRelationships()
 		{
-			var relationships = EntityRelationshipHelper.GetRelationshipsForType(typeof(BaseEntityModel));
+			var entityMapper = new EntityMapper<BaseEntityModel>();
+			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper);
 			var relationship = relationships.FirstOrDefault();
 
 			Assert.IsTrue(relationship.IsCollection);
@@ -75,34 +77,7 @@ namespace MongoFramework.Tests.EntityRelationships.EntityCollection
 			Assert.AreEqual(2, dbEntity.RelatedEntities.Count);
 			Assert.IsTrue(dbEntity.RelatedEntities.All(e => e.Id != null));
 		}
-
-		[TestMethod]
-		public void UpdateCollectionItem()
-		{
-			var database = TestConfiguration.GetDatabase();
-			var dbSet = new MongoDbSet<BaseEntityModel>();
-			dbSet.SetDatabase(database);
-
-			var entity = dbSet.Create();
-			entity.Description = "UpdateCollectionItem";
-
-			var item = new RelatedEntityModel
-			{
-				Description = "UpdateCollectionItem-RelatedEntityModel-1"
-			};
-			entity.RelatedEntities.Add(item);
-
-			dbSet.SaveChanges();
-
-			item.Description = "UpdateCollectionItem-RelatedEntityModel-1-Updated";
-
-			dbSet.SaveChanges();
-
-			var dbEntity = dbSet.Where(e => e.Id == entity.Id).FirstOrDefault();
-
-			Assert.AreEqual("UpdateCollectionItem-RelatedEntityModel-1-Updated", dbEntity.RelatedEntities.FirstOrDefault().Description);
-		}
-
+		
 		[TestMethod]
 		public void RemoveCollectionItem()
 		{
@@ -159,7 +134,8 @@ namespace MongoFramework.Tests.EntityRelationships.EntityCollection
 		[ExpectedException(typeof(NotImplementedException))]
 		public void InversePropertyMapping()
 		{
-			EntityRelationshipHelper.GetRelationshipsForType(typeof(InversePropertyModel)).ToArray();
+			var entityMapper = new EntityMapper<InversePropertyModel>();
+			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper);
 		}
 	}
 }

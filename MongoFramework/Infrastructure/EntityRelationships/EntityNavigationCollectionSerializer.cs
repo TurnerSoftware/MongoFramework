@@ -17,7 +17,6 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			if (type == BsonType.Array)
 			{
 				var collection = new EntityNavigationCollection<TEntity>();
-				var entityIds = new List<object>();
 				context.Reader.ReadStartArray();
 
 				while (context.Reader.ReadBsonType() != BsonType.EndOfDocument)
@@ -25,17 +24,16 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 					if (context.Reader.CurrentBsonType == BsonType.ObjectId)
 					{
 						var entityId = context.Reader.ReadObjectId();
-						entityIds.Add(entityId);
+						collection.AddEntityById(entityId);
 					}
 					else
 					{
 						var entityId = context.Reader.ReadString();
-						entityIds.Add(entityId);
+						collection.AddEntityById(entityId);
 					}
 				}
 
 				context.Reader.ReadEndArray();
-				collection.BeginImport(entityIds);
 				return collection;
 			}
 			else if (type == BsonType.Null)
@@ -51,32 +49,48 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 
 		public void Serialize(BsonSerializationContext context, BsonSerializationArgs args, object value)
 		{
-			if (value is EntityNavigationCollection<TEntity> collection)
+			if (value == null)
 			{
-				context.Writer.WriteStartArray();
+				context.Writer.WriteNull();
+				return;
+			}
 
-				foreach (var entityId in collection.PersistingEntityIds)
-				{
-					if (entityId == null)
-					{
-						context.Writer.WriteNull();
-					}
-					else if (entityId is ObjectId objectId)
-					{
-						context.Writer.WriteObjectId(objectId);
-					}
-					else
-					{
-						context.Writer.WriteString(entityId.ToString());
-					}
-				}
+			IEnumerable<object> entityIds;
 
-				context.Writer.WriteEndArray();
+			if (value is EntityNavigationCollection<TEntity> entityNavigationCollection)
+			{
+				//Calling GetEntityIds prevents unnecessary DB calls if the entities aren't actually loaded yet
+				entityIds = entityNavigationCollection.GetEntityIds();
+			}
+			else if (value is ICollection<TEntity> simpleCollection)
+			{
+				var entityMapper = new EntityMapper<TEntity>();
+				entityIds = simpleCollection.Select(e => entityMapper.GetIdValue(e));
 			}
 			else
 			{
-				context.Writer.WriteNull();
+				throw new NotSupportedException($"Unable to serialize {value.GetType().Name}. Only ICollection<{typeof(TEntity).Name}> types are supported");
 			}
+
+			context.Writer.WriteStartArray();
+
+			foreach (var entityId in entityIds)
+			{
+				if (entityId == null)
+				{
+					context.Writer.WriteNull();
+				}
+				else if (entityId is ObjectId objectId)
+				{
+					context.Writer.WriteObjectId(objectId);
+				}
+				else
+				{
+					context.Writer.WriteString(entityId.ToString());
+				}
+			}
+
+			context.Writer.WriteEndArray();
 		}
 
 		public void Serialize(BsonSerializationContext context, BsonSerializationArgs args, ICollection<TEntity> value)

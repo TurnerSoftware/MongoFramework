@@ -1,5 +1,6 @@
 ﻿using MongoDB.Driver;
 using MongoFramework.Infrastructure;
+using MongoFramework.Infrastructure.EntityRelationships;
 using MongoFramework.Infrastructure.Indexing;
 using MongoFramework.Infrastructure.Linq;
 using MongoFramework.Infrastructure.Linq.Processors;
@@ -27,6 +28,7 @@ namespace MongoFramework
 		private IDbEntityWriter<TEntity> EntityWriter { get; set; }
 		private IDbEntityReader<TEntity> EntityReader { get; set; }
 		private IEntityIndexWriter<TEntity> EntityIndexWriter { get; set; }
+		private IEntityRelationshipWriter<TEntity> EntityRelationshipWriter { get; set; }
 
 		/// <summary>
 		/// Whether any entity validation is performed prior to saving changes. (Default is true)
@@ -77,6 +79,8 @@ namespace MongoFramework
 			var indexMapper = new EntityIndexMapper<TEntity>(entityMapper);
 			var collection = database.GetCollection<TEntity>(entityMapper.GetCollectionName());
 			EntityIndexWriter = new EntityIndexWriter<TEntity>(collection, indexMapper);
+
+			EntityRelationshipWriter = new EntityRelationshipWriter<TEntity>(database, entityMapper);
 		}
 
 		public virtual TEntity Create()
@@ -200,6 +204,7 @@ namespace MongoFramework
 		public virtual void SaveChanges()
 		{
 			EntityIndexWriter.ApplyIndexing();
+			EntityRelationshipWriter.CommitEntityRelationships(ChangeTracker);
 			ChangeTracker.DetectChanges();
 			CheckEntityValidation();
 			EntityWriter.Write(ChangeTracker);
@@ -213,6 +218,7 @@ namespace MongoFramework
 		public virtual async Task SaveChangesAsync()
 		{
 			await EntityIndexWriter.ApplyIndexingAsync();
+			await EntityRelationshipWriter.CommitEntityRelationshipsAsync(ChangeTracker);
 			ChangeTracker.DetectChanges();
 			CheckEntityValidation();
 			await EntityWriter.WriteAsync(ChangeTracker);

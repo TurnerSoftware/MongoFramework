@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace MongoFramework.Infrastructure.EntityRelationships
 {
-	public class EntityRelationshipPropertyPair
+	public class EntityRelationship
 	{
 		public PropertyInfo IdProperty { get; set; }
 		public PropertyInfo NavigationProperty { get; set; }

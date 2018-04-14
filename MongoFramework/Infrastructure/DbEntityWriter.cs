@@ -47,10 +47,8 @@ namespace MongoFramework.Infrastructure
 					var filter = Builders<TEntity>.Filter.Eq(idFieldName, idFieldValue);
 					var updateDefintion = UpdateDefinitionHelper.CreateFromDiff<TEntity>(entry.OriginalValues, entry.CurrentValues);
 
-					//This additional check here really is a workaround for how we detect changes to navigation properties
-					//More specificly, how the change tracker uses a BsonDocument to check changes but navigation properties aren't fully serialized
-					//One option: Full serialize navigation properties in some contexts
-					//Another option: Have the change tracker treat navigation properties as a first-class feature
+					//MongoDB doesn't like it if an UpdateDefinition is empty.
+					//This is primarily to work around a mutation that may set an entity to its default state.
 					if (updateDefintion.HasChanges())
 					{
 						writeModel.Add(new UpdateOneModel<TEntity>(filter, updateDefintion));

@@ -9,7 +9,8 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 	{
 		public void ApplyMapping(Type entityType, BsonClassMap classMap)
 		{
-			var relationships = EntityRelationshipHelper.GetRelationshipsForType(entityType);
+			var entityMapper = new EntityMapper(entityType);
+			var relationships = entityMapper.GetEntityRelationships();
 
 			foreach (var relationship in relationships)
 			{
