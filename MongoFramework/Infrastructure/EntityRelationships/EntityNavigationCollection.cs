@@ -11,13 +11,20 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 	public class EntityNavigationCollection<TEntity> : DbEntityCollection<TEntity>, IEntityNavigationCollection<TEntity>
 	{
 		private IMongoDatabase Database { get; set; }
-		private IEntityMapper EntityMapper { get; } = new EntityMapper<TEntity>();
+		private IEntityMapper EntityMapper { get; }
 		private HashSet<object> UnloadedEntityIds { get; } = new HashSet<object>();
 
 		public new int Count => LoadedCount + UnloadedCount;
 
 		public int LoadedCount => Entries.Count;
 		public int UnloadedCount => UnloadedEntityIds.Count;
+
+		public EntityNavigationCollection() : this(new EntityMapper<TEntity>()) { }
+
+		public EntityNavigationCollection(IEntityMapper entityMapper)
+		{
+			EntityMapper = entityMapper;
+		}
 
 		public void Connect(IMongoDatabase database)
 		{
@@ -92,7 +99,6 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			//Enumerate list of unloaded entity IDs and load them in one at a time
 			if (UnloadedEntityIds.Any())
 			{
-				var entityMapper = new EntityMapper<TEntity>();
 				var dbEntityReader = new DbEntityReader<TEntity>(Database);
 				var unloadedEntities = dbEntityReader.AsQueryable().WhereIdMatches(UnloadedEntityIds);
 
@@ -106,7 +112,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 						Update(loadedEntity, DbEntityEntryState.NoChanges);
 
 						//Remove from unloaded entity collection
-						var entityId = entityMapper.GetIdValue(loadedEntity);
+						var entityId = EntityMapper.GetIdValue(loadedEntity);
 						UnloadedEntityIds.Remove(entityId);
 
 						yield return loadedEntity;
