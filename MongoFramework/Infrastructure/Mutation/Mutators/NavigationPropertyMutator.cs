@@ -22,7 +22,7 @@ namespace MongoFramework.Infrastructure.Mutation.Mutators
 				else if (mutationType == MutatorType.Create && relationship.IsCollection)
 				{
 					var navigationCollectionType = typeof(EntityNavigationCollection<>).MakeGenericType(relationship.EntityType);
-					var navigationCollection = Activator.CreateInstance(navigationCollectionType) as IEntityNavigationCollection;
+					var navigationCollection = Activator.CreateInstance(navigationCollectionType, relationship.IdProperty.Name) as IEntityNavigationCollection;
 					navigationCollection.Connect(database);
 					relationship.NavigationProperty.SetValue(entity, navigationCollection);
 				}

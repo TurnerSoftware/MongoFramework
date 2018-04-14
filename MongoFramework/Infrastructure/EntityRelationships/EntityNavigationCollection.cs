@@ -12,17 +12,22 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 	{
 		private IMongoDatabase Database { get; set; }
 		private IEntityMapper EntityMapper { get; }
-		private HashSet<object> UnloadedEntityIds { get; } = new HashSet<object>();
+		private IEntityPropertyMap ForeignPropertyMap { get; }
+		private HashSet<object> UnloadedIds { get; } = new HashSet<object>();
+
+		public string ForeignKey { get; }
 
 		public new int Count => LoadedCount + UnloadedCount;
 
 		public int LoadedCount => Entries.Count;
-		public int UnloadedCount => UnloadedEntityIds.Count;
+		public int UnloadedCount => UnloadedIds.Count;
 
-		public EntityNavigationCollection() : this(new EntityMapper<TEntity>()) { }
+		public EntityNavigationCollection(string foreignKey) : this(foreignKey, new EntityMapper<TEntity>()) { }
 
-		public EntityNavigationCollection(IEntityMapper entityMapper)
+		public EntityNavigationCollection(string foreignKey, IEntityMapper entityMapper)
 		{
+			ForeignKey = foreignKey;
+			ForeignPropertyMap = entityMapper.GetEntityMapping().Where(m => m.Property.Name == foreignKey).FirstOrDefault();
 			EntityMapper = entityMapper;
 		}
 
@@ -31,57 +36,57 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			Database = database;
 		}
 
-		public void AddEntityById(object entityId)
+		public void AddForeignId(object foreignId)
 		{
-			if (entityId == null)
+			if (foreignId == null)
 			{
-				throw new ArgumentNullException(nameof(entityId));
+				throw new ArgumentNullException(nameof(foreignId));
 			}
 
 			//Check the EntityId matches the known type for TEntity
-			var idPropertyType = EntityMapper.GetEntityMapping().Where(m => m.IsKey).Select(m => m.PropertyType).FirstOrDefault();
-			if (!idPropertyType.Equals(entityId.GetType()))
+			if (!ForeignPropertyMap.PropertyType.Equals(foreignId.GetType()))
 			{
-				throw new InvalidOperationException($"Invalid entity ID type for {nameof(TEntity)}");
+				throw new InvalidOperationException($"Type mismatch for foreign key. {foreignId.GetType()} specified however expected type {ForeignPropertyMap.PropertyType}");
 			}
-			
+
 			//Check the entity isn't already loaded
-			if (!Entries.Any(e => Equals(entityId, EntityMapper.GetIdValue(e.Entity))))
+			var foreignProperty = ForeignPropertyMap.Property;
+			if (!Entries.Any(e => Equals(foreignId, foreignProperty.GetValue(e.Entity))))
 			{
-				UnloadedEntityIds.Add(entityId);
+				UnloadedIds.Add(foreignId);
 			}
 		}
 
-		public void AddEntitiesById(IEnumerable<object> entityIds)
+		public void AddForeignIds(IEnumerable<object> foreignIds)
 		{
-			foreach (var entityId in entityIds)
+			foreach (var foreignId in foreignIds)
 			{
-				AddEntityById(entityId);
+				AddForeignId(foreignId);
 			}
 		}
 
 		public void LoadEntities()
 		{
-			if (!UnloadedEntityIds.Any())
+			if (!UnloadedIds.Any())
 			{
 				return;
 			}
 
 			var dbEntityReader = new DbEntityReader<TEntity>(Database);
-			var entities = dbEntityReader.AsQueryable().WhereIdMatches(UnloadedEntityIds);
+			var entities = dbEntityReader.AsQueryable().WherePropertyMatches(ForeignKey, UnloadedIds);
 
 			foreach (var entity in entities)
 			{
 				Update(entity, DbEntityEntryState.NoChanges);
 			}
 
-			UnloadedEntityIds.Clear();
+			UnloadedIds.Clear();
 		}
 
-		public IEnumerable<object> GetEntityIds()
+		public IEnumerable<object> GetForeignIds()
 		{
-			var loadedEntityIds = Entries.Select(e => EntityMapper.GetIdValue(e.Entity));
-			return UnloadedEntityIds.Concat(loadedEntityIds);
+			var loadedEntityIds = Entries.Select(e => ForeignPropertyMap.Property.GetValue(e.Entity));
+			return loadedEntityIds.Concat(UnloadedIds);
 		}
 
 		public new IEnumerator<TEntity> GetEnumerator()
@@ -96,11 +101,11 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 				}
 			}
 
-			//Enumerate list of unloaded entity IDs and load them in one at a time
-			if (UnloadedEntityIds.Any())
+			//Enumerate list of unloaded IDs and load them in one at a time
+			if (UnloadedIds.Any())
 			{
 				var dbEntityReader = new DbEntityReader<TEntity>(Database);
-				var unloadedEntities = dbEntityReader.AsQueryable().WhereIdMatches(UnloadedEntityIds);
+				var unloadedEntities = dbEntityReader.AsQueryable().WherePropertyMatches(ForeignKey, UnloadedIds);
 
 				using (var unloadedEnumerator = unloadedEntities.GetEnumerator())
 				{
@@ -112,8 +117,8 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 						Update(loadedEntity, DbEntityEntryState.NoChanges);
 
 						//Remove from unloaded entity collection
-						var entityId = EntityMapper.GetIdValue(loadedEntity);
-						UnloadedEntityIds.Remove(entityId);
+						var foreignId = ForeignPropertyMap.Property.GetValue(loadedEntity);
+						UnloadedIds.Remove(foreignId);
 
 						yield return loadedEntity;
 					}

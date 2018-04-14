@@ -6,8 +6,8 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 {
 	public interface IEntityNavigationCollection
 	{
-		void AddEntityById(object entityId);
-		void AddEntitiesById(IEnumerable<object> entityIds);
+		void AddForeignId(object foreignId);
+		void AddForeignIds(IEnumerable<object> foreignIds);
 		void LoadEntities();
 		void Connect(IMongoDatabase database);
 	}

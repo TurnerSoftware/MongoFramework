@@ -9,14 +9,27 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 {
 	public class EntityNavigationCollectionSerializer<TEntity> : IBsonSerializer<ICollection<TEntity>>, IBsonArraySerializer
 	{
+		private IEntityMapper EntityMapper { get; }
+		private IEntityPropertyMap ForeignPropertyMap { get; }
+
+		public string ForeignKey { get; }
 		public Type ValueType => typeof(ICollection<TEntity>);
+
+		public EntityNavigationCollectionSerializer(string foreignKey) : this(foreignKey, new EntityMapper<TEntity>()) { }
+
+		public EntityNavigationCollectionSerializer(string foreignKey, IEntityMapper entityMapper)
+		{
+			ForeignKey = foreignKey;
+			ForeignPropertyMap = entityMapper.GetEntityMapping().Where(m => m.Property.Name == foreignKey).FirstOrDefault();
+			EntityMapper = entityMapper;
+		}
 
 		public object Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
 		{
 			var type = context.Reader.GetCurrentBsonType();
 			if (type == BsonType.Array)
 			{
-				var collection = new EntityNavigationCollection<TEntity>();
+				var collection = new EntityNavigationCollection<TEntity>(ForeignKey, EntityMapper);
 				context.Reader.ReadStartArray();
 
 				while (context.Reader.ReadBsonType() != BsonType.EndOfDocument)
@@ -24,12 +37,12 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 					if (context.Reader.CurrentBsonType == BsonType.ObjectId)
 					{
 						var entityId = context.Reader.ReadObjectId();
-						collection.AddEntityById(entityId);
+						collection.AddForeignId(entityId);
 					}
 					else
 					{
 						var entityId = context.Reader.ReadString();
-						collection.AddEntityById(entityId);
+						collection.AddForeignId(entityId);
 					}
 				}
 
@@ -39,7 +52,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			else if (type == BsonType.Null)
 			{
 				context.Reader.ReadNull();
-				return new EntityNavigationCollection<TEntity>();
+				return new EntityNavigationCollection<TEntity>(ForeignKey, EntityMapper);
 			}
 			else
 			{
@@ -55,17 +68,15 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 				return;
 			}
 
-			IEnumerable<object> entityIds;
+			IEnumerable<object> foreignIds;
 
 			if (value is EntityNavigationCollection<TEntity> entityNavigationCollection)
 			{
-				//Calling GetEntityIds prevents unnecessary DB calls if the entities aren't actually loaded yet
-				entityIds = entityNavigationCollection.GetEntityIds();
+				foreignIds = entityNavigationCollection.GetForeignIds();
 			}
 			else if (value is ICollection<TEntity> simpleCollection)
 			{
-				var entityMapper = new EntityMapper<TEntity>();
-				entityIds = simpleCollection.Select(e => entityMapper.GetIdValue(e));
+				foreignIds = simpleCollection.Select(e => ForeignPropertyMap.Property.GetValue(e));
 			}
 			else
 			{
@@ -74,19 +85,19 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 
 			context.Writer.WriteStartArray();
 
-			foreach (var entityId in entityIds)
+			foreach (var foreignId in foreignIds)
 			{
-				if (entityId == null)
+				if (foreignId == null)
 				{
 					context.Writer.WriteNull();
 				}
-				else if (entityId is ObjectId objectId)
+				else if (foreignId is ObjectId objectId)
 				{
 					context.Writer.WriteObjectId(objectId);
 				}
 				else
 				{
-					context.Writer.WriteString(entityId.ToString());
+					context.Writer.WriteString(foreignId.ToString());
 				}
 			}
 
@@ -100,10 +111,8 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 
 		public bool TryGetItemSerializationInfo(out BsonSerializationInfo serializationInfo)
 		{
-			var entityMapper = new EntityMapper<TEntity>();
-			var idType = entityMapper.GetEntityMapping().Where(m => m.IsKey).Select(m => m.PropertyType).FirstOrDefault();
-			var serializer = BsonSerializer.LookupSerializer(idType);
-			serializationInfo = new BsonSerializationInfo(null, serializer, idType);
+			var serializer = BsonSerializer.LookupSerializer(ForeignPropertyMap.PropertyType);
+			serializationInfo = new BsonSerializationInfo(null, serializer, ForeignPropertyMap.PropertyType);
 			return true;
 		}
 

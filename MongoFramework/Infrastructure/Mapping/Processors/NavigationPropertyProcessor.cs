@@ -18,8 +18,8 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 				{
 					var memberMap = classMap.MapMember(relationship.NavigationProperty);
 					var serializerType = typeof(EntityNavigationCollectionSerializer<>).MakeGenericType(relationship.EntityType);
-					var entitySpecificSerializer = Activator.CreateInstance(serializerType) as IBsonSerializer;
-					memberMap.SetSerializer(entitySpecificSerializer);
+					var collectionSerializer = Activator.CreateInstance(serializerType, relationship.IdProperty.Name) as IBsonSerializer;
+					memberMap.SetSerializer(collectionSerializer);
 				}
 				else
 				{

@@ -15,7 +15,7 @@ namespace MongoFramework.Tests.EntityRelationships.Serializer
 		[TestMethod]
 		public void DeserializingNullReturnsCollection()
 		{
-			var serializer = new EntityNavigationCollectionSerializer<StringIdModel>();
+			var serializer = new EntityNavigationCollectionSerializer<StringIdModel>("Id");
 
 			var document = new BsonDocument(new Dictionary<string, object>
 			{
@@ -41,7 +41,7 @@ namespace MongoFramework.Tests.EntityRelationships.Serializer
 		[ExpectedException(typeof(NotSupportedException))]
 		public void DeserializingInvalidTypeThrowsException()
 		{
-			var serializer = new EntityNavigationCollectionSerializer<StringIdModel>();
+			var serializer = new EntityNavigationCollectionSerializer<StringIdModel>("Id");
 
 			var document = new BsonDocument(new Dictionary<string, object>
 			{
@@ -63,9 +63,9 @@ namespace MongoFramework.Tests.EntityRelationships.Serializer
 		[TestMethod]
 		public void ReserializingStringIdEntityMaintainsState()
 		{
-			var serializer = new EntityNavigationCollectionSerializer<StringIdModel>();
+			var serializer = new EntityNavigationCollectionSerializer<StringIdModel>("Id");
 
-			var initialCollection = new EntityNavigationCollection<StringIdModel>
+			var initialCollection = new EntityNavigationCollection<StringIdModel>("Id")
 			{
 				new StringIdModel
 				{
@@ -75,7 +75,7 @@ namespace MongoFramework.Tests.EntityRelationships.Serializer
 			};
 			EntityNavigationCollection<StringIdModel> deserializedCollection = null;
 
-			initialCollection.AddEntityById("5ac383379a5f1303784400f9");
+			initialCollection.AddForeignId("5ac383379a5f1303784400f9");
 
 			var document = new BsonDocument();
 
@@ -101,17 +101,17 @@ namespace MongoFramework.Tests.EntityRelationships.Serializer
 				deserializedCollection = serializer.Deserialize(context) as EntityNavigationCollection<StringIdModel>;
 			}
 
-			Assert.AreEqual(2, initialCollection.GetEntityIds().Count());
-			Assert.AreEqual(2, deserializedCollection.GetEntityIds().Count());
-			Assert.IsTrue(initialCollection.GetEntityIds().All(id => deserializedCollection.GetEntityIds().Contains(id)));
+			Assert.AreEqual(2, initialCollection.GetForeignIds().Count());
+			Assert.AreEqual(2, deserializedCollection.GetForeignIds().Count());
+			Assert.IsTrue(initialCollection.GetForeignIds().All(id => deserializedCollection.GetForeignIds().Contains(id)));
 		}
 
 		[TestMethod]
 		public void ReserializingObjectIdIdEntityMaintainsState()
 		{
-			var serializer = new EntityNavigationCollectionSerializer<ObjectIdIdModel>();
+			var serializer = new EntityNavigationCollectionSerializer<ObjectIdIdModel>("Id");
 
-			var initialCollection = new EntityNavigationCollection<ObjectIdIdModel>
+			var initialCollection = new EntityNavigationCollection<ObjectIdIdModel>("Id")
 			{
 				new ObjectIdIdModel
 				{
@@ -121,7 +121,7 @@ namespace MongoFramework.Tests.EntityRelationships.Serializer
 			};
 			EntityNavigationCollection<ObjectIdIdModel> deserializedCollection = null;
 
-			initialCollection.AddEntityById(ObjectId.GenerateNewId());
+			initialCollection.AddForeignId(ObjectId.GenerateNewId());
 
 			var document = new BsonDocument();
 
@@ -147,9 +147,9 @@ namespace MongoFramework.Tests.EntityRelationships.Serializer
 				deserializedCollection = serializer.Deserialize(context) as EntityNavigationCollection<ObjectIdIdModel>;
 			}
 
-			Assert.AreEqual(2, initialCollection.GetEntityIds().Count());
-			Assert.AreEqual(2, deserializedCollection.GetEntityIds().Count());
-			Assert.IsTrue(initialCollection.GetEntityIds().All(id => deserializedCollection.GetEntityIds().Contains(id)));
+			Assert.AreEqual(2, initialCollection.GetForeignIds().Count());
+			Assert.AreEqual(2, deserializedCollection.GetForeignIds().Count());
+			Assert.IsTrue(initialCollection.GetForeignIds().All(id => deserializedCollection.GetForeignIds().Contains(id)));
 		}
 	}
 }
