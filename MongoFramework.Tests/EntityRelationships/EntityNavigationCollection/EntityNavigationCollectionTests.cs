@@ -4,24 +4,11 @@ using MongoFramework.Infrastructure.Mapping;
 using System;
 using System.Linq;
 
-namespace MongoFramework.Tests.EntityRelationships.EntityCollection
+namespace MongoFramework.Tests.EntityRelationships.EntityNavigationCollection
 {
 	[TestClass]
 	public class EntityCollectionTests : DbTest
 	{
-		[TestMethod]
-		public void IdentifyCollectionRelationships()
-		{
-			var entityMapper = new EntityMapper<BaseEntityModel>();
-			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper);
-			var relationship = relationships.FirstOrDefault();
-
-			Assert.IsTrue(relationship.IsCollection);
-			Assert.AreEqual(typeof(RelatedEntityModel), relationship.EntityType);
-			Assert.AreEqual(typeof(RelatedEntityModel).GetProperty("Id"), relationship.IdProperty);
-			Assert.AreEqual(typeof(BaseEntityModel).GetProperty("RelatedEntities"), relationship.NavigationProperty);
-		}
-
 		[TestMethod]
 		public void AddItemsToNewEntity()
 		{
@@ -128,15 +115,6 @@ namespace MongoFramework.Tests.EntityRelationships.EntityCollection
 			var dbEntity = dbSet.Where(e => e.Id == entity.Id).FirstOrDefault();
 
 			Assert.AreEqual(0, dbEntity.RelatedEntities.Count);
-		}
-
-		[TestMethod]
-		public void InversePropertyMapping()
-		{
-			var entityMapper = new EntityMapper<InversePropertyModel>();
-			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper);
-
-			Assert.IsTrue(relationships.Any(r => r.IsCollection && r.IdProperty.Name == "RelatedId"));
 		}
 	}
 }

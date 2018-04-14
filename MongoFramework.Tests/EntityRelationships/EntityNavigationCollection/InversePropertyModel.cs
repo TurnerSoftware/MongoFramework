@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
-namespace MongoFramework.Tests.EntityRelationships.EntityCollection
+namespace MongoFramework.Tests.EntityRelationships.EntityNavigationCollection
 {
 	public class InversePropertyModel
 	{

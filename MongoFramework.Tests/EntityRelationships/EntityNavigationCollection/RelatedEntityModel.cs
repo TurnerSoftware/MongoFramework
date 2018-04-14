@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace MongoFramework.Tests.EntityRelationships.EntityCollection
+namespace MongoFramework.Tests.EntityRelationships.EntityNavigationCollection
 {
 	public class RelatedEntityModel
 	{
