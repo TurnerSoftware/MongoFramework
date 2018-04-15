@@ -12,14 +12,17 @@ namespace MongoFramework.Tests.EntityRelationships.Mapping.EntityCollection
 		[TestMethod]
 		public void IdentifyCollectionRelationships()
 		{
-			var entityMapper = new EntityMapper<BaseEntityModel>();
+			var entityMapper = new EntityMapper<CollectionMappingModel>();
 			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper);
-			var relationship = relationships.FirstOrDefault();
+
+			Assert.IsTrue(relationships.All(r => r.IsCollection));
+
+			var relationship = relationships.Where(r => r.NavigationProperty.Name == "StringModelEntities").FirstOrDefault();
 
 			Assert.IsTrue(relationship.IsCollection);
-			Assert.AreEqual(typeof(RelatedEntityModel), relationship.EntityType);
-			Assert.AreEqual(typeof(RelatedEntityModel).GetProperty("Id"), relationship.IdProperty);
-			Assert.AreEqual(typeof(BaseEntityModel).GetProperty("RelatedEntities"), relationship.NavigationProperty);
+			Assert.AreEqual(typeof(StringIdModel), relationship.EntityType);
+			Assert.AreEqual(typeof(StringIdModel).GetProperty("Id"), relationship.IdProperty);
+			Assert.AreEqual(typeof(CollectionMappingModel).GetProperty("StringModelEntities"), relationship.NavigationProperty);
 		}
 
 		[TestMethod]
@@ -28,7 +31,7 @@ namespace MongoFramework.Tests.EntityRelationships.Mapping.EntityCollection
 			var entityMapper = new EntityMapper<ValidInversePropertyModel>();
 			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper);
 
-			Assert.IsTrue(relationships.Any(r => r.IsCollection && r.IdProperty.Name == "RelatedId"));
+			Assert.IsTrue(relationships.Any(r => r.IsCollection && r.IdProperty.Name == "SecondaryId"));
 		}
 
 		[TestMethod]

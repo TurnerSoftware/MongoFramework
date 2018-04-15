@@ -110,46 +110,5 @@ namespace MongoFramework.Tests.Linq
 			Assert.AreEqual(2, idMatchQueryable.Count());
 			Assert.IsTrue(idMatchQueryable.ToList().All(e => entityIds.Contains(e.Id)));
 		}
-
-		[TestMethod]
-		public void WhereIdMatchesMixedIdTypes()
-		{
-			var database = TestConfiguration.GetDatabase();
-
-			var dbEntityWriter = new DbEntityWriter<WhereIdMatchesStringModel>(database);
-			var entityCollection = new DbEntityCollection<WhereIdMatchesStringModel>
-			{
-				new WhereIdMatchesStringModel { Description = "1" },
-				new WhereIdMatchesStringModel { Description = "2" }
-			};
-			dbEntityWriter.Write(entityCollection);
-
-			var dbEntityWriterObjectId = new DbEntityWriter<WhereIdMatchesObjectIdModel>(database);
-			var entityCollectionObjectId = new DbEntityCollection<WhereIdMatchesObjectIdModel>
-			{
-				new WhereIdMatchesObjectIdModel { Description = "1" },
-				new WhereIdMatchesObjectIdModel { Description = "2" }
-			};
-			dbEntityWriterObjectId.Write(entityCollectionObjectId);
-
-			var dbEntityWriterGuid = new DbEntityWriter<WhereIdMatchesGuidModel>(database);
-			var entityCollectionGuid = new DbEntityCollection<WhereIdMatchesGuidModel>
-			{
-				new WhereIdMatchesGuidModel { Description = "1" },
-				new WhereIdMatchesGuidModel { Description = "2" }
-			};
-			dbEntityWriterGuid.Write(entityCollectionGuid);
-
-			var collection = TestConfiguration.GetDatabase().GetCollection<WhereIdMatchesStringModel>("WhereIdMatchesStringModel");
-			var underlyingQueryable = collection.AsQueryable();
-			var queryable = new MongoFrameworkQueryable<WhereIdMatchesStringModel, WhereIdMatchesStringModel>(underlyingQueryable);
-
-			var entityIds = new object[] { entityCollection.FirstOrDefault().Id, entityCollectionObjectId.FirstOrDefault().Id, entityCollectionGuid.FirstOrDefault().Id };
-
-			var idMatchQueryable = LinqExtensions.WhereIdMatches(queryable, entityIds);
-
-			Assert.AreEqual(1, idMatchQueryable.Count());
-			Assert.IsTrue(idMatchQueryable.ToList().All(e => e.Id == (string)entityIds[0]));
-		}
 	}
 }

@@ -10,6 +10,6 @@ namespace MongoFramework.Tests.EntityRelationships.Mapping.EntityCollection
 		public string Id { get; set; }
 
 		[InverseProperty("NonExistantPropertyId")]
-		public ICollection<RelatedEntityModel> RelatedEntities { get; set; }
+		public ICollection<StringIdModel> StringModelEntities { get; set; }
 	}
 }

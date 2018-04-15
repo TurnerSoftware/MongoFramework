@@ -10,6 +10,6 @@ namespace MongoFramework.Tests.EntityRelationships.Mapping.EntityCollection
 		public string Id { get; set; }
 
 		[InverseProperty("CreatedDate")]
-		public ICollection<RelatedEntityModel> RelatedEntities { get; set; }
+		public ICollection<StringIdModel> StringModelEntities { get; set; }
 	}
 }

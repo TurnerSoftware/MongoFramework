@@ -7,6 +7,7 @@ namespace MongoFramework.Tests.EntityRelationships
 	public class ObjectIdIdModel
 	{
 		public ObjectId Id { get; set; }
+		public ObjectId SecondaryId { get; set; }
 		public string Description { get; set; }
 	}
 }

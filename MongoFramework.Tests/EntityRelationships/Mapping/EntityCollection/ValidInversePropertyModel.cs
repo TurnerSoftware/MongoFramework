@@ -9,7 +9,7 @@ namespace MongoFramework.Tests.EntityRelationships.Mapping.EntityCollection
 	{
 		public string Id { get; set; }
 
-		[InverseProperty("RelatedId")]
-		public ICollection<RelatedEntityModel> RelatedEntities { get; set; }
+		[InverseProperty("SecondaryId")]
+		public ICollection<StringIdModel> StringModelEntities { get; set; }
 	}
 }
