@@ -93,15 +93,11 @@
     <Compile Include="EntityRelationships\Mapping\SingleEntity\UnsupportedIdModel.cs" />
     <Compile Include="EntityRelationships\Mapping\SingleEntity\UserEntityModel.cs" />
     <Compile Include="EntityRelationships\Serializer\EntityNavigationCollectionSerializerTests.cs" />
-    <Compile Include="EntityRelationships\SingleEntity\InvalidForeignKeyModel.cs" />
-    <Compile Include="EntityRelationships\SingleEntity\UnsupportedIdModel.cs" />
+    <Compile Include="EntityRelationships\SingleEntity\SingleEntityIntegrationModel.cs" />
     <Compile Include="EntityRelationships\StringIdModel.cs" />
-    <Compile Include="EntityRelationships\SingleEntity\BaseEntityModel.cs" />
-    <Compile Include="EntityRelationships\SingleEntity\BaseVariedIdModel.cs" />
     <Compile Include="EntityRelationships\GuidIdModel.cs" />
     <Compile Include="EntityRelationships\ObjectIdIdModel.cs" />
-    <Compile Include="EntityRelationships\SingleEntity\SingleEntityTests.cs" />
-    <Compile Include="EntityRelationships\SingleEntity\UserEntityModel.cs" />
+    <Compile Include="EntityRelationships\SingleEntity\SingleEntityIntegrationTests.cs" />
     <Compile Include="Linq\LinqExtensionsTests.cs" />
     <Compile Include="Linq\MongoFrameworkQueryableTestProcessor.cs" />
     <Compile Include="Linq\MongoFrameworkQueryableTests.cs" />
