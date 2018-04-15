@@ -14,6 +14,7 @@ Some of the major features include:
 - Changeset support (allowing for queuing multiple DB updates to run at once)
 - Diff-updates (only _changes_ to an entity to be written)
 - Entity mutation (allowing automatic changes on properties during select/insert/update calls)
+- Navigation properties for related entities (both single-entity relationships and collections)
 
 ## Entity Attributes
 Through attributes on entities and their properties, you have control over various aspects of how the entities are saved or processed.
@@ -36,6 +37,14 @@ Unmaps the property from the entity when reading/writing.
 `[Column("NewColumnName")]`
 
 Remaps the property with the specified name when reading/writing.
+
+`[ForeignKey("NameOfIdProperty")]` / `[ForeignKey("NameOfNavigationProperty")]`
+
+Allows connecting two properties, an ID property and a navigation property, together in a relationship. The ID property will be saved and updated based on the navigation property. The navigation property won't be mapped to the entity.
+
+`[InverseProperty("NameOfIdProperty)]`
+
+Allows connecting an `ICollection` navigation property to a specific identifier on the related entity. Without this attribute on a collection, the ID property of the related entity will be used.
 
 ### MongoFramework-specific Attributes
 There are additional attributes defined by MongoFramework that allow for more advanced functionality. These include indexing, controlling how "extra elements" are handled as well as entity mutation.
