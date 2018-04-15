@@ -3,6 +3,7 @@ using MongoFramework.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace MongoFramework
 {
@@ -66,6 +67,14 @@ namespace MongoFramework
 			foreach (var dbSet in DbSets)
 			{
 				dbSet.SaveChanges();
+			}
+		}
+
+		public virtual async Task SaveChangesAsync()
+		{
+			foreach (var dbSet in DbSets)
+			{
+				await dbSet.SaveChangesAsync().ConfigureAwait(false);
 			}
 		}
 
