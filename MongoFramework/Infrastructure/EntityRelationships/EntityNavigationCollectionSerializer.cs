@@ -39,10 +39,14 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 						var entityId = context.Reader.ReadObjectId();
 						collection.AddForeignId(entityId);
 					}
-					else
+					else if (context.Reader.CurrentBsonType == BsonType.String)
 					{
 						var entityId = context.Reader.ReadString();
 						collection.AddForeignId(entityId);
+					}
+					else
+					{
+						context.Reader.SkipValue();
 					}
 				}
 

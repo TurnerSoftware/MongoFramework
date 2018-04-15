@@ -61,7 +61,7 @@ namespace MongoFramework.Tests.EntityRelationships.Serializer
 		}
 
 		[TestMethod]
-		public void ReserializingStringIdEntityMaintainsState()
+		public void ReserializingStringIdEntityMaintainsStateExceptNulls()
 		{
 			var serializer = new EntityNavigationCollectionSerializer<StringIdModel>("Id");
 
@@ -69,8 +69,12 @@ namespace MongoFramework.Tests.EntityRelationships.Serializer
 			{
 				new StringIdModel
 				{
-					Id = "5ac383379a5f1303784400f8",
 					Description = "1"
+				},
+				new StringIdModel
+				{
+					Id = "5ac383379a5f1303784400f8",
+					Description = "2"
 				}
 			};
 			EntityNavigationCollection<StringIdModel> deserializedCollection = null;
@@ -101,9 +105,9 @@ namespace MongoFramework.Tests.EntityRelationships.Serializer
 				deserializedCollection = serializer.Deserialize(context) as EntityNavigationCollection<StringIdModel>;
 			}
 
-			Assert.AreEqual(2, initialCollection.GetForeignIds().Count());
+			Assert.AreEqual(3, initialCollection.GetForeignIds().Count());
 			Assert.AreEqual(2, deserializedCollection.GetForeignIds().Count());
-			Assert.IsTrue(initialCollection.GetForeignIds().All(id => deserializedCollection.GetForeignIds().Contains(id)));
+			Assert.IsTrue(deserializedCollection.GetForeignIds().All(id => initialCollection.GetForeignIds().Contains(id)));
 		}
 
 		[TestMethod]
@@ -150,6 +154,74 @@ namespace MongoFramework.Tests.EntityRelationships.Serializer
 			Assert.AreEqual(2, initialCollection.GetForeignIds().Count());
 			Assert.AreEqual(2, deserializedCollection.GetForeignIds().Count());
 			Assert.IsTrue(initialCollection.GetForeignIds().All(id => deserializedCollection.GetForeignIds().Contains(id)));
+		}
+
+		[TestMethod]
+		public void SerializeICollectionCompatibleButIsntEntityNavigationCollection()
+		{
+			var serializer = new EntityNavigationCollectionSerializer<ObjectIdIdModel>("Id");
+
+			var initialCollection = new List<ObjectIdIdModel>
+			{
+				new ObjectIdIdModel
+				{
+					Id = ObjectId.GenerateNewId(),
+					Description = "1"
+				}
+			};
+			EntityNavigationCollection<ObjectIdIdModel> deserializedCollection = null;
+
+			var document = new BsonDocument();
+
+			using (var writer = new BsonDocumentWriter(document))
+			{
+				writer.WriteStartDocument();
+				writer.WriteName("Items");
+
+				var context = BsonSerializationContext.CreateRoot(writer);
+				serializer.Serialize(context, initialCollection);
+
+				writer.WriteEndDocument();
+			}
+
+			using (var reader = new BsonDocumentReader(document))
+			{
+				reader.ReadBsonType();
+				reader.ReadStartDocument();
+				reader.ReadBsonType();
+				reader.SkipName();
+
+				var context = BsonDeserializationContext.CreateRoot(reader);
+				deserializedCollection = serializer.Deserialize(context) as EntityNavigationCollection<ObjectIdIdModel>;
+			}
+
+			Assert.AreEqual(1, initialCollection.Count());
+			Assert.AreEqual(1, deserializedCollection.GetForeignIds().Count());
+			Assert.IsTrue(initialCollection.Select(e => e.Id).All(id => deserializedCollection.GetForeignIds().Contains(id)));
+		}
+
+		[TestMethod, ExpectedException(typeof(NotSupportedException))]
+		public void SerializeUnsupportedType()
+		{
+			var serializer = new EntityNavigationCollectionSerializer<ObjectIdIdModel>("Id");
+
+			var initialCollection = new List<DateTime>
+			{
+				DateTime.Now
+			};
+
+			var document = new BsonDocument();
+
+			using (var writer = new BsonDocumentWriter(document))
+			{
+				writer.WriteStartDocument();
+				writer.WriteName("Items");
+
+				var context = BsonSerializationContext.CreateRoot(writer);
+				serializer.Serialize(context, initialCollection);
+
+				writer.WriteEndDocument();
+			}
 		}
 	}
 }
