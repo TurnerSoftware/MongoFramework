@@ -2,7 +2,6 @@
 using MongoFramework.Infrastructure.Mapping;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -27,11 +26,6 @@ namespace MongoFramework.Linq
 			var idProperty = entityMapper.GetEntityMapping().Where(m => m.IsKey).Select(m => m.Property).FirstOrDefault();
 
 			return queryable.WherePropertyMatches(idProperty.Name, idProperty.PropertyType, entityIds);
-		}
-
-		public static IQueryable<TEntity> WherePropertyMatches<TEntity, TIdentifierType>(this IQueryable<TEntity> queryable, string propertyName, IEnumerable<TIdentifierType> identifiers)
-		{
-			return queryable.WherePropertyMatches(propertyName, typeof(TIdentifierType), identifiers);
 		}
 
 		public static IQueryable<TEntity> WherePropertyMatches<TEntity>(this IQueryable<TEntity> queryable, string propertyName, Type propertyType, IEnumerable identifiers)

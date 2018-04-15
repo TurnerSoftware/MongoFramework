@@ -2,8 +2,8 @@
 using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.EntityRelationships;
 using MongoFramework.Infrastructure.Mapping;
-using MongoFramework.Infrastructure.Mutation.Mutators;
 using MongoFramework.Infrastructure.Mutation;
+using MongoFramework.Infrastructure.Mutation.Mutators;
 using System;
 using System.Linq;
 

@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson;
 using MongoFramework.Infrastructure.EntityRelationships;
-using MongoFramework.Infrastructure.Mapping;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -93,7 +92,7 @@ namespace MongoFramework.Tests.EntityRelationships.EntityNavigationCollection
 			Assert.AreEqual(2, dbEntity.StringModelEntities.Count);
 			Assert.IsTrue(dbEntity.StringModelEntities.All(e => e.Id != null));
 		}
-		
+
 		[TestMethod]
 		public void RemoveRelationshipToEntity()
 		{

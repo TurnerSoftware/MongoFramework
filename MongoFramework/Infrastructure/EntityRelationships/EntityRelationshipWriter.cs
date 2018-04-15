@@ -1,9 +1,8 @@
-﻿using System;
+﻿using MongoDB.Driver;
+using MongoFramework.Infrastructure.Mapping;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using MongoDB.Driver;
-using MongoFramework.Infrastructure.Mapping;
 using System.Reflection;
 using System.Threading.Tasks;
 
