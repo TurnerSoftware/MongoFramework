@@ -1,4 +1,5 @@
-﻿using MongoFramework.Attributes;
+﻿using MongoDB.Driver;
+using MongoFramework.Attributes;
 using MongoFramework.Infrastructure.Mapping;
 using System.Linq;
 using System.Reflection;
@@ -7,7 +8,7 @@ namespace MongoFramework.Infrastructure.Mutation.Mutators
 {
 	public class EntityAttributeMutator<TEntity> : IEntityMutator<TEntity>
 	{
-		public void MutateEntity(TEntity entity, MutatorType mutationType, IEntityMapper entityMapper)
+		public void MutateEntity(TEntity entity, MutatorType mutationType, IEntityMapper entityMapper, IMongoDatabase database)
 		{
 			var mutateProperties = entityMapper.GetEntityMapping().Select(m => new
 			{

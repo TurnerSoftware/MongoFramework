@@ -5,7 +5,7 @@ using System.Linq;
 namespace MongoFramework.Tests
 {
 	[TestClass]
-	public class MongoDbContextTests
+	public class MongoDbContextTests : DbTest
 	{
 		[TestMethod]
 		public void ContextCreatesDbSets()

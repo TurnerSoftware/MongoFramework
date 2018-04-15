@@ -25,7 +25,7 @@ namespace MongoFramework.Tests.Mutation.Mutators.UpdatedDate
 			var entityMapper = new EntityMapper<ValidAttributeUseModel>();
 			var mutator = new EntityAttributeMutator<ValidAttributeUseModel>();
 
-			mutator.MutateEntity(entity, MutatorType.Insert, entityMapper);
+			mutator.MutateEntity(entity, MutatorType.Insert, entityMapper, null);
 
 			Assert.IsTrue(DateTime.MinValue < entity.UpdatedDate);
 		}
@@ -37,7 +37,7 @@ namespace MongoFramework.Tests.Mutation.Mutators.UpdatedDate
 			var entityMapper = new EntityMapper<ValidAttributeUseModel>();
 			var mutator = new EntityAttributeMutator<ValidAttributeUseModel>();
 
-			mutator.MutateEntity(entity, MutatorType.Update, entityMapper);
+			mutator.MutateEntity(entity, MutatorType.Update, entityMapper, null);
 
 			Assert.IsTrue(DateTime.MinValue < entity.UpdatedDate);
 		}
@@ -49,7 +49,7 @@ namespace MongoFramework.Tests.Mutation.Mutators.UpdatedDate
 			var entityMapper = new EntityMapper<InvalidAttributeUseModel>();
 			var mutator = new EntityAttributeMutator<InvalidAttributeUseModel>();
 
-			mutator.MutateEntity(entity, MutatorType.Insert, entityMapper);
+			mutator.MutateEntity(entity, MutatorType.Insert, entityMapper, null);
 		}
 	}
 }

@@ -14,9 +14,8 @@ namespace MongoFramework.Infrastructure.Mapping
 		public Type EntityType { get; private set; }
 		private BsonClassMap ClassMap { get; set; }
 
-		private static ReaderWriterLockSlim MappingLock { get; set; } = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+		private static ReaderWriterLockSlim MappingLock { get; } = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 		private static ConcurrentDictionary<Type, IEnumerable<IEntityPropertyMap>> EntityMapCache { get; set; }
-
 
 		static EntityMapper()
 		{
@@ -94,6 +93,16 @@ namespace MongoFramework.Infrastructure.Mapping
 		{
 			var idProperty = GetEntityMapping().Where(m => m.IsKey).Select(m => m.Property).FirstOrDefault();
 			return idProperty?.GetValue(entity);
+		}
+
+		public object GetDefaultId()
+		{
+			var idPropertyType = GetEntityMapping().Where(m => m.IsKey).Select(m => m.PropertyType).FirstOrDefault();
+			if (idPropertyType.IsValueType)
+			{
+				return Activator.CreateInstance(idPropertyType);
+			}
+			return null;
 		}
 
 		public IEnumerable<IEntityPropertyMap> GetEntityMapping()

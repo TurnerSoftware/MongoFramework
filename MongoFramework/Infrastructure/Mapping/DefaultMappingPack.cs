@@ -5,7 +5,7 @@ namespace MongoFramework.Infrastructure.Mapping
 {
 	public class DefaultMappingPack : IMappingProcessorPack
 	{
-		public IEnumerable<IMappingProcessor> Processors { get; private set; }
+		public IEnumerable<IMappingProcessor> Processors { get; }
 
 		private DefaultMappingPack()
 		{
@@ -15,10 +15,11 @@ namespace MongoFramework.Infrastructure.Mapping
 				new EntityIdProcessor(),
 				new MappedPropertiesProcessor(),
 				new NestedPropertyProcessor(),
-				new ExtraElementsProcessor()
+				new ExtraElementsProcessor(),
+				new NavigationPropertyProcessor()
 			};
 		}
 
-		public static IMappingProcessorPack Instance { get; private set; } = new DefaultMappingPack();
+		public static IMappingProcessorPack Instance { get; } = new DefaultMappingPack();
 	}
 }

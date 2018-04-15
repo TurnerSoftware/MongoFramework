@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace MongoFramework.Tests.Indexing
 {
 	[TestClass]
-	public partial class EntityIndexWriterTests
+	public partial class EntityIndexWriterTests : DbTest
 	{
 		[TestMethod]
 		public void WriteIndexSync()

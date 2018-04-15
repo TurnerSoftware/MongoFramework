@@ -10,7 +10,7 @@ using System.Linq;
 namespace MongoFramework.Tests.Linq
 {
 	[TestClass]
-	public class MongoFrameworkQueryableTests
+	public class MongoFrameworkQueryableTests : DbTest
 	{
 		[TestMethod]
 		public void EnumerateQueryable()
@@ -21,7 +21,7 @@ namespace MongoFramework.Tests.Linq
 			var underlyingQueryable = collection.AsQueryable();
 			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel, MongoFrameworkQueryableModel>(underlyingQueryable);
 
-			var entityContainer = new DbEntityContainer<MongoFrameworkQueryableModel>();
+			var entityContainer = new DbEntityCollection<MongoFrameworkQueryableModel>();
 			var writer = new DbEntityWriter<MongoFrameworkQueryableModel>(database);
 			entityContainer.Update(new MongoFrameworkQueryableModel { Title = "EnumerateQueryable" }, DbEntityEntryState.Added);
 			writer.Write(entityContainer);
@@ -44,7 +44,7 @@ namespace MongoFramework.Tests.Linq
 			var processor = new MongoFrameworkQueryableTestProcessor<MongoFrameworkQueryableModel>();
 			queryable.EntityProcessors.Add(processor);
 
-			var entityContainer = new DbEntityContainer<MongoFrameworkQueryableModel>();
+			var entityContainer = new DbEntityCollection<MongoFrameworkQueryableModel>();
 			var writer = new DbEntityWriter<MongoFrameworkQueryableModel>(database);
 			entityContainer.Update(new MongoFrameworkQueryableModel { Title = "EntityProcessorFireTest" }, DbEntityEntryState.Added);
 			writer.Write(entityContainer);
@@ -69,7 +69,7 @@ namespace MongoFramework.Tests.Linq
 			var processor = new MongoFrameworkQueryableTestProcessor<MongoFrameworkQueryableModel>();
 			queryable.EntityProcessors.Add(processor);
 
-			var entityContainer = new DbEntityContainer<MongoFrameworkQueryableModel>();
+			var entityContainer = new DbEntityCollection<MongoFrameworkQueryableModel>();
 			var writer = new DbEntityWriter<MongoFrameworkQueryableModel>(database);
 			entityContainer.Update(new MongoFrameworkQueryableModel { Title = "EntityProcessorNoFireTest" }, DbEntityEntryState.Added);
 			writer.Write(entityContainer);
