@@ -170,7 +170,7 @@ namespace MongoFramework.Tests
 			};
 			entityContainer.Update(updateEntity, DbEntityEntryState.Added);
 			entityContainer.Update(deleteEntity, DbEntityEntryState.Added);
-			await writer.WriteAsync(entityContainer);
+			await writer.WriteAsync(entityContainer).ConfigureAwait(false);
 			entityContainer.Clear();
 
 			var addedEntity = new EntityWriterModel
@@ -181,7 +181,7 @@ namespace MongoFramework.Tests
 			entityContainer.Update(addedEntity, DbEntityEntryState.Added);
 			entityContainer.Update(updateEntity, DbEntityEntryState.Updated);
 			entityContainer.Update(deleteEntity, DbEntityEntryState.Deleted);
-			await writer.WriteAsync(entityContainer);
+			await writer.WriteAsync(entityContainer).ConfigureAwait(false);
 
 			Assert.IsTrue(reader.AsQueryable().Where(e => e.Id == addedEntity.Id).Any());
 			Assert.IsFalse(reader.AsQueryable().Where(e => e.Id == deleteEntity.Id).Any());

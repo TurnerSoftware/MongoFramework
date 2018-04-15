@@ -56,7 +56,7 @@ namespace MongoFramework.Tests.EntityRelationships.EntityNavigationCollection
 				Description = "AddRelationshipsToNewEntityAsync-ObjectIdIdModel-2"
 			});
 
-			await dbSet.SaveChangesAsync();
+			await dbSet.SaveChangesAsync().ConfigureAwait(false);
 
 			var dbEntity = dbSet.Where(e => e.Id == entity.Id).FirstOrDefault();
 

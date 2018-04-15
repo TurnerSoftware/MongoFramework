@@ -60,7 +60,7 @@ namespace MongoFramework.Tests
 			});
 
 			Assert.IsFalse(dbSet.Any(m => m.RequiredField == "ValueAsync"));
-			await dbSet.SaveChangesAsync();
+			await dbSet.SaveChangesAsync().ConfigureAwait(false);
 			Assert.IsTrue(dbSet.Any(m => m.RequiredField == "ValueAsync"));
 		}
 	}

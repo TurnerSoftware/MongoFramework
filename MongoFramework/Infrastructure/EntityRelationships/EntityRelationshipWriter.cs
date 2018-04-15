@@ -35,8 +35,8 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			var writeMethod = GetType().GetMethod("CommitRelationshipAsync", BindingFlags.NonPublic | BindingFlags.Instance);
 			foreach (var relationship in Relationships)
 			{
-				await (Task)writeMethod.MakeGenericMethod(relationship.EntityType)
-					.Invoke(this, new object[] { relationship, entities });
+				await ((Task)writeMethod.MakeGenericMethod(relationship.EntityType)
+					.Invoke(this, new object[] { relationship, entities })).ConfigureAwait(false);
 			}
 		}
 
@@ -68,7 +68,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 				var dbSet = new MongoDbSet<TRelatedEntity>();
 				dbSet.SetDatabase(Database);
 				dbSet.AddRange(collection);
-				await dbSet.SaveChangesAsync();
+				await dbSet.SaveChangesAsync().ConfigureAwait(false);
 			}
 
 			if (!relationship.IsCollection)

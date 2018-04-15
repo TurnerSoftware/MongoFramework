@@ -83,7 +83,7 @@ namespace MongoFramework.Infrastructure
 			if (writeModel.Any())
 			{
 				//TODO: Add support for Transactions with MongoDB Server 4.0
-				await GetCollection().BulkWriteAsync(writeModel);
+				await GetCollection().BulkWriteAsync(writeModel).ConfigureAwait(false);
 			}
 		}
 	}

@@ -49,7 +49,7 @@ namespace MongoFramework.Tests.EntityRelationships.SingleEntity
 			var entityMapper = new EntityMapper<SingleEntityIntegrationModel>();
 			var entityRelationshipWriter = new EntityRelationshipWriter<SingleEntityIntegrationModel>(database, entityMapper);
 
-			await entityRelationshipWriter.CommitEntityRelationshipsAsync(new[] { entity });
+			await entityRelationshipWriter.CommitEntityRelationshipsAsync(new[] { entity }).ConfigureAwait(false);
 
 			Assert.IsNotNull(entity.RelatedItemId);
 			Assert.IsTrue(entity.RelatedItemId == entity.RelatedItem.Id);

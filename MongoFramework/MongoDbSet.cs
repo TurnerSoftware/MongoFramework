@@ -217,11 +217,11 @@ namespace MongoFramework
 		/// <returns></returns>
 		public virtual async Task SaveChangesAsync()
 		{
-			await EntityIndexWriter.ApplyIndexingAsync();
-			await EntityRelationshipWriter.CommitEntityRelationshipsAsync(ChangeTracker);
+			await EntityIndexWriter.ApplyIndexingAsync().ConfigureAwait(false);
+			await EntityRelationshipWriter.CommitEntityRelationshipsAsync(ChangeTracker).ConfigureAwait(false);
 			ChangeTracker.DetectChanges();
 			CheckEntityValidation();
-			await EntityWriter.WriteAsync(ChangeTracker);
+			await EntityWriter.WriteAsync(ChangeTracker).ConfigureAwait(false);
 			ChangeTracker.CommitChanges();
 		}
 

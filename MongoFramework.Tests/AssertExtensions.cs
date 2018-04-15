@@ -42,7 +42,7 @@ namespace MongoFramework.Tests
 		{
 			try
 			{
-				await expressionUnderTest();
+				await expressionUnderTest().ConfigureAwait(false);
 			}
 			catch (T)
 			{

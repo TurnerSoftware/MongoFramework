@@ -37,7 +37,7 @@ namespace MongoFramework.Infrastructure.Indexing
 			var indexModel = GenerateIndexModel();
 			if (indexModel.Any())
 			{
-				await Collection.Indexes.CreateManyAsync(indexModel);
+				await Collection.Indexes.CreateManyAsync(indexModel).ConfigureAwait(false);
 			}
 		}
 	}

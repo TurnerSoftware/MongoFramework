@@ -31,9 +31,9 @@ namespace MongoFramework.Tests.Indexing
 			var indexMapper = new EntityIndexMapper<Models.EntityIndexWriterTests.IndexModel>();
 			var indexWriter = new EntityIndexWriter<Models.EntityIndexWriterTests.IndexModel>(collection, indexMapper);
 
-			await indexWriter.ApplyIndexingAsync();
+			await indexWriter.ApplyIndexingAsync().ConfigureAwait(false);
 
-			var dbIndexes = await collection.Indexes.List().ToListAsync();
+			var dbIndexes = await collection.Indexes.List().ToListAsync().ConfigureAwait(false);
 			Assert.AreEqual(3, dbIndexes.Count);
 		}
 
@@ -56,7 +56,7 @@ namespace MongoFramework.Tests.Indexing
 			var indexMapper = new EntityIndexMapper<Models.EntityIndexWriterTests.NoIndexModel>();
 			var indexWriter = new EntityIndexWriter<Models.EntityIndexWriterTests.NoIndexModel>(collection, indexMapper);
 
-			await AssertExtensions.DoesNotThrowAsync<Exception>(async () => await indexWriter.ApplyIndexingAsync());
+			await AssertExtensions.DoesNotThrowAsync<Exception>(async () => await indexWriter.ApplyIndexingAsync().ConfigureAwait(false)).ConfigureAwait(false);
 		}
 	}
 }
