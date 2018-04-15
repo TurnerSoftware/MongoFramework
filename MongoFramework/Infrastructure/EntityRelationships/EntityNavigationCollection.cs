@@ -26,7 +26,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 
 		public EntityNavigationCollection(string foreignKey, IEntityMapper entityMapper)
 		{
-			ForeignKey = foreignKey;
+			ForeignKey = foreignKey ?? throw new ArgumentNullException(nameof(foreignKey));
 			ForeignPropertyMap = entityMapper.GetEntityMapping().Where(m => m.Property.Name == foreignKey).FirstOrDefault();
 			EntityMapper = entityMapper;
 		}
@@ -72,8 +72,8 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 				return;
 			}
 
-			var dbEntityReader = new DbEntityReader<TEntity>(Database);
-			var entities = dbEntityReader.AsQueryable().WherePropertyMatches(ForeignKey, UnloadedIds);
+			var dbEntityReader = new DbEntityReader<TEntity>(Database, EntityMapper);
+			var entities = dbEntityReader.AsQueryable().WherePropertyMatches(ForeignKey, ForeignPropertyMap.PropertyType, UnloadedIds);
 
 			foreach (var entity in entities)
 			{
@@ -104,8 +104,8 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			//Enumerate list of unloaded IDs and load them in one at a time
 			if (UnloadedIds.Any())
 			{
-				var dbEntityReader = new DbEntityReader<TEntity>(Database);
-				var unloadedEntities = dbEntityReader.AsQueryable().WherePropertyMatches(ForeignKey, UnloadedIds);
+				var dbEntityReader = new DbEntityReader<TEntity>(Database, EntityMapper);
+				var unloadedEntities = dbEntityReader.AsQueryable().WherePropertyMatches(ForeignKey, ForeignPropertyMap.PropertyType, UnloadedIds);
 
 				using (var unloadedEnumerator = unloadedEntities.GetEnumerator())
 				{
