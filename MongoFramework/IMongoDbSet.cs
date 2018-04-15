@@ -1,6 +1,7 @@
 ﻿using MongoDB.Driver;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MongoFramework
@@ -9,7 +10,7 @@ namespace MongoFramework
 	{
 		void SetDatabase(IMongoDatabase database);
 		void SaveChanges();
-		Task SaveChangesAsync();
+		Task SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
 	}
 
 	public interface IMongoDbSet<TEntity> : IMongoDbSet, IQueryable<TEntity>

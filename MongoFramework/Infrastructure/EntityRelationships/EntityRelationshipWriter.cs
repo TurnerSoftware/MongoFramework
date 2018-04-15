@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MongoFramework.Infrastructure.EntityRelationships
@@ -30,13 +31,13 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			}
 		}
 
-		public async Task CommitEntityRelationshipsAsync(IEnumerable<TEntity> entities)
+		public async Task CommitEntityRelationshipsAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default(CancellationToken))
 		{
 			var writeMethod = GetType().GetMethod("CommitRelationshipAsync", BindingFlags.NonPublic | BindingFlags.Instance);
 			foreach (var relationship in Relationships)
 			{
 				await ((Task)writeMethod.MakeGenericMethod(relationship.EntityType)
-					.Invoke(this, new object[] { relationship, entities })).ConfigureAwait(false);
+					.Invoke(this, new object[] { relationship, entities, cancellationToken })).ConfigureAwait(false);
 			}
 		}
 
@@ -60,15 +61,18 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 #pragma warning restore CRR0026 // Unused member - used via Reflection
 
 #pragma warning disable CRR0026 // Unused member - used via Reflection
-		private async Task CommitRelationshipAsync<TRelatedEntity>(EntityRelationship relationship, IEnumerable<TEntity> entities)
+		private async Task CommitRelationshipAsync<TRelatedEntity>(EntityRelationship relationship, IEnumerable<TEntity> entities, CancellationToken cancellationToken)
 		{
 			var collection = BuildRelatedEntityCollection<TRelatedEntity>(relationship, entities);
+
+			cancellationToken.ThrowIfCancellationRequested();
+
 			if (collection.Any())
 			{
 				var dbSet = new MongoDbSet<TRelatedEntity>();
 				dbSet.SetDatabase(Database);
 				dbSet.AddRange(collection);
-				await dbSet.SaveChangesAsync().ConfigureAwait(false);
+				await dbSet.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 			}
 
 			if (!relationship.IsCollection)

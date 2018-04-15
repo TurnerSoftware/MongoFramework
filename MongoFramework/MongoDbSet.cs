@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MongoFramework
@@ -215,13 +216,16 @@ namespace MongoFramework
 		/// Writes all of the items in the changeset to the database.
 		/// </summary>
 		/// <returns></returns>
-		public virtual async Task SaveChangesAsync()
+		public virtual async Task SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
 		{
-			await EntityIndexWriter.ApplyIndexingAsync().ConfigureAwait(false);
-			await EntityRelationshipWriter.CommitEntityRelationshipsAsync(ChangeTracker).ConfigureAwait(false);
+			await EntityIndexWriter.ApplyIndexingAsync(cancellationToken).ConfigureAwait(false);
+			cancellationToken.ThrowIfCancellationRequested();
+			await EntityRelationshipWriter.CommitEntityRelationshipsAsync(ChangeTracker, cancellationToken).ConfigureAwait(false);
+			cancellationToken.ThrowIfCancellationRequested();
 			ChangeTracker.DetectChanges();
 			CheckEntityValidation();
-			await EntityWriter.WriteAsync(ChangeTracker).ConfigureAwait(false);
+			cancellationToken.ThrowIfCancellationRequested();
+			await EntityWriter.WriteAsync(ChangeTracker, cancellationToken).ConfigureAwait(false);
 			ChangeTracker.CommitChanges();
 		}
 

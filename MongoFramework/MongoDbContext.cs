@@ -3,6 +3,7 @@ using MongoFramework.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MongoFramework
@@ -70,11 +71,11 @@ namespace MongoFramework
 			}
 		}
 
-		public virtual async Task SaveChangesAsync()
+		public virtual async Task SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
 		{
 			foreach (var dbSet in DbSets)
 			{
-				await dbSet.SaveChangesAsync().ConfigureAwait(false);
+				await dbSet.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 			}
 		}
 

@@ -1,6 +1,7 @@
 ﻿using MongoDB.Driver;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MongoFramework.Infrastructure.Indexing
@@ -32,12 +33,12 @@ namespace MongoFramework.Infrastructure.Indexing
 			}
 		}
 
-		public async Task ApplyIndexingAsync()
+		public async Task ApplyIndexingAsync(CancellationToken cancellationToken = default(CancellationToken))
 		{
 			var indexModel = GenerateIndexModel();
 			if (indexModel.Any())
 			{
-				await Collection.Indexes.CreateManyAsync(indexModel).ConfigureAwait(false);
+				await Collection.Indexes.CreateManyAsync(indexModel, cancellationToken).ConfigureAwait(false);
 			}
 		}
 	}

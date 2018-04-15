@@ -5,6 +5,7 @@ using MongoFramework.Infrastructure.Mutation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MongoFramework.Infrastructure
@@ -76,14 +77,16 @@ namespace MongoFramework.Infrastructure
 			}
 		}
 
-		public async Task WriteAsync(IDbEntityCollection<TEntity> entityCollection)
+		public async Task WriteAsync(IDbEntityCollection<TEntity> entityCollection, CancellationToken cancellationToken = default(CancellationToken))
 		{
 			var writeModel = BuildWriteModel(entityCollection);
+
+			cancellationToken.ThrowIfCancellationRequested();
 
 			if (writeModel.Any())
 			{
 				//TODO: Add support for Transactions with MongoDB Server 4.0
-				await GetCollection().BulkWriteAsync(writeModel).ConfigureAwait(false);
+				await GetCollection().BulkWriteAsync(writeModel, null, cancellationToken).ConfigureAwait(false);
 			}
 		}
 	}
