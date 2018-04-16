@@ -27,7 +27,7 @@ namespace MongoFramework.Infrastructure.Indexing
 		public EntityIndexMapper(IEntityMapper entityMapper)
 		{
 			EntityMapper = entityMapper ?? throw new ArgumentNullException(nameof(entityMapper));
-			EntityType = entityMapper?.EntityType;
+			EntityType = entityMapper.EntityType;
 		}
 
 		public IEnumerable<IEntityIndexMap> GetIndexMapping()

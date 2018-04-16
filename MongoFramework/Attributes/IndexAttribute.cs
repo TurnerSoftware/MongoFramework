@@ -3,7 +3,7 @@ using System;
 
 namespace MongoFramework.Attributes
 {
-	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+	[AttributeUsage(AttributeTargets.Property)]
 	public class IndexAttribute : Attribute, IEntityIndex
 	{
 		public string Name { get; private set; }

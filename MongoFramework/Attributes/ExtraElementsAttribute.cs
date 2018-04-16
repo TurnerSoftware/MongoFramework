@@ -2,7 +2,7 @@
 
 namespace MongoFramework.Attributes
 {
-	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+	[AttributeUsage(AttributeTargets.Property)]
 	public class ExtraElementsAttribute : Attribute
 	{
 
