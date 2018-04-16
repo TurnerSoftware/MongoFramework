@@ -1,5 +1,4 @@
 ﻿using MongoDB.Driver;
-using System;
 using System.Collections.Generic;
 
 namespace MongoFramework.Infrastructure.EntityRelationships
