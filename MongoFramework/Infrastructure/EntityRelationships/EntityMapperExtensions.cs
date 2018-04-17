@@ -1,5 +1,4 @@
 ﻿using MongoDB.Bson;
-using MongoDB.Driver;
 using MongoFramework.Infrastructure.Mapping;
 using System;
 using System.Collections.Generic;
@@ -66,7 +65,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 					var inversePropertyAttr = currentProperty.GetCustomAttribute<InversePropertyAttribute>();
 					var relatedEntityMapping = new EntityMapper(collectionEntityType).GetEntityMapping();
 
-					PropertyInfo idProperty = null;
+					PropertyInfo idProperty;
 
 					if (inversePropertyAttr != null)
 					{

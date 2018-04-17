@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace MongoFramework.Attributes
 {
-	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+	[AttributeUsage(AttributeTargets.Property)]
 	public class UpdatedDateAttribute : CreatedDateAttribute
 	{
 		public override void OnUpdate(object target, PropertyInfo property)
