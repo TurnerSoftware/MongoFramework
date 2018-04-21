@@ -60,7 +60,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 
 				//For an entity collection relationship
 				var propertyType = currentProperty.PropertyType;
-				if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(ICollection<>))
+				if (currentProperty.CanRead && currentProperty.GetGetMethod().IsVirtual && propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(ICollection<>))
 				{
 					var collectionEntityType = propertyType.GetGenericArguments().FirstOrDefault();
 					var inversePropertyAttr = currentProperty.GetCustomAttribute<InversePropertyAttribute>();
