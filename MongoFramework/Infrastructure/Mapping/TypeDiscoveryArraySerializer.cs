@@ -11,9 +11,17 @@ using MongoDB.Bson.Serialization.Serializers;
 
 namespace MongoFramework.Infrastructure.Mapping
 {
-	public class TypeDiscoveryArraySerializer<TEntity> : IBsonSerializer, IBsonArraySerializer
+	public class TypeDiscoveryArraySerializer<TEntity, TCollectionType> : IBsonSerializer, IBsonArraySerializer where TCollectionType : IEnumerable<TEntity>
 	{
-		public Type ValueType => typeof(ICollection<TEntity>);
+		public Type ValueType => typeof(TCollectionType);
+
+		public TypeDiscoveryArraySerializer()
+		{
+			if (!ValueType.IsAssignableFrom(typeof(List<TEntity>)))
+			{
+				throw new NotSupportedException($"{ValueType} is an incompatible collection type. It must be assignable from {typeof(List<TEntity>)}.");
+			}
+		}
 
 		public object Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
 		{
@@ -46,11 +54,12 @@ namespace MongoFramework.Infrastructure.Mapping
 			}
 			else if (type == BsonType.Null)
 			{
-				return default(ICollection<TEntity>);
+				context.Reader.ReadNull();
+				return default(TCollectionType);
 			}
 			else
 			{
-				throw new NotSupportedException($"Unsupported type {type} for TypeDiscoveryArraySerializer");
+				throw new NotSupportedException($"Unsupported type {type} for deserialization.");
 			}
 		}
 

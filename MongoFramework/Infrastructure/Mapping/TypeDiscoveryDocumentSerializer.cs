@@ -14,7 +14,7 @@ namespace MongoFramework.Infrastructure.Mapping
 	public class TypeDiscoveryDocumentSerializer<TEntity> : IBsonSerializer<TEntity>, IBsonDocumentSerializer
 	{
 		private static ReaderWriterLockSlim TypeCacheLock { get; } = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
-		private static ConcurrentBag<Type> AssignableTypes { get; set; }
+		private static ConcurrentBag<Type> AssignableTypes { get; } = new ConcurrentBag<Type>();
 
 		public Type ValueType => typeof(TEntity);
 
@@ -26,6 +26,9 @@ namespace MongoFramework.Infrastructure.Mapping
 				var bookmark = context.Reader.GetBookmark();
 				context.Reader.ReadStartDocument();
 
+				//By default, assume the document is at least the generic type
+				var documentType = ValueType;
+
 				while (context.Reader.ReadBsonType() != BsonType.EndOfDocument)
 				{
 					var name = context.Reader.ReadName();
@@ -34,22 +37,14 @@ namespace MongoFramework.Infrastructure.Mapping
 					{
 						var typeHierarchy = ReadTypeHierarchy(context);
 						var topMostTypeName = typeHierarchy.LastOrDefault();
-						var foundType = FindTypeByName(topMostTypeName);
+						documentType = FindTypeByName(topMostTypeName);
 
-						if (foundType == null)
+						if (documentType == null)
 						{
 							throw new TypeAccessException($"Can't find the type {topMostTypeName} in any currently loaded assemblies");
 						}
 
-						context.Reader.ReturnToBookmark(bookmark);
-
-						var document = BsonDocumentSerializer.Instance.Deserialize(context, new BsonDeserializationArgs());
-
-						var deserializeMethod = typeof(BsonSerializer).GetMethods().Where(m => m.Name == "Deserialize" &&
-							m.IsGenericMethod && m.GetGenericArguments().Count() == 1 && m.GetParameters().FirstOrDefault().ParameterType == typeof(BsonDocument)).FirstOrDefault();
-						var deserializedResult = deserializeMethod.MakeGenericMethod(foundType).Invoke(null, new object[] { document, null });
-
-						return deserializedResult;
+						break;
 					}
 					else
 					{
@@ -57,12 +52,16 @@ namespace MongoFramework.Infrastructure.Mapping
 					}
 				}
 
-				context.Reader.ReadEndDocument();
+				//To deserialize the document, we need to be in the right position
+				context.Reader.ReturnToBookmark(bookmark);
 
-				throw new InvalidOperationException("Unable to determine document type");
+				var document = BsonDocumentSerializer.Instance.Deserialize(context, new BsonDeserializationArgs());
+				var deserializedResult = BsonSerializer.Deserialize(document, documentType);
+				return deserializedResult;
 			}
 			else if (type == BsonType.Null)
 			{
+				context.Reader.ReadNull();
 				return default(TEntity);
 			}
 			else
