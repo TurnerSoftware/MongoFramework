@@ -16,7 +16,8 @@ namespace MongoFramework.Infrastructure.Mapping
 				new MappedPropertiesProcessor(),
 				new NestedPropertyProcessor(),
 				new ExtraElementsProcessor(),
-				new NavigationPropertyProcessor()
+				new NavigationPropertyProcessor(),
+				new RuntimeTypeProcessor()
 			};
 		}
 
