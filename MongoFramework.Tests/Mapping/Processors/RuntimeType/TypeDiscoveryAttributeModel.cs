@@ -7,11 +7,9 @@ using MongoFramework.Attributes;
 
 namespace MongoFramework.Tests.Mapping.Processors.RuntimeType
 {
-	public class UnsupportedArrayTypeModel
+	[RuntimeTypeDiscovery]
+	public class TypeDiscoveryAttributeModel
 	{
-		public string Id { get; set; }
-
-		[RuntimeTypeDiscovery]
-		public LinkedList<KnownBaseModel> UnsupportedList { get; set; }
+		
 	}
 }

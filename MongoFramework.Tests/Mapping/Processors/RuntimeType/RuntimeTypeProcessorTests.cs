@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson.Serialization;
-using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mapping.Processors;
+using MongoFramework.Infrastructure.Mapping.Serialization;
 
 namespace MongoFramework.Tests.Mapping.Processors.RuntimeType
 {
@@ -14,69 +14,33 @@ namespace MongoFramework.Tests.Mapping.Processors.RuntimeType
 	public class RuntimeTypeProcessorTests
 	{
 		[TestMethod]
-		public void MappingAppliesDocumentSerializer()
+		public void TypeDiscoverySerializerWhenAttributeIsDefined()
 		{
-			var processor = new RuntimeTypeProcessor();
-			var classMap = new BsonClassMap<RuntimeTypeMappingModel>();
+			var processor = new TypeDiscoveryProcessor();
+			var classMap = new BsonClassMap<TypeDiscoveryAttributeModel>();
 			classMap.AutoMap();
+			BsonClassMap.RegisterClassMap(classMap);
 
-			var memberSerializers = classMap.DeclaredMemberMaps.ToDictionary(m => m.MemberName, m => m);
-			var expectedSerializers = new Dictionary<string, Type>
-			{
-				{ "KnownCustomCollection", typeof(TypeDiscoveryDocumentSerializer<CustomCollectionModel>) }
-			};
+			processor.ApplyMapping(typeof(TypeDiscoveryAttributeModel), classMap);
 
-			foreach (var expectedSerializer in expectedSerializers)
-			{
-				Assert.AreNotEqual(expectedSerializer.Value, memberSerializers[expectedSerializer.Key].GetSerializer().GetType());
-			}
+			var serializer = BsonSerializer.LookupSerializer<TypeDiscoveryAttributeModel>();
 
-			processor.ApplyMapping(typeof(RuntimeTypeMappingModel), classMap);
-
-			foreach (var expectedSerializer in expectedSerializers)
-			{
-				Assert.AreEqual(expectedSerializer.Value, memberSerializers[expectedSerializer.Key].GetSerializer().GetType());
-			}
+			Assert.AreEqual(typeof(TypeDiscoverySerializer<>), serializer.GetType().GetGenericTypeDefinition());
 		}
 
 		[TestMethod]
-		public void MappingAppliesArraySerializer()
+		public void NotTypeDiscoverySerializerWhenAttributeNotDefined()
 		{
-			var processor = new RuntimeTypeProcessor();
-			var classMap = new BsonClassMap<RuntimeTypeMappingModel>();
+			var processor = new TypeDiscoveryProcessor();
+			var classMap = new BsonClassMap<NoTypeDiscoveryAttributeModel>();
 			classMap.AutoMap();
+			BsonClassMap.RegisterClassMap(classMap);
 
-			var memberSerializers = classMap.DeclaredMemberMaps.ToDictionary(m => m.MemberName, m => m);
+			processor.ApplyMapping(typeof(NoTypeDiscoveryAttributeModel), classMap);
 
-			var expectedSerializers = new Dictionary<string, Type>
-			{
-				{ "KnownEnumerableInterface", typeof(TypeDiscoveryArraySerializer<KnownBaseModel, IEnumerable<KnownBaseModel>>) },
-				{ "KnownCollectionInterface", typeof(TypeDiscoveryArraySerializer<KnownBaseModel, ICollection<KnownBaseModel>>) },
-				{ "KnownListInterface", typeof(TypeDiscoveryArraySerializer<KnownBaseModel, IList<KnownBaseModel>>) },
-				{ "KnownListImplementation", typeof(TypeDiscoveryArraySerializer<KnownBaseModel, List<KnownBaseModel>>) }
-			};
+			var serializer = BsonSerializer.LookupSerializer<NoTypeDiscoveryAttributeModel>();
 
-			foreach (var expectedSerializer in expectedSerializers)
-			{
-				Assert.AreNotEqual(expectedSerializer.Value, memberSerializers[expectedSerializer.Key].GetSerializer().GetType());
-			}
-
-			processor.ApplyMapping(typeof(RuntimeTypeMappingModel), classMap);
-
-			foreach (var expectedSerializer in expectedSerializers)
-			{
-				Assert.AreEqual(expectedSerializer.Value, memberSerializers[expectedSerializer.Key].GetSerializer().GetType());
-			}
-		}
-
-		[TestMethod, ExpectedException(typeof(NotSupportedException))]
-		public void UnsupportedTypeForArraySerialization()
-		{
-			var processor = new RuntimeTypeProcessor();
-			var classMap = new BsonClassMap<UnsupportedArrayTypeModel>();
-			classMap.AutoMap();
-
-			processor.ApplyMapping(typeof(UnsupportedArrayTypeModel), classMap);
+			Assert.AreNotEqual(typeof(TypeDiscoverySerializer<>), serializer.GetType().GetGenericTypeDefinition());
 		}
 	}
 }

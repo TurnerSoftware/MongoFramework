@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MongoFramework.Attributes;
 
-namespace MongoFramework.Tests.Mapping.Serializers.TypeDiscoveryArray
+namespace MongoFramework.Tests.Mapping.Serialization.TypeDiscovery
 {
+	[RuntimeTypeDiscovery]
 	public class KnownBaseModel
 	{
-		public string Id { get; set; }
-		public string Description { get; set; }
 	}
 }

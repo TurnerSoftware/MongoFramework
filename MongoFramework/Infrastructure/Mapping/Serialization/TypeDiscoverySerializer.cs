@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
+using System;
+using System.Collections.Concurrent;
+using System.Linq;
+using System.Threading;
 
-namespace MongoFramework.Infrastructure.Mapping
+namespace MongoFramework.Infrastructure.Mapping.Serialization
 {
-	public class TypeDiscoveryDocumentSerializer<TEntity> : IBsonSerializer<TEntity>, IBsonDocumentSerializer
+	public class TypeDiscoverySerializer<TEntity> : IBsonSerializer<TEntity>, IBsonDocumentSerializer
 	{
 		private static ReaderWriterLockSlim TypeCacheLock { get; } = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 		private static ConcurrentBag<Type> AssignableTypes { get; } = new ConcurrentBag<Type>();
@@ -26,37 +24,23 @@ namespace MongoFramework.Infrastructure.Mapping
 				var bookmark = context.Reader.GetBookmark();
 				context.Reader.ReadStartDocument();
 
-				//By default, assume the document is at least the generic type
-				var documentType = ValueType;
-
-				while (context.Reader.ReadBsonType() != BsonType.EndOfDocument)
+				var actualType = ValueType;
+				if (context.Reader.FindElement("_t"))
 				{
-					var name = context.Reader.ReadName();
-
-					if (name == "_t")
+					var discriminator = BsonValueSerializer.Instance.Deserialize(context);
+					if (discriminator.IsBsonArray)
 					{
-						var typeHierarchy = ReadTypeHierarchy(context);
-						var topMostTypeName = typeHierarchy.LastOrDefault();
-						documentType = FindTypeByName(topMostTypeName);
-
-						if (documentType == null)
-						{
-							throw new TypeAccessException($"Can't find the type {topMostTypeName} in any currently loaded assemblies");
-						}
-
-						break;
+						discriminator = discriminator.AsBsonArray.Last();
 					}
-					else
+					if (discriminator.IsString)
 					{
-						context.Reader.SkipValue();
+						actualType = FindTypeByName(discriminator.AsString);
 					}
 				}
-
-				//To deserialize the document, we need to be in the right position
 				context.Reader.ReturnToBookmark(bookmark);
 
-				var document = BsonDocumentSerializer.Instance.Deserialize(context, new BsonDeserializationArgs());
-				var deserializedResult = BsonSerializer.Deserialize(document, documentType);
+				var serializer = GetRealSerializer(actualType);
+				var deserializedResult = serializer.Deserialize(context);
 				return deserializedResult;
 			}
 			else if (type == BsonType.Null)
@@ -66,7 +50,7 @@ namespace MongoFramework.Infrastructure.Mapping
 			}
 			else
 			{
-				throw new NotSupportedException($"Unsupported type {type} for TypeDiscoveryDocumentSerializer");
+				throw new NotSupportedException($"Unsupported BsonType {type} for TypeDiscoverySerializer");
 			}
 		}
 
@@ -107,28 +91,15 @@ namespace MongoFramework.Infrastructure.Mapping
 			}
 		}
 
-		private IEnumerable<string> ReadTypeHierarchy(BsonDeserializationContext context)
+		private IBsonSerializer GetRealSerializer(Type type)
 		{
-			if (context.Reader.CurrentBsonType == BsonType.String)
-			{
-				return new[] { context.Reader.ReadString() };
-			}
-			else if (context.Reader.CurrentBsonType == BsonType.Array)
-			{
-				context.Reader.ReadStartArray();
-				var typeList = new List<string>();
+			//Force the type to be processed by the Entity Mapper
+			new EntityMapper(type);
 
-				while (context.Reader.ReadBsonType() != BsonType.EndOfDocument)
-				{
-					typeList.Add(context.Reader.ReadString());
-				}
-
-				context.Reader.ReadEndArray();
-
-				return typeList;
-			}
-
-			throw new InvalidOperationException($"Unexpected reader position. Expected string or array but got {context.Reader.CurrentBsonType}.");
+			var classMap = BsonClassMap.LookupClassMap(type);
+			var serializerType = typeof(BsonClassMapSerializer<>).MakeGenericType(type);
+			var serializer = (IBsonSerializer)Activator.CreateInstance(serializerType, classMap);
+			return serializer;
 		}
 
 		public void Serialize(BsonSerializationContext context, BsonSerializationArgs args, object value)
@@ -138,7 +109,8 @@ namespace MongoFramework.Infrastructure.Mapping
 
 		public void Serialize(BsonSerializationContext context, BsonSerializationArgs args, TEntity value)
 		{
-			BsonSerializer.Serialize(context.Writer, ValueType, value);
+			var serializer = GetRealSerializer(value?.GetType() ?? ValueType);
+			serializer.Serialize(context, args, value);
 		}
 
 		public bool TryGetMemberSerializationInfo(string memberName, out BsonSerializationInfo serializationInfo)

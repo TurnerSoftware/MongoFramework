@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MongoFramework.Tests.Mapping.Serializers.TypeDiscoveryArray
+namespace MongoFramework.Tests.Mapping.Serialization.TypeDiscovery
 {
-	public interface IKnownBase
+	public class UnknownNestedChildModel : UnknownChildModel
 	{
 	}
 }

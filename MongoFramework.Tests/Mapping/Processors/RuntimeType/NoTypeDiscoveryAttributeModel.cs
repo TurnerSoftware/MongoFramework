@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MongoFramework.Attributes;
 
 namespace MongoFramework.Tests.Mapping.Processors.RuntimeType
 {
-	public class KnownBaseModel
+	public class NoTypeDiscoveryAttributeModel
 	{
-		public string Description { get; set; }
+		
 	}
 }
