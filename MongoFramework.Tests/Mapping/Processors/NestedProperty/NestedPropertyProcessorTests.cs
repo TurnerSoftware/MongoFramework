@@ -10,19 +10,35 @@ namespace MongoFramework.Tests.Mapping.Processors.NestedProperty
 	public class NestedPropertyProcessorTests
 	{
 		[TestMethod]
-		public void MapsSimpleNestedProperty()
+		public void MapsNestedStandardPropertyModel()
 		{
 			var processor = new NestedPropertyProcessor();
-			var classMap = new BsonClassMap<ParentModel>();
+			var classMap = new BsonClassMap<PropertyBaseModel>();
 			classMap.AutoMap();
 
 			var registeredClassMaps = BsonClassMap.GetRegisteredClassMaps();
-			Assert.IsFalse(registeredClassMaps.Any(m => m.ClassType == typeof(NestedModel)));
+			Assert.IsFalse(registeredClassMaps.Any(m => m.ClassType == typeof(PropertyNestedModel)));
 
-			processor.ApplyMapping(typeof(ParentModel), classMap);
+			processor.ApplyMapping(typeof(PropertyBaseModel), classMap);
 
 			registeredClassMaps = BsonClassMap.GetRegisteredClassMaps();
-			Assert.IsTrue(registeredClassMaps.Any(m => m.ClassType == typeof(NestedModel)));
+			Assert.IsTrue(registeredClassMaps.Any(m => m.ClassType == typeof(PropertyNestedModel)));
+		}
+
+		[TestMethod]
+		public void MapsNestedCollectionPropertyModel()
+		{
+			var processor = new NestedPropertyProcessor();
+			var classMap = new BsonClassMap<CollectionBaseModel>();
+			classMap.AutoMap();
+
+			var registeredClassMaps = BsonClassMap.GetRegisteredClassMaps();
+			Assert.IsFalse(registeredClassMaps.Any(m => m.ClassType == typeof(CollectionNestedModel)));
+
+			processor.ApplyMapping(typeof(CollectionBaseModel), classMap);
+
+			registeredClassMaps = BsonClassMap.GetRegisteredClassMaps();
+			Assert.IsTrue(registeredClassMaps.Any(m => m.ClassType == typeof(CollectionNestedModel)));
 		}
 	}
 }
