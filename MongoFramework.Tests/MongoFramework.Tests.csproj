@@ -104,9 +104,12 @@
     <Compile Include="Linq\WhereIdMatchesObjectIdModel.cs" />
     <Compile Include="Linq\WhereIdMatchesGuidModel.cs" />
     <Compile Include="Linq\WhereIdMatchesStringModel.cs" />
+    <Compile Include="Mapping\Processors\NestedProperty\CollectionNestedModel.cs" />
+    <Compile Include="Mapping\Processors\NestedProperty\CollectionBaseModel.cs" />
     <Compile Include="Mapping\Processors\RuntimeType\NoTypeDiscoveryAttributeModel.cs" />
     <Compile Include="Mapping\Processors\RuntimeType\TypeDiscoveryAttributeModel.cs" />
     <Compile Include="Mapping\Processors\RuntimeType\RuntimeTypeProcessorTests.cs" />
+    <Compile Include="Mapping\Serialization\TypeDiscovery\CollectionBaseModel.cs" />
     <Compile Include="Mapping\Serialization\TypeDiscovery\KnownBaseModel.cs" />
     <Compile Include="Mapping\Serialization\TypeDiscovery\TypeDiscoverySerializationTests.cs" />
     <Compile Include="Mapping\Serialization\TypeDiscovery\UnknownNestedChildModel.cs" />
@@ -125,8 +128,8 @@
     <Compile Include="Models\ParentTestModel.cs" />
     <Compile Include="Models\ColumnAttributePropertyModel.cs" />
     <Compile Include="Models\NotMappedPropertiesModel.cs" />
-    <Compile Include="Models\NestedModel.cs" />
-    <Compile Include="Models\ParentModel.cs" />
+    <Compile Include="Mapping\Processors\NestedProperty\PropertyNestedModel.cs" />
+    <Compile Include="Mapping\Processors\NestedProperty\PropertyBaseModel.cs" />
     <Compile Include="Models\CustomCollectionAndSchemaModel.cs" />
     <Compile Include="Models\CustomCollectionModel.cs" />
     <Compile Include="Models\DefaultCollectionNameModel.cs" />

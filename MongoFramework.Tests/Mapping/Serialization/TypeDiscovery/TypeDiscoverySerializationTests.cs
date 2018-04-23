@@ -69,7 +69,7 @@ namespace MongoFramework.Tests.Mapping.Serialization.TypeDiscovery
 		}
 
 		[TestMethod]
-		public void DeserializationSuccessWithTypeDiscovery()
+		public void DeserializeChildTypeDiscoveryForRootEntity()
 		{
 			var entityMapper = new EntityMapper<KnownBaseModel>();
 
@@ -83,7 +83,7 @@ namespace MongoFramework.Tests.Mapping.Serialization.TypeDiscovery
 		}
 
 		[TestMethod]
-		public void NestedDeserializationSuccessWithTypeDiscovery()
+		public void DeserializeGrandChildTypeDiscoveryForRootEntity()
 		{
 			var entityMapper = new EntityMapper<KnownBaseModel>();
 
@@ -97,7 +97,7 @@ namespace MongoFramework.Tests.Mapping.Serialization.TypeDiscovery
 		}
 
 		[TestMethod]
-		public void DeserializationFailureWithoutTypeDiscovery()
+		public void DeserializeWithoutTypeDiscovery()
 		{
 			var entityMapper = new EntityMapper<KnownBaseModel>();
 
@@ -112,6 +112,40 @@ namespace MongoFramework.Tests.Mapping.Serialization.TypeDiscovery
 			Assert.AreNotEqual(typeof(UnknownChildModel), deserializedResult.GetType());
 
 			TypeDiscoverySerializationProvider.Instance.Enabled = true;
+		}
+
+		[TestMethod]
+		public void DeserializeCollection()
+		{
+			var entityMapper = new EntityMapper<CollectionBaseModel>();
+
+			var document = new BsonDocument
+			{
+				{ "_t", "CollectionBaseModel" },
+				{
+					"KnownList",
+					new BsonArray
+					{
+						new BsonDocument
+						{
+							{ "_t", "KnownBaseModel" }
+						},
+						new BsonDocument
+						{
+							{ "_t", "UnknownChildModel" }
+						},
+						new BsonDocument
+						{
+							{ "_t", new BsonArray(new [] { "KnownBaseModel", "UnknownChildModel", "UnknownNestedChildModel" }) }
+						}
+					}
+				}
+			};
+			
+			var deserializedResult = BsonSerializer.Deserialize<CollectionBaseModel>(document);
+			Assert.AreEqual(typeof(KnownBaseModel), deserializedResult.KnownList[0].GetType());
+			Assert.AreEqual(typeof(UnknownChildModel), deserializedResult.KnownList[1].GetType());
+			Assert.AreEqual(typeof(UnknownNestedChildModel), deserializedResult.KnownList[2].GetType());
 		}
 	}
 }

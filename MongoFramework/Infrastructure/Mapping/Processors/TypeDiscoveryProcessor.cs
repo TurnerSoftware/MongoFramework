@@ -14,6 +14,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 		{
 			if (!ProviderAdded && entityType.GetCustomAttribute<RuntimeTypeDiscoveryAttribute>() != null)
 			{
+				ProviderAdded = true;
 				BsonSerializer.RegisterSerializationProvider(TypeDiscoverySerializationProvider.Instance);
 			}
 		}
