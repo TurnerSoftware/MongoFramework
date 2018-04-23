@@ -89,11 +89,11 @@ namespace MongoFramework.Tests.Mapping.Serialization.TypeDiscovery
 
 			var document = new BsonDocument
 			{
-				{ "_t", new BsonArray(new [] { "KnownBaseModel", "UnknownChildModel", "UnknownNestedChildModel" }) }
+				{ "_t", new BsonArray(new [] { "KnownBaseModel", "UnknownChildModel", "UnknownGrandChildModel" }) }
 			};
 
 			var deserializedResult = BsonSerializer.Deserialize<KnownBaseModel>(document);
-			Assert.AreEqual(typeof(UnknownNestedChildModel), deserializedResult.GetType());
+			Assert.AreEqual(typeof(UnknownGrandChildModel), deserializedResult.GetType());
 		}
 
 		[TestMethod]
@@ -136,7 +136,7 @@ namespace MongoFramework.Tests.Mapping.Serialization.TypeDiscovery
 						},
 						new BsonDocument
 						{
-							{ "_t", new BsonArray(new [] { "KnownBaseModel", "UnknownChildModel", "UnknownNestedChildModel" }) }
+							{ "_t", new BsonArray(new [] { "KnownBaseModel", "UnknownChildModel", "UnknownGrandChildModel" }) }
 						}
 					}
 				}
@@ -145,7 +145,37 @@ namespace MongoFramework.Tests.Mapping.Serialization.TypeDiscovery
 			var deserializedResult = BsonSerializer.Deserialize<CollectionBaseModel>(document);
 			Assert.AreEqual(typeof(KnownBaseModel), deserializedResult.KnownList[0].GetType());
 			Assert.AreEqual(typeof(UnknownChildModel), deserializedResult.KnownList[1].GetType());
-			Assert.AreEqual(typeof(UnknownNestedChildModel), deserializedResult.KnownList[2].GetType());
+			Assert.AreEqual(typeof(UnknownGrandChildModel), deserializedResult.KnownList[2].GetType());
+		}
+
+		[TestMethod]
+		public void ReserializationWithoutDataLoss()
+		{
+			var entityMapper = new EntityMapper<CollectionBaseModel>();
+
+			var initialEntity = new CollectionBaseModel
+			{
+				KnownList = new List<KnownBaseModel>
+				{
+					new KnownBaseModel(),
+					new UnknownChildModel(),
+					new UnknownGrandChildModel()
+				}
+			};
+
+			var document = new BsonDocument();
+
+			using (var writer = new BsonDocumentWriter(document))
+			{
+				BsonSerializer.Serialize(writer, initialEntity);
+			}
+
+			var deserializedResult = BsonSerializer.Deserialize<CollectionBaseModel>(document);
+
+			Assert.AreEqual(3, deserializedResult.KnownList.Count);
+			Assert.AreEqual(typeof(KnownBaseModel), deserializedResult.KnownList[0].GetType());
+			Assert.AreEqual(typeof(UnknownChildModel), deserializedResult.KnownList[1].GetType());
+			Assert.AreEqual(typeof(UnknownGrandChildModel), deserializedResult.KnownList[2].GetType());
 		}
 	}
 }

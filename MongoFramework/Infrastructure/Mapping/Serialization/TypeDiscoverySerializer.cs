@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace MongoFramework.Infrastructure.Mapping.Serialization
 {
-	public class TypeDiscoverySerializer<TEntity> : IBsonSerializer<TEntity>, IBsonDocumentSerializer
+	public class TypeDiscoverySerializer<TEntity> : IBsonSerializer<TEntity>, IBsonDocumentSerializer, IBsonIdProvider
 	{
 		private static ReaderWriterLockSlim TypeCacheLock { get; } = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 		private static ConcurrentBag<Type> AssignableTypes { get; } = new ConcurrentBag<Type>();
@@ -115,12 +115,33 @@ namespace MongoFramework.Infrastructure.Mapping.Serialization
 
 		public bool TryGetMemberSerializationInfo(string memberName, out BsonSerializationInfo serializationInfo)
 		{
-			throw new NotImplementedException();
+			var classMap = BsonClassMap.GetRegisteredClassMaps().Where(c => c.ClassType == typeof(TEntity)).FirstOrDefault();
+			//Serializer requires frozen class map
+			classMap.Freeze();
+			return new BsonClassMapSerializer<TEntity>(classMap).TryGetMemberSerializationInfo(memberName, out serializationInfo);
 		}
 
 		TEntity IBsonSerializer<TEntity>.Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
 		{
 			return (TEntity)Deserialize(context, args);
+		}
+
+		public bool GetDocumentId(object document, out object id, out Type idNominalType, out IIdGenerator idGenerator)
+		{
+			//This specifically DOESN'T look at the type of the given document as it assumes the known document has the Id defined
+			var classMap = BsonClassMap.GetRegisteredClassMaps().Where(c => c.ClassType == typeof(TEntity)).FirstOrDefault();
+			//Serializer requires frozen class map
+			classMap.Freeze();
+			return new BsonClassMapSerializer<TEntity>(classMap).GetDocumentId(document, out id, out idNominalType, out idGenerator);
+		}
+
+		public void SetDocumentId(object document, object id)
+		{
+			//This specifically DOESN'T look at the type of the given document as it assumes the known document has the Id defined
+			var classMap = BsonClassMap.GetRegisteredClassMaps().Where(c => c.ClassType == typeof(TEntity)).FirstOrDefault();
+			//Serializer requires frozen class map
+			classMap.Freeze();
+			new BsonClassMapSerializer<TEntity>(classMap).SetDocumentId(document, id);
 		}
 	}
 }
