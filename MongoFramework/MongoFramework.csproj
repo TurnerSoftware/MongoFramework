@@ -18,6 +18,10 @@
     <PackageReleaseNotes />
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework)'=='net20'">
+    <DefineConstants>NET20</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="MongoDB.Driver" Version="2.5.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.4.1" />

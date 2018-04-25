@@ -12,7 +12,7 @@ namespace MongoFramework.Tests.Infrastructure
 		{
 			public string Id { get; set; }
 		}
-
+#if !NETCOREAPP2_0
 		[TestMethod]
 		public void UrlFromConfigFound()
 		{
@@ -34,12 +34,20 @@ namespace MongoFramework.Tests.Infrastructure
 			var database = MongoDbUtility.GetDatabase(url);
 			Assert.IsNotNull(database);
 		}
+#endif
 
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentNullException), "ArgumentNullException")]
-		public void DatabaseFromInvalidUrl()
+		public void DatabaseFromNullUrl()
 		{
-			MongoDbUtility.GetDatabase(null);
+			MongoDbUtility.GetDatabase((MongoDB.Driver.MongoUrl)null);
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(ArgumentNullException), "ArgumentNullException")]
+		public void DatabaseFromNullOptions()
+		{
+			MongoDbUtility.GetDatabase((IMongoDbContextOptions)null);
 		}
 
 		[TestMethod]
