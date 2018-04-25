@@ -5,8 +5,6 @@
     <RootNamespace>MongoFramework.Tests</RootNamespace>
     <TargetFrameworks>net461;netcoreapp2.0</TargetFrameworks>
     <IsPackable>false</IsPackable>
-    <DebugType>full</DebugType>
-    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)'=='netcoreapp2.0'">

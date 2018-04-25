@@ -16,10 +16,12 @@
     <FileVersion>0.7.4</FileVersion>
     <Version>0.7.4</Version>
     <PackageReleaseNotes />
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)'=='net20'">
-    <DefineConstants>NET20</DefineConstants>
+  <PropertyGroup Condition="'$(TargetFramework)'=='NETCOREAPP2_0'">
+    <DefineConstants>NETCOREAPP2_0</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
