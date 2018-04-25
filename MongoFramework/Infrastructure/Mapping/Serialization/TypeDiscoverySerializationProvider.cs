@@ -17,7 +17,7 @@ namespace MongoFramework.Infrastructure.Mapping.Serialization
 		{
 			if (type == null)
 			{
-				throw new ArgumentNullException("type");
+				throw new ArgumentNullException(nameof(type));
 			}
 
 			if (Enabled && type.GetCustomAttribute<RuntimeTypeDiscoveryAttribute>() != null)
