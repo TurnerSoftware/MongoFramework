@@ -10,6 +10,6 @@ namespace MongoFramework.Tests.EntityRelationships.Mapping.SingleEntity
 
 		[ForeignKey("CreatedBy")]
 		public int CreatedById { get; set; }
-		public UserEntityModel CreatedBy { get; set; }
+		public virtual UserEntityModel CreatedBy { get; set; }
 	}
 }

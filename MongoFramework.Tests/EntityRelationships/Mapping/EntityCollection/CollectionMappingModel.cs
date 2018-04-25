@@ -10,11 +10,11 @@ namespace MongoFramework.Tests.EntityRelationships.Mapping.EntityCollection
 		public string Id { get; set; }
 		public string Description { get; set; }
 
-		public ICollection<StringIdModel> StringModelEntities { get; set; }
-		public ICollection<ObjectIdIdModel> ObjectIdModelEntities { get; set; }
-		public ICollection<GuidIdModel> GuidModelEntities { get; set; }
+		public virtual ICollection<StringIdModel> StringModelEntities { get; set; }
+		public virtual ICollection<ObjectIdIdModel> ObjectIdModelEntities { get; set; }
+		public virtual ICollection<GuidIdModel> GuidModelEntities { get; set; }
 
 		[InverseProperty("SecondaryId")]
-		public ICollection<StringIdModel> InverseCollection { get; set; }
+		public virtual ICollection<StringIdModel> InverseCollection { get; set; }
 	}
 }

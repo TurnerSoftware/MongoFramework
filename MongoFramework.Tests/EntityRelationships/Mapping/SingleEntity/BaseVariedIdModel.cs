@@ -11,10 +11,10 @@ namespace MongoFramework.Tests.EntityRelationships.Mapping.SingleEntity
 
 		[ForeignKey("GuidProperty")]
 		public Guid GuidTestId { get; set; }
-		public GuidIdModel GuidProperty { get; set; }
+		public virtual GuidIdModel GuidProperty { get; set; }
 
 		[ForeignKey("ObjectIdProperty")]
 		public ObjectId ObjectIdTestId { get; set; }
-		public ObjectIdIdModel ObjectIdProperty { get; set; }
+		public virtual ObjectIdIdModel ObjectIdProperty { get; set; }
 	}
 }
