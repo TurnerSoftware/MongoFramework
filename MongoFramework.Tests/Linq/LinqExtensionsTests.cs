@@ -1,9 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Linq;
 using MongoFramework.Linq;
-using MongoFramework.Tests.Models;
 using System;
 using System.Linq;
 
@@ -12,6 +12,26 @@ namespace MongoFramework.Tests.Linq
 	[TestClass]
 	public class LinqExtensionsTests
 	{
+		public class LinqExtensionsModel
+		{
+			public string Id { get; set; }
+		}
+		public class WhereIdMatchesGuidModel
+		{
+			public Guid Id { get; set; }
+			public string Description { get; set; }
+		}
+		public class WhereIdMatchesObjectIdModel
+		{
+			public ObjectId Id { get; set; }
+			public string Description { get; set; }
+		}
+		public class WhereIdMatchesStringModel
+		{
+			public string Id { get; set; }
+			public string Description { get; set; }
+		}
+
 		[TestMethod]
 		public void ValidToQuery()
 		{
