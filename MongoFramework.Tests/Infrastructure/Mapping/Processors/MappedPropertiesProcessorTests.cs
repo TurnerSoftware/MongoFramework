@@ -5,10 +5,10 @@ using MongoFramework.Infrastructure.Mapping.Processors;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
-namespace MongoFramework.Tests.Mapping.Processors
+namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 {
 	[TestClass]
-	public class MappedPropertiesProcessorTests
+	public class MappedPropertiesProcessorTests : TestBase
 	{
 		public class ColumnAttributePropertyModel
 		{

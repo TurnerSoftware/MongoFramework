@@ -5,10 +5,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MongoFramework.Tests
+namespace MongoFramework.Tests.Infrastructure.Mapping
 {
 	[TestClass]
-	public class EntityMapperTests
+	public class EntityMapperTests : TestBase
 	{
 		public class MappingLockModel
 		{

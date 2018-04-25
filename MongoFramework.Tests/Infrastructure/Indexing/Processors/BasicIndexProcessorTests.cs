@@ -4,10 +4,10 @@ using MongoFramework.Infrastructure.Indexing;
 using MongoFramework.Infrastructure.Indexing.Processors;
 using System.Linq;
 
-namespace MongoFramework.Tests.Indexing.Processors
+namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 {
 	[TestClass]
-	public class BasicIndexProcessorTests
+	public class BasicIndexProcessorTests : TestBase
 	{
 		public class IndexNamingModel
 		{

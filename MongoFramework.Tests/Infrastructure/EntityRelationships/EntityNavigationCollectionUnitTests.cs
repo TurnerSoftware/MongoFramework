@@ -3,10 +3,10 @@ using MongoDB.Bson;
 using System;
 using System.Linq;
 
-namespace MongoFramework.Tests.EntityRelationships
+namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 {
 	[TestClass]
-	public class EntityNavigationCollectionUnitTests
+	public class EntityNavigationCollectionUnitTests : TestBase
 	{
 		[TestMethod, ExpectedException(typeof(ArgumentNullException))]
 		public void NullForeignKeyThrowsException()

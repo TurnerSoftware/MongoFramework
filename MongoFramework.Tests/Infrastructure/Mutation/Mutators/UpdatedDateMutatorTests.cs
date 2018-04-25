@@ -5,10 +5,10 @@ using MongoFramework.Infrastructure.Mutation;
 using MongoFramework.Infrastructure.Mutation.Mutators;
 using System;
 
-namespace MongoFramework.Tests.Mutation.Mutators
+namespace MongoFramework.Tests.Infrastructure.Mutation.Mutators
 {
 	[TestClass]
-	public class UpdatedDateMutatorTests
+	public class UpdatedDateMutatorTests : TestBase
 	{
 		public class InvalidAttributeUseModel
 		{

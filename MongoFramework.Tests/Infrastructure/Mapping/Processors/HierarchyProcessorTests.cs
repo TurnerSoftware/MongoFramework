@@ -4,10 +4,10 @@ using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mapping.Processors;
 using System.Linq;
 
-namespace MongoFramework.Tests.Mapping.Processors
+namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 {
 	[TestClass]
-	public class HierarchyProcessorTests
+	public class HierarchyProcessorTests : TestBase
 	{
 		public class ParentTestModel
 		{

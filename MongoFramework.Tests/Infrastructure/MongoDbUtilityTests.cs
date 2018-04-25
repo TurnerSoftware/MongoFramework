@@ -3,10 +3,10 @@ using MongoFramework.Infrastructure;
 using System;
 using System.Linq;
 
-namespace MongoFramework.Tests
+namespace MongoFramework.Tests.Infrastructure
 {
 	[TestClass]
-	public class MongoDbUtilityTests
+	public class MongoDbUtilityTests : TestBase
 	{
 		public class MongoDbUtilityModel
 		{

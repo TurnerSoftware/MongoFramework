@@ -4,10 +4,10 @@ using MongoFramework.Infrastructure.Mapping.Processors;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MongoFramework.Tests.Mapping.Processors
+namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 {
 	[TestClass]
-	public class NestedPropertyProcessorTests
+	public class NestedPropertyProcessorTests : TestBase
 	{
 		public class CollectionBaseModel
 		{

@@ -7,10 +7,10 @@ using MongoFramework.Infrastructure.Mapping.Processors;
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace MongoFramework.Tests.Mapping.Processors
+namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 {
 	[TestClass]
-	public class EntityIdProcessorTests
+	public class EntityIdProcessorTests : TestBase
 	{
 		public class GuidIdGeneratorTestModel
 		{

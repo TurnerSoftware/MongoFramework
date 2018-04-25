@@ -6,10 +6,10 @@ using MongoFramework.Infrastructure.Mapping.Serialization;
 using System;
 using System.Linq;
 
-namespace MongoFramework.Tests.Mapping.Processors
+namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 {
 	[TestClass]
-	public class TypeDiscoveryProcessorTests
+	public class TypeDiscoveryProcessorTests : TestBase
 	{
 		public class NoTypeDiscoveryAttributeModel
 		{

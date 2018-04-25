@@ -4,10 +4,10 @@ using MongoFramework.Attributes;
 using MongoFramework.Infrastructure.Mapping.Processors;
 using System.Collections.Generic;
 
-namespace MongoFramework.Tests.Mapping.Processors
+namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 {
 	[TestClass]
-	public class ExtraElementsProcessorTests
+	public class ExtraElementsProcessorTests : TestBase
 	{
 		public class ExtraElementsModel
 		{

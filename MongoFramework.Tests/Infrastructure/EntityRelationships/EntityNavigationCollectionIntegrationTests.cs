@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MongoFramework.Tests.EntityRelationships
+namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 {
 	[TestClass]
 	public class EntityNavigationCollectionIntegrationTests : TestBase

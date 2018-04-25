@@ -6,7 +6,7 @@ using MongoFramework.Infrastructure.Mapping;
 using System;
 using System.Linq;
 
-namespace MongoFramework.Tests.Linq
+namespace MongoFramework.Tests.Infrastructure.Linq
 {
 	[TestClass]
 	public class MongoFrameworkQueryableTests : TestBase

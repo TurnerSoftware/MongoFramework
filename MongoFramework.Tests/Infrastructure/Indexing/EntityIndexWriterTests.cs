@@ -5,7 +5,7 @@ using MongoFramework.Infrastructure.Indexing;
 using System;
 using System.Threading.Tasks;
 
-namespace MongoFramework.Tests.Indexing
+namespace MongoFramework.Tests.Infrastructure.Indexing
 {
 	[TestClass]
 	public class EntityIndexWriterTests : TestBase

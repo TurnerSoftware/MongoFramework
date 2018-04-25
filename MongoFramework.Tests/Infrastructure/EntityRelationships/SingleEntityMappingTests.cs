@@ -6,7 +6,7 @@ using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
-namespace MongoFramework.Tests.EntityRelationships
+namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 {
 	[TestClass]
 	public class SingleEntityMappingTests : TestBase

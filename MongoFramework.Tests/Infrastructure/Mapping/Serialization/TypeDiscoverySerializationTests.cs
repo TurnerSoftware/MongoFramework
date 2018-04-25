@@ -11,10 +11,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace MongoFramework.Tests.Mapping.Serialization
+namespace MongoFramework.Tests.Infrastructure.Mapping.Serialization
 {
 	[TestClass]
-	public class TypeDiscoverySerializationTests
+	public class TypeDiscoverySerializationTests : TestBase
 	{
 		public class CollectionBaseModel
 		{

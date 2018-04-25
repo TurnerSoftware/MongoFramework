@@ -10,7 +10,7 @@ using System.Linq;
 namespace MongoFramework.Tests.Linq
 {
 	[TestClass]
-	public class LinqExtensionsTests
+	public class LinqExtensionsTests : TestBase
 	{
 		public class LinqExtensionsModel
 		{

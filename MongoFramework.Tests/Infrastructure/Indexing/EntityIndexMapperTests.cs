@@ -4,10 +4,10 @@ using MongoFramework.Infrastructure.Mapping;
 using System;
 using System.Linq;
 
-namespace MongoFramework.Tests.Indexing
+namespace MongoFramework.Tests.Infrastructure.Indexing
 {
 	[TestClass]
-	public class EntityIndexMapperTests
+	public class EntityIndexMapperTests : TestBase
 	{
 		public class SomeEntity { }
 		public class AnotherEntity { }

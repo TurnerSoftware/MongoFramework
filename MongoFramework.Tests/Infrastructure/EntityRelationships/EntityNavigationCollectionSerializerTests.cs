@@ -7,10 +7,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MongoFramework.Tests.EntityRelationships
+namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 {
 	[TestClass]
-	public class EntityNavigationCollectionSerializerTests
+	public class EntityNavigationCollectionSerializerTests : TestBase
 	{
 		[TestMethod]
 		public void DeserializingNullReturnsCollection()

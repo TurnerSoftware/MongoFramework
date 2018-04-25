@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MongoFramework.Tests.DefinitionHelpers.UpdateDefinition
+namespace MongoFramework.Tests.Infrastructure.DefinitionHelpers
 {
 	[TestClass]
 	public class UpdateDefinitionHelperTests : TestBase

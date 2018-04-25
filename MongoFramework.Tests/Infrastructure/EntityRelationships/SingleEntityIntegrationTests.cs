@@ -9,20 +9,20 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MongoFramework.Tests.EntityRelationships
+namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 {
-	public class SingleEntityIntegrationModel
-	{
-		public string Id { get; set; }
-
-		[ForeignKey("RelatedItem")]
-		public string RelatedItemId { get; set; }
-		public StringIdModel RelatedItem { get; set; }
-	}
-
 	[TestClass]
 	public class SingleEntityIntegrationTests : TestBase
 	{
+		public class SingleEntityIntegrationModel
+		{
+			public string Id { get; set; }
+
+			[ForeignKey("RelatedItem")]
+			public string RelatedItemId { get; set; }
+			public StringIdModel RelatedItem { get; set; }
+		}
+
 		[TestMethod]
 		public void AddRelationshipToNewEntity()
 		{

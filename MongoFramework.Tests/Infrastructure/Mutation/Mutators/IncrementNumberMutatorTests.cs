@@ -4,10 +4,10 @@ using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mutation;
 using MongoFramework.Infrastructure.Mutation.Mutators;
 
-namespace MongoFramework.Tests.Mutation.Mutators
+namespace MongoFramework.Tests.Infrastructure.Mutation.Mutators
 {
 	[TestClass]
-	public class IncrementNumberMutatorTests
+	public class IncrementNumberMutatorTests : TestBase
 	{
 		public class IncrementalEntity
 		{

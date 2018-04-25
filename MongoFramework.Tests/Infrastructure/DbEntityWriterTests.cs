@@ -3,7 +3,7 @@ using MongoFramework.Infrastructure;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MongoFramework.Tests
+namespace MongoFramework.Tests.Infrastructure
 {
 	[TestClass]
 	public class DbEntityWriterTests : TestBase

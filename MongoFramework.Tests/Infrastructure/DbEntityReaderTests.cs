@@ -2,7 +2,7 @@
 using MongoFramework.Infrastructure;
 using System.Linq;
 
-namespace MongoFramework.Tests
+namespace MongoFramework.Tests.Infrastructure
 {
 	[TestClass]
 	public class DbEntityReaderTests : TestBase
