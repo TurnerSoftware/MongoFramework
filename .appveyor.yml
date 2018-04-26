@@ -1,4 +1,4 @@
-version: '0.7.4+{build}'
+version: '0.8.0+{build}'
 image: Visual Studio 2017
 skip_branch_with_pr: true
 skip_commits:
