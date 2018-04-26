@@ -1,209 +1,23 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\MSTest.TestAdapter.1.2.1\build\net45\MSTest.TestAdapter.props" Condition="Exists('..\packages\MSTest.TestAdapter.1.2.1\build\net45\MSTest.TestAdapter.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D7CF8D91-ED70-4200-8EE2-B509EA404C54}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MongoFramework.Tests</RootNamespace>
     <AssemblyName>MongoFramework.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">15.0</VisualStudioVersion>
-    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
-    <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
-    <IsCodedUITest>False</IsCodedUITest>
-    <TestProjectType>UnitTest</TestProjectType>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <TargetFrameworkProfile />
+    <RootNamespace>MongoFramework.Tests</RootNamespace>
+    <TargetFrameworks>net461;netcoreapp2.0</TargetFrameworks>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='netcoreapp2.0'">
+    <DefineConstants>NETCOREAPP2_0</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="DnsClient, Version=1.0.7.0, Culture=neutral, PublicKeyToken=4574bb5573c51424, processorArchitecture=MSIL">
-      <HintPath>..\packages\DnsClient.1.0.7\lib\net45\DnsClient.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.TestPlatform.TestFramework, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\MSTest.TestFramework.1.2.1\lib\net45\Microsoft.VisualStudio.TestPlatform.TestFramework.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\MSTest.TestFramework.1.2.1\lib\net45\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="MongoDB.Bson, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MongoDB.Bson.2.5.0\lib\net45\MongoDB.Bson.dll</HintPath>
-    </Reference>
-    <Reference Include="MongoDB.Driver, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MongoDB.Driver.2.5.0\lib\net45\MongoDB.Driver.dll</HintPath>
-    </Reference>
-    <Reference Include="MongoDB.Driver.Core, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MongoDB.Driver.Core.2.5.0\lib\net45\MongoDB.Driver.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Buffers, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Buffers.4.4.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ComponentModel.Annotations, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ComponentModel.Annotations.4.4.1\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Configuration.ConfigurationManager, Version=4.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Configuration.ConfigurationManager.4.4.1\lib\net461\System.Configuration.ConfigurationManager.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.6.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="1.2.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="1.2.0" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="AssertExtensions.cs" />
-    <Compile Include="Bson\GetDifferencesTests.cs" />
-    <Compile Include="Bson\HasDifferencesTests.cs" />
-    <Compile Include="DbEntityCollectionTests.cs" />
-    <Compile Include="EntityRelationships\EntityNavigationCollection\CollectionIntegrationModel.cs" />
-    <Compile Include="EntityRelationships\EntityNavigationCollection\EntityNavigationCollectionIntegrationTests.cs" />
-    <Compile Include="EntityRelationships\EntityNavigationCollection\EntityNavigationCollectionUnitTests.cs" />
-    <Compile Include="EntityRelationships\Mapping\EntityCollection\CollectionMappingModel.cs" />
-    <Compile Include="EntityRelationships\Mapping\EntityCollection\CollectionMappingTests.cs" />
-    <Compile Include="EntityRelationships\Mapping\EntityCollection\InversePropertyMappingInvalidPropertyTypeModel.cs" />
-    <Compile Include="EntityRelationships\Mapping\EntityCollection\InversePropertyNonExistantPropertyModel.cs" />
-    <Compile Include="EntityRelationships\Mapping\EntityCollection\ValidInversePropertyModel.cs" />
-    <Compile Include="EntityRelationships\Mapping\SingleEntity\BaseEntityModel.cs" />
-    <Compile Include="EntityRelationships\Mapping\SingleEntity\BaseVariedIdModel.cs" />
-    <Compile Include="EntityRelationships\Mapping\SingleEntity\InvalidForeignKeyModel.cs" />
-    <Compile Include="EntityRelationships\Mapping\SingleEntity\SingleEntityMappingTests.cs" />
-    <Compile Include="EntityRelationships\Mapping\SingleEntity\UnsupportedIdModel.cs" />
-    <Compile Include="EntityRelationships\Mapping\SingleEntity\UserEntityModel.cs" />
-    <Compile Include="EntityRelationships\Serializer\EntityNavigationCollectionSerializerTests.cs" />
-    <Compile Include="EntityRelationships\SingleEntity\SingleEntityIntegrationModel.cs" />
-    <Compile Include="EntityRelationships\StringIdModel.cs" />
-    <Compile Include="EntityRelationships\GuidIdModel.cs" />
-    <Compile Include="EntityRelationships\ObjectIdIdModel.cs" />
-    <Compile Include="EntityRelationships\SingleEntity\SingleEntityIntegrationTests.cs" />
-    <Compile Include="Linq\LinqExtensionsTests.cs" />
-    <Compile Include="Linq\MongoFrameworkQueryableTestProcessor.cs" />
-    <Compile Include="Linq\MongoFrameworkQueryableTests.cs" />
-    <Compile Include="Linq\WhereIdMatchesObjectIdModel.cs" />
-    <Compile Include="Linq\WhereIdMatchesGuidModel.cs" />
-    <Compile Include="Linq\WhereIdMatchesStringModel.cs" />
-    <Compile Include="Mapping\Processors\NestedProperty\CollectionNestedModel.cs" />
-    <Compile Include="Mapping\Processors\NestedProperty\CollectionBaseModel.cs" />
-    <Compile Include="Mapping\Processors\RuntimeType\NoTypeDiscoveryAttributeModel.cs" />
-    <Compile Include="Mapping\Processors\RuntimeType\TypeDiscoveryAttributeModel.cs" />
-    <Compile Include="Mapping\Processors\RuntimeType\RuntimeTypeProcessorTests.cs" />
-    <Compile Include="Mapping\Serialization\TypeDiscovery\CollectionBaseModel.cs" />
-    <Compile Include="Mapping\Serialization\TypeDiscovery\KnownBaseModel.cs" />
-    <Compile Include="Mapping\Serialization\TypeDiscovery\UnknownChildToRootModel.cs" />
-    <Compile Include="Mapping\Serialization\TypeDiscovery\RootKnownBaseModel.cs" />
-    <Compile Include="Mapping\Serialization\TypeDiscovery\TypeDiscoverySerializationTests.cs" />
-    <Compile Include="Mapping\Serialization\TypeDiscovery\UnknownGrandChildModel.cs" />
-    <Compile Include="Mapping\Serialization\TypeDiscovery\UnknownChildModel.cs" />
-    <Compile Include="Mapping\Serialization\TypeDiscovery\TypeDiscoveryIntegrationTests.cs" />
-    <Compile Include="Models\EntityContainerModel.cs" />
-    <Compile Include="Models\GuidIdGeneratorTestModel.cs" />
-    <Compile Include="Models\IdByAttributeTestModel.cs" />
-    <Compile Include="Models\LinqExtensionsModel.cs" />
-    <Compile Include="Models\MongoDbUtilityModel.cs" />
-    <Compile Include="Models\MongoFrameworkQueryableModel.cs" />
-    <Compile Include="Models\ObjectIdGeneratorTestModel.cs" />
-    <Compile Include="Models\StringIdGeneratorTestModel.cs" />
-    <Compile Include="Models\ExtraElementsModel.cs" />
-    <Compile Include="Models\IgnoreExtraElementsModel.cs" />
-    <Compile Include="Models\ChildTestModel.cs" />
-    <Compile Include="Models\ParentTestModel.cs" />
-    <Compile Include="Models\ColumnAttributePropertyModel.cs" />
-    <Compile Include="Models\NotMappedPropertiesModel.cs" />
-    <Compile Include="Mapping\Processors\NestedProperty\PropertyNestedModel.cs" />
-    <Compile Include="Mapping\Processors\NestedProperty\PropertyBaseModel.cs" />
-    <Compile Include="Models\CustomCollectionAndSchemaModel.cs" />
-    <Compile Include="Models\CustomCollectionModel.cs" />
-    <Compile Include="Models\DefaultCollectionNameModel.cs" />
-    <Compile Include="Models\InnerNestedTraverseMappingModel.cs" />
-    <Compile Include="Models\MappingLockModel.cs" />
-    <Compile Include="Models\NestedTraverseMappingModel.cs" />
-    <Compile Include="Models\TraverseMappingModel.cs" />
-    <Compile Include="Models\EntityIndexWriterTests.IndexModel.cs" />
-    <Compile Include="Models\EntityIndexWriterTests.NoIndexModel.cs" />
-    <Compile Include="Models\CompoundIndexModel.cs" />
-    <Compile Include="Models\IndexNamingModel.cs" />
-    <Compile Include="Models\IndexSortOrderModel.cs" />
-    <Compile Include="Models\NestedIndexBaseModel.cs" />
-    <Compile Include="Models\NestedIndexChildModel.cs" />
-    <Compile Include="Models\UniqueConstraintModel.cs" />
-    <Compile Include="Models\EntityWriterModel.cs" />
-    <Compile Include="Models\ExtendedEntityWriterModel.cs" />
-    <Compile Include="Models\ChangeTrackerModel.cs" />
-    <Compile Include="DefinitionHelpers\UpdateDefinition\UpdateDefinitionHelperTests.cs" />
-    <Compile Include="Indexing\EntityIndexMapperTests.cs" />
-    <Compile Include="Indexing\EntityIndexWriterTests.cs" />
-    <Compile Include="Indexing\Processors\BasicIndex\BasicIndexProcessorTests.cs" />
-    <Compile Include="Mapping\Processors\EntityId\EntityIdProcessorTests.cs" />
-    <Compile Include="Mapping\Processors\ExtraElements\ExtraElementsProcessorTests.cs" />
-    <Compile Include="Mapping\Processors\Hierarchy\HierarchyProcessorTests.cs" />
-    <Compile Include="Mapping\Processors\MappedProperties\MappedPropertiesProcessorTests.cs" />
-    <Compile Include="Mapping\Processors\NestedProperty\NestedPropertyProcessorTests.cs" />
-    <Compile Include="Models\MongoDbContextModel.cs" />
-    <Compile Include="MongoDbContextTestContext.cs" />
-    <Compile Include="MongoDbContextTests.cs" />
-    <Compile Include="MongoDbSetTests.cs" />
-    <Compile Include="Models\MongoDbSetValidationModel.cs" />
-    <Compile Include="MongoDbUtilityTests.cs" />
-    <Compile Include="Mutation\Mutators\CreatedDate\InvalidAttributeUseModel.cs" />
-    <Compile Include="Mutation\Mutators\CreatedDate\ValidAttributeUseModel.cs" />
-    <Compile Include="Mutation\Mutators\IncrementNumber\IncrementalEntity.cs" />
-    <Compile Include="Mutation\Mutators\IncrementNumber\IncrementNumberMutatorTests.cs" />
-    <Compile Include="Mutation\Mutators\UpdatedDate\UpdatedDateMutatorTests.cs" />
-    <Compile Include="Models\ExtendedEntity.cs" />
-    <Compile Include="Models\CommonEntity.cs" />
-    <Compile Include="Mapping\EntityMapperTests.cs" />
-    <Compile Include="Models\ListRelationItem.cs" />
-    <Compile Include="Models\SingleRelation.cs" />
-    <Compile Include="Mutation\Mutators\CreatedDate\CreatedDateMutatorTests.cs" />
-    <Compile Include="Mutation\Mutators\UpdatedDate\ValidAttributeUseModel.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestConfiguration.cs" />
-    <Compile Include="DbTest.cs" />
-    <Compile Include="DbEntityWriterTests.cs" />
-    <Compile Include="DbEntityChangeTrackerTests.cs" />
-    <Compile Include="DbEntityReaderTests.cs" />
+    <ProjectReference Include="..\MongoFramework\MongoFramework.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\MongoFramework\MongoFramework.csproj">
-      <Project>{d871cd75-cc1e-4482-934f-42e74b2bf255}</Project>
-      <Name>MongoFramework</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\MSTest.TestAdapter.1.2.1\build\net45\MSTest.TestAdapter.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MSTest.TestAdapter.1.2.1\build\net45\MSTest.TestAdapter.props'))" />
-    <Error Condition="!Exists('..\packages\MSTest.TestAdapter.1.2.1\build\net45\MSTest.TestAdapter.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MSTest.TestAdapter.1.2.1\build\net45\MSTest.TestAdapter.targets'))" />
-  </Target>
-  <Import Project="..\packages\MSTest.TestAdapter.1.2.1\build\net45\MSTest.TestAdapter.targets" Condition="Exists('..\packages\MSTest.TestAdapter.1.2.1\build\net45\MSTest.TestAdapter.targets')" />
 </Project>

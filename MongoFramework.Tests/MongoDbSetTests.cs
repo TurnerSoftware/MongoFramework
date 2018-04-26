@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MongoFramework.Tests.Models;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -8,8 +7,16 @@ using System.Threading.Tasks;
 namespace MongoFramework.Tests
 {
 	[TestClass]
-	public class MongoDbSetTests : DbTest
+	public class MongoDbSetTests : TestBase
 	{
+		public class MongoDbSetValidationModel
+		{
+			public string Id { get; set; }
+
+			[Required]
+			public string RequiredField { get; set; }
+		}
+
 		[TestMethod]
 		public void InitialiseDbSet()
 		{

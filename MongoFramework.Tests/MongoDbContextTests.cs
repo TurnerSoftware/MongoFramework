@@ -1,13 +1,42 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MongoFramework.Tests.Models;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace MongoFramework.Tests
 {
 	[TestClass]
-	public class MongoDbContextTests : DbTest
+	public class MongoDbContextTests : TestBase
 	{
+		public class MongoDbContextModel
+		{
+			public string Id { get; set; }
+		}
+
+		public class MongoDbContextTestContext : MongoDbContext
+		{
+			public MongoDbContextTestContext(IMongoDbContextOptions options) : base(options) { }
+			public MongoDbContextTestContext(string connectionString, string databaseName) : base(connectionString, databaseName) { }
+			public MongoDbSet<MongoDbContextModel> ContextDbSet { get; set; }
+		}
+
+		[TestMethod]
+		public void ContextCreatedWithOptions()
+		{
+			var options = new MongoDbContextOptions
+			{
+				ConnectionString = TestConfiguration.ConnectionString,
+				Database = TestConfiguration.GetDatabaseName()
+			};
+
+			using (var context = new MongoDbContextTestContext(options))
+			{
+				context.ContextDbSet.Add(new MongoDbContextModel());
+				Assert.IsFalse(context.ContextDbSet.Any());
+				context.SaveChanges();
+				Assert.IsTrue(context.ContextDbSet.Any());
+			}
+		}
+
 		[TestMethod]
 		public void ContextCreatesDbSets()
 		{
