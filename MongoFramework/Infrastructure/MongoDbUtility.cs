@@ -6,6 +6,7 @@ namespace MongoFramework.Infrastructure
 {
 	public static class MongoDbUtility
 	{
+#if !NETCOREAPP2_0
 		public static MongoUrl GetMongoUrlFromConfig(string connectionName)
 		{
 			var connectionStringConfig = System.Configuration.ConfigurationManager.ConnectionStrings[connectionName];
@@ -17,6 +18,7 @@ namespace MongoFramework.Infrastructure
 
 			return null;
 		}
+#endif
 
 		public static IMongoDatabase GetDatabase(MongoUrl mongoUrl)
 		{
@@ -25,14 +27,28 @@ namespace MongoFramework.Infrastructure
 				throw new ArgumentNullException(nameof(mongoUrl));
 			}
 
-			return GetDatabase(mongoUrl.Url, mongoUrl.DatabaseName);
+			var client = new MongoClient(mongoUrl);
+			var database = client.GetDatabase(mongoUrl.DatabaseName);
+			return database;
 		}
 
 		public static IMongoDatabase GetDatabase(string connectionString, string databaseName)
 		{
-			var client = new MongoClient(connectionString);
-			var database = client.GetDatabase(databaseName);
-			return database;
+			var urlBuilder = new MongoUrlBuilder(connectionString)
+			{
+				DatabaseName = databaseName
+			};
+			return GetDatabase(urlBuilder.ToMongoUrl());
+		}
+
+		public static IMongoDatabase GetDatabase(IMongoDbContextOptions options)
+		{
+			if (options == null)
+			{
+				throw new ArgumentNullException(nameof(options));
+			}
+
+			return GetDatabase(options.ConnectionString, options.Database);
 		}
 
 		/// <summary>

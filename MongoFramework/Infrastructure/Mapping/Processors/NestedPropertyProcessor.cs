@@ -1,5 +1,7 @@
 ﻿using MongoDB.Bson.Serialization;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace MongoFramework.Infrastructure.Mapping.Processors
@@ -12,10 +14,22 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 
 			foreach (var property in properties)
 			{
+				var propertyType = property.PropertyType;
+
 				//Maps the property type for handling property nesting
-				if (property.PropertyType.IsClass && property.PropertyType != entityType)
+				if (propertyType.IsClass && propertyType != entityType)
 				{
 					new EntityMapper(property.PropertyType);
+				}
+				else if (
+					propertyType.IsGenericType && propertyType.GetGenericArguments().Count() == 1 &&
+					(
+						propertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>) ||
+						propertyType.GetInterfaces().Where(i => i.IsGenericType).Any(i => i.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+					)
+				)
+				{
+					new EntityMapper(propertyType.GetGenericArguments()[0]);
 				}
 			}
 		}

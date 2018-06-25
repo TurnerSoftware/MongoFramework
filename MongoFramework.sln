@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2024
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoFramework.Tests", "MongoFramework.Tests\MongoFramework.Tests.csproj", "{D7CF8D91-ED70-4200-8EE2-B509EA404C54}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MongoFramework", "MongoFramework\MongoFramework.csproj", "{D871CD75-CC1E-4482-934F-42E74B2BF255}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoFramework.Tests", "MongoFramework.Tests\MongoFramework.Tests.csproj", "{FAAAAE78-22D5-42EB-824F-4B8CEB109023}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +21,10 @@ Global
 		{D871CD75-CC1E-4482-934F-42E74B2BF255}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D871CD75-CC1E-4482-934F-42E74B2BF255}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D871CD75-CC1E-4482-934F-42E74B2BF255}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FAAAAE78-22D5-42EB-824F-4B8CEB109023}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FAAAAE78-22D5-42EB-824F-4B8CEB109023}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FAAAAE78-22D5-42EB-824F-4B8CEB109023}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FAAAAE78-22D5-42EB-824F-4B8CEB109023}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

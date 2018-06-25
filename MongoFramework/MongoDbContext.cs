@@ -14,6 +14,7 @@ namespace MongoFramework
 
 		private IList<IMongoDbSet> DbSets { get; set; }
 
+#if !NETCOREAPP2_0
 		public MongoDbContext(string connectionName)
 		{
 			var mongoUrl = MongoDbUtility.GetMongoUrlFromConfig(connectionName);
@@ -26,10 +27,16 @@ namespace MongoFramework
 			Database = MongoDbUtility.GetDatabase(mongoUrl);
 			InitialiseDbSets();
 		}
-
+#endif
 		public MongoDbContext(string connectionString, string databaseName)
 		{
 			Database = MongoDbUtility.GetDatabase(connectionString, databaseName);
+			InitialiseDbSets();
+		}
+
+		public MongoDbContext(IMongoDbContextOptions options)
+		{
+			Database = MongoDbUtility.GetDatabase(options);
 			InitialiseDbSets();
 		}
 

@@ -8,7 +8,7 @@ using System.Linq;
 namespace MongoFramework.Tests.Bson
 {
 	[TestClass]
-	public class HasDifferencesTests
+	public class HasDifferencesTests : TestBase
 	{
 		[TestMethod]
 		public void NullDocument()

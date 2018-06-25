@@ -8,7 +8,7 @@ using System.Linq;
 namespace MongoFramework.Tests.Bson
 {
 	[TestClass]
-	public class GetDifferencesTests
+	public class GetDifferencesTests : TestBase
 	{
 		[TestMethod]
 		public void GetDocumentDiffWithNoDifferences()
