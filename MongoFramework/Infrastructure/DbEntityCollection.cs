@@ -10,11 +10,16 @@ namespace MongoFramework.Infrastructure
 	{
 		protected List<DbEntityEntry<TEntity>> Entries { get; } = new List<DbEntityEntry<TEntity>>();
 
-		private EntityMapper<TEntity> EntityMapper { get; } = new EntityMapper<TEntity>();
+		private IEntityMapper EntityMapper { get; }
 
 		public int Count => Entries.Count;
 
 		public bool IsReadOnly => false;
+
+		public DbEntityCollection(IEntityMapper entityMapper)
+		{
+			EntityMapper = entityMapper;
+		}
 
 		public DbEntityEntry<TEntity> GetEntry(TEntity entity)
 		{

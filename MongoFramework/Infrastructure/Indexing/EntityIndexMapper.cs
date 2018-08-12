@@ -18,12 +18,6 @@ namespace MongoFramework.Infrastructure.Indexing
 			EntityIndexCache = new ConcurrentDictionary<Type, IEnumerable<IEntityIndexMap>>();
 		}
 
-		public EntityIndexMapper(Type entityType)
-		{
-			EntityType = entityType ?? throw new ArgumentNullException(nameof(entityType));
-			EntityMapper = new EntityMapper(entityType);
-		}
-
 		public EntityIndexMapper(IEntityMapper entityMapper)
 		{
 			EntityMapper = entityMapper ?? throw new ArgumentNullException(nameof(entityMapper));
@@ -43,18 +37,6 @@ namespace MongoFramework.Infrastructure.Indexing
 					})
 				);
 			});
-		}
-	}
-
-	public class EntityIndexMapper<TEntity> : EntityIndexMapper
-	{
-		public EntityIndexMapper() : base(typeof(TEntity)) { }
-		public EntityIndexMapper(IEntityMapper entityMapper) : base(entityMapper)
-		{
-			if (typeof(TEntity) != entityMapper.EntityType)
-			{
-				throw new InvalidOperationException("Generic type does not match IDbEntityMapper's EntityType");
-			}
 		}
 	}
 }

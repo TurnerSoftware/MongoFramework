@@ -14,7 +14,13 @@ namespace MongoFramework.Infrastructure.Mapping.Serialization
 		private static ReaderWriterLockSlim TypeCacheLock { get; } = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 		private static ConcurrentBag<Type> AssignableTypes { get; } = new ConcurrentBag<Type>();
 
+		private IEntityMappingFactory EntityMappingFactory { get; }
 		public Type ValueType => typeof(TEntity);
+
+		public TypeDiscoverySerializer(IEntityMappingFactory entityMappingFactory)
+		{
+			EntityMappingFactory = entityMappingFactory;
+		}
 
 		public object Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
 		{

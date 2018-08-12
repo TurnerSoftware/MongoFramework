@@ -6,6 +6,7 @@ using MongoFramework.Infrastructure.Linq;
 using MongoFramework.Infrastructure.Linq.Processors;
 using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mutation;
+using MongoFramework.Infrastructure.Settings;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,7 +26,7 @@ namespace MongoFramework
 	{
 		public IDbEntityChangeTracker<TEntity> ChangeTracker { get; private set; } = new DbEntityChangeTracker<TEntity>();
 
-		private IMongoDatabase Database { get; set; }
+		private IDbContextSettings Settings { get; set; }
 		private IDbEntityWriter<TEntity> EntityWriter { get; set; }
 		private IDbEntityReader<TEntity> EntityReader { get; set; }
 		private IEntityIndexWriter<TEntity> EntityIndexWriter { get; set; }
@@ -36,58 +37,24 @@ namespace MongoFramework
 		/// </summary>
 		public bool PerformEntityValidation { get; set; } = true;
 
-		public MongoDbSet() { }
-
-		/// <summary>
-		/// Creates a new MongoDbSet using the connection string in the configuration that matches the specified connection name.
-		/// </summary>
-		/// <param name="connectionName">The name of the connection string stored in the configuration.</param>
-		public MongoDbSet(string connectionName)
+		public MongoDbSet(IDbContextSettings settings)
 		{
-			var mongoUrl = MongoDbUtility.GetMongoUrlFromConfig(connectionName);
-
-			if (mongoUrl == null)
-			{
-				throw new MongoConfigurationException("No connection string found with the name \'" + connectionName + "\'");
-			}
-
-			SetDatabase(MongoDbUtility.GetDatabase(mongoUrl));
+			Settings = settings;
+			Initialise();
 		}
 
-		/// <summary>
-		/// Creates a new MongoDbSet using the specified connection string and database combination.
-		/// </summary>
-		/// <param name="connectionString">The connection string to the server</param>
-		/// <param name="databaseName">The database name on the server</param> 
-		public MongoDbSet(string connectionString, string databaseName)
+		private void Initialise()
 		{
-			SetDatabase(MongoDbUtility.GetDatabase(connectionString, databaseName));
-		}
-
-		/// <summary>
-		/// Initialise a new entity reader and writer to the specified database.
-		/// </summary>
-		/// <param name="database"></param>
-		public void SetDatabase(IMongoDatabase database)
-		{
-			Database = database;
-
-			var entityMapper = new EntityMapper<TEntity>();
-			EntityWriter = new DbEntityWriter<TEntity>(database, entityMapper);
-			EntityReader = new DbEntityReader<TEntity>(database, entityMapper);
-
-			//TODO: Look at this again in the future, this seems unnecessarily complex
-			var indexMapper = new EntityIndexMapper<TEntity>(entityMapper);
-			var collection = database.GetCollection<TEntity>(entityMapper.GetCollectionName());
-			EntityIndexWriter = new EntityIndexWriter<TEntity>(collection, indexMapper);
-
-			EntityRelationshipWriter = new EntityRelationshipWriter<TEntity>(database, entityMapper);
+			EntityWriter = new DbEntityWriter<TEntity>(Settings);
+			EntityReader = new DbEntityReader<TEntity>(Settings);
+			EntityIndexWriter = new EntityIndexWriter<TEntity>(Settings);
+			EntityRelationshipWriter = new EntityRelationshipWriter<TEntity>(Settings);
 		}
 
 		public virtual TEntity Create()
 		{
 			var entity = Activator.CreateInstance<TEntity>();
-			EntityMutation<TEntity>.MutateEntity(entity, MutatorType.Create, Database);
+			EntityMutation<TEntity>.MutateEntity(entity, MutatorType.Create, Settings);
 			Add(entity);
 			return entity;
 		}
@@ -100,7 +67,7 @@ namespace MongoFramework
 		{
 			if (entity == null)
 			{
-				throw new ArgumentNullException("entity");
+				throw new ArgumentNullException(nameof(entity));
 			}
 
 			ChangeTracker.Update(entity, DbEntityEntryState.Added);
@@ -113,7 +80,7 @@ namespace MongoFramework
 		{
 			if (entities == null)
 			{
-				throw new ArgumentNullException("entities");
+				throw new ArgumentNullException(nameof(entities));
 			}
 
 			foreach (var entity in entities)
@@ -130,7 +97,7 @@ namespace MongoFramework
 		{
 			if (entity == null)
 			{
-				throw new ArgumentNullException("entity");
+				throw new ArgumentNullException(nameof(entity));
 			}
 
 			ChangeTracker.Update(entity, DbEntityEntryState.Updated);
@@ -143,7 +110,7 @@ namespace MongoFramework
 		{
 			if (entities == null)
 			{
-				throw new ArgumentNullException("entities");
+				throw new ArgumentNullException(nameof(entities));
 			}
 
 			foreach (var entity in entities)
@@ -160,7 +127,7 @@ namespace MongoFramework
 		{
 			if (entity == null)
 			{
-				throw new ArgumentNullException("entity");
+				throw new ArgumentNullException(nameof(entity));
 			}
 
 			ChangeTracker.Update(entity, DbEntityEntryState.Deleted);
@@ -173,7 +140,7 @@ namespace MongoFramework
 		{
 			if (entities == null)
 			{
-				throw new ArgumentNullException("entities");
+				throw new ArgumentNullException(nameof(entities));
 			}
 
 			foreach (var entity in entities)
@@ -216,7 +183,7 @@ namespace MongoFramework
 		/// Writes all of the items in the changeset to the database.
 		/// </summary>
 		/// <returns></returns>
-		public virtual async Task SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
+		public virtual async Task SaveChangesAsync(CancellationToken cancellationToken = default)
 		{
 			await EntityIndexWriter.ApplyIndexingAsync(cancellationToken).ConfigureAwait(false);
 			cancellationToken.ThrowIfCancellationRequested();

@@ -15,12 +15,10 @@ namespace MongoFramework.Infrastructure
 		public IMongoDatabase Database { get; private set; }
 		public IEntityMapper EntityMapper { get; private set; }
 
-		public DbEntityWriter(IMongoDatabase database) : this(database, new EntityMapper(typeof(TEntity))) { }
-
-		public DbEntityWriter(IMongoDatabase database, IEntityMapper mapper)
+		public DbEntityWriter(IDbContextSettings settings)
 		{
-			Database = database ?? throw new ArgumentNullException(nameof(database));
-			EntityMapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+			Database = settings.GetDatabase();
+			EntityMapper = settings.GetEntityMapper<TEntity>();
 		}
 
 		private IMongoCollection<TEntity> GetCollection()

@@ -8,8 +8,9 @@ namespace MongoFramework.Infrastructure.Mutation.Mutators
 {
 	public class EntityAttributeMutator<TEntity> : IEntityMutator<TEntity>
 	{
-		public void MutateEntity(TEntity entity, MutatorType mutationType, IEntityMapper entityMapper, IMongoDatabase database)
+		public void MutateEntity(TEntity entity, MutatorType mutationType, IDbContextSettings settings)
 		{
+			var entityMapper = settings.GetEntityMapper<TEntity>();
 			var mutateProperties = entityMapper.GetEntityMapping().Select(m => new
 			{
 				PropertyInfo = m.Property,

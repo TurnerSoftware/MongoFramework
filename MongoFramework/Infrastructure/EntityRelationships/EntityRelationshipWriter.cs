@@ -12,12 +12,14 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 	{
 		private IEnumerable<EntityRelationship> Relationships { get; }
 
-		public IMongoDatabase Database { get; }
+		private IDbContextSettings Settings { get; set; }
 
-		public EntityRelationshipWriter(IMongoDatabase database, IEntityMapper entityMapper)
+		public EntityRelationshipWriter(IDbContextSettings settings)
 		{
+			Settings = settings;
+
+			var entityMapper = settings.GetEntityMapper<TEntity>();
 			Relationships = entityMapper.GetEntityRelationships();
-			Database = database;
 		}
 
 		public void CommitEntityRelationships(IEnumerable<TEntity> entities)
@@ -30,7 +32,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			}
 		}
 
-		public async Task CommitEntityRelationshipsAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default(CancellationToken))
+		public async Task CommitEntityRelationshipsAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
 		{
 			var writeMethod = GetType().GetMethod("CommitRelationshipAsync", BindingFlags.NonPublic | BindingFlags.Instance);
 			foreach (var relationship in Relationships)
@@ -46,8 +48,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			var collection = BuildRelatedEntityCollection<TRelatedEntity>(relationship, entities);
 			if (collection.Any())
 			{
-				var dbSet = new MongoDbSet<TRelatedEntity>();
-				dbSet.SetDatabase(Database);
+				var dbSet = new MongoDbSet<TRelatedEntity>(Settings);
 				dbSet.AddRange(collection);
 				dbSet.SaveChanges();
 			}
@@ -68,8 +69,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 
 			if (collection.Any())
 			{
-				var dbSet = new MongoDbSet<TRelatedEntity>();
-				dbSet.SetDatabase(Database);
+				var dbSet = new MongoDbSet<TRelatedEntity>(Settings);
 				dbSet.AddRange(collection);
 				await dbSet.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 			}

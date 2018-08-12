@@ -9,19 +9,19 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 {
 	public class EntityNavigationCollectionSerializer<TEntity> : IBsonSerializer<ICollection<TEntity>>, IBsonArraySerializer
 	{
-		private IEntityMapper EntityMapper { get; }
+		private IDbContextSettings Settings { get; }
 		private IEntityPropertyMap ForeignPropertyMap { get; }
 
 		public string ForeignKey { get; }
 		public Type ValueType => typeof(ICollection<TEntity>);
 
-		public EntityNavigationCollectionSerializer(string foreignKey) : this(foreignKey, new EntityMapper<TEntity>()) { }
-
-		public EntityNavigationCollectionSerializer(string foreignKey, IEntityMapper entityMapper)
+		public EntityNavigationCollectionSerializer(string foreignKey, IDbContextSettings settings)
 		{
 			ForeignKey = foreignKey;
+			Settings = settings;
+
+			var entityMapper = settings.GetEntityMapper<TEntity>();
 			ForeignPropertyMap = entityMapper.GetEntityMapping().Where(m => m.Property.Name == foreignKey).FirstOrDefault();
-			EntityMapper = entityMapper;
 		}
 
 		public object Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
@@ -29,7 +29,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			var type = context.Reader.GetCurrentBsonType();
 			if (type == BsonType.Array)
 			{
-				var collection = new EntityNavigationCollection<TEntity>(ForeignKey, EntityMapper);
+				var collection = new EntityNavigationCollection<TEntity>(ForeignKey, Settings);
 				context.Reader.ReadStartArray();
 
 				while (context.Reader.ReadBsonType() != BsonType.EndOfDocument)
@@ -56,7 +56,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			else if (type == BsonType.Null)
 			{
 				context.Reader.ReadNull();
-				return new EntityNavigationCollection<TEntity>(ForeignKey, EntityMapper);
+				return new EntityNavigationCollection<TEntity>(ForeignKey, Settings);
 			}
 			else
 			{

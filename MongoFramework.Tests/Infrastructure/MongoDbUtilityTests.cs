@@ -47,7 +47,7 @@ namespace MongoFramework.Tests.Infrastructure
 		[ExpectedException(typeof(ArgumentNullException), "ArgumentNullException")]
 		public void DatabaseFromNullOptions()
 		{
-			MongoDbUtility.GetDatabase((IMongoDbContextOptions)null);
+			MongoDbUtility.GetDatabase((IDbContextSettings)null);
 		}
 
 		[TestMethod]

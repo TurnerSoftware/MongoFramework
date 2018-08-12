@@ -1,4 +1,5 @@
 ﻿using MongoDB.Driver;
+using MongoFramework.Infrastructure.Settings;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -11,10 +12,14 @@ namespace MongoFramework.Infrastructure.Indexing
 		private IMongoCollection<TEntity> Collection { get; set; }
 		private IEntityIndexMapper IndexMapper { get; set; }
 
-		public EntityIndexWriter(IMongoCollection<TEntity> collection, IEntityIndexMapper indexMapper)
+		public EntityIndexWriter(IDbContextSettings settings)
 		{
-			Collection = collection;
-			IndexMapper = indexMapper;
+			var database = settings.GetDatabase();
+			var extensionSettings = EntityMappingProviderSettingsExtension.Extract(settings);
+			var entityMapper = extensionSettings.GetEntityMapper(typeof(TEntity));
+
+			Collection = database.GetCollection<TEntity>(entityMapper.GetCollectionName());
+			IndexMapper = extensionSettings.GetEntityIndexMapper(typeof(TEntity));
 		}
 
 		private IEnumerable<CreateIndexModel<TEntity>> GenerateIndexModel()

@@ -10,8 +10,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 {
 	public class EntityNavigationCollection<TEntity> : DbEntityCollection<TEntity>, IEntityNavigationCollection<TEntity>
 	{
-		private IMongoDatabase Database { get; set; }
-		private IEntityMapper EntityMapper { get; }
+		private IDbContextSettings Settings { get; }
 		private IEntityPropertyMap ForeignPropertyMap { get; }
 		private HashSet<object> UnloadedIds { get; } = new HashSet<object>();
 
@@ -22,18 +21,13 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 		public int LoadedCount => Entries.Count;
 		public int UnloadedCount => UnloadedIds.Count;
 
-		public EntityNavigationCollection(string foreignKey) : this(foreignKey, new EntityMapper<TEntity>()) { }
-
-		public EntityNavigationCollection(string foreignKey, IEntityMapper entityMapper)
+		public EntityNavigationCollection(string foreignKey, IDbContextSettings settings)
 		{
 			ForeignKey = foreignKey ?? throw new ArgumentNullException(nameof(foreignKey));
-			ForeignPropertyMap = entityMapper.GetEntityMapping().Where(m => m.Property.Name == foreignKey).FirstOrDefault();
-			EntityMapper = entityMapper;
-		}
+			Settings = settings ?? throw new ArgumentNullException(nameof(settings));
 
-		public void Connect(IMongoDatabase database)
-		{
-			Database = database;
+			var entityMapper = settings.GetEntityMapper<TEntity>();
+			ForeignPropertyMap = entityMapper.GetEntityMapping().Where(m => m.Property.Name == foreignKey).FirstOrDefault();
 		}
 
 		public void AddForeignId(object foreignId)
@@ -72,7 +66,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 				return;
 			}
 
-			var dbEntityReader = new DbEntityReader<TEntity>(Database, EntityMapper);
+			var dbEntityReader = new DbEntityReader<TEntity>(Settings);
 			var entities = dbEntityReader.AsQueryable().WherePropertyMatches(ForeignKey, ForeignPropertyMap.PropertyType, UnloadedIds);
 
 			foreach (var entity in entities)
@@ -104,7 +98,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			//Enumerate list of unloaded IDs and load them in one at a time
 			if (UnloadedIds.Any())
 			{
-				var dbEntityReader = new DbEntityReader<TEntity>(Database, EntityMapper);
+				var dbEntityReader = new DbEntityReader<TEntity>(Settings);
 				var unloadedEntities = dbEntityReader.AsQueryable().WherePropertyMatches(ForeignKey, ForeignPropertyMap.PropertyType, UnloadedIds);
 
 				using (var unloadedEnumerator = unloadedEntities.GetEnumerator())

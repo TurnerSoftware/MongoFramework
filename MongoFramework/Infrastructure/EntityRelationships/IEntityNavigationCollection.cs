@@ -1,5 +1,4 @@
-﻿using MongoDB.Driver;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace MongoFramework.Infrastructure.EntityRelationships
 {
@@ -8,7 +7,6 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 		void AddForeignId(object foreignId);
 		void AddForeignIds(IEnumerable<object> foreignIds);
 		void LoadEntities();
-		void Connect(IMongoDatabase database);
 	}
 
 	public interface IEntityNavigationCollection<TEntity> : IEntityNavigationCollection, IDbEntityCollection<TEntity>
