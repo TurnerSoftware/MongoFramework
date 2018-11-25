@@ -13,7 +13,7 @@ namespace MongoFramework
 		Task SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
 	}
 
-	public interface IMongoDbSet<TEntity> : IMongoDbSet, IQueryable<TEntity>
+	public interface IMongoDbSet<TEntity> : IMongoDbSet, IQueryable<TEntity> where TEntity : class
 	{
 		TEntity Create();
 		void Add(TEntity entity);

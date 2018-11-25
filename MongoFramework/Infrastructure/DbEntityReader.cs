@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace MongoFramework.Infrastructure
 {
-	public class DbEntityReader<TEntity> : IDbEntityReader<TEntity>
+	public class DbEntityReader<TEntity> : IDbEntityReader<TEntity> where TEntity : class
 	{
 		public IMongoDatabase Database { get; private set; }
 		public IEntityMapper EntityMapper { get; private set; }

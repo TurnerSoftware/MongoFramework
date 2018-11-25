@@ -6,7 +6,7 @@
 		void CommitChanges();
 	}
 
-	public interface IDbEntityChangeTracker<TEntity> : IDbEntityChangeTracker, IDbEntityCollection<TEntity>
+	public interface IDbEntityChangeTracker<TEntity> : IDbEntityChangeTracker, IDbEntityCollection<TEntity> where TEntity : class
 	{
 	}
 }

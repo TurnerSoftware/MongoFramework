@@ -6,12 +6,12 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 {
 	public static class UpdateDefinitionHelper
 	{
-		public static UpdateDefinition<TEntity> CreateFromDiff<TEntity>(BsonDocument documentA, BsonDocument documentB)
+		public static UpdateDefinition<TEntity> CreateFromDiff<TEntity>(BsonDocument documentA, BsonDocument documentB) where TEntity : class
 		{
 			var definition = Builders<TEntity>.Update.Combine();
 			return CreateFromDiff(definition, string.Empty, documentA, documentB);
 		}
-		private static UpdateDefinition<TEntity> CreateFromDiff<TEntity>(UpdateDefinition<TEntity> definition, string name, BsonDocument documentA, BsonDocument documentB)
+		private static UpdateDefinition<TEntity> CreateFromDiff<TEntity>(UpdateDefinition<TEntity> definition, string name, BsonDocument documentA, BsonDocument documentB) where TEntity : class
 		{
 			var documentAProperties = documentA?.Names ?? Enumerable.Empty<string>();
 			var documentBProperties = documentB?.Names ?? Enumerable.Empty<string>();
@@ -42,7 +42,7 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 
 			return definition;
 		}
-		private static UpdateDefinition<TEntity> CreateFromDiff<TEntity>(UpdateDefinition<TEntity> definition, string name, BsonValue valueA, BsonValue valueB)
+		private static UpdateDefinition<TEntity> CreateFromDiff<TEntity>(UpdateDefinition<TEntity> definition, string name, BsonValue valueA, BsonValue valueB) where TEntity : class
 		{
 			if (valueA?.BsonType != valueB?.BsonType)
 			{
@@ -65,7 +65,7 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 
 			return definition;
 		}
-		private static UpdateDefinition<TEntity> CreateFromDiff<TEntity>(UpdateDefinition<TEntity> definition, string name, BsonArray arrayA, BsonArray arrayB)
+		private static UpdateDefinition<TEntity> CreateFromDiff<TEntity>(UpdateDefinition<TEntity> definition, string name, BsonArray arrayA, BsonArray arrayB) where TEntity : class
 		{
 			var arrayACount = arrayA.Count;
 			var arrayBCount = arrayB.Count;

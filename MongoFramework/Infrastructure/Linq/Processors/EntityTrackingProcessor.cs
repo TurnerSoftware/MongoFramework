@@ -1,6 +1,6 @@
 ﻿namespace MongoFramework.Infrastructure.Linq.Processors
 {
-	public class EntityTrackingProcessor<TEntity> : ILinqProcessor<TEntity>
+	public class EntityTrackingProcessor<TEntity> : ILinqProcessor<TEntity> where TEntity : class
 	{
 		public IDbEntityChangeTracker<TEntity> ChangeTracker { get; private set; }
 

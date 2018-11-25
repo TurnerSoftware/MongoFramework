@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MongoFramework.Infrastructure.Indexing
 {
-	public class EntityIndexWriter<TEntity> : IEntityIndexWriter<TEntity>
+	public class EntityIndexWriter<TEntity> : IEntityIndexWriter<TEntity> where TEntity : class
 	{
 		private IMongoCollection<TEntity> Collection { get; set; }
 		private IEntityIndexMapper IndexMapper { get; set; }

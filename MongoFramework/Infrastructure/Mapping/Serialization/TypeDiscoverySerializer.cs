@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace MongoFramework.Infrastructure.Mapping.Serialization
 {
-	public class TypeDiscoverySerializer<TEntity> : IBsonSerializer<TEntity>, IBsonDocumentSerializer, IBsonIdProvider
+	public class TypeDiscoverySerializer<TEntity> : IBsonSerializer<TEntity>, IBsonDocumentSerializer, IBsonIdProvider where TEntity : class
 	{
 		private static ReaderWriterLockSlim TypeCacheLock { get; } = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 		private static ConcurrentBag<Type> AssignableTypes { get; } = new ConcurrentBag<Type>();

@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace MongoFramework.Infrastructure.Mutation.Mutators
 {
-	public class EntityAttributeMutator<TEntity> : IEntityMutator<TEntity>
+	public class EntityAttributeMutator<TEntity> : IEntityMutator<TEntity> where TEntity : class
 	{
 		public void MutateEntity(TEntity entity, MutatorType mutationType, IEntityMapper entityMapper, IMongoDatabase database)
 		{

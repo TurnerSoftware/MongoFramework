@@ -9,7 +9,7 @@ using System.Linq.Expressions;
 
 namespace MongoFramework.Infrastructure.Linq
 {
-	public class MongoFrameworkQueryable<TEntity, TOutput> : IMongoFrameworkQueryable<TEntity, TOutput>
+	public class MongoFrameworkQueryable<TEntity, TOutput> : IMongoFrameworkQueryable<TEntity, TOutput> where TEntity : class
 	{
 		private IMongoFrameworkQueryProvider<TEntity, TOutput> InternalProvider { get; set; }
 

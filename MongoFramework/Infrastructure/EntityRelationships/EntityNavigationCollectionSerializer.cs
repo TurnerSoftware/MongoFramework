@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace MongoFramework.Infrastructure.EntityRelationships
 {
-	public class EntityNavigationCollectionSerializer<TEntity> : IBsonSerializer<ICollection<TEntity>>, IBsonArraySerializer
+	public class EntityNavigationCollectionSerializer<TEntity> : IBsonSerializer<ICollection<TEntity>>, IBsonArraySerializer where TEntity : class
 	{
 		private IEntityMapper EntityMapper { get; }
 		private IEntityPropertyMap ForeignPropertyMap { get; }

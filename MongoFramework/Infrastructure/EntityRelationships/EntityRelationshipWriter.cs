@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MongoFramework.Infrastructure.EntityRelationships
 {
-	public class EntityRelationshipWriter<TEntity> : IEntityRelationshipWriter<TEntity>
+	public class EntityRelationshipWriter<TEntity> : IEntityRelationshipWriter<TEntity> where TEntity : class
 	{
 		private IEnumerable<EntityRelationship> Relationships { get; }
 
@@ -41,7 +41,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 		}
 
 #pragma warning disable CRR0026 // Unused member - used via Reflection
-		private void CommitRelationship<TRelatedEntity>(EntityRelationship relationship, IEnumerable<TEntity> entities)
+		private void CommitRelationship<TRelatedEntity>(EntityRelationship relationship, IEnumerable<TEntity> entities) where TRelatedEntity : class
 		{
 			var collection = BuildRelatedEntityCollection<TRelatedEntity>(relationship, entities);
 			if (collection.Any())
@@ -60,7 +60,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 #pragma warning restore CRR0026 // Unused member - used via Reflection
 
 #pragma warning disable CRR0026 // Unused member - used via Reflection
-		private async Task CommitRelationshipAsync<TRelatedEntity>(EntityRelationship relationship, IEnumerable<TEntity> entities, CancellationToken cancellationToken)
+		private async Task CommitRelationshipAsync<TRelatedEntity>(EntityRelationship relationship, IEnumerable<TEntity> entities, CancellationToken cancellationToken) where TRelatedEntity : class
 		{
 			var collection = BuildRelatedEntityCollection<TRelatedEntity>(relationship, entities);
 
@@ -81,7 +81,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 		}
 #pragma warning restore CRR0026 // Unused member - used via Reflection
 
-		private IDbEntityCollection<TRelatedEntity> BuildRelatedEntityCollection<TRelatedEntity>(EntityRelationship relationship, IEnumerable<TEntity> entities)
+		private IDbEntityCollection<TRelatedEntity> BuildRelatedEntityCollection<TRelatedEntity>(EntityRelationship relationship, IEnumerable<TEntity> entities) where TRelatedEntity : class
 		{
 			var collection = new DbEntityCollection<TRelatedEntity>();
 			var entityMapper = new EntityMapper<TRelatedEntity>();
@@ -120,7 +120,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			return collection;
 		}
 
-		private void ApplyForeignKeyChanges<TRelatedEntity>(EntityRelationship relationship, IEnumerable<TEntity> entities)
+		private void ApplyForeignKeyChanges<TRelatedEntity>(EntityRelationship relationship, IEnumerable<TEntity> entities) where TRelatedEntity : class
 		{
 			var entityMapper = new EntityMapper<TRelatedEntity>();
 			var defaultId = entityMapper.GetDefaultId();

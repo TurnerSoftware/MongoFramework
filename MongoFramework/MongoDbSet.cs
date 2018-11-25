@@ -21,7 +21,7 @@ namespace MongoFramework
 	/// Basic Mongo "DbSet", providing changeset support and attribute validation
 	/// </summary>
 	/// <typeparam name="TEntity"></typeparam>
-	public class MongoDbSet<TEntity> : IMongoDbSet<TEntity>
+	public class MongoDbSet<TEntity> : IMongoDbSet<TEntity> where TEntity : class
 	{
 		public IDbEntityChangeTracker<TEntity> ChangeTracker { get; private set; } = new DbEntityChangeTracker<TEntity>();
 

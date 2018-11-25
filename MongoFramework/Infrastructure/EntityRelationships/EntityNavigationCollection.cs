@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace MongoFramework.Infrastructure.EntityRelationships
 {
-	public class EntityNavigationCollection<TEntity> : DbEntityCollection<TEntity>, IEntityNavigationCollection<TEntity>
+	public class EntityNavigationCollection<TEntity> : DbEntityCollection<TEntity>, IEntityNavigationCollection<TEntity> where TEntity : class
 	{
 		private IMongoDatabase Database { get; set; }
 		private IEntityMapper EntityMapper { get; }

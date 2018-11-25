@@ -11,7 +11,7 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 	[TestClass]
 	public class MongoFrameworkQueryableTests : TestBase
 	{
-		public class TestProcessor<TEntity> : ILinqProcessor<TEntity>
+		public class TestProcessor<TEntity> : ILinqProcessor<TEntity> where TEntity : class
 		{
 			public bool EntityProcessed { get; private set; }
 

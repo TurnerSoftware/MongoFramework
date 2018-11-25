@@ -20,7 +20,7 @@ namespace MongoFramework.Linq
 			return (queryable as IMongoFrameworkQueryable).ToQuery();
 		}
 
-		public static IQueryable<TEntity> WhereIdMatches<TEntity>(this IQueryable<TEntity> queryable, IEnumerable entityIds)
+		public static IQueryable<TEntity> WhereIdMatches<TEntity>(this IQueryable<TEntity> queryable, IEnumerable entityIds) where TEntity : class
 		{
 			var entityMapper = new EntityMapper<TEntity>();
 			var idProperty = entityMapper.GetEntityMapping().Where(m => m.IsKey).Select(m => m.Property).FirstOrDefault();
@@ -28,7 +28,7 @@ namespace MongoFramework.Linq
 			return queryable.WherePropertyMatches(idProperty.Name, idProperty.PropertyType, entityIds);
 		}
 
-		public static IQueryable<TEntity> WherePropertyMatches<TEntity>(this IQueryable<TEntity> queryable, string propertyName, Type propertyType, IEnumerable identifiers)
+		public static IQueryable<TEntity> WherePropertyMatches<TEntity>(this IQueryable<TEntity> queryable, string propertyName, Type propertyType, IEnumerable identifiers) where TEntity : class
 		{
 			//The cast allows for handling identifiers generically as "IEnumerable<object>". Without the Cast call, we can't handle ObjectId identifiers.
 			var castMethod = typeof(Enumerable).GetMethod("Cast", BindingFlags.Public | BindingFlags.Static);
