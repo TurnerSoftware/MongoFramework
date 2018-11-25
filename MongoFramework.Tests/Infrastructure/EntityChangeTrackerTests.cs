@@ -5,7 +5,7 @@ using System.Linq;
 namespace MongoFramework.Tests.Infrastructure
 {
 	[TestClass]
-	public class DbChangeTrackerTests : TestBase
+	public class EntityChangeTrackerTests : TestBase
 	{
 		public class ChangeTrackerModel
 		{
@@ -16,44 +16,44 @@ namespace MongoFramework.Tests.Infrastructure
 		[TestMethod]
 		public void DetectChangesDoesntCountAddedEntries()
 		{
-			var changeTracker = new DbEntityChangeTracker<ChangeTrackerModel>();
+			var changeTracker = new EntityChangeTracker<ChangeTrackerModel>();
 			var entity = new ChangeTrackerModel
 			{
 				Title = "DbChangeTrackerTests.DetectChangesWhenNoneExist"
 			};
-			changeTracker.Update(entity, DbEntityEntryState.Added);
+			changeTracker.Update(entity, EntityEntryState.Added);
 
 			changeTracker.DetectChanges();
 
-			Assert.IsTrue(changeTracker.GetEntries().All(e => e.State == DbEntityEntryState.Added));
+			Assert.IsTrue(changeTracker.GetEntries().All(e => e.State == EntityEntryState.Added));
 		}
 
 		[TestMethod]
 		public void DetectAnyChanges()
 		{
-			var changeTracker = new DbEntityChangeTracker<ChangeTrackerModel>();
+			var changeTracker = new EntityChangeTracker<ChangeTrackerModel>();
 			var entity = new ChangeTrackerModel
 			{
 				Title = "DbChangeTrackerTests.DetectAnyChanges"
 			};
-			changeTracker.Update(entity, DbEntityEntryState.NoChanges);
+			changeTracker.Update(entity, EntityEntryState.NoChanges);
 
 			entity.Title = "DbChangeTrackerTests.DetectAnyChanges-Changed";
 
 			changeTracker.DetectChanges();
 
-			Assert.IsTrue(changeTracker.GetEntries().All(e => e.State == DbEntityEntryState.Updated));
+			Assert.IsTrue(changeTracker.GetEntries().All(e => e.State == EntityEntryState.Updated));
 		}
 
 		[TestMethod]
 		public void DetectAnyChangesThenChangedBackToOriginal()
 		{
-			var changeTracker = new DbEntityChangeTracker<ChangeTrackerModel>();
+			var changeTracker = new EntityChangeTracker<ChangeTrackerModel>();
 			var entity = new ChangeTrackerModel
 			{
 				Title = "DbChangeTrackerTests.DetectAnyChangesThenChangedBackToOriginal"
 			};
-			changeTracker.Update(entity, DbEntityEntryState.NoChanges);
+			changeTracker.Update(entity, EntityEntryState.NoChanges);
 
 			entity.Title = "DbChangeTrackerTests.DetectAnyChangesThenChangedBackToOriginal-Changed";
 
@@ -63,26 +63,26 @@ namespace MongoFramework.Tests.Infrastructure
 
 			changeTracker.DetectChanges();
 
-			Assert.IsTrue(changeTracker.GetEntries().All(e => e.State == DbEntityEntryState.NoChanges));
+			Assert.IsTrue(changeTracker.GetEntries().All(e => e.State == EntityEntryState.NoChanges));
 		}
 
 		[TestMethod]
 		public void CommittedChangesAreUpdated()
 		{
-			var changeTracker = new DbEntityChangeTracker<ChangeTrackerModel>();
+			var changeTracker = new EntityChangeTracker<ChangeTrackerModel>();
 
 			var addedEntity = new ChangeTrackerModel();
 			var updatedEntity = new ChangeTrackerModel();
 			var deletedEntity = new ChangeTrackerModel();
 
-			changeTracker.Update(addedEntity, DbEntityEntryState.Added);
-			changeTracker.Update(updatedEntity, DbEntityEntryState.Updated);
-			changeTracker.Update(deletedEntity, DbEntityEntryState.Deleted);
+			changeTracker.Update(addedEntity, EntityEntryState.Added);
+			changeTracker.Update(updatedEntity, EntityEntryState.Updated);
+			changeTracker.Update(deletedEntity, EntityEntryState.Deleted);
 
 			changeTracker.CommitChanges();
 
-			Assert.AreEqual(DbEntityEntryState.NoChanges, changeTracker.GetEntry(addedEntity).State);
-			Assert.AreEqual(DbEntityEntryState.NoChanges, changeTracker.GetEntry(updatedEntity).State);
+			Assert.AreEqual(EntityEntryState.NoChanges, changeTracker.GetEntry(addedEntity).State);
+			Assert.AreEqual(EntityEntryState.NoChanges, changeTracker.GetEntry(updatedEntity).State);
 			Assert.AreEqual(2, changeTracker.GetEntries().Count());
 		}
 	}

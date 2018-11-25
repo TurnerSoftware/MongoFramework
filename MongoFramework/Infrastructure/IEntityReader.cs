@@ -2,7 +2,7 @@
 
 namespace MongoFramework.Infrastructure
 {
-	public interface IDbEntityReader<TEntity> where TEntity : class
+	public interface IEntityReader<TEntity> where TEntity : class
 	{
 		IQueryable<TEntity> AsQueryable();
 	}

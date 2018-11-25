@@ -6,9 +6,9 @@ using System.Linq;
 
 namespace MongoFramework.Infrastructure
 {
-	public class DbEntityCollection<TEntity> : IDbEntityCollection<TEntity> where TEntity : class
+	public class EntityCollection<TEntity> : IEntityCollection<TEntity> where TEntity : class
 	{
-		protected List<DbEntityEntry<TEntity>> Entries { get; } = new List<DbEntityEntry<TEntity>>();
+		protected List<EntityEntry<TEntity>> Entries { get; } = new List<EntityEntry<TEntity>>();
 
 		private EntityMapper<TEntity> EntityMapper { get; } = new EntityMapper<TEntity>();
 
@@ -16,7 +16,7 @@ namespace MongoFramework.Infrastructure
 
 		public bool IsReadOnly => false;
 
-		public DbEntityEntry<TEntity> GetEntry(TEntity entity)
+		public EntityEntry<TEntity> GetEntry(TEntity entity)
 		{
 			var entityId = EntityMapper.GetIdValue(entity);
 			var defaultIdValue = EntityMapper.GetDefaultId();
@@ -40,12 +40,12 @@ namespace MongoFramework.Infrastructure
 			return null;
 		}
 
-		public IEnumerable<DbEntityEntry<TEntity>> GetEntries()
+		public IEnumerable<EntityEntry<TEntity>> GetEntries()
 		{
 			return Entries;
 		}
 
-		public void Update(TEntity entity, DbEntityEntryState state)
+		public void Update(TEntity entity, EntityEntryState state)
 		{
 			var entry = GetEntry(entity);
 			if (entry != null)
@@ -57,12 +57,12 @@ namespace MongoFramework.Infrastructure
 				else
 				{
 					Entries.Remove(entry);
-					Entries.Add(new DbEntityEntry<TEntity>(entity, state));
+					Entries.Add(new EntityEntry<TEntity>(entity, state));
 				}
 			}
 			else
 			{
-				Entries.Add(new DbEntityEntry<TEntity>(entity, state));
+				Entries.Add(new EntityEntry<TEntity>(entity, state));
 			}
 		}
 
@@ -85,7 +85,7 @@ namespace MongoFramework.Infrastructure
 		public void Add(TEntity item)
 		{
 			//TODO: Check the ID value is a default value - if not, mark it as non-changed
-			Update(item, DbEntityEntryState.Added);
+			Update(item, EntityEntryState.Added);
 		}
 
 		public bool Contains(TEntity item)

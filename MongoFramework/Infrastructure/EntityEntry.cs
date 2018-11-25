@@ -2,12 +2,12 @@
 
 namespace MongoFramework.Infrastructure
 {
-	public class DbEntityEntry<TEntity> where TEntity : class
+	public class EntityEntry<TEntity> where TEntity : class
 	{
 		/// <summary>
-		/// The state of the entity in this <see cref="DbEntityEntry{TEntity}"/> object.
+		/// The state of the entity in this <see cref="EntityEntry{TEntity}"/> object.
 		/// </summary>
-		public DbEntityEntryState State { get; set; }
+		public EntityEntryState State { get; set; }
 
 		/// <summary>
 		/// The original values of the entity.
@@ -15,21 +15,21 @@ namespace MongoFramework.Infrastructure
 		public BsonDocument OriginalValues { get; private set; }
 
 		/// <summary>
-		/// The entity that forms this <see cref="DbEntityEntry{TEntity}"/> object.
+		/// The entity that forms this <see cref="EntityEntry{TEntity}"/> object.
 		/// </summary>
 		public TEntity Entity { get; private set; }
 
 		/// <summary>
-		/// Creates a new <see cref="DbEntityEntry{TEntity}"/> with the specified entity and state information.
+		/// Creates a new <see cref="EntityEntry{TEntity}"/> with the specified entity and state information.
 		/// </summary>
 		/// <param name="entity"></param>
 		/// <param name="state"></param>
-		public DbEntityEntry(TEntity entity, DbEntityEntryState state)
+		public EntityEntry(TEntity entity, EntityEntryState state)
 		{
 			State = state;
 			Entity = entity;
 
-			if (state == DbEntityEntryState.NoChanges)
+			if (state == EntityEntryState.NoChanges)
 			{
 				Refresh();
 			}
@@ -50,7 +50,7 @@ namespace MongoFramework.Infrastructure
 		public void Refresh(TEntity entity)
 		{
 			OriginalValues = entity.ToBsonDocument();
-			State = this.HasChanges() ? DbEntityEntryState.Updated : DbEntityEntryState.NoChanges;
+			State = this.HasChanges() ? EntityEntryState.Updated : EntityEntryState.NoChanges;
 		}
 
 		/// <summary>

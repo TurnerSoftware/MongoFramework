@@ -74,8 +74,8 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 			{
 				Description = "LoadRelationship-RelatedItem"
 			};
-			var dbEntityWriter = new DbEntityWriter<StringIdModel>(database);
-			var collection = new DbEntityCollection<StringIdModel>
+			var dbEntityWriter = new EntityWriter<StringIdModel>(database);
+			var collection = new EntityCollection<StringIdModel>
 			{
 				relatedEntity
 			};

@@ -11,7 +11,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 		void Connect(IMongoDatabase database);
 	}
 
-	public interface IEntityNavigationCollection<TEntity> : IEntityNavigationCollection, IDbEntityCollection<TEntity> where TEntity : class
+	public interface IEntityNavigationCollection<TEntity> : IEntityNavigationCollection, IEntityCollection<TEntity> where TEntity : class
 	{
 
 	}

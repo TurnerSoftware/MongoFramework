@@ -7,14 +7,14 @@ using System.Linq;
 
 namespace MongoFramework.Infrastructure
 {
-	public class DbEntityReader<TEntity> : IDbEntityReader<TEntity> where TEntity : class
+	public class EntityReader<TEntity> : IEntityReader<TEntity> where TEntity : class
 	{
 		public IMongoDatabase Database { get; private set; }
 		public IEntityMapper EntityMapper { get; private set; }
 
-		public DbEntityReader(IMongoDatabase database) : this(database, new EntityMapper(typeof(TEntity))) { }
+		public EntityReader(IMongoDatabase database) : this(database, new EntityMapper(typeof(TEntity))) { }
 
-		public DbEntityReader(IMongoDatabase database, IEntityMapper mapper)
+		public EntityReader(IMongoDatabase database, IEntityMapper mapper)
 		{
 			Database = database ?? throw new ArgumentNullException(nameof(database));
 			EntityMapper = mapper ?? throw new ArgumentNullException(nameof(mapper));

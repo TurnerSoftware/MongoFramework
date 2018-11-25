@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace MongoFramework.Infrastructure.EntityRelationships
 {
-	public class EntityNavigationCollection<TEntity> : DbEntityCollection<TEntity>, IEntityNavigationCollection<TEntity> where TEntity : class
+	public class EntityNavigationCollection<TEntity> : EntityCollection<TEntity>, IEntityNavigationCollection<TEntity> where TEntity : class
 	{
 		private IMongoDatabase Database { get; set; }
 		private IEntityMapper EntityMapper { get; }
@@ -72,12 +72,12 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 				return;
 			}
 
-			var dbEntityReader = new DbEntityReader<TEntity>(Database, EntityMapper);
+			var dbEntityReader = new EntityReader<TEntity>(Database, EntityMapper);
 			var entities = dbEntityReader.AsQueryable().WherePropertyMatches(ForeignKey, ForeignPropertyMap.PropertyType, UnloadedIds);
 
 			foreach (var entity in entities)
 			{
-				Update(entity, DbEntityEntryState.NoChanges);
+				Update(entity, EntityEntryState.NoChanges);
 			}
 
 			UnloadedIds.Clear();
@@ -104,7 +104,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			//Enumerate list of unloaded IDs and load them in one at a time
 			if (UnloadedIds.Any())
 			{
-				var dbEntityReader = new DbEntityReader<TEntity>(Database, EntityMapper);
+				var dbEntityReader = new EntityReader<TEntity>(Database, EntityMapper);
 				var unloadedEntities = dbEntityReader.AsQueryable().WherePropertyMatches(ForeignKey, ForeignPropertyMap.PropertyType, UnloadedIds);
 
 				using (var unloadedEnumerator = unloadedEntities.GetEnumerator())
@@ -114,7 +114,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 						var loadedEntity = unloadedEnumerator.Current;
 
 						//Load the data into the collection so we don't need to query it again
-						Update(loadedEntity, DbEntityEntryState.NoChanges);
+						Update(loadedEntity, EntityEntryState.NoChanges);
 
 						//Remove from unloaded entity collection
 						var foreignId = ForeignPropertyMap.Property.GetValue(loadedEntity);

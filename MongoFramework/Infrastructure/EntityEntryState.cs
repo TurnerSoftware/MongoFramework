@@ -1,6 +1,6 @@
 ﻿namespace MongoFramework.Infrastructure
 {
-	public enum DbEntityEntryState
+	public enum EntityEntryState
 	{
 		/// <summary>
 		/// There are no known changes to the entity

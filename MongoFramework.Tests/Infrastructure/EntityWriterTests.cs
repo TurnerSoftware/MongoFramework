@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace MongoFramework.Tests.Infrastructure
 {
 	[TestClass]
-	public class DbEntityWriterTests : TestBase
+	public class EntityWriterTests : TestBase
 	{
 		public class EntityWriterModel
 		{
@@ -23,15 +23,15 @@ namespace MongoFramework.Tests.Infrastructure
 		public void AddEntity()
 		{
 			var database = TestConfiguration.GetDatabase();
-			var entityContainer = new DbEntityCollection<EntityWriterModel>();
-			var writer = new DbEntityWriter<EntityWriterModel>(database);
+			var entityContainer = new EntityCollection<EntityWriterModel>();
+			var writer = new EntityWriter<EntityWriterModel>(database);
 
 			var entity = new EntityWriterModel
 			{
 				Title = "DbEntityWriterTests.AddEntity"
 			};
 
-			entityContainer.Update(entity, DbEntityEntryState.Added);
+			entityContainer.Update(entity, EntityEntryState.Added);
 			writer.Write(entityContainer);
 
 			Assert.IsNotNull(entity.Id);
@@ -41,8 +41,8 @@ namespace MongoFramework.Tests.Infrastructure
 		public void AddMixedTypeEntities()
 		{
 			var database = TestConfiguration.GetDatabase();
-			var entityContainer = new DbEntityCollection<EntityWriterModel>();
-			var writer = new DbEntityWriter<EntityWriterModel>(database);
+			var entityContainer = new EntityCollection<EntityWriterModel>();
+			var writer = new EntityWriter<EntityWriterModel>(database);
 			var entities = new[]
 			{
 				new EntityWriterModel
@@ -58,7 +58,7 @@ namespace MongoFramework.Tests.Infrastructure
 
 			foreach (var entity in entities)
 			{
-				entityContainer.Update(entity, DbEntityEntryState.Added);
+				entityContainer.Update(entity, EntityEntryState.Added);
 			}
 
 			writer.Write(entityContainer);
@@ -71,9 +71,9 @@ namespace MongoFramework.Tests.Infrastructure
 		public void UpdateEntity()
 		{
 			var database = TestConfiguration.GetDatabase();
-			var entityContainer = new DbEntityCollection<EntityWriterModel>();
-			var writer = new DbEntityWriter<EntityWriterModel>(database);
-			var reader = new DbEntityReader<EntityWriterModel>(database);
+			var entityContainer = new EntityCollection<EntityWriterModel>();
+			var writer = new EntityWriter<EntityWriterModel>(database);
+			var reader = new EntityReader<EntityWriterModel>(database);
 
 			//Get entity initially into the DB so we can update it
 			var entity = new EntityWriterModel
@@ -81,7 +81,7 @@ namespace MongoFramework.Tests.Infrastructure
 				Title = "DbEntityWriterTests.UpdateEntity"
 			};
 
-			entityContainer.Update(entity, DbEntityEntryState.Added);
+			entityContainer.Update(entity, EntityEntryState.Added);
 			writer.Write(entityContainer);
 			entityContainer.Clear();
 
@@ -92,7 +92,7 @@ namespace MongoFramework.Tests.Infrastructure
 				Title = "DbEntityWriterTests.UpdateEntity-Updated"
 			};
 
-			entityContainer.Update(updatedEntity, DbEntityEntryState.Updated);
+			entityContainer.Update(updatedEntity, EntityEntryState.Updated);
 			writer.Write(entityContainer);
 
 			var dbEntity = reader.AsQueryable().Where(e => e.Id == entity.Id).FirstOrDefault();
@@ -103,9 +103,9 @@ namespace MongoFramework.Tests.Infrastructure
 		public void RemoveEntity()
 		{
 			var database = TestConfiguration.GetDatabase();
-			var entityContainer = new DbEntityCollection<EntityWriterModel>();
-			var writer = new DbEntityWriter<EntityWriterModel>(database);
-			var reader = new DbEntityReader<EntityWriterModel>(database);
+			var entityContainer = new EntityCollection<EntityWriterModel>();
+			var writer = new EntityWriter<EntityWriterModel>(database);
+			var reader = new EntityReader<EntityWriterModel>(database);
 
 			//Get entity initially into the DB so we can remove it
 			var entity = new EntityWriterModel
@@ -113,12 +113,12 @@ namespace MongoFramework.Tests.Infrastructure
 				Title = "DbEntityWriterTests.RemoveEntity"
 			};
 
-			entityContainer.Update(entity, DbEntityEntryState.Added);
+			entityContainer.Update(entity, EntityEntryState.Added);
 			writer.Write(entityContainer);
 			entityContainer.Clear();
 
 			//Remove the entity
-			entityContainer.Update(entity, DbEntityEntryState.Deleted);
+			entityContainer.Update(entity, EntityEntryState.Deleted);
 			writer.Write(entityContainer);
 
 			Assert.IsFalse(reader.AsQueryable().Any(e => e.Id == entity.Id));
@@ -128,9 +128,9 @@ namespace MongoFramework.Tests.Infrastructure
 		public void MixedActionWrite()
 		{
 			var database = TestConfiguration.GetDatabase();
-			var entityContainer = new DbEntityCollection<EntityWriterModel>();
-			var writer = new DbEntityWriter<EntityWriterModel>(database);
-			var reader = new DbEntityReader<EntityWriterModel>(database);
+			var entityContainer = new EntityCollection<EntityWriterModel>();
+			var writer = new EntityWriter<EntityWriterModel>(database);
+			var reader = new EntityReader<EntityWriterModel>(database);
 
 			var updateEntity = new EntityWriterModel
 			{
@@ -140,8 +140,8 @@ namespace MongoFramework.Tests.Infrastructure
 			{
 				Title = "DbEntityWriterTests.MixedActionWrite-DeleteEntity"
 			};
-			entityContainer.Update(updateEntity, DbEntityEntryState.Added);
-			entityContainer.Update(deleteEntity, DbEntityEntryState.Added);
+			entityContainer.Update(updateEntity, EntityEntryState.Added);
+			entityContainer.Update(deleteEntity, EntityEntryState.Added);
 			writer.Write(entityContainer);
 			entityContainer.Clear();
 
@@ -150,9 +150,9 @@ namespace MongoFramework.Tests.Infrastructure
 				Title = "DbEntityWriterTests.MixedActionWrite-AddEntity"
 			};
 			updateEntity.Title = "DbEntityWriterTests.MixedActionWrite-UpdateEntity-Updated";
-			entityContainer.Update(addedEntity, DbEntityEntryState.Added);
-			entityContainer.Update(updateEntity, DbEntityEntryState.Updated);
-			entityContainer.Update(deleteEntity, DbEntityEntryState.Deleted);
+			entityContainer.Update(addedEntity, EntityEntryState.Added);
+			entityContainer.Update(updateEntity, EntityEntryState.Updated);
+			entityContainer.Update(deleteEntity, EntityEntryState.Deleted);
 			writer.Write(entityContainer);
 
 			Assert.IsTrue(reader.AsQueryable().Where(e => e.Id == addedEntity.Id).Any());
@@ -166,9 +166,9 @@ namespace MongoFramework.Tests.Infrastructure
 		public async Task MixedActionWriteAsync()
 		{
 			var database = TestConfiguration.GetDatabase();
-			var entityContainer = new DbEntityCollection<EntityWriterModel>();
-			var writer = new DbEntityWriter<EntityWriterModel>(database);
-			var reader = new DbEntityReader<EntityWriterModel>(database);
+			var entityContainer = new EntityCollection<EntityWriterModel>();
+			var writer = new EntityWriter<EntityWriterModel>(database);
+			var reader = new EntityReader<EntityWriterModel>(database);
 
 			var updateEntity = new EntityWriterModel
 			{
@@ -178,8 +178,8 @@ namespace MongoFramework.Tests.Infrastructure
 			{
 				Title = "DbEntityWriterTests.MixedActionWriteAsync-DeleteEntity"
 			};
-			entityContainer.Update(updateEntity, DbEntityEntryState.Added);
-			entityContainer.Update(deleteEntity, DbEntityEntryState.Added);
+			entityContainer.Update(updateEntity, EntityEntryState.Added);
+			entityContainer.Update(deleteEntity, EntityEntryState.Added);
 			await writer.WriteAsync(entityContainer).ConfigureAwait(false);
 			entityContainer.Clear();
 
@@ -188,9 +188,9 @@ namespace MongoFramework.Tests.Infrastructure
 				Title = "DbEntityWriterTests.MixedActionWriteAsync-AddEntity"
 			};
 			updateEntity.Title = "DbEntityWriterTests.MixedActionWriteAsync-UpdateEntity-Updated";
-			entityContainer.Update(addedEntity, DbEntityEntryState.Added);
-			entityContainer.Update(updateEntity, DbEntityEntryState.Updated);
-			entityContainer.Update(deleteEntity, DbEntityEntryState.Deleted);
+			entityContainer.Update(addedEntity, EntityEntryState.Added);
+			entityContainer.Update(updateEntity, EntityEntryState.Updated);
+			entityContainer.Update(deleteEntity, EntityEntryState.Deleted);
 			await writer.WriteAsync(entityContainer).ConfigureAwait(false);
 
 			Assert.IsTrue(reader.AsQueryable().Where(e => e.Id == addedEntity.Id).Any());

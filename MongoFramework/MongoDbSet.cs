@@ -23,11 +23,11 @@ namespace MongoFramework
 	/// <typeparam name="TEntity"></typeparam>
 	public class MongoDbSet<TEntity> : IMongoDbSet<TEntity> where TEntity : class
 	{
-		public IDbEntityChangeTracker<TEntity> ChangeTracker { get; private set; } = new DbEntityChangeTracker<TEntity>();
+		public IEntityChangeTracker<TEntity> ChangeTracker { get; private set; } = new EntityChangeTracker<TEntity>();
 
 		private IMongoDatabase Database { get; set; }
-		private IDbEntityWriter<TEntity> EntityWriter { get; set; }
-		private IDbEntityReader<TEntity> EntityReader { get; set; }
+		private IEntityWriter<TEntity> EntityWriter { get; set; }
+		private IEntityReader<TEntity> EntityReader { get; set; }
 		private IEntityIndexWriter<TEntity> EntityIndexWriter { get; set; }
 		private IEntityRelationshipWriter<TEntity> EntityRelationshipWriter { get; set; }
 
@@ -73,8 +73,8 @@ namespace MongoFramework
 			Database = database;
 
 			var entityMapper = new EntityMapper<TEntity>();
-			EntityWriter = new DbEntityWriter<TEntity>(database, entityMapper);
-			EntityReader = new DbEntityReader<TEntity>(database, entityMapper);
+			EntityWriter = new EntityWriter<TEntity>(database, entityMapper);
+			EntityReader = new EntityReader<TEntity>(database, entityMapper);
 
 			//TODO: Look at this again in the future, this seems unnecessarily complex
 			var indexMapper = new EntityIndexMapper<TEntity>(entityMapper);
@@ -103,7 +103,7 @@ namespace MongoFramework
 				throw new ArgumentNullException("entity");
 			}
 
-			ChangeTracker.Update(entity, DbEntityEntryState.Added);
+			ChangeTracker.Update(entity, EntityEntryState.Added);
 		}
 		/// <summary>
 		/// Marks the collection of entities for insertion into the database.
@@ -118,7 +118,7 @@ namespace MongoFramework
 
 			foreach (var entity in entities)
 			{
-				ChangeTracker.Update(entity, DbEntityEntryState.Added);
+				ChangeTracker.Update(entity, EntityEntryState.Added);
 			}
 		}
 
@@ -133,7 +133,7 @@ namespace MongoFramework
 				throw new ArgumentNullException("entity");
 			}
 
-			ChangeTracker.Update(entity, DbEntityEntryState.Updated);
+			ChangeTracker.Update(entity, EntityEntryState.Updated);
 		}
 		/// <summary>
 		/// Marks the collection of entities for updating.
@@ -148,7 +148,7 @@ namespace MongoFramework
 
 			foreach (var entity in entities)
 			{
-				ChangeTracker.Update(entity, DbEntityEntryState.Updated);
+				ChangeTracker.Update(entity, EntityEntryState.Updated);
 			}
 		}
 
@@ -163,7 +163,7 @@ namespace MongoFramework
 				throw new ArgumentNullException("entity");
 			}
 
-			ChangeTracker.Update(entity, DbEntityEntryState.Deleted);
+			ChangeTracker.Update(entity, EntityEntryState.Deleted);
 		}
 		/// <summary>
 		/// Marks the collection of entities for deletion.
@@ -178,7 +178,7 @@ namespace MongoFramework
 
 			foreach (var entity in entities)
 			{
-				ChangeTracker.Update(entity, DbEntityEntryState.Deleted);
+				ChangeTracker.Update(entity, EntityEntryState.Deleted);
 			}
 		}
 
@@ -187,7 +187,7 @@ namespace MongoFramework
 			if (PerformEntityValidation)
 			{
 				var savingEntities = ChangeTracker.GetEntries()
-					.Where(e => e.State == DbEntityEntryState.Added || e.State == DbEntityEntryState.Updated)
+					.Where(e => e.State == EntityEntryState.Added || e.State == EntityEntryState.Updated)
 					.Select(e => e.Entity);
 
 				foreach (var savingEntity in savingEntities)

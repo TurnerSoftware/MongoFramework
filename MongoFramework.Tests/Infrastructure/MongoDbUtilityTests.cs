@@ -54,11 +54,11 @@ namespace MongoFramework.Tests.Infrastructure
 		public void ValidObjectId()
 		{
 			var database = TestConfiguration.GetDatabase();
-			var entityContainer = new DbEntityCollection<MongoDbUtilityModel>();
-			var writer = new DbEntityWriter<MongoDbUtilityModel>(database);
+			var entityContainer = new EntityCollection<MongoDbUtilityModel>();
+			var writer = new EntityWriter<MongoDbUtilityModel>(database);
 
 			var entity = new MongoDbUtilityModel();
-			entityContainer.Update(entity, DbEntityEntryState.Added);
+			entityContainer.Update(entity, EntityEntryState.Added);
 			writer.Write(entityContainer);
 
 			Assert.IsTrue(MongoDbUtility.IsValidObjectId(entity.Id));

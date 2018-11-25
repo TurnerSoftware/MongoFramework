@@ -5,7 +5,7 @@ using System.Linq;
 namespace MongoFramework.Tests.Infrastructure
 {
 	[TestClass]
-	public class DbEntityReaderTests : TestBase
+	public class EntityReaderTests : TestBase
 	{
 		public class A
 		{
@@ -21,20 +21,20 @@ namespace MongoFramework.Tests.Infrastructure
 		public void ReadMixedEntities()
 		{
 			var database = TestConfiguration.GetDatabase();
-			var entityContainer = new DbEntityCollection<A>();
-			var reader = new DbEntityReader<A>(database);
-			var writer = new DbEntityWriter<A>(database);
+			var entityContainer = new EntityCollection<A>();
+			var reader = new EntityReader<A>(database);
+			var writer = new EntityWriter<A>(database);
 
 			entityContainer.Update(new A
 			{
 				Description = "DbEntityReaderTests.ReadMixedEntities"
-			}, DbEntityEntryState.Added);
+			}, EntityEntryState.Added);
 
 			entityContainer.Update(new B
 			{
 				BIsForBoolean = true,
 				Description = "DbEntityReaderTests.ReadMixedEntities"
-			}, DbEntityEntryState.Added);
+			}, EntityEntryState.Added);
 
 
 			writer.Write(entityContainer);

@@ -6,7 +6,7 @@ using System.Linq;
 namespace MongoFramework.Tests.Infrastructure
 {
 	[TestClass]
-	public class DbEntityCollectionTests : TestBase
+	public class EntityCollectionTests : TestBase
 	{
 		public class EntityCollectionModel
 		{
@@ -17,34 +17,34 @@ namespace MongoFramework.Tests.Infrastructure
 		[TestMethod]
 		public void AddNewEntry()
 		{
-			var entityCollection = new DbEntityCollection<EntityCollectionModel>();
+			var entityCollection = new EntityCollection<EntityCollectionModel>();
 			var entity = new EntityCollectionModel
 			{
 				Title = "DbEntityCollectionTests.AddNewEntry"
 			};
-			entityCollection.Update(entity, DbEntityEntryState.Added);
+			entityCollection.Update(entity, EntityEntryState.Added);
 
-			Assert.IsTrue(entityCollection.GetEntries().All(e => e.Entity == entity && e.State == DbEntityEntryState.Added));
+			Assert.IsTrue(entityCollection.GetEntries().All(e => e.Entity == entity && e.State == EntityEntryState.Added));
 		}
 
 		[TestMethod]
 		public void UpdateExistingEntryIdMatch()
 		{
-			var entityCollection = new DbEntityCollection<EntityCollectionModel>();
+			var entityCollection = new EntityCollection<EntityCollectionModel>();
 			var entity = new EntityCollectionModel
 			{
 				Id = "123",
 				Title = "DbEntityCollectionTests.UpdateExistingEntryWithId-1"
 			};
-			entityCollection.Update(entity, DbEntityEntryState.Added);
-			Assert.IsTrue(entityCollection.GetEntries().All(e => e.Entity == entity && e.State == DbEntityEntryState.Added));
+			entityCollection.Update(entity, EntityEntryState.Added);
+			Assert.IsTrue(entityCollection.GetEntries().All(e => e.Entity == entity && e.State == EntityEntryState.Added));
 
 			var updatedEntity = new EntityCollectionModel
 			{
 				Id = "123",
 				Title = "DbEntityCollectionTests.UpdateExistingEntryWithId-2"
 			};
-			entityCollection.Update(updatedEntity, DbEntityEntryState.Updated);
+			entityCollection.Update(updatedEntity, EntityEntryState.Updated);
 			Assert.IsFalse(entityCollection.GetEntries().Any(e => e.Entity == entity));
 			Assert.IsTrue(entityCollection.GetEntries()
 				.Any(e => e.Entity == updatedEntity && e.Entity.Title == "DbEntityCollectionTests.UpdateExistingEntryWithId-2"));
@@ -53,22 +53,22 @@ namespace MongoFramework.Tests.Infrastructure
 		[TestMethod]
 		public void UpdateExistingEntryInstanceMatch()
 		{
-			var entityCollection = new DbEntityCollection<EntityCollectionModel>();
+			var entityCollection = new EntityCollection<EntityCollectionModel>();
 			var entity = new EntityCollectionModel
 			{
 				Title = "DbEntityCollectionTests.UpdateExistingEntryWithoutId"
 			};
-			entityCollection.Update(entity, DbEntityEntryState.Added);
-			Assert.IsTrue(entityCollection.GetEntries().All(e => e.Entity == entity && e.State == DbEntityEntryState.Added));
+			entityCollection.Update(entity, EntityEntryState.Added);
+			Assert.IsTrue(entityCollection.GetEntries().All(e => e.Entity == entity && e.State == EntityEntryState.Added));
 
-			entityCollection.Update(entity, DbEntityEntryState.NoChanges);
-			Assert.IsTrue(entityCollection.GetEntries().All(e => e.Entity == entity && e.State == DbEntityEntryState.NoChanges));
+			entityCollection.Update(entity, EntityEntryState.NoChanges);
+			Assert.IsTrue(entityCollection.GetEntries().All(e => e.Entity == entity && e.State == EntityEntryState.NoChanges));
 		}
 
 		[TestMethod]
 		public void RemoveRange()
 		{
-			var entityCollection = new DbEntityCollection<EntityCollectionModel>();
+			var entityCollection = new EntityCollection<EntityCollectionModel>();
 			var entities = new[]
 			{
 				new EntityCollectionModel
@@ -88,7 +88,7 @@ namespace MongoFramework.Tests.Infrastructure
 
 			foreach (var entity in entities)
 			{
-				entityCollection.Update(entity, DbEntityEntryState.Added);
+				entityCollection.Update(entity, EntityEntryState.Added);
 				entityCollection.Remove(entity);
 			}
 
@@ -98,12 +98,12 @@ namespace MongoFramework.Tests.Infrastructure
 		[TestMethod]
 		public void ClearTracker()
 		{
-			var entityCollection = new DbEntityCollection<EntityCollectionModel>();
+			var entityCollection = new EntityCollection<EntityCollectionModel>();
 			var entity = new EntityCollectionModel
 			{
 				Title = "DbEntityCollectionTests.ClearTracker"
 			};
-			entityCollection.Update(entity, DbEntityEntryState.NoChanges);
+			entityCollection.Update(entity, EntityEntryState.NoChanges);
 
 			entityCollection.Clear();
 
@@ -113,14 +113,14 @@ namespace MongoFramework.Tests.Infrastructure
 		[TestMethod]
 		public void RemoveNonExistentEntities()
 		{
-			var entityCollection = new DbEntityCollection<EntityCollectionModel>();
+			var entityCollection = new EntityCollection<EntityCollectionModel>();
 			Assert.IsFalse(entityCollection.Remove(new EntityCollectionModel { }));
 		}
 
 		[TestMethod]
 		public void ContainsExactEntity()
 		{
-			var entityCollection = new DbEntityCollection<EntityCollectionModel>();
+			var entityCollection = new EntityCollection<EntityCollectionModel>();
 			var entity = new EntityCollectionModel
 			{
 				Id = "ABC"
@@ -133,7 +133,7 @@ namespace MongoFramework.Tests.Infrastructure
 		[TestMethod]
 		public void ContainsEntityById()
 		{
-			var entityCollection = new DbEntityCollection<EntityCollectionModel>();
+			var entityCollection = new EntityCollection<EntityCollectionModel>();
 			var entity = new EntityCollectionModel
 			{
 				Id = "ABC",
@@ -153,7 +153,7 @@ namespace MongoFramework.Tests.Infrastructure
 		[ExpectedException(typeof(ArgumentNullException))]
 		public void CopyToInvalidArray()
 		{
-			var entityCollection = new DbEntityCollection<EntityCollectionModel>();
+			var entityCollection = new EntityCollection<EntityCollectionModel>();
 			EntityCollectionModel[] array = null;
 			entityCollection.CopyTo(array, 0);
 		}
@@ -162,7 +162,7 @@ namespace MongoFramework.Tests.Infrastructure
 		[ExpectedException(typeof(IndexOutOfRangeException))]
 		public void CopyToIndexOutOfRangeLow()
 		{
-			var entityCollection = new DbEntityCollection<EntityCollectionModel>();
+			var entityCollection = new EntityCollection<EntityCollectionModel>();
 			var array = new EntityCollectionModel[4];
 			entityCollection.CopyTo(array, -1);
 		}
@@ -171,7 +171,7 @@ namespace MongoFramework.Tests.Infrastructure
 		[ExpectedException(typeof(IndexOutOfRangeException))]
 		public void CopyToIndexOutOfRangeHigh()
 		{
-			var entityCollection = new DbEntityCollection<EntityCollectionModel>
+			var entityCollection = new EntityCollection<EntityCollectionModel>
 			{
 				new EntityCollectionModel { },
 				new EntityCollectionModel { },

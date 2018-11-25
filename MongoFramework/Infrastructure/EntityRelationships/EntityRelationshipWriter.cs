@@ -81,9 +81,9 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 		}
 #pragma warning restore CRR0026 // Unused member - used via Reflection
 
-		private IDbEntityCollection<TRelatedEntity> BuildRelatedEntityCollection<TRelatedEntity>(EntityRelationship relationship, IEnumerable<TEntity> entities) where TRelatedEntity : class
+		private IEntityCollection<TRelatedEntity> BuildRelatedEntityCollection<TRelatedEntity>(EntityRelationship relationship, IEnumerable<TEntity> entities) where TRelatedEntity : class
 		{
-			var collection = new DbEntityCollection<TRelatedEntity>();
+			var collection = new EntityCollection<TRelatedEntity>();
 			var entityMapper = new EntityMapper<TRelatedEntity>();
 
 			var defaultId = entityMapper.GetDefaultId();

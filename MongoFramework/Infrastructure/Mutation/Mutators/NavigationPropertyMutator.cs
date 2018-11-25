@@ -46,7 +46,7 @@ namespace MongoFramework.Infrastructure.Mutation.Mutators
 #pragma warning disable CRR0026 // Unused member - called through Reflection
 		private static void InitialiseSingleEntityRelationship<TRelatedEntity>(TEntity targetEntity, EntityRelationship relationship, IMongoDatabase database) where TRelatedEntity : class
 		{
-			var dbEntityReader = new DbEntityReader<TRelatedEntity>(database);
+			var dbEntityReader = new EntityReader<TRelatedEntity>(database);
 			var relationshipIdValue = relationship.IdProperty.GetValue(targetEntity);
 			var loadedEntity = dbEntityReader.AsQueryable().WhereIdMatches(new[] { relationshipIdValue }).FirstOrDefault();
 			relationship.NavigationProperty.SetValue(targetEntity, loadedEntity);

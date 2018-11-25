@@ -36,9 +36,9 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 			var underlyingQueryable = collection.AsQueryable();
 			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel, MongoFrameworkQueryableModel>(underlyingQueryable);
 
-			var entityContainer = new DbEntityCollection<MongoFrameworkQueryableModel>();
-			var writer = new DbEntityWriter<MongoFrameworkQueryableModel>(database);
-			entityContainer.Update(new MongoFrameworkQueryableModel { Title = "EnumerateQueryable" }, DbEntityEntryState.Added);
+			var entityContainer = new EntityCollection<MongoFrameworkQueryableModel>();
+			var writer = new EntityWriter<MongoFrameworkQueryableModel>(database);
+			entityContainer.Update(new MongoFrameworkQueryableModel { Title = "EnumerateQueryable" }, EntityEntryState.Added);
 			writer.Write(entityContainer);
 
 			foreach (var entity in queryable)
@@ -59,9 +59,9 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 			var processor = new TestProcessor<MongoFrameworkQueryableModel>();
 			queryable.EntityProcessors.Add(processor);
 
-			var entityContainer = new DbEntityCollection<MongoFrameworkQueryableModel>();
-			var writer = new DbEntityWriter<MongoFrameworkQueryableModel>(database);
-			entityContainer.Update(new MongoFrameworkQueryableModel { Title = "EntityProcessorFireTest" }, DbEntityEntryState.Added);
+			var entityContainer = new EntityCollection<MongoFrameworkQueryableModel>();
+			var writer = new EntityWriter<MongoFrameworkQueryableModel>(database);
+			entityContainer.Update(new MongoFrameworkQueryableModel { Title = "EntityProcessorFireTest" }, EntityEntryState.Added);
 			writer.Write(entityContainer);
 
 			foreach (var entity in queryable)
@@ -84,9 +84,9 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 			var processor = new TestProcessor<MongoFrameworkQueryableModel>();
 			queryable.EntityProcessors.Add(processor);
 
-			var entityContainer = new DbEntityCollection<MongoFrameworkQueryableModel>();
-			var writer = new DbEntityWriter<MongoFrameworkQueryableModel>(database);
-			entityContainer.Update(new MongoFrameworkQueryableModel { Title = "EntityProcessorNoFireTest" }, DbEntityEntryState.Added);
+			var entityContainer = new EntityCollection<MongoFrameworkQueryableModel>();
+			var writer = new EntityWriter<MongoFrameworkQueryableModel>(database);
+			entityContainer.Update(new MongoFrameworkQueryableModel { Title = "EntityProcessorNoFireTest" }, EntityEntryState.Added);
 			writer.Write(entityContainer);
 
 			foreach (var titles in queryable.Select(e => e.Title))

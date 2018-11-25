@@ -10,14 +10,14 @@ using System.Threading.Tasks;
 
 namespace MongoFramework.Infrastructure
 {
-	public class DbEntityWriter<TEntity> : IDbEntityWriter<TEntity> where TEntity : class
+	public class EntityWriter<TEntity> : IEntityWriter<TEntity> where TEntity : class
 	{
 		public IMongoDatabase Database { get; private set; }
 		public IEntityMapper EntityMapper { get; private set; }
 
-		public DbEntityWriter(IMongoDatabase database) : this(database, new EntityMapper(typeof(TEntity))) { }
+		public EntityWriter(IMongoDatabase database) : this(database, new EntityMapper(typeof(TEntity))) { }
 
-		public DbEntityWriter(IMongoDatabase database, IEntityMapper mapper)
+		public EntityWriter(IMongoDatabase database, IEntityMapper mapper)
 		{
 			Database = database ?? throw new ArgumentNullException(nameof(database));
 			EntityMapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -29,19 +29,19 @@ namespace MongoFramework.Infrastructure
 			return Database.GetCollection<TEntity>(collectionName);
 		}
 
-		private IEnumerable<WriteModel<TEntity>> BuildWriteModel(IDbEntityCollection<TEntity> entityCollection)
+		private IEnumerable<WriteModel<TEntity>> BuildWriteModel(IEntityCollection<TEntity> entityCollection)
 		{
 			var idFieldName = EntityMapper.GetIdName();
 			var writeModel = new List<WriteModel<TEntity>>();
 
 			foreach (var entry in entityCollection.GetEntries())
 			{
-				if (entry.State == DbEntityEntryState.Added)
+				if (entry.State == EntityEntryState.Added)
 				{
 					EntityMutation<TEntity>.MutateEntity(entry.Entity, MutatorType.Insert, Database);
 					writeModel.Add(new InsertOneModel<TEntity>(entry.Entity));
 				}
-				else if (entry.State == DbEntityEntryState.Updated)
+				else if (entry.State == EntityEntryState.Updated)
 				{
 					EntityMutation<TEntity>.MutateEntity(entry.Entity, MutatorType.Update, Database);
 					var idFieldValue = EntityMapper.GetIdValue(entry.Entity);
@@ -55,7 +55,7 @@ namespace MongoFramework.Infrastructure
 						writeModel.Add(new UpdateOneModel<TEntity>(filter, updateDefintion));
 					}
 				}
-				else if (entry.State == DbEntityEntryState.Deleted)
+				else if (entry.State == EntityEntryState.Deleted)
 				{
 					var idFieldValue = EntityMapper.GetIdValue(entry.Entity);
 					var filter = Builders<TEntity>.Filter.Eq(idFieldName, idFieldValue);
@@ -66,7 +66,7 @@ namespace MongoFramework.Infrastructure
 			return writeModel;
 		}
 
-		public void Write(IDbEntityCollection<TEntity> entityCollection)
+		public void Write(IEntityCollection<TEntity> entityCollection)
 		{
 			var writeModel = BuildWriteModel(entityCollection);
 
@@ -77,7 +77,7 @@ namespace MongoFramework.Infrastructure
 			}
 		}
 
-		public async Task WriteAsync(IDbEntityCollection<TEntity> entityCollection, CancellationToken cancellationToken = default(CancellationToken))
+		public async Task WriteAsync(IEntityCollection<TEntity> entityCollection, CancellationToken cancellationToken = default(CancellationToken))
 		{
 			var writeModel = BuildWriteModel(entityCollection);
 
