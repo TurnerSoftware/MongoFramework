@@ -185,7 +185,7 @@ namespace MongoFramework.Infrastructure.Mapping
 		}
 	}
 
-	public class EntityMapper<TEntity> : EntityMapper
+	public class EntityMapper<TEntity> : EntityMapper where TEntity : class
 	{
 		public EntityMapper() : base(typeof(TEntity)) { }
 	}

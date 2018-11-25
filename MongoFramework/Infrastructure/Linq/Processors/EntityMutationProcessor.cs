@@ -3,7 +3,7 @@ using MongoFramework.Infrastructure.Mutation;
 
 namespace MongoFramework.Infrastructure.Linq.Processors
 {
-	public class EntityMutationProcessor<TEntity> : ILinqProcessor<TEntity>
+	public class EntityMutationProcessor<TEntity> : ILinqProcessor<TEntity> where TEntity : class
 	{
 		public IMongoDatabase Database { get; private set; }
 

@@ -2,7 +2,7 @@
 
 namespace MongoFramework.Infrastructure
 {
-	public class DbEntityEntry<TEntity>
+	public class DbEntityEntry<TEntity> where TEntity : class
 	{
 		/// <summary>
 		/// The state of the entity in this <see cref="DbEntityEntry{TEntity}"/> object.

@@ -10,7 +10,7 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 {
 	public static class UpdateDefinitionExtensions
 	{
-		public static UpdateDefinition<TEntity> Set<TEntity>(this UpdateDefinition<TEntity> definition, string fieldName, BsonValue value)
+		public static UpdateDefinition<TEntity> Set<TEntity>(this UpdateDefinition<TEntity> definition, string fieldName, BsonValue value) where TEntity : class
 		{
 			var dotNetValue = BsonTypeMapper.MapToDotNetValue(value);
 			var valueType = dotNetValue?.GetType();

@@ -8,7 +8,7 @@ namespace MongoFramework.Infrastructure.Linq
 		string ToQuery();
 	}
 
-	public interface IMongoFrameworkQueryable<TEntity, TOutput> : IMongoFrameworkQueryable, IOrderedQueryable<TOutput>
+	public interface IMongoFrameworkQueryable<TEntity, TOutput> : IMongoFrameworkQueryable, IOrderedQueryable<TOutput> where TEntity : class
 	{
 		EntityProcessorCollection<TEntity> EntityProcessors { get; }
 	}

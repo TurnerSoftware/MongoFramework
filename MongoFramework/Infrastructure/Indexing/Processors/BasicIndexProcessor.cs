@@ -7,7 +7,7 @@ namespace MongoFramework.Infrastructure.Indexing.Processors
 {
 	public class BasicIndexProcessor : IIndexingProcessor
 	{
-		public IEnumerable<CreateIndexModel<TEntity>> BuildIndexModel<TEntity>(IEnumerable<IEntityIndexMap> indexMapping)
+		public IEnumerable<CreateIndexModel<TEntity>> BuildIndexModel<TEntity>(IEnumerable<IEntityIndexMap> indexMapping) where TEntity : class
 		{
 			var result = new List<CreateIndexModel<TEntity>>();
 			var indexBuilder = Builders<TEntity>.IndexKeys;

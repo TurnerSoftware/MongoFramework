@@ -2,7 +2,7 @@
 
 namespace MongoFramework.Infrastructure
 {
-	public class DbEntityChangeTracker<TEntity> : DbEntityCollection<TEntity>, IDbEntityChangeTracker<TEntity>
+	public class DbEntityChangeTracker<TEntity> : DbEntityCollection<TEntity>, IDbEntityChangeTracker<TEntity> where TEntity : class
 	{
 		public void DetectChanges()
 		{

@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace MongoFramework.Infrastructure.Mutation.Mutators
 {
-	public class NavigationPropertyMutator<TEntity> : IEntityMutator<TEntity>
+	public class NavigationPropertyMutator<TEntity> : IEntityMutator<TEntity> where TEntity : class
 	{
 		public void MutateEntity(TEntity entity, MutatorType mutationType, IEntityMapper entityMapper, IMongoDatabase database)
 		{
@@ -44,7 +44,7 @@ namespace MongoFramework.Infrastructure.Mutation.Mutators
 		}
 
 #pragma warning disable CRR0026 // Unused member - called through Reflection
-		private static void InitialiseSingleEntityRelationship<TRelatedEntity>(TEntity targetEntity, EntityRelationship relationship, IMongoDatabase database)
+		private static void InitialiseSingleEntityRelationship<TRelatedEntity>(TEntity targetEntity, EntityRelationship relationship, IMongoDatabase database) where TRelatedEntity : class
 		{
 			var dbEntityReader = new DbEntityReader<TRelatedEntity>(database);
 			var relationshipIdValue = relationship.IdProperty.GetValue(targetEntity);

@@ -2,7 +2,7 @@
 
 namespace MongoFramework.Infrastructure
 {
-	public interface IDbEntityCollection<TEntity> : ICollection<TEntity>
+	public interface IDbEntityCollection<TEntity> : ICollection<TEntity> where TEntity : class
 	{
 		DbEntityEntry<TEntity> GetEntry(TEntity entity);
 		IEnumerable<DbEntityEntry<TEntity>> GetEntries();

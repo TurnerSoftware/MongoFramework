@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MongoFramework.Infrastructure
 {
-	public class DbEntityWriter<TEntity> : IDbEntityWriter<TEntity>
+	public class DbEntityWriter<TEntity> : IDbEntityWriter<TEntity> where TEntity : class
 	{
 		public IMongoDatabase Database { get; private set; }
 		public IEntityMapper EntityMapper { get; private set; }

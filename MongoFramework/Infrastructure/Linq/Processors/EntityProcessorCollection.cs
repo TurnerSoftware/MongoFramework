@@ -2,7 +2,7 @@
 
 namespace MongoFramework.Infrastructure.Linq.Processors
 {
-	public class EntityProcessorCollection<TEntity> : List<ILinqProcessor<TEntity>>, ILinqProcessor<TEntity>
+	public class EntityProcessorCollection<TEntity> : List<ILinqProcessor<TEntity>>, ILinqProcessor<TEntity> where TEntity : class
 	{
 		public void ProcessEntity(TEntity entity)
 		{

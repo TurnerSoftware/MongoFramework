@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 
 namespace MongoFramework.Infrastructure.Linq
 {
-	public class MongoFrameworkQueryProvider<TEntity, TOutput> : IMongoFrameworkQueryProvider<TEntity, TOutput>
+	public class MongoFrameworkQueryProvider<TEntity, TOutput> : IMongoFrameworkQueryProvider<TEntity, TOutput> where TEntity : class
 	{
 		public IMongoQueryable UnderlyingQueryable { get; private set; }
 

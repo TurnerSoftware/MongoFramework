@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace MongoFramework.Infrastructure
 {
-	public class DbEntityCollection<TEntity> : IDbEntityCollection<TEntity>
+	public class DbEntityCollection<TEntity> : IDbEntityCollection<TEntity> where TEntity : class
 	{
 		protected List<DbEntityEntry<TEntity>> Entries { get; } = new List<DbEntityEntry<TEntity>>();
 

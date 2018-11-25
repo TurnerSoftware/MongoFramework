@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace MongoFramework.Infrastructure.Mutation
 {
-	public static class EntityMutation<TEntity>
+	public static class EntityMutation<TEntity> where TEntity : class
 	{
 		public static List<IEntityMutator<TEntity>> MutationDrivers { get; }
 
