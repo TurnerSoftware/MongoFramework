@@ -329,5 +329,36 @@ namespace MongoFramework.Tests
 			Assert.ThrowsException<ArgumentNullException>(() => dbSet.AddRange(null, null));
 			Assert.ThrowsException<ArgumentNullException>(() => dbSet.AddRange(new EntityGroup(), null));
 		}
+
+		[TestMethod]
+		public void ValueTypeSubEntity()
+		{
+			var database = TestConfiguration.GetDatabase();
+			var dbSet = new MongoDbBucketSet<EntityGroup, int>(new BucketSetOptions
+			{
+				BucketSize = 2
+			});
+			dbSet.SetDatabase(database);
+
+			dbSet.AddRange(new EntityGroup
+			{
+				Name = "Group1"
+			}, new[] { 2, 4, 6, 8, 10 });
+			dbSet.SaveChanges();
+
+			Assert.AreEqual(3, dbSet.Count());
+
+			var results = dbSet.WithGroup(new EntityGroup
+			{
+				Name = "Group1"
+			}).ToArray();
+
+			Assert.AreEqual(5, results.Length);
+			Assert.AreEqual(2, results[0]);
+			Assert.AreEqual(4, results[1]);
+			Assert.AreEqual(6, results[2]);
+			Assert.AreEqual(8, results[3]);
+			Assert.AreEqual(10, results[4]);
+		}
 	}
 }
