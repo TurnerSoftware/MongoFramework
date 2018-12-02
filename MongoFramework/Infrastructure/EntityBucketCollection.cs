@@ -45,7 +45,7 @@ namespace MongoFramework.Infrastructure
 				var remainingEntitiesCount = entityList.Count;
 
 				//Identify last bucket of the group for the last index and to potentially backfill into it (if there is space)
-				var bucket = EntityReader.AsQueryable().Where(e => e.Group == grouping.Key).OrderBy(e => e.Index).LastOrDefault();
+				var bucket = EntityReader.AsQueryable().Where(e => e.Group == grouping.Key).OrderByDescending(e => e.Index).FirstOrDefault();
 				if (bucket != null)
 				{
 					//Check if there is room to backfill into the existing bucket
