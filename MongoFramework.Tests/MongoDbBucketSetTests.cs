@@ -278,5 +278,56 @@ namespace MongoFramework.Tests
 			Assert.AreEqual("Group1", results[0].Name);
 			Assert.AreEqual("Group2", results[1].Name);
 		}
+
+		[TestMethod]
+		public void IterateQueryable()
+		{
+			var database = TestConfiguration.GetDatabase();
+			var dbSet = new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
+			{
+				BucketSize = 2
+			});
+			dbSet.SetDatabase(database);
+
+			dbSet.Add(new EntityGroup
+			{
+				Name = "Group1"
+			}, new SubEntityClass
+			{
+				Label = "Entry1"
+			});
+			dbSet.Add(new EntityGroup
+			{
+				Name = "Group2"
+			}, new SubEntityClass
+			{
+				Label = "Entry1"
+			});
+			dbSet.Add(new EntityGroup
+			{
+				Name = "Group3"
+			}, new SubEntityClass
+			{
+				Label = "Entry1"
+			});
+
+			foreach (var bucket in dbSet)
+			{
+				Assert.AreEqual("Entry", bucket.Items[0].Label);
+			}
+		}
+
+		[TestMethod]
+		public void InvalidAddArguments()
+		{
+			var dbSet = new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
+			{
+				BucketSize = 2
+			});
+
+			Assert.ThrowsException<ArgumentNullException>(() => dbSet.Add(null, new SubEntityClass()));
+			Assert.ThrowsException<ArgumentNullException>(() => dbSet.AddRange(null, null));
+			Assert.ThrowsException<ArgumentNullException>(() => dbSet.AddRange(new EntityGroup(), null));
+		}
 	}
 }

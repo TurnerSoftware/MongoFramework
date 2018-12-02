@@ -22,7 +22,7 @@ namespace MongoFramework
 		private IEntityIndexWriter<EntityBucket<TGroup, TSubEntity>> EntityIndexWriter { get; set; }
 
 		private EntityBucketCollection<TGroup, TSubEntity> BucketCollection { get; set; }
-		private IEntityChangeTracker<EntityBucket<TGroup, TSubEntity>> ChangeTracker { get; set; } = new EntityChangeTracker<EntityBucket<TGroup, TSubEntity>>();
+		private IEntityChangeTracker<EntityBucket<TGroup, TSubEntity>> ChangeTracker { get; } = new EntityChangeTracker<EntityBucket<TGroup, TSubEntity>>();
 
 		public int BucketSize { get; }
 
@@ -54,6 +54,7 @@ namespace MongoFramework
 			EntityIndexWriter = new EntityIndexWriter<EntityBucket<TGroup, TSubEntity>>(collection, indexMapper);
 
 			BucketCollection = new EntityBucketCollection<TGroup, TSubEntity>(EntityReader, BucketSize);
+			ChangeTracker.Clear();
 		}
 
 		public virtual void Add(TGroup group, TSubEntity entity)
@@ -61,11 +62,6 @@ namespace MongoFramework
 			if (group == null)
 			{
 				throw new ArgumentNullException(nameof(group));
-			}
-
-			if (entity == null)
-			{
-				throw new ArgumentNullException(nameof(entity));
 			}
 
 			BucketCollection.AddEntity(group, entity);
