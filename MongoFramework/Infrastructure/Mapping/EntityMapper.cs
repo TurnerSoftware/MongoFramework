@@ -1,4 +1,5 @@
 ﻿using MongoDB.Bson.Serialization;
+using MongoFramework.Infrastructure;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -67,6 +68,17 @@ namespace MongoFramework.Infrastructure.Mapping
 		public string GetCollectionName()
 		{
 			var tableAttribute = EntityType.GetCustomAttribute<TableAttribute>();
+
+			if (tableAttribute == null && EntityType.IsGenericType && EntityType.GetGenericTypeDefinition() == typeof(EntityBucket<,>))
+			{
+				var groupProperty = EntityType.GetProperty("Group", BindingFlags.Public | BindingFlags.Instance);
+				tableAttribute = groupProperty.GetCustomAttribute<TableAttribute>();
+				if (tableAttribute == null)
+				{
+					return groupProperty.PropertyType.Name;
+				}
+			}
+
 			if (tableAttribute != null)
 			{
 				if (string.IsNullOrEmpty(tableAttribute.Schema))

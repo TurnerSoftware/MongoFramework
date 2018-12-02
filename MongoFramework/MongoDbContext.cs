@@ -1,4 +1,5 @@
 ﻿using MongoDB.Driver;
+using MongoFramework.Attributes;
 using MongoFramework.Infrastructure;
 using System;
 using System.Collections.Generic;
@@ -62,7 +63,20 @@ namespace MongoFramework
 				var propertyType = property.PropertyType;
 				if (propertyType.IsGenericType && mongoDbSetType.IsAssignableFrom(propertyType))
 				{
-					var dbSet = Activator.CreateInstance(propertyType) as IMongoDbSet;
+					IMongoDbSet dbSet;
+
+					var dbSetWithOptionsConstructor = propertyType.GetConstructor(new[] { typeof(IDbSetOptions) });
+					if (dbSetWithOptionsConstructor != null)
+					{
+						var dbSetOptionsAttribute = property.GetCustomAttribute<DbSetOptionsAttribute>();
+						var dbSetOptions = dbSetOptionsAttribute?.GetOptions();
+						dbSet = dbSetWithOptionsConstructor.Invoke(new[] { dbSetOptions }) as IMongoDbSet;
+					}
+					else
+					{
+						dbSet = Activator.CreateInstance(propertyType) as IMongoDbSet;
+					}
+
 					dbSet.SetDatabase(Database);
 					DbSets.Add(dbSet);
 					property.SetValue(this, dbSet);
