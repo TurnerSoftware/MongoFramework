@@ -59,6 +59,29 @@ namespace MongoFramework.Tests
 			Assert.IsTrue(dbSet.Any(b => b.Group.Name == "Group1" && b.Items.Any(i => i.Label == "Entry1")));
 		}
 
+		[TestMethod]
+		public async Task SuccessfullyInsertAndQueryBackEntityBucketsAsync()
+		{
+			var database = TestConfiguration.GetDatabase();
+			var dbSet = new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
+			{
+				BucketSize = 100
+			});
+			dbSet.SetDatabase(database);
+
+			dbSet.Add(new EntityGroup
+			{
+				Name = "Group1"
+			}, new SubEntityClass
+			{
+				Label = "Entry1"
+			});
+
+			Assert.IsFalse(dbSet.Any(b => b.Group.Name == "Group1"));
+			await dbSet.SaveChangesAsync();
+			Assert.IsTrue(dbSet.Any(b => b.Group.Name == "Group1" && b.Items.Any(i => i.Label == "Entry1")));
+		}
+
 		[TestMethod, ExpectedException(typeof(ArgumentException))]
 		public void InvalidBucketSize()
 		{
