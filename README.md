@@ -1,8 +1,8 @@
 # MongoFramework
 An "Entity Framework"-like interface for the MongoDB C# Driver
 
-[![AppVeyor](https://img.shields.io/appveyor/ci/Turnerj/mongoframework.svg)](https://ci.appveyor.com/project/Turnerj/mongoframework)
-[![Codecov](https://img.shields.io/codecov/c/github/turnersoftware/mongoframework.svg)](https://codecov.io/gh/TurnerSoftware/MongoFramework)
+[![AppVeyor](https://img.shields.io/appveyor/ci/Turnerj/mongoframework/master.svg)](https://ci.appveyor.com/project/Turnerj/mongoframework)
+[![Codecov](https://img.shields.io/codecov/c/github/turnersoftware/mongoframework/master.svg)](https://codecov.io/gh/TurnerSoftware/MongoFramework)
 [![NuGet](https://img.shields.io/nuget/v/MongoFramework.svg)](https://www.nuget.org/packages/MongoFramework/)
 
 ## Overview
