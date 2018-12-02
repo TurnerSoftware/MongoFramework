@@ -148,5 +148,112 @@ namespace MongoFramework.Tests
 			Assert.AreEqual(1, additionalBucket.ItemCount);
 			Assert.AreEqual("Entry3", additionalBucket.Items[0].Label);
 		}
+
+		[TestMethod]
+		public void ContinuousSubEntityAccessAcrossBuckets()
+		{
+			var database = TestConfiguration.GetDatabase();
+			var dbSet = new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
+			{
+				BucketSize = 2
+			});
+			dbSet.SetDatabase(database);
+			
+			dbSet.AddRange(new EntityGroup
+			{
+				Name = "Group1"
+			}, new[] {
+				new SubEntityClass
+				{
+					Label = "Entry1"
+				},
+				new SubEntityClass
+				{
+					Label = "Entry2"
+				},
+				new SubEntityClass
+				{
+					Label = "Entry3"
+				},
+				new SubEntityClass
+				{
+					Label = "Entry4"
+				},
+				new SubEntityClass
+				{
+					Label = "Entry5"
+				}
+			});
+			dbSet.SaveChanges();
+
+			Assert.AreEqual(3, dbSet.Count());
+
+			var results = dbSet.WithGroup(new EntityGroup
+			{
+				Name = "Group1"
+			}).ToArray();
+
+			Assert.AreEqual(5, results.Length);
+			Assert.AreEqual("Entry1", results[0].Label);
+			Assert.AreEqual("Entry2", results[1].Label);
+			Assert.AreEqual("Entry3", results[2].Label);
+			Assert.AreEqual("Entry4", results[3].Label);
+			Assert.AreEqual("Entry5", results[4].Label);
+		}
+
+		[TestMethod]
+		public void DistinctGroups()
+		{
+			var database = TestConfiguration.GetDatabase();
+			var dbSet = new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
+			{
+				BucketSize = 2
+			});
+			dbSet.SetDatabase(database);
+
+			dbSet.AddRange(new EntityGroup
+			{
+				Name = "Group1"
+			}, new[] {
+				new SubEntityClass
+				{
+					Label = "Entry1"
+				},
+				new SubEntityClass
+				{
+					Label = "Entry2"
+				},
+				new SubEntityClass
+				{
+					Label = "Entry3"
+				}
+			});
+			dbSet.AddRange(new EntityGroup
+			{
+				Name = "Group2"
+			}, new[] {
+				new SubEntityClass
+				{
+					Label = "Entry1"
+				},
+				new SubEntityClass
+				{
+					Label = "Entry2"
+				},
+				new SubEntityClass
+				{
+					Label = "Entry3"
+				}
+			});
+			dbSet.SaveChanges();
+
+			Assert.AreEqual(4, dbSet.Count());
+
+			var results = dbSet.Groups().OrderBy(g => g.Name).ToArray();
+
+			Assert.AreEqual(2, results.Length);
+			Assert.AreEqual("Group1", results[0].Name);
+			Assert.AreEqual("Group2", results[1].Name);
+		}
 	}
 }
