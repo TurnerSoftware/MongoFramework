@@ -1,22 +1,28 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Indexing;
+using MongoFramework.Infrastructure.Linq;
+using MongoFramework.Infrastructure.Linq.Processors;
 using MongoFramework.Infrastructure.Mapping;
 
 namespace MongoFramework
 {
-	public class MongoDbBucketSet<TGroup, TSubEntity> : IMongoDbSet where TGroup : class where TSubEntity : class
+	public class MongoDbBucketSet<TGroup, TSubEntity> : IMongoDbBucketSet<TGroup, TSubEntity> where TGroup : class
 	{
 		private IEntityWriter<EntityBucket<TGroup, TSubEntity>> EntityWriter { get; set; }
 		private IEntityReader<EntityBucket<TGroup, TSubEntity>> EntityReader { get; set; }
 		private IEntityIndexWriter<EntityBucket<TGroup, TSubEntity>> EntityIndexWriter { get; set; }
+
 		private EntityBucketCollection<TGroup, TSubEntity> BucketCollection { get; set; }
+		private IEntityChangeTracker<EntityBucket<TGroup, TSubEntity>> ChangeTracker { get; set; } = new EntityChangeTracker<EntityBucket<TGroup, TSubEntity>>();
 
 		public int BucketSize { get; }
 
@@ -88,7 +94,9 @@ namespace MongoFramework
 			EntityIndexWriter.ApplyIndexing();
 			var entityCollection = BucketCollection.AsEntityCollection();
 			EntityWriter.Write(entityCollection);
+			EntityWriter.Write(ChangeTracker);
 			BucketCollection.Clear();
+			ChangeTracker.CommitChanges();
 		}
 
 		public virtual async Task SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
@@ -97,7 +105,36 @@ namespace MongoFramework
 			cancellationToken.ThrowIfCancellationRequested();
 			var entityCollection = BucketCollection.AsEntityCollection();
 			await EntityWriter.WriteAsync(entityCollection);
+			await EntityWriter.WriteAsync(ChangeTracker);
 			BucketCollection.Clear();
+			ChangeTracker.CommitChanges();
 		}
+
+		#region IQueryable Implementation
+
+		private IQueryable<EntityBucket<TGroup, TSubEntity>> GetQueryable()
+		{
+			var queryable = EntityReader.AsQueryable() as IMongoFrameworkQueryable<EntityBucket<TGroup, TSubEntity>, EntityBucket<TGroup, TSubEntity>>;
+			queryable.EntityProcessors.Add(new EntityTrackingProcessor<EntityBucket<TGroup, TSubEntity>>(ChangeTracker));
+			return queryable;
+		}
+	
+		public Type ElementType => GetQueryable().ElementType;
+
+		public Expression Expression => GetQueryable().Expression;
+
+		public IQueryProvider Provider => GetQueryable().Provider;
+
+		public IEnumerator<EntityBucket<TGroup, TSubEntity>> GetEnumerator()
+		{
+			return GetQueryable().GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
+
+		#endregion
 	}
 }
