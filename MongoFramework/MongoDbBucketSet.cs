@@ -26,9 +26,16 @@ namespace MongoFramework
 
 		public int BucketSize { get; }
 
-		public MongoDbBucketSet(int bucketSize)
+		public MongoDbBucketSet(IDbSetOptions options)
 		{
-			BucketSize = bucketSize;
+			if (options is BucketSetOptions bucketOptions)
+			{
+				BucketSize = bucketOptions.BucketSize;
+			}
+			else
+			{
+				throw new ArgumentException("Invalid DbSet options supplied", nameof(options));
+			}
 		}
 
 		public void SetDatabase(IMongoDatabase database)
