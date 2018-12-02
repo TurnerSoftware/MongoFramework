@@ -30,6 +30,10 @@ namespace MongoFramework
 		{
 			if (options is BucketSetOptions bucketOptions)
 			{
+				if (bucketOptions.BucketSize < 1)
+				{
+					throw new ArgumentException($"Invalid bucket size of {bucketOptions.BucketSize}");
+				}
 				BucketSize = bucketOptions.BucketSize;
 			}
 			else
