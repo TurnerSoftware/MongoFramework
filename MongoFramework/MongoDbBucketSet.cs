@@ -48,10 +48,8 @@ namespace MongoFramework
 			EntityWriter = new EntityWriter<EntityBucket<TGroup, TSubEntity>>(database, entityMapper);
 			EntityReader = new EntityReader<EntityBucket<TGroup, TSubEntity>>(database, entityMapper);
 			
-			//TODO: Look at this again in the future, this seems unnecessarily complex 
 			var indexMapper = new EntityIndexMapper<EntityBucket<TGroup, TSubEntity>>(entityMapper);
-			var collection = database.GetCollection<EntityBucket<TGroup, TSubEntity>>(entityMapper.GetCollectionName());
-			EntityIndexWriter = new EntityIndexWriter<EntityBucket<TGroup, TSubEntity>>(collection, indexMapper);
+			EntityIndexWriter = new EntityIndexWriter<EntityBucket<TGroup, TSubEntity>>(database, indexMapper);
 
 			BucketCollection = new EntityBucketCollection<TGroup, TSubEntity>(EntityReader, BucketSize);
 			ChangeTracker.Clear();

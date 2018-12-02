@@ -8,13 +8,19 @@ namespace MongoFramework.Infrastructure.Indexing
 {
 	public class EntityIndexWriter<TEntity> : IEntityIndexWriter<TEntity> where TEntity : class
 	{
-		private IMongoCollection<TEntity> Collection { get; set; }
+		private IMongoDatabase Database { get; set; }
 		private IEntityIndexMapper IndexMapper { get; set; }
 
-		public EntityIndexWriter(IMongoCollection<TEntity> collection, IEntityIndexMapper indexMapper)
+		public EntityIndexWriter(IMongoDatabase database, IEntityIndexMapper indexMapper)
 		{
-			Collection = collection;
+			Database = database;
 			IndexMapper = indexMapper;
+		}
+
+		private IMongoCollection<TEntity> GetCollection()
+		{
+			var collectionName = IndexMapper.GetCollectionName();
+			return Database.GetCollection<TEntity>(collectionName);
 		}
 
 		private IEnumerable<CreateIndexModel<TEntity>> GenerateIndexModel()
@@ -29,7 +35,7 @@ namespace MongoFramework.Infrastructure.Indexing
 			var indexModel = GenerateIndexModel();
 			if (indexModel.Any())
 			{
-				Collection.Indexes.CreateMany(indexModel);
+				GetCollection().Indexes.CreateMany(indexModel);
 			}
 		}
 
@@ -38,7 +44,7 @@ namespace MongoFramework.Infrastructure.Indexing
 			var indexModel = GenerateIndexModel();
 			if (indexModel.Any())
 			{
-				await Collection.Indexes.CreateManyAsync(indexModel, cancellationToken).ConfigureAwait(false);
+				await GetCollection().Indexes.CreateManyAsync(indexModel, cancellationToken).ConfigureAwait(false);
 			}
 		}
 	}

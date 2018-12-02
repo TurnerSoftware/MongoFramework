@@ -30,6 +30,11 @@ namespace MongoFramework.Infrastructure.Indexing
 			EntityType = entityMapper.EntityType;
 		}
 
+		public string GetCollectionName()
+		{
+			return EntityMapper.GetCollectionName();
+		}
+
 		public IEnumerable<IEntityIndexMap> GetIndexMapping()
 		{
 			return EntityIndexCache.GetOrAdd(EntityType, t =>
