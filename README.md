@@ -15,6 +15,7 @@ Some of the major features include:
 - Diff-updates (only _changes_ to an entity to be written)
 - Entity mutation (allowing automatic changes on properties during select/insert/update calls)
 - Navigation properties for related entities (both single-entity relationships and collections)
+- Entity Buckets (clustering of small documents together, optimised for write performance)
 
 ## Entity Attributes
 Through attributes on entities and their properties, you have control over various aspects of how the entities are saved or processed.
