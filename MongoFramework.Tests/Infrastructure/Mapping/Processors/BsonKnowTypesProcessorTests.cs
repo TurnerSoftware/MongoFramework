@@ -1,0 +1,57 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Attributes;
+using MongoFramework.Infrastructure.Mapping.Processors;
+
+namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
+{
+	[TestClass]
+	public class BsonKnowTypesProcessorTests : TestBase
+	{
+		[BsonKnownTypes(typeof(KnownTypesChildModel))]
+		class KnownTypesBaseModel
+		{
+			public string Id { get; set; }
+		}
+
+		class KnownTypesChildModel : KnownTypesBaseModel
+		{
+
+		}
+
+		class UnknownTypesBaseModel
+		{
+
+		}
+
+		class UnknownTypesChildModel : UnknownTypesBaseModel
+		{
+
+		}
+
+		[TestMethod]
+		public void WithAttribute()
+		{
+			var processor = new BsonKnownTypesProcessor();
+			var classMap = new BsonClassMap<KnownTypesBaseModel>();
+			Assert.IsFalse(BsonClassMap.IsClassMapRegistered(typeof(KnownTypesChildModel)));
+			processor.ApplyMapping(typeof(KnownTypesBaseModel), classMap);
+			Assert.IsTrue(BsonClassMap.IsClassMapRegistered(typeof(KnownTypesChildModel)));
+		}
+
+		[TestMethod]
+		public void WithoutAttribute()
+		{
+			var processor = new BsonKnownTypesProcessor();
+			var classMap = new BsonClassMap<UnknownTypesBaseModel>();
+			Assert.IsFalse(BsonClassMap.IsClassMapRegistered(typeof(UnknownTypesChildModel)));
+			processor.ApplyMapping(typeof(UnknownTypesBaseModel), classMap);
+			Assert.IsFalse(BsonClassMap.IsClassMapRegistered(typeof(UnknownTypesChildModel)));
+		}
+	}
+}

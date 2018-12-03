@@ -17,7 +17,8 @@ namespace MongoFramework.Infrastructure.Mapping
 				new NestedPropertyProcessor(),
 				new ExtraElementsProcessor(),
 				new NavigationPropertyProcessor(),
-				new TypeDiscoveryProcessor()
+				new TypeDiscoveryProcessor(),
+				new BsonKnownTypesProcessor()
 			};
 		}
 
