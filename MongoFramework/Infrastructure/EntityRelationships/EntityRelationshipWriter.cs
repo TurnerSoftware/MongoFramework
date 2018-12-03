@@ -12,12 +12,12 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 	{
 		private IEnumerable<EntityRelationship> Relationships { get; }
 
-		public IMongoDatabase Database { get; }
+		private IMongoDbConnection Connection { get; }
 
-		public EntityRelationshipWriter(IMongoDatabase database, IEntityMapper entityMapper)
+		public EntityRelationshipWriter(IMongoDbConnection connection)
 		{
-			Relationships = entityMapper.GetEntityRelationships();
-			Database = database;
+			Connection = connection;
+			Relationships = connection.GetEntityMapper(typeof(TEntity)).GetEntityRelationships(connection);
 		}
 
 		public void CommitEntityRelationships(IEnumerable<TEntity> entities)
@@ -47,7 +47,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			if (collection.Any())
 			{
 				var dbSet = new MongoDbSet<TRelatedEntity>();
-				dbSet.SetDatabase(Database);
+				dbSet.SetConnection(Connection);
 				dbSet.AddRange(collection);
 				dbSet.SaveChanges();
 			}
@@ -69,7 +69,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			if (collection.Any())
 			{
 				var dbSet = new MongoDbSet<TRelatedEntity>();
-				dbSet.SetDatabase(Database);
+				dbSet.SetConnection(Connection);
 				dbSet.AddRange(collection);
 				await dbSet.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 			}
@@ -83,8 +83,8 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 
 		private IEntityCollection<TRelatedEntity> BuildRelatedEntityCollection<TRelatedEntity>(EntityRelationship relationship, IEnumerable<TEntity> entities) where TRelatedEntity : class
 		{
-			var collection = new EntityCollection<TRelatedEntity>();
-			var entityMapper = new EntityMapper<TRelatedEntity>();
+			var entityMapper = Connection.GetEntityMapper(typeof(TRelatedEntity));
+			var collection = new EntityCollection<TRelatedEntity>(entityMapper);
 
 			var defaultId = entityMapper.GetDefaultId();
 			var relatedEntitiesToProcess = new List<TRelatedEntity>();
@@ -122,7 +122,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 
 		private void ApplyForeignKeyChanges<TRelatedEntity>(EntityRelationship relationship, IEnumerable<TEntity> entities) where TRelatedEntity : class
 		{
-			var entityMapper = new EntityMapper<TRelatedEntity>();
+			var entityMapper = Connection.GetEntityMapper(typeof(TRelatedEntity));
 			var defaultId = entityMapper.GetDefaultId();
 
 			foreach (var entity in entities)

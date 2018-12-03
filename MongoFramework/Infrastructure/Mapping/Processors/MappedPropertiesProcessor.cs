@@ -7,7 +7,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 {
 	public class MappedPropertiesProcessor : IMappingProcessor
 	{
-		public void ApplyMapping(Type entityType, BsonClassMap classMap)
+		public void ApplyMapping(Type entityType, BsonClassMap classMap, IMongoDbConnection connection)
 		{
 			var properties = entityType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 

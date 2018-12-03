@@ -5,16 +5,16 @@ namespace MongoFramework.Infrastructure.Linq.Processors
 {
 	public class EntityMutationProcessor<TEntity> : ILinqProcessor<TEntity> where TEntity : class
 	{
-		public IMongoDatabase Database { get; private set; }
+		public IMongoDbConnection Connection { get; private set; }
 
-		public EntityMutationProcessor(IMongoDatabase database)
+		public EntityMutationProcessor(IMongoDbConnection connection)
 		{
-			Database = database;
+			Connection = connection;
 		}
 
 		public void ProcessEntity(TEntity entity)
 		{
-			EntityMutation<TEntity>.MutateEntity(entity, MutatorType.Select, Database);
+			EntityMutation<TEntity>.MutateEntity(entity, MutatorType.Select, Connection);
 		}
 	}
 }

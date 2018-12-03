@@ -23,7 +23,7 @@ namespace MongoFramework.Tests
 
 		class MongoDbContextTestContext : MongoDbContext
 		{
-			public MongoDbContextTestContext(IMongoDbContextOptions options) : base(options) { }
+			public MongoDbContextTestContext(IMongoDbConnection options) : base(options) { }
 			public MongoDbContextTestContext(string connectionString, string databaseName) : base(connectionString, databaseName) { }
 			public MongoDbSet<DbSetModel> DbSet { get; set; }
 			[BucketSetOptions(5)]
@@ -33,7 +33,7 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public void ContextCreatedWithOptions()
 		{
-			var options = new MongoDbContextOptions
+			var options = new MongoDbConnection
 			{
 				ConnectionString = TestConfiguration.ConnectionString,
 				Database = TestConfiguration.GetDatabaseName()

@@ -23,9 +23,9 @@ namespace MongoFramework
 	/// <typeparam name="TEntity"></typeparam>
 	public class MongoDbSet<TEntity> : IMongoDbSet<TEntity> where TEntity : class
 	{
-		public IEntityChangeTracker<TEntity> ChangeTracker { get; private set; } = new EntityChangeTracker<TEntity>();
+		public IEntityChangeTracker<TEntity> ChangeTracker { get; private set; }
 
-		private IMongoDatabase Database { get; set; }
+		private IMongoDbConnection Connection { get; set; }
 		private IEntityWriter<TEntity> EntityWriter { get; set; }
 		private IEntityReader<TEntity> EntityReader { get; set; }
 		private IEntityIndexWriter<TEntity> EntityIndexWriter { get; set; }
@@ -39,53 +39,23 @@ namespace MongoFramework
 		public MongoDbSet() { }
 
 		/// <summary>
-		/// Creates a new MongoDbSet using the connection string in the configuration that matches the specified connection name.
-		/// </summary>
-		/// <param name="connectionName">The name of the connection string stored in the configuration.</param>
-		public MongoDbSet(string connectionName)
-		{
-			var mongoUrl = MongoDbUtility.GetMongoUrlFromConfig(connectionName);
-
-			if (mongoUrl == null)
-			{
-				throw new MongoConfigurationException("No connection string found with the name \'" + connectionName + "\'");
-			}
-
-			SetDatabase(MongoDbUtility.GetDatabase(mongoUrl));
-		}
-
-		/// <summary>
-		/// Creates a new MongoDbSet using the specified connection string and database combination.
-		/// </summary>
-		/// <param name="connectionString">The connection string to the server</param>
-		/// <param name="databaseName">The database name on the server</param> 
-		public MongoDbSet(string connectionString, string databaseName)
-		{
-			SetDatabase(MongoDbUtility.GetDatabase(connectionString, databaseName));
-		}
-
-		/// <summary>
 		/// Initialise a new entity reader and writer to the specified database.
 		/// </summary>
-		/// <param name="database"></param>
-		public void SetDatabase(IMongoDatabase database)
+		/// <param name="connection"></param>
+		public void SetConnection(IMongoDbConnection connection)
 		{
-			Database = database;
-
-			var entityMapper = new EntityMapper<TEntity>();
-			EntityWriter = new EntityWriter<TEntity>(database, entityMapper);
-			EntityReader = new EntityReader<TEntity>(database, entityMapper);
-
-			var indexMapper = new EntityIndexMapper<TEntity>(entityMapper);
-			EntityIndexWriter = new EntityIndexWriter<TEntity>(database, indexMapper);
-
-			EntityRelationshipWriter = new EntityRelationshipWriter<TEntity>(database, entityMapper);
+			Connection = connection;
+			EntityWriter = new EntityWriter<TEntity>(connection);
+			EntityReader = new EntityReader<TEntity>(connection);
+			EntityIndexWriter = new EntityIndexWriter<TEntity>(connection);
+			EntityRelationshipWriter = new EntityRelationshipWriter<TEntity>(connection);
+			ChangeTracker = new EntityChangeTracker<TEntity>(connection.GetEntityMapper(typeof(TEntity)));
 		}
 
 		public virtual TEntity Create()
 		{
 			var entity = Activator.CreateInstance<TEntity>();
-			EntityMutation<TEntity>.MutateEntity(entity, MutatorType.Create, Database);
+			EntityMutation<TEntity>.MutateEntity(entity, MutatorType.Create, Connection);
 			Add(entity);
 			return entity;
 		}

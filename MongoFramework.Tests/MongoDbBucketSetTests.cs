@@ -44,7 +44,7 @@ namespace MongoFramework.Tests
 			{
 				BucketSize = 100
 			});
-			dbSet.SetDatabase(database);
+			dbSet.SetConnection(database);
 
 			dbSet.Add(new EntityGroup
 			{
@@ -67,7 +67,7 @@ namespace MongoFramework.Tests
 			{
 				BucketSize = 100
 			});
-			dbSet.SetDatabase(database);
+			dbSet.SetConnection(database);
 
 			dbSet.Add(new EntityGroup
 			{
@@ -99,7 +99,7 @@ namespace MongoFramework.Tests
 			{
 				BucketSize = 2
 			});
-			dbSet.SetDatabase(database);
+			dbSet.SetConnection(database);
 
 			dbSet.AddRange(new EntityGroup
 			{
@@ -133,7 +133,7 @@ namespace MongoFramework.Tests
 			{
 				BucketSize = 2
 			});
-			dbSet.SetDatabase(database);
+			dbSet.SetConnection(database);
 
 			dbSet.Add(new EntityGroup
 			{
@@ -180,7 +180,7 @@ namespace MongoFramework.Tests
 			{
 				BucketSize = 2
 			});
-			dbSet.SetDatabase(database);
+			dbSet.SetConnection(database);
 			
 			dbSet.AddRange(new EntityGroup
 			{
@@ -232,7 +232,7 @@ namespace MongoFramework.Tests
 			{
 				BucketSize = 2
 			});
-			dbSet.SetDatabase(database);
+			dbSet.SetConnection(database);
 
 			dbSet.AddRange(new EntityGroup
 			{
@@ -287,7 +287,7 @@ namespace MongoFramework.Tests
 			{
 				BucketSize = 2
 			});
-			dbSet.SetDatabase(database);
+			dbSet.SetConnection(database);
 
 			dbSet.Add(new EntityGroup
 			{
@@ -338,7 +338,7 @@ namespace MongoFramework.Tests
 			{
 				BucketSize = 2
 			});
-			dbSet.SetDatabase(database);
+			dbSet.SetConnection(database);
 
 			dbSet.AddRange(new EntityGroup
 			{

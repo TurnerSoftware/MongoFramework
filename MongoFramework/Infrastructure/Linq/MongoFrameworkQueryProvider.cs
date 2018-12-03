@@ -8,12 +8,14 @@ namespace MongoFramework.Infrastructure.Linq
 {
 	public class MongoFrameworkQueryProvider<TEntity, TOutput> : IMongoFrameworkQueryProvider<TEntity, TOutput> where TEntity : class
 	{
-		public IMongoQueryable UnderlyingQueryable { get; private set; }
+		private IMongoDbConnection Connection { get; }
+		public IMongoQueryable UnderlyingQueryable { get; }
 
 		public EntityProcessorCollection<TEntity> EntityProcessors { get; } = new EntityProcessorCollection<TEntity>();
 
-		public MongoFrameworkQueryProvider(IMongoQueryable<TOutput> underlyingQueryable)
+		public MongoFrameworkQueryProvider(IMongoDbConnection connection, IMongoQueryable<TOutput> underlyingQueryable)
 		{
+			Connection = connection;
 			UnderlyingQueryable = underlyingQueryable;
 		}
 
@@ -25,7 +27,7 @@ namespace MongoFramework.Infrastructure.Linq
 		public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
 		{
 			var newUnderlyingQueryable = (IMongoQueryable<TElement>)UnderlyingQueryable.Provider.CreateQuery<TElement>(expression);
-			var queryable = new MongoFrameworkQueryable<TEntity, TElement>(newUnderlyingQueryable, expression);
+			var queryable = new MongoFrameworkQueryable<TEntity, TElement>(Connection, newUnderlyingQueryable, expression);
 			queryable.EntityProcessors.AddRange(EntityProcessors);
 			return queryable;
 		}

@@ -14,7 +14,7 @@ namespace MongoFramework.Linq
 		{
 			if (!(queryable is IMongoFrameworkQueryable))
 			{
-				throw new ArgumentException("Queryable must implement interface IMongoFrameworkQueryable", nameof(queryable));
+				throw new ArgumentException($"Queryable must implement interface {nameof(IMongoFrameworkQueryable)}", nameof(queryable));
 			}
 
 			return (queryable as IMongoFrameworkQueryable).ToQuery();
@@ -22,10 +22,15 @@ namespace MongoFramework.Linq
 
 		public static IQueryable<TEntity> WhereIdMatches<TEntity>(this IQueryable<TEntity> queryable, IEnumerable entityIds) where TEntity : class
 		{
-			var entityMapper = new EntityMapper<TEntity>();
-			var idProperty = entityMapper.GetEntityMapping().Where(m => m.IsKey).Select(m => m.Property).FirstOrDefault();
+			if (queryable is IMongoFrameworkQueryable mongoDbQueryable)
+			{
+				var entityMapper = mongoDbQueryable.Connection.GetEntityMapper(typeof(TEntity));
+				var idProperty = entityMapper.GetEntityMapping().Where(m => m.IsKey).Select(m => m.Property).FirstOrDefault();
+				return queryable.WherePropertyMatches(idProperty.Name, idProperty.PropertyType, entityIds);
+			}
 
-			return queryable.WherePropertyMatches(idProperty.Name, idProperty.PropertyType, entityIds);
+			//TODO: Look at potentially avoiding the EntityMapper by looking at the BsonClassMapSerializer instead?
+			throw new ArgumentException($"Queryable must implement interface {nameof(IMongoFrameworkQueryable)}", nameof(queryable));
 		}
 
 		public static IQueryable<TEntity> WherePropertyMatches<TEntity>(this IQueryable<TEntity> queryable, string propertyName, Type propertyType, IEnumerable identifiers) where TEntity : class

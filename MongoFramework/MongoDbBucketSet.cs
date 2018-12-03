@@ -22,7 +22,7 @@ namespace MongoFramework
 		private IEntityIndexWriter<EntityBucket<TGroup, TSubEntity>> EntityIndexWriter { get; set; }
 
 		private EntityBucketCollection<TGroup, TSubEntity> BucketCollection { get; set; }
-		private IEntityChangeTracker<EntityBucket<TGroup, TSubEntity>> ChangeTracker { get; } = new EntityChangeTracker<EntityBucket<TGroup, TSubEntity>>();
+		private IEntityChangeTracker<EntityBucket<TGroup, TSubEntity>> ChangeTracker { get; set; }
 
 		public int BucketSize { get; }
 
@@ -42,17 +42,15 @@ namespace MongoFramework
 			}
 		}
 
-		public void SetDatabase(IMongoDatabase database)
+		public void SetConnection(IMongoDbConnection connection)
 		{
-			var entityMapper = new EntityMapper<EntityBucket<TGroup, TSubEntity>>();
-			EntityWriter = new EntityWriter<EntityBucket<TGroup, TSubEntity>>(database, entityMapper);
-			EntityReader = new EntityReader<EntityBucket<TGroup, TSubEntity>>(database, entityMapper);
-			
-			var indexMapper = new EntityIndexMapper<EntityBucket<TGroup, TSubEntity>>(entityMapper);
-			EntityIndexWriter = new EntityIndexWriter<EntityBucket<TGroup, TSubEntity>>(database, indexMapper);
+			EntityWriter = new EntityWriter<EntityBucket<TGroup, TSubEntity>>(connection);
+			EntityReader = new EntityReader<EntityBucket<TGroup, TSubEntity>>(connection);
+			EntityIndexWriter = new EntityIndexWriter<EntityBucket<TGroup, TSubEntity>>(connection);
 
-			BucketCollection = new EntityBucketCollection<TGroup, TSubEntity>(EntityReader, BucketSize);
-			ChangeTracker.Clear();
+			var entityMapper = connection.GetEntityMapper(typeof(EntityBucket<TGroup, TSubEntity>));
+			BucketCollection = new EntityBucketCollection<TGroup, TSubEntity>(EntityReader, BucketSize, entityMapper);
+			ChangeTracker = new EntityChangeTracker<EntityBucket<TGroup, TSubEntity>>(entityMapper);
 		}
 
 		public virtual void Add(TGroup group, TSubEntity entity)

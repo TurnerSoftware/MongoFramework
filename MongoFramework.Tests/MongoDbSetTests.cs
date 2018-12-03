@@ -31,7 +31,7 @@ namespace MongoFramework.Tests
 		{
 			var database = TestConfiguration.GetDatabase();
 			var dbSet = new MongoDbSet<MongoDbSetValidationModel>();
-			dbSet.SetDatabase(database);
+			dbSet.SetConnection(database);
 
 			dbSet.Add(new MongoDbSetValidationModel());
 			dbSet.SaveChanges();
@@ -42,7 +42,7 @@ namespace MongoFramework.Tests
 		{
 			var database = TestConfiguration.GetDatabase();
 			var dbSet = new MongoDbSet<MongoDbSetValidationModel>();
-			dbSet.SetDatabase(database);
+			dbSet.SetConnection(database);
 
 			dbSet.Add(new MongoDbSetValidationModel
 			{
@@ -59,7 +59,7 @@ namespace MongoFramework.Tests
 		{
 			var database = TestConfiguration.GetDatabase();
 			var dbSet = new MongoDbSet<MongoDbSetValidationModel>();
-			dbSet.SetDatabase(database);
+			dbSet.SetConnection(database);
 
 			dbSet.Add(new MongoDbSetValidationModel
 			{

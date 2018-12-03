@@ -13,21 +13,24 @@ namespace MongoFramework.Infrastructure.Linq
 	{
 		private IMongoFrameworkQueryProvider<TEntity, TOutput> InternalProvider { get; set; }
 
+		public IMongoDbConnection Connection { get; }
 		public Type ElementType => typeof(TOutput);
 		public Expression Expression { get; }
 		public IQueryProvider Provider => InternalProvider;
 
 		public EntityProcessorCollection<TEntity> EntityProcessors => InternalProvider.EntityProcessors;
 
-		public MongoFrameworkQueryable(IMongoQueryable<TOutput> underlyingQueryable)
+		public MongoFrameworkQueryable(IMongoDbConnection connection, IMongoQueryable<TOutput> underlyingQueryable)
 		{
-			InternalProvider = new MongoFrameworkQueryProvider<TEntity, TOutput>(underlyingQueryable);
+			Connection = connection;
+			InternalProvider = new MongoFrameworkQueryProvider<TEntity, TOutput>(connection, underlyingQueryable);
 			Expression = Expression.Constant(underlyingQueryable, typeof(IMongoQueryable<TOutput>));
 		}
 
-		public MongoFrameworkQueryable(IMongoQueryable<TOutput> underlyingQueryable, Expression expression)
+		public MongoFrameworkQueryable(IMongoDbConnection connection, IMongoQueryable<TOutput> underlyingQueryable, Expression expression)
 		{
-			InternalProvider = new MongoFrameworkQueryProvider<TEntity, TOutput>(underlyingQueryable);
+			Connection = connection;
+			InternalProvider = new MongoFrameworkQueryProvider<TEntity, TOutput>(connection, underlyingQueryable);
 			Expression = expression;
 		}
 
@@ -56,7 +59,7 @@ namespace MongoFramework.Infrastructure.Linq
 		public string ToQuery()
 		{
 			var executionModel = InternalProvider.UnderlyingQueryable.GetExecutionModel();
-			var entityMapper = new EntityMapper<TEntity>();
+			var entityMapper = Connection.GetEntityMapper(typeof(TEntity));
 			return $"db.{entityMapper.GetCollectionName()}.{executionModel}";
 		}
 	}

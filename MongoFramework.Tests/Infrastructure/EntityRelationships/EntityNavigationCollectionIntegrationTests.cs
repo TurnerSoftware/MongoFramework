@@ -30,7 +30,7 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		{
 			var database = TestConfiguration.GetDatabase();
 			var dbSet = new MongoDbSet<CollectionIntegrationModel>();
-			dbSet.SetDatabase(database);
+			dbSet.SetConnection(database);
 
 			var entity = dbSet.Create();
 			entity.Description = "AddItemsToNewEntity";
@@ -57,7 +57,7 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		{
 			var database = TestConfiguration.GetDatabase();
 			var dbSet = new MongoDbSet<CollectionIntegrationModel>();
-			dbSet.SetDatabase(database);
+			dbSet.SetConnection(database);
 
 			var entity = dbSet.Create();
 			entity.Description = "AddRelationshipsToNewEntityAsync";
@@ -84,7 +84,7 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		{
 			var database = TestConfiguration.GetDatabase();
 			var dbSet = new MongoDbSet<CollectionIntegrationModel>();
-			dbSet.SetDatabase(database);
+			dbSet.SetConnection(database);
 
 			var entity = dbSet.Create();
 			entity.Description = "AddRelationshipsToExistingEntity";
@@ -113,7 +113,7 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		{
 			var database = TestConfiguration.GetDatabase();
 			var dbSet = new MongoDbSet<CollectionIntegrationModel>();
-			dbSet.SetDatabase(database);
+			dbSet.SetConnection(database);
 
 			var entity = dbSet.Create();
 			entity.Description = "RemoveRelationshipToEntity";
@@ -134,7 +134,7 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 			Assert.AreEqual(0, dbEntity.StringModelEntities.Count);
 
 			var collectionDbSet = new MongoDbSet<StringIdModel>();
-			collectionDbSet.SetDatabase(database);
+			collectionDbSet.SetConnection(database);
 			var itemDbEntity = collectionDbSet.Where(e => e.Id == item.Id).FirstOrDefault();
 
 			Assert.IsNotNull(itemDbEntity);
@@ -145,7 +145,7 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		{
 			var database = TestConfiguration.GetDatabase();
 			var dbSet = new MongoDbSet<CollectionIntegrationModel>();
-			dbSet.SetDatabase(database);
+			dbSet.SetConnection(database);
 
 			var entity = new CollectionIntegrationModel
 			{
@@ -165,7 +165,7 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		{
 			var database = TestConfiguration.GetDatabase();
 			var dbSet = new MongoDbSet<CollectionIntegrationModel>();
-			dbSet.SetDatabase(database);
+			dbSet.SetConnection(database);
 
 			var entity = dbSet.Create();
 			entity.Description = "ForceLoadEntities";

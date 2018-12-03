@@ -10,7 +10,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 {
 	public class EntityIdProcessor : IMappingProcessor
 	{
-		public void ApplyMapping(Type entityType, BsonClassMap classMap)
+		public void ApplyMapping(Type entityType, BsonClassMap classMap, IMongoDbConnection connection)
 		{
 			//If no Id member map exists, find the first property with the "Key" attribute or is named "Id" and use that
 			if (classMap.IdMemberMap == null)

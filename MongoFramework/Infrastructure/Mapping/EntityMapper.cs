@@ -14,6 +14,7 @@ namespace MongoFramework.Infrastructure.Mapping
 	{
 		public Type EntityType { get; private set; }
 		private BsonClassMap ClassMap { get; set; }
+		private IMongoDbConnection Connection { get; }
 
 		private static ReaderWriterLockSlim MappingLock { get; } = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 		private static ConcurrentDictionary<Type, IEnumerable<IEntityPropertyMap>> EntityMapCache { get; set; }
@@ -23,9 +24,10 @@ namespace MongoFramework.Infrastructure.Mapping
 			EntityMapCache = new ConcurrentDictionary<Type, IEnumerable<IEntityPropertyMap>>();
 		}
 
-		public EntityMapper(Type entityType)
+		public EntityMapper(Type entityType, IMongoDbConnection connection)
 		{
 			EntityType = entityType ?? throw new ArgumentNullException("entityType");
+			Connection = connection;
 			InitialiseClassMap();
 		}
 
@@ -50,7 +52,7 @@ namespace MongoFramework.Infrastructure.Mapping
 
 						foreach (var processor in DefaultMappingPack.Instance.Processors)
 						{
-							processor.ApplyMapping(EntityType, ClassMap);
+							processor.ApplyMapping(EntityType, ClassMap, Connection);
 						}
 					}
 					finally
@@ -127,7 +129,7 @@ namespace MongoFramework.Infrastructure.Mapping
 			if (includeInherited && EntityType.BaseType != typeof(object))
 			{
 				var declaredProperties = GetEntityMapping(false);
-				var inheritedProperties = new EntityMapper(EntityType.BaseType).GetEntityMapping(true);
+				var inheritedProperties = new EntityMapper(EntityType.BaseType, Connection).GetEntityMapping(true);
 				return declaredProperties.Concat(inheritedProperties);
 			}
 			else
@@ -165,7 +167,7 @@ namespace MongoFramework.Infrastructure.Mapping
 
 					if (map.PropertyType.IsClass && !state.TypeHierarchy.Contains(map.PropertyType))
 					{
-						var nestedMapping = new EntityMapper(map.PropertyType)
+						var nestedMapping = new EntityMapper(map.PropertyType, Connection)
 							.GetEntityMapping()
 							.Select(m => new EntityPropertyMap
 							{
@@ -199,6 +201,6 @@ namespace MongoFramework.Infrastructure.Mapping
 
 	public class EntityMapper<TEntity> : EntityMapper where TEntity : class
 	{
-		public EntityMapper() : base(typeof(TEntity)) { }
+		public EntityMapper(IMongoDbConnection connection) : base(typeof(TEntity), connection) { }
 	}
 }

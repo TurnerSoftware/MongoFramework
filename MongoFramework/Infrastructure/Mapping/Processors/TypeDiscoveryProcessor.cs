@@ -10,13 +10,15 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 	{
 		private static bool ProviderAdded { get; set; }
 
-		public void ApplyMapping(Type entityType, BsonClassMap classMap)
+		public void ApplyMapping(Type entityType, BsonClassMap classMap, IMongoDbConnection connection)
 		{
 			if (!ProviderAdded && entityType.GetCustomAttribute<RuntimeTypeDiscoveryAttribute>() != null)
 			{
 				ProviderAdded = true;
 				BsonSerializer.RegisterSerializationProvider(TypeDiscoverySerializationProvider.Instance);
 			}
+
+			TypeDiscoverySerializationProvider.Instance.AddMapping(entityType, connection);
 		}
 	}
 }

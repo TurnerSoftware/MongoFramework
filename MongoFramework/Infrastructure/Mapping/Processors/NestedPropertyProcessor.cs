@@ -8,7 +8,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 {
 	public class NestedPropertyProcessor : IMappingProcessor
 	{
-		public void ApplyMapping(Type entityType, BsonClassMap classMap)
+		public void ApplyMapping(Type entityType, BsonClassMap classMap, IMongoDbConnection connection)
 		{
 			var properties = entityType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
@@ -19,7 +19,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 				//Maps the property type for handling property nesting
 				if (propertyType.IsClass && propertyType != entityType)
 				{
-					new EntityMapper(property.PropertyType);
+					connection.GetEntityMapper(propertyType);
 				}
 				else if (
 					propertyType.IsGenericType && propertyType.GetGenericArguments().Count() == 1 &&
@@ -29,7 +29,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 					)
 				)
 				{
-					new EntityMapper(propertyType.GetGenericArguments()[0]);
+					connection.GetEntityMapper(propertyType.GetGenericArguments()[0]);
 				}
 			}
 		}

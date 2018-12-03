@@ -54,7 +54,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Serialization
 		{
 			var database = TestConfiguration.GetDatabase();
 			var dbSet = new MongoDbSet<RootKnownBaseModel>();
-			dbSet.SetDatabase(database);
+			dbSet.SetConnection(database);
 
 			var rootEntity = new RootKnownBaseModel
 			{
@@ -72,7 +72,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Serialization
 
 			ResetMongoDbDriver();
 			dbSet = new MongoDbSet<RootKnownBaseModel>();
-			dbSet.SetDatabase(database);
+			dbSet.SetConnection(database);
 
 			var dbRootEntity = dbSet.Where(e => e.Id == rootEntity.Id).FirstOrDefault();
 			Assert.IsNotNull(dbRootEntity);

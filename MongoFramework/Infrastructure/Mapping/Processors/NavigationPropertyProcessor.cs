@@ -6,10 +6,10 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 {
 	public class NavigationPropertyProcessor : IMappingProcessor
 	{
-		public void ApplyMapping(Type entityType, BsonClassMap classMap)
+		public void ApplyMapping(Type entityType, BsonClassMap classMap, IMongoDbConnection connection)
 		{
-			var entityMapper = new EntityMapper(entityType);
-			var relationships = entityMapper.GetEntityRelationships();
+			var entityMapper = connection.GetEntityMapper(entityType);
+			var relationships = entityMapper.GetEntityRelationships(connection);
 
 			foreach (var relationship in relationships)
 			{
@@ -17,7 +17,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 				{
 					var memberMap = classMap.MapMember(relationship.NavigationProperty);
 					var serializerType = typeof(EntityNavigationCollectionSerializer<>).MakeGenericType(relationship.EntityType);
-					var collectionSerializer = Activator.CreateInstance(serializerType, relationship.IdProperty.Name) as IBsonSerializer;
+					var collectionSerializer = Activator.CreateInstance(serializerType, relationship.IdProperty.Name, connection) as IBsonSerializer;
 					memberMap.SetSerializer(collectionSerializer);
 				}
 				else

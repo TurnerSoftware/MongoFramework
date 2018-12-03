@@ -41,16 +41,6 @@ namespace MongoFramework.Infrastructure
 			return GetDatabase(urlBuilder.ToMongoUrl());
 		}
 
-		public static IMongoDatabase GetDatabase(IMongoDbContextOptions options)
-		{
-			if (options == null)
-			{
-				throw new ArgumentNullException(nameof(options));
-			}
-
-			return GetDatabase(options.ConnectionString, options.Database);
-		}
-
 		/// <summary>
 		/// Checks whether the provided string matches the 24-character hexadecimal format of an ObjectId
 		/// </summary>
