@@ -15,7 +15,7 @@ namespace MongoFramework.Infrastructure.Mutation.Mutators
 			var relationships = connection.GetEntityMapper(typeof(TEntity)).GetEntityRelationships(connection);
 			foreach (var relationship in relationships)
 			{
-				if (mutationType == MutatorType.Select)
+				if (mutationType == MutatorType.Select && !relationship.IsCollection)
 				{
 					var initialiseSingleEntityMethod = GetType().GetMethod("InitialiseSingleEntityRelationship", BindingFlags.NonPublic | BindingFlags.Static).MakeGenericMethod(relationship.EntityType);
 					initialiseSingleEntityMethod.Invoke(entity, new object[] { entity, relationship, connection });

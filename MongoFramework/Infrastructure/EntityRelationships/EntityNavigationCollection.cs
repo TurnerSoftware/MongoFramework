@@ -22,10 +22,10 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 		public int LoadedCount => Entries.Count;
 		public int UnloadedCount => UnloadedIds.Count;
 		
-		public EntityNavigationCollection(string foreignKey, IMongoDbConnection connection) : base(connection.GetEntityMapper(typeof(TEntity)))
+		public EntityNavigationCollection(string foreignKey, IMongoDbConnection connection) : base(connection?.GetEntityMapper(typeof(TEntity)))
 		{
 			ForeignKey = foreignKey ?? throw new ArgumentNullException(nameof(foreignKey));
-			Connection = connection;
+			Connection = connection ?? throw new ArgumentNullException(nameof(connection));
 			EntityMapper = connection.GetEntityMapper(typeof(TEntity));
 			ForeignPropertyMap = EntityMapper.GetEntityMapping().Where(m => m.Property.Name == foreignKey).FirstOrDefault();
 		}

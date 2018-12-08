@@ -16,7 +16,7 @@ namespace MongoFramework.Tests.Infrastructure.Indexing
 		public void EntityTypeMismatchFromEntityMapper()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var indexMapper = new EntityIndexMapper<AnotherEntity>(connection.GetEntityMapper(typeof(AnotherEntity)));
+			var indexMapper = new EntityIndexMapper<AnotherEntity>(connection.GetEntityMapper(typeof(SomeEntity)));
 		}
 	}
 }
