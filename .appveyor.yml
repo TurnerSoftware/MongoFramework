@@ -13,7 +13,7 @@ install:
 
 
 build_script:
-  - dotnet-install.ps1 -Version 3.0.0-preview1 -Verbose
+  - dotnet-install.ps1 -Version 3.0.100-preview-009812 -Verbose
   - dotnet build -c Debug
   - dotnet build -c Release
 test_script:
