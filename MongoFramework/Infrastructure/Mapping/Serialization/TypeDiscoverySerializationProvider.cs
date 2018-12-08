@@ -13,7 +13,7 @@ namespace MongoFramework.Infrastructure.Mapping.Serialization
 
 		public bool Enabled { get; set; } = true;
 
-		private Dictionary<Type, IEntityMapperFactory> EntityFactoryMapping { get; set; }
+		private Dictionary<Type, IEntityMapperFactory> EntityFactoryMapping { get; } = new Dictionary<Type, IEntityMapperFactory>();
 
 		public override IBsonSerializer GetSerializer(Type type, IBsonSerializerRegistry serializerRegistry)
 		{
