@@ -15,8 +15,8 @@ namespace MongoFramework.Tests.Infrastructure.Indexing
 		[TestMethod, ExpectedException(typeof(InvalidOperationException))]
 		public void EntityTypeMismatchFromEntityMapper()
 		{
-			var entityMapper = new EntityMapper<SomeEntity>();
-			var indexMapper = new EntityIndexMapper<AnotherEntity>(entityMapper);
+			var connection = TestConfiguration.GetConnection();
+			var indexMapper = new EntityIndexMapper<AnotherEntity>(connection.GetEntityMapper(typeof(SomeEntity)));
 		}
 	}
 }

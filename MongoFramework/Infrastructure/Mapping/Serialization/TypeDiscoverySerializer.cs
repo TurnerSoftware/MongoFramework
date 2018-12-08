@@ -14,7 +14,13 @@ namespace MongoFramework.Infrastructure.Mapping.Serialization
 		private static ReaderWriterLockSlim TypeCacheLock { get; } = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 		private static ConcurrentBag<Type> AssignableTypes { get; } = new ConcurrentBag<Type>();
 
+		private IEntityMapperFactory EntityMapperFactory { get; }
 		public Type ValueType => typeof(TEntity);
+
+		public TypeDiscoverySerializer(IEntityMapperFactory entityMapperFactory)
+		{
+			EntityMapperFactory = entityMapperFactory;
+		}
 
 		public object Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
 		{
@@ -94,7 +100,7 @@ namespace MongoFramework.Infrastructure.Mapping.Serialization
 		private IBsonSerializer GetRealSerializer(Type type)
 		{
 			//Force the type to be processed by the Entity Mapper
-			new EntityMapper(type);
+			EntityMapperFactory.GetEntityMapper(type);
 
 			var classMap = BsonClassMap.LookupClassMap(type);
 			var serializerType = typeof(BsonClassMapSerializer<>).MakeGenericType(type);

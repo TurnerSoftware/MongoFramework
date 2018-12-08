@@ -37,7 +37,8 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Serialization
 		[TestMethod]
 		public void NullDeserialization()
 		{
-			var entityMapper = new EntityMapper<KnownBaseModel>();
+			var connection = TestConfiguration.GetConnection();
+			var entityMapper = connection.GetEntityMapper(typeof(KnownBaseModel));
 			var serializer = TypeDiscoverySerializationProvider.Instance.GetSerializer(typeof(KnownBaseModel));
 
 			var document = new BsonDocument
@@ -64,7 +65,8 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Serialization
 		[TestMethod]
 		public void DeserializeChildTypeDiscoveryForRootEntity()
 		{
-			var entityMapper = new EntityMapper<KnownBaseModel>();
+			var connection = TestConfiguration.GetConnection();
+			var entityMapper = connection.GetEntityMapper(typeof(KnownBaseModel));
 
 			var document = new BsonDocument
 			{
@@ -78,7 +80,8 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Serialization
 		[TestMethod]
 		public void DeserializeGrandChildTypeDiscoveryForRootEntity()
 		{
-			var entityMapper = new EntityMapper<KnownBaseModel>();
+			var connection = TestConfiguration.GetConnection();
+			var entityMapper = connection.GetEntityMapper(typeof(KnownBaseModel));
 
 			var document = new BsonDocument
 			{
@@ -92,7 +95,8 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Serialization
 		[TestMethod]
 		public void DeserializeWithoutTypeDiscovery()
 		{
-			var entityMapper = new EntityMapper<KnownBaseModel>();
+			var connection = TestConfiguration.GetConnection();
+			var entityMapper = connection.GetEntityMapper(typeof(KnownBaseModel));
 
 			TypeDiscoverySerializationProvider.Instance.Enabled = false;
 
@@ -110,7 +114,8 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Serialization
 		[TestMethod]
 		public void DeserializeCollection()
 		{
-			var entityMapper = new EntityMapper<CollectionBaseModel>();
+			var connection = TestConfiguration.GetConnection();
+			var entityMapper = connection.GetEntityMapper(typeof(CollectionBaseModel));
 
 			var document = new BsonDocument
 			{
@@ -144,7 +149,8 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Serialization
 		[TestMethod]
 		public void ReserializationWithoutDataLoss()
 		{
-			var entityMapper = new EntityMapper<CollectionBaseModel>();
+			var connection = TestConfiguration.GetConnection();
+			var entityMapper = connection.GetEntityMapper(typeof(CollectionBaseModel));
 
 			var initialEntity = new CollectionBaseModel
 			{

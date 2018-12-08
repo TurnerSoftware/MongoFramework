@@ -51,28 +51,32 @@ namespace MongoFramework.Tests.Infrastructure.Mapping
 		[TestMethod]
 		public void CollectionNameFromClassName()
 		{
-			var mapper = new EntityMapper<DefaultCollectionNameModel>();
+			var connection = TestConfiguration.GetConnection();
+			var mapper = new EntityMapper<DefaultCollectionNameModel>(connection);
 			Assert.AreEqual("DefaultCollectionNameModel", mapper.GetCollectionName());
 		}
 
 		[TestMethod]
 		public void CollectionNameFromAttribute()
 		{
-			var mapper = new EntityMapper<CustomCollectionModel>();
+			var connection = TestConfiguration.GetConnection();
+			var mapper = new EntityMapper<CustomCollectionModel>(connection);
 			Assert.AreEqual("CustomCollection", mapper.GetCollectionName());
 		}
 
 		[TestMethod]
 		public void CollectionNameAndSchemaFromAttribute()
 		{
-			var mapper = new EntityMapper<CustomCollectionAndSchemaModel>();
+			var connection = TestConfiguration.GetConnection();
+			var mapper = new EntityMapper<CustomCollectionAndSchemaModel>(connection);
 			Assert.AreEqual("CustomSchema.CustomCollection", mapper.GetCollectionName());
 		}
 
 		[TestMethod]
 		public void TraverseMapping()
 		{
-			var mapper = new EntityMapper<TraverseMappingModel>();
+			var connection = TestConfiguration.GetConnection();
+			var mapper = new EntityMapper<TraverseMappingModel>(connection);
 			var result = mapper.TraverseMapping().ToArray();
 
 			Assert.AreEqual(14, result.Length);
@@ -102,9 +106,10 @@ namespace MongoFramework.Tests.Infrastructure.Mapping
 		[TestMethod]
 		public void MappingLocks()
 		{
+			var connection = TestConfiguration.GetConnection();
 			AssertExtensions.DoesNotThrow<Exception>(() =>
 			{
-				Parallel.For(1, 10, i => { new EntityMapper<MappingLockModel>(); });
+				Parallel.For(1, 10, i => { new EntityMapper<MappingLockModel>(connection); });
 			});
 		}
 	}

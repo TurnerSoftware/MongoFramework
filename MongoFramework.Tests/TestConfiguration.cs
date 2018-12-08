@@ -19,11 +19,9 @@ namespace MongoFramework.Tests
 			return DatabaseName;
 		}
 
-		public static IMongoDatabase GetDatabase()
+		public static IMongoDbConnection GetConnection()
 		{
-			var client = new MongoClient(ConnectionString);
-			var database = client.GetDatabase(GetDatabaseName());
-			return database;
+			return MongoDbConnection.FromConnectionString(ConnectionString, GetDatabaseName());
 		}
 	}
 }

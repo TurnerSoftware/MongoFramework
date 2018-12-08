@@ -17,21 +17,11 @@ namespace MongoFramework.Tests
 			public string RequiredField { get; set; }
 		}
 
-		[TestMethod]
-		public void InitialiseDbSet()
-		{
-			var connectionString = TestConfiguration.ConnectionString;
-			var databaseName = TestConfiguration.GetDatabaseName();
-			AssertExtensions.DoesNotThrow<Exception>(() =>
-				new MongoDbSet<MongoDbSetValidationModel>(connectionString, databaseName));
-		}
-
 		[TestMethod, ExpectedException(typeof(ValidationException))]
 		public void ValidationExceptionOnInvalidModel()
 		{
-			var database = TestConfiguration.GetDatabase();
 			var dbSet = new MongoDbSet<MongoDbSetValidationModel>();
-			dbSet.SetDatabase(database);
+			dbSet.SetConnection(TestConfiguration.GetConnection());
 
 			dbSet.Add(new MongoDbSetValidationModel());
 			dbSet.SaveChanges();
@@ -40,9 +30,8 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public void SuccessfulInsertAndQueryBack()
 		{
-			var database = TestConfiguration.GetDatabase();
 			var dbSet = new MongoDbSet<MongoDbSetValidationModel>();
-			dbSet.SetDatabase(database);
+			dbSet.SetConnection(TestConfiguration.GetConnection());
 
 			dbSet.Add(new MongoDbSetValidationModel
 			{
@@ -57,9 +46,8 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public async Task SuccessfulInsertAndQueryBackAsync()
 		{
-			var database = TestConfiguration.GetDatabase();
 			var dbSet = new MongoDbSet<MongoDbSetValidationModel>();
-			dbSet.SetDatabase(database);
+			dbSet.SetConnection(TestConfiguration.GetConnection());
 
 			dbSet.Add(new MongoDbSetValidationModel
 			{

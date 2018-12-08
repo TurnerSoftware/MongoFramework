@@ -11,44 +11,14 @@ namespace MongoFramework
 {
 	public class MongoDbContext : IMongoDbContext, IDisposable
 	{
-		protected IMongoDatabase Database { get; set; }
+		protected IMongoDbConnection Connection { get; private set; }
 
 		private IList<IMongoDbSet> DbSets { get; set; }
 
-#if !NETCOREAPP2_0
-		public MongoDbContext(string connectionName)
+		public MongoDbContext(IMongoDbConnection connection)
 		{
-			var mongoUrl = MongoDbUtility.GetMongoUrlFromConfig(connectionName);
-
-			if (mongoUrl == null)
-			{
-				throw new MongoConfigurationException("No connection string found with the name \'" + connectionName + "\'");
-			}
-
-			Database = MongoDbUtility.GetDatabase(mongoUrl);
+			Connection = connection;
 			InitialiseDbSets();
-		}
-#endif
-		public MongoDbContext(string connectionString, string databaseName)
-		{
-			Database = MongoDbUtility.GetDatabase(connectionString, databaseName);
-			InitialiseDbSets();
-		}
-
-		public MongoDbContext(IMongoDbContextOptions options)
-		{
-			Database = MongoDbUtility.GetDatabase(options);
-			InitialiseDbSets();
-		}
-
-		internal MongoDbContext(IMongoDatabase database)
-		{
-			Database = database;
-			InitialiseDbSets();
-		}
-		public static MongoDbContext CreateWithDatabase(IMongoDatabase database)
-		{
-			return new MongoDbContext(database);
 		}
 
 		private void InitialiseDbSets()
@@ -63,25 +33,32 @@ namespace MongoFramework
 				var propertyType = property.PropertyType;
 				if (propertyType.IsGenericType && mongoDbSetType.IsAssignableFrom(propertyType))
 				{
-					IMongoDbSet dbSet;
-
-					var dbSetWithOptionsConstructor = propertyType.GetConstructor(new[] { typeof(IDbSetOptions) });
-					if (dbSetWithOptionsConstructor != null)
-					{
-						var dbSetOptionsAttribute = property.GetCustomAttribute<DbSetOptionsAttribute>();
-						var dbSetOptions = dbSetOptionsAttribute?.GetOptions();
-						dbSet = dbSetWithOptionsConstructor.Invoke(new[] { dbSetOptions }) as IMongoDbSet;
-					}
-					else
-					{
-						dbSet = Activator.CreateInstance(propertyType) as IMongoDbSet;
-					}
-
-					dbSet.SetDatabase(Database);
+					var dbSet = OnDbSetCreation(property);
 					DbSets.Add(dbSet);
 					property.SetValue(this, dbSet);
 				}
 			}
+		}
+
+		protected virtual IMongoDbSet OnDbSetCreation(PropertyInfo property)
+		{
+			IMongoDbSet dbSet;
+
+			var propertyType = property.PropertyType;
+			var dbSetWithOptionsConstructor = propertyType.GetConstructor(new[] { typeof(IDbSetOptions) });
+			if (dbSetWithOptionsConstructor != null)
+			{
+				var dbSetOptionsAttribute = property.GetCustomAttribute<DbSetOptionsAttribute>();
+				var dbSetOptions = dbSetOptionsAttribute?.GetOptions();
+				dbSet = dbSetWithOptionsConstructor.Invoke(new[] { dbSetOptions }) as IMongoDbSet;
+			}
+			else
+			{
+				dbSet = Activator.CreateInstance(propertyType) as IMongoDbSet;
+			}
+
+			dbSet.SetConnection(Connection);
+			return dbSet;
 		}
 
 		public virtual void SaveChanges()
@@ -110,7 +87,8 @@ namespace MongoFramework
 		{
 			if (disposing)
 			{
-				Database = null;
+				Connection?.Dispose();
+				Connection = null;
 				DbSets = null;
 			}
 		}

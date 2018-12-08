@@ -39,20 +39,22 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void IdMapsOnAttribute()
 		{
+			var connection = TestConfiguration.GetConnection();
 			var processor = new EntityIdProcessor();
 			var classMap = new BsonClassMap<IdByAttributeTestModel>();
-			processor.ApplyMapping(typeof(IdByAttributeTestModel), classMap);
+			processor.ApplyMapping(typeof(IdByAttributeTestModel), classMap, connection);
 
-			var entityMapper = new EntityMapper<IdByAttributeTestModel>();
+			var entityMapper = connection.GetEntityMapper(typeof(IdByAttributeTestModel));
 			Assert.AreEqual("MyCustomId", entityMapper.GetIdName());
 		}
 
 		[TestMethod]
 		public void StringIdGeneratorOnStringProperty()
 		{
+			var connection = TestConfiguration.GetConnection();
 			var processor = new EntityIdProcessor();
 			var classMap = new BsonClassMap<StringIdGeneratorTestModel>();
-			processor.ApplyMapping(typeof(StringIdGeneratorTestModel), classMap);
+			processor.ApplyMapping(typeof(StringIdGeneratorTestModel), classMap, connection);
 
 			Assert.AreEqual(typeof(StringObjectIdGenerator), classMap.IdMemberMap.IdGenerator?.GetType());
 		}
@@ -60,9 +62,10 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void GuidIdGeneratorOnGuidProperty()
 		{
+			var connection = TestConfiguration.GetConnection();
 			var processor = new EntityIdProcessor();
 			var classMap = new BsonClassMap<GuidIdGeneratorTestModel>();
-			processor.ApplyMapping(typeof(GuidIdGeneratorTestModel), classMap);
+			processor.ApplyMapping(typeof(GuidIdGeneratorTestModel), classMap, connection);
 
 			Assert.AreEqual(typeof(CombGuidGenerator), classMap.IdMemberMap.IdGenerator?.GetType());
 		}
@@ -70,9 +73,10 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void ObjectIdGeneratorOnObjectIdProperty()
 		{
+			var connection = TestConfiguration.GetConnection();
 			var processor = new EntityIdProcessor();
 			var classMap = new BsonClassMap<ObjectIdGeneratorTestModel>();
-			processor.ApplyMapping(typeof(ObjectIdGeneratorTestModel), classMap);
+			processor.ApplyMapping(typeof(ObjectIdGeneratorTestModel), classMap, connection);
 
 			Assert.AreEqual(typeof(ObjectIdGenerator), classMap.IdMemberMap.IdGenerator?.GetType());
 		}

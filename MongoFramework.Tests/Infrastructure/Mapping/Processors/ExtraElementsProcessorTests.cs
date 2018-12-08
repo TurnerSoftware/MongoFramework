@@ -25,10 +25,11 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void ObeysIgnoreExtraElementsAttribute()
 		{
+			var connection = TestConfiguration.GetConnection();
 			var processor = new ExtraElementsProcessor();
 			var classMap = new BsonClassMap<IgnoreExtraElementsModel>();
 			classMap.AutoMap();
-			processor.ApplyMapping(typeof(IgnoreExtraElementsModel), classMap);
+			processor.ApplyMapping(typeof(IgnoreExtraElementsModel), classMap, connection);
 
 			Assert.IsTrue(classMap.IgnoreExtraElements);
 		}
@@ -36,10 +37,11 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void ObeysExtraElementsAttribute()
 		{
+			var connection = TestConfiguration.GetConnection();
 			var processor = new ExtraElementsProcessor();
 			var classMap = new BsonClassMap<ExtraElementsModel>();
 			classMap.AutoMap();
-			processor.ApplyMapping(typeof(ExtraElementsModel), classMap);
+			processor.ApplyMapping(typeof(ExtraElementsModel), classMap, connection);
 
 			Assert.AreEqual("AdditionalElements", classMap.ExtraElementsMemberMap?.ElementName);
 		}

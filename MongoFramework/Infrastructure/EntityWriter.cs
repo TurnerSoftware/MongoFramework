@@ -12,21 +12,19 @@ namespace MongoFramework.Infrastructure
 {
 	public class EntityWriter<TEntity> : IEntityWriter<TEntity> where TEntity : class
 	{
-		public IMongoDatabase Database { get; private set; }
-		public IEntityMapper EntityMapper { get; private set; }
-
-		public EntityWriter(IMongoDatabase database) : this(database, new EntityMapper(typeof(TEntity))) { }
-
-		public EntityWriter(IMongoDatabase database, IEntityMapper mapper)
+		public IMongoDbConnection Connection { get; }
+		public IEntityMapper EntityMapper { get; }
+		
+		public EntityWriter(IMongoDbConnection connection)
 		{
-			Database = database ?? throw new ArgumentNullException(nameof(database));
-			EntityMapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+			Connection = connection ?? throw new ArgumentNullException(nameof(connection));
+			EntityMapper = connection.GetEntityMapper(typeof(TEntity));
 		}
 
 		private IMongoCollection<TEntity> GetCollection()
 		{
 			var collectionName = EntityMapper.GetCollectionName();
-			return Database.GetCollection<TEntity>(collectionName);
+			return Connection.GetDatabase().GetCollection<TEntity>(collectionName);
 		}
 
 		private IEnumerable<WriteModel<TEntity>> BuildWriteModel(IEntityCollection<TEntity> entityCollection)
@@ -38,12 +36,12 @@ namespace MongoFramework.Infrastructure
 			{
 				if (entry.State == EntityEntryState.Added)
 				{
-					EntityMutation<TEntity>.MutateEntity(entry.Entity, MutatorType.Insert, Database);
+					EntityMutation<TEntity>.MutateEntity(entry.Entity, MutatorType.Insert, Connection);
 					writeModel.Add(new InsertOneModel<TEntity>(entry.Entity));
 				}
 				else if (entry.State == EntityEntryState.Updated)
 				{
-					EntityMutation<TEntity>.MutateEntity(entry.Entity, MutatorType.Update, Database);
+					EntityMutation<TEntity>.MutateEntity(entry.Entity, MutatorType.Update, Connection);
 					var idFieldValue = EntityMapper.GetIdValue(entry.Entity);
 					var filter = Builders<TEntity>.Filter.Eq(idFieldName, idFieldValue);
 					var updateDefintion = UpdateDefinitionHelper.CreateFromDiff<TEntity>(entry.OriginalValues, entry.CurrentValues);

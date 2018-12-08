@@ -27,12 +27,13 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void ObeysNotMappedAttribute()
 		{
+			var connection = TestConfiguration.GetConnection();
 			var processor = new MappedPropertiesProcessor();
 			var classMap = new BsonClassMap<NotMappedPropertiesModel>();
 			classMap.AutoMap();
-			processor.ApplyMapping(typeof(NotMappedPropertiesModel), classMap);
+			processor.ApplyMapping(typeof(NotMappedPropertiesModel), classMap, connection);
 
-			var entityMapper = new EntityMapper<NotMappedPropertiesModel>();
+			var entityMapper = connection.GetEntityMapper(typeof(NotMappedPropertiesModel));
 			var mappedProperties = entityMapper.GetEntityMapping();
 			Assert.IsFalse(mappedProperties.Any(p => p.ElementName == "NotMapped"));
 		}
@@ -40,12 +41,13 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void ObeysColumnAttributeRemap()
 		{
+			var connection = TestConfiguration.GetConnection();
 			var processor = new MappedPropertiesProcessor();
 			var classMap = new BsonClassMap<ColumnAttributePropertyModel>();
 			classMap.AutoMap();
-			processor.ApplyMapping(typeof(ColumnAttributePropertyModel), classMap);
+			processor.ApplyMapping(typeof(ColumnAttributePropertyModel), classMap, connection);
 
-			var entityMapper = new EntityMapper<ColumnAttributePropertyModel>();
+			var entityMapper = connection.GetEntityMapper(typeof(ColumnAttributePropertyModel));
 			var mappedProperties = entityMapper.GetEntityMapping();
 			Assert.IsTrue(mappedProperties.Any(p => p.ElementName == "CustomPropertyName"));
 		}

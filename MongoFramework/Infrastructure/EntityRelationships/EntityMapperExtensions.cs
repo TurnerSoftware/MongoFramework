@@ -12,7 +12,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 	{
 		public static readonly Type[] IdTypes = new[] { typeof(string), typeof(Guid), typeof(ObjectId) };
 
-		public static IEnumerable<EntityRelationship> GetEntityRelationships(this IEntityMapper entityMapper)
+		public static IEnumerable<EntityRelationship> GetEntityRelationships(this IEntityMapper entityMapper, IEntityMapperFactory entityMapperFactory)
 		{
 			var entityType = entityMapper.EntityType;
 			var propertyMap = entityType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToDictionary(p => p.Name);
@@ -63,7 +63,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 				{
 					var collectionEntityType = propertyType.GetGenericArguments().FirstOrDefault();
 					var inversePropertyAttr = currentProperty.GetCustomAttribute<InversePropertyAttribute>();
-					var relatedEntityMapping = new EntityMapper(collectionEntityType).GetEntityMapping();
+					var relatedEntityMapping = entityMapperFactory.GetEntityMapper(collectionEntityType).GetEntityMapping();
 
 					PropertyInfo idProperty;
 

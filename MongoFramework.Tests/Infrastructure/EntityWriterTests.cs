@@ -22,9 +22,9 @@ namespace MongoFramework.Tests.Infrastructure
 		[TestMethod]
 		public void AddEntity()
 		{
-			var database = TestConfiguration.GetDatabase();
-			var entityContainer = new EntityCollection<EntityWriterModel>();
-			var writer = new EntityWriter<EntityWriterModel>(database);
+			var connection = TestConfiguration.GetConnection();
+			var entityContainer = new EntityCollection<EntityWriterModel>(connection.GetEntityMapper(typeof(EntityWriterModel)));
+			var writer = new EntityWriter<EntityWriterModel>(connection);
 
 			var entity = new EntityWriterModel
 			{
@@ -40,9 +40,9 @@ namespace MongoFramework.Tests.Infrastructure
 		[TestMethod]
 		public void AddMixedTypeEntities()
 		{
-			var database = TestConfiguration.GetDatabase();
-			var entityContainer = new EntityCollection<EntityWriterModel>();
-			var writer = new EntityWriter<EntityWriterModel>(database);
+			var connection = TestConfiguration.GetConnection();
+			var entityContainer = new EntityCollection<EntityWriterModel>(connection.GetEntityMapper(typeof(EntityWriterModel)));
+			var writer = new EntityWriter<EntityWriterModel>(connection);
 			var entities = new[]
 			{
 				new EntityWriterModel
@@ -70,10 +70,10 @@ namespace MongoFramework.Tests.Infrastructure
 		[TestMethod]
 		public void UpdateEntity()
 		{
-			var database = TestConfiguration.GetDatabase();
-			var entityContainer = new EntityCollection<EntityWriterModel>();
-			var writer = new EntityWriter<EntityWriterModel>(database);
-			var reader = new EntityReader<EntityWriterModel>(database);
+			var connection = TestConfiguration.GetConnection();
+			var entityContainer = new EntityCollection<EntityWriterModel>(connection.GetEntityMapper(typeof(EntityWriterModel)));
+			var writer = new EntityWriter<EntityWriterModel>(connection);
+			var reader = new EntityReader<EntityWriterModel>(connection);
 
 			//Get entity initially into the DB so we can update it
 			var entity = new EntityWriterModel
@@ -102,10 +102,10 @@ namespace MongoFramework.Tests.Infrastructure
 		[TestMethod]
 		public void RemoveEntity()
 		{
-			var database = TestConfiguration.GetDatabase();
-			var entityContainer = new EntityCollection<EntityWriterModel>();
-			var writer = new EntityWriter<EntityWriterModel>(database);
-			var reader = new EntityReader<EntityWriterModel>(database);
+			var connection = TestConfiguration.GetConnection();
+			var entityContainer = new EntityCollection<EntityWriterModel>(connection.GetEntityMapper(typeof(EntityWriterModel)));
+			var writer = new EntityWriter<EntityWriterModel>(connection);
+			var reader = new EntityReader<EntityWriterModel>(connection);
 
 			//Get entity initially into the DB so we can remove it
 			var entity = new EntityWriterModel
@@ -127,10 +127,10 @@ namespace MongoFramework.Tests.Infrastructure
 		[TestMethod]
 		public void MixedActionWrite()
 		{
-			var database = TestConfiguration.GetDatabase();
-			var entityContainer = new EntityCollection<EntityWriterModel>();
-			var writer = new EntityWriter<EntityWriterModel>(database);
-			var reader = new EntityReader<EntityWriterModel>(database);
+			var connection = TestConfiguration.GetConnection();
+			var entityContainer = new EntityCollection<EntityWriterModel>(connection.GetEntityMapper(typeof(EntityWriterModel)));
+			var writer = new EntityWriter<EntityWriterModel>(connection);
+			var reader = new EntityReader<EntityWriterModel>(connection);
 
 			var updateEntity = new EntityWriterModel
 			{
@@ -165,10 +165,10 @@ namespace MongoFramework.Tests.Infrastructure
 		[TestMethod]
 		public async Task MixedActionWriteAsync()
 		{
-			var database = TestConfiguration.GetDatabase();
-			var entityContainer = new EntityCollection<EntityWriterModel>();
-			var writer = new EntityWriter<EntityWriterModel>(database);
-			var reader = new EntityReader<EntityWriterModel>(database);
+			var connection = TestConfiguration.GetConnection();
+			var entityContainer = new EntityCollection<EntityWriterModel>(connection.GetEntityMapper(typeof(EntityWriterModel)));
+			var writer = new EntityWriter<EntityWriterModel>(connection);
+			var reader = new EntityReader<EntityWriterModel>(connection);
 
 			var updateEntity = new EntityWriterModel
 			{

@@ -8,19 +8,19 @@ namespace MongoFramework.Infrastructure.Indexing
 {
 	public class EntityIndexWriter<TEntity> : IEntityIndexWriter<TEntity> where TEntity : class
 	{
-		private IMongoDatabase Database { get; set; }
+		private IMongoDbConnection Connection { get; }
 		private IEntityIndexMapper IndexMapper { get; set; }
 
-		public EntityIndexWriter(IMongoDatabase database, IEntityIndexMapper indexMapper)
+		public EntityIndexWriter(IMongoDbConnection connection)
 		{
-			Database = database;
-			IndexMapper = indexMapper;
+			Connection = connection;
+			IndexMapper = connection.GetIndexMapper(typeof(TEntity));
 		}
 
 		private IMongoCollection<TEntity> GetCollection()
 		{
 			var collectionName = IndexMapper.GetCollectionName();
-			return Database.GetCollection<TEntity>(collectionName);
+			return Connection.GetDatabase().GetCollection<TEntity>(collectionName);
 		}
 
 		private IEnumerable<CreateIndexModel<TEntity>> GenerateIndexModel()

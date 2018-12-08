@@ -25,12 +25,13 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void TypeDiscoverySerializerWhenAttributeIsDefined()
 		{
+			var connection = TestConfiguration.GetConnection();
 			var processor = new TypeDiscoveryProcessor();
 			var classMap = new BsonClassMap<TypeDiscoveryAttributeModel>();
 			classMap.AutoMap();
 			BsonClassMap.RegisterClassMap(classMap);
 
-			processor.ApplyMapping(typeof(TypeDiscoveryAttributeModel), classMap);
+			processor.ApplyMapping(typeof(TypeDiscoveryAttributeModel), classMap, connection);
 
 			var serializer = BsonSerializer.LookupSerializer<TypeDiscoveryAttributeModel>();
 
@@ -40,12 +41,13 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void NotTypeDiscoverySerializerWhenAttributeNotDefined()
 		{
+			var connection = TestConfiguration.GetConnection();
 			var processor = new TypeDiscoveryProcessor();
 			var classMap = new BsonClassMap<NoTypeDiscoveryAttributeModel>();
 			classMap.AutoMap();
 			BsonClassMap.RegisterClassMap(classMap);
 
-			processor.ApplyMapping(typeof(NoTypeDiscoveryAttributeModel), classMap);
+			processor.ApplyMapping(typeof(NoTypeDiscoveryAttributeModel), classMap, connection);
 
 			var serializer = BsonSerializer.LookupSerializer<NoTypeDiscoveryAttributeModel>();
 

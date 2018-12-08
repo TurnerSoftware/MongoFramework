@@ -8,7 +8,7 @@ namespace MongoFramework
 {
 	public interface IMongoDbSet
 	{
-		void SetDatabase(IMongoDatabase database);
+		void SetConnection(IMongoDbConnection connection);
 		void SaveChanges();
 		Task SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
 	}

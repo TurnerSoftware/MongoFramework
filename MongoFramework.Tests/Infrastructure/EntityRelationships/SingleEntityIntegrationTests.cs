@@ -26,7 +26,7 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		[TestMethod]
 		public void AddRelationshipToNewEntity()
 		{
-			var database = TestConfiguration.GetDatabase();
+			var connection = TestConfiguration.GetConnection();
 			var entity = new SingleEntityIntegrationModel
 			{
 				RelatedItem = new StringIdModel
@@ -35,8 +35,7 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 				}
 			};
 
-			var entityMapper = new EntityMapper<SingleEntityIntegrationModel>();
-			var entityRelationshipWriter = new EntityRelationshipWriter<SingleEntityIntegrationModel>(database, entityMapper);
+			var entityRelationshipWriter = new EntityRelationshipWriter<SingleEntityIntegrationModel>(connection);
 
 			entityRelationshipWriter.CommitEntityRelationships(new[] { entity });
 
@@ -47,7 +46,7 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		[TestMethod]
 		public async Task AddRelationshipToNewEntityAsync()
 		{
-			var database = TestConfiguration.GetDatabase();
+			var connection = TestConfiguration.GetConnection();
 			var entity = new SingleEntityIntegrationModel
 			{
 				RelatedItem = new StringIdModel
@@ -56,8 +55,7 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 				}
 			};
 
-			var entityMapper = new EntityMapper<SingleEntityIntegrationModel>();
-			var entityRelationshipWriter = new EntityRelationshipWriter<SingleEntityIntegrationModel>(database, entityMapper);
+			var entityRelationshipWriter = new EntityRelationshipWriter<SingleEntityIntegrationModel>(connection);
 
 			await entityRelationshipWriter.CommitEntityRelationshipsAsync(new[] { entity }).ConfigureAwait(false);
 
@@ -68,14 +66,14 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		[TestMethod]
 		public void LoadRelationship()
 		{
-			var database = TestConfiguration.GetDatabase();
+			var connection = TestConfiguration.GetConnection();
 
 			var relatedEntity = new StringIdModel
 			{
 				Description = "LoadRelationship-RelatedItem"
 			};
-			var dbEntityWriter = new EntityWriter<StringIdModel>(database);
-			var collection = new EntityCollection<StringIdModel>
+			var dbEntityWriter = new EntityWriter<StringIdModel>(connection);
+			var collection = new EntityCollection<StringIdModel>(connection.GetEntityMapper(typeof(StringIdModel)))
 			{
 				relatedEntity
 			};
@@ -86,8 +84,7 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 				RelatedItemId = relatedEntity.Id
 			};
 
-			var entityMapper = new EntityMapper<SingleEntityIntegrationModel>();
-			new NavigationPropertyMutator<SingleEntityIntegrationModel>().MutateEntity(entity, MutatorType.Select, entityMapper, database);
+			new NavigationPropertyMutator<SingleEntityIntegrationModel>().MutateEntity(entity, MutatorType.Select, connection);
 
 			Assert.AreEqual("LoadRelationship-RelatedItem", entity.RelatedItem.Description);
 		}

@@ -13,6 +13,8 @@ namespace MongoFramework.Infrastructure.Mapping.Serialization
 
 		public bool Enabled { get; set; } = true;
 
+		private Dictionary<Type, IEntityMapperFactory> EntityFactoryMapping { get; } = new Dictionary<Type, IEntityMapperFactory>();
+
 		public override IBsonSerializer GetSerializer(Type type, IBsonSerializerRegistry serializerRegistry)
 		{
 			if (type == null)
@@ -22,11 +24,20 @@ namespace MongoFramework.Infrastructure.Mapping.Serialization
 
 			if (Enabled && type.GetCustomAttribute<RuntimeTypeDiscoveryAttribute>() != null)
 			{
+				var entityMapperFactory = EntityFactoryMapping[type];
 				var serializerType = typeof(TypeDiscoverySerializer<>).MakeGenericType(type);
-				return (IBsonSerializer)Activator.CreateInstance(serializerType);
+				return (IBsonSerializer)Activator.CreateInstance(serializerType, entityMapperFactory);
 			}
 
 			return null;
+		}
+
+		public void AddMapping(Type type, IEntityMapperFactory mapperFactory)
+		{
+			if (!EntityFactoryMapping.ContainsKey(type))
+			{
+				EntityFactoryMapping.Add(type, mapperFactory);
+			}
 		}
 	}
 }

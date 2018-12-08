@@ -23,8 +23,7 @@ namespace MongoFramework.Tests
 
 		class MongoDbContextTestContext : MongoDbContext
 		{
-			public MongoDbContextTestContext(IMongoDbContextOptions options) : base(options) { }
-			public MongoDbContextTestContext(string connectionString, string databaseName) : base(connectionString, databaseName) { }
+			public MongoDbContextTestContext(IMongoDbConnection connection) : base(connection) { }
 			public MongoDbSet<DbSetModel> DbSet { get; set; }
 			[BucketSetOptions(5)]
 			public MongoDbBucketSet<BucketGroupModel, BucketSubEntity> DbBucketSet { get; set; }
@@ -33,13 +32,7 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public void ContextCreatedWithOptions()
 		{
-			var options = new MongoDbContextOptions
-			{
-				ConnectionString = TestConfiguration.ConnectionString,
-				Database = TestConfiguration.GetDatabaseName()
-			};
-
-			using (var context = new MongoDbContextTestContext(options))
+			using (var context = new MongoDbContextTestContext(TestConfiguration.GetConnection()))
 			{
 				context.DbSet.Add(new DbSetModel());
 				Assert.IsFalse(context.DbSet.Any());
@@ -51,9 +44,7 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public void ContextCreatesDbSets()
 		{
-			var connectionString = TestConfiguration.ConnectionString;
-			var databaseName = TestConfiguration.GetDatabaseName();
-			using (var context = new MongoDbContextTestContext(connectionString, databaseName))
+			using (var context = new MongoDbContextTestContext(TestConfiguration.GetConnection()))
 			{
 				Assert.IsNotNull(context.DbSet);
 				Assert.IsNotNull(context.DbBucketSet);
@@ -63,9 +54,7 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public void DbSetsHaveOptionsApplied()
 		{
-			var connectionString = TestConfiguration.ConnectionString;
-			var databaseName = TestConfiguration.GetDatabaseName();
-			using (var context = new MongoDbContextTestContext(connectionString, databaseName))
+			using (var context = new MongoDbContextTestContext(TestConfiguration.GetConnection()))
 			{
 				Assert.AreEqual(5, context.DbBucketSet.BucketSize);
 			}
@@ -74,9 +63,7 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public void ContextSavesDbSets()
 		{
-			var connectionString = TestConfiguration.ConnectionString;
-			var databaseName = TestConfiguration.GetDatabaseName();
-			using (var context = new MongoDbContextTestContext(connectionString, databaseName))
+			using (var context = new MongoDbContextTestContext(TestConfiguration.GetConnection()))
 			{
 				context.DbSet.Add(new DbSetModel());
 				Assert.IsFalse(context.DbSet.Any());
@@ -90,7 +77,7 @@ namespace MongoFramework.Tests
 		{
 			var connectionString = TestConfiguration.ConnectionString;
 			var databaseName = TestConfiguration.GetDatabaseName();
-			using (var context = new MongoDbContextTestContext(connectionString, databaseName))
+			using (var context = new MongoDbContextTestContext(TestConfiguration.GetConnection()))
 			{
 				context.DbSet.Add(new DbSetModel());
 				Assert.IsFalse(context.DbSet.Any());

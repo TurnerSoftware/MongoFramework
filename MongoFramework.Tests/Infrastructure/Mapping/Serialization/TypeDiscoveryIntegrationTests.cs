@@ -52,9 +52,9 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Serialization
 		[TestMethod]
 		public void ReadAndWriteRootEntity()
 		{
-			var database = TestConfiguration.GetDatabase();
+			var connection = TestConfiguration.GetConnection();
 			var dbSet = new MongoDbSet<RootKnownBaseModel>();
-			dbSet.SetDatabase(database);
+			dbSet.SetConnection(connection);
 
 			var rootEntity = new RootKnownBaseModel
 			{
@@ -72,7 +72,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Serialization
 
 			ResetMongoDbDriver();
 			dbSet = new MongoDbSet<RootKnownBaseModel>();
-			dbSet.SetDatabase(database);
+			dbSet.SetConnection(connection);
 
 			var dbRootEntity = dbSet.Where(e => e.Id == rootEntity.Id).FirstOrDefault();
 			Assert.IsNotNull(dbRootEntity);

@@ -5,6 +5,7 @@ namespace MongoFramework.Infrastructure.Linq
 {
 	public interface IMongoFrameworkQueryable : IOrderedQueryable
 	{
+		IMongoDbConnection Connection { get; }
 		string ToQuery();
 	}
 
