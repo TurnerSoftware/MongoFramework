@@ -22,11 +22,12 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void AccessToInherittedProperty()
 		{
+			var connection = TestConfiguration.GetConnection();
 			var processor = new HierarchyProcessor();
 			var classMap = new BsonClassMap<ChildTestModel>();
-			processor.ApplyMapping(typeof(ChildTestModel), classMap);
+			processor.ApplyMapping(typeof(ChildTestModel), classMap, connection);
 
-			var entityMapper = new EntityMapper<ChildTestModel>();
+			var entityMapper = connection.GetEntityMapper(typeof(ChildTestModel));
 			var mappedProperties = entityMapper.GetEntityMapping();
 			Assert.IsTrue(mappedProperties.Any(p => p.ElementName == "Id"));
 		}
@@ -34,11 +35,12 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void AccessToDeclaredProperty()
 		{
+			var connection = TestConfiguration.GetConnection();
 			var processor = new HierarchyProcessor();
 			var classMap = new BsonClassMap<ChildTestModel>();
-			processor.ApplyMapping(typeof(ChildTestModel), classMap);
+			processor.ApplyMapping(typeof(ChildTestModel), classMap, connection);
 
-			var entityMapper = new EntityMapper<ChildTestModel>();
+			var entityMapper = connection.GetEntityMapper(typeof(ChildTestModel));
 			var mappedProperties = entityMapper.GetEntityMapping();
 			Assert.IsTrue(mappedProperties.Any(p => p.ElementName == "DeclaredProperty"));
 		}

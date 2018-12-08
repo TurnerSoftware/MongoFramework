@@ -55,10 +55,10 @@ namespace MongoFramework.Tests.Infrastructure.Mutation.Mutators
 		public void NoExistingItems()
 		{
 			var entity = new ValidAttributeUseModel();
-			var entityMapper = new EntityMapper<ValidAttributeUseModel>();
+			var connection = TestConfiguration.GetConnection();
 			var mutator = new EntityAttributeMutator<ValidAttributeUseModel>();
 
-			mutator.MutateEntity(entity, MutatorType.Insert, entityMapper, null);
+			mutator.MutateEntity(entity, MutatorType.Insert, connection);
 
 			var expected = new[] { new TestItem(), new TestItem(), new TestItem(), new TestItem(), new TestItem() };
 
@@ -74,12 +74,12 @@ namespace MongoFramework.Tests.Infrastructure.Mutation.Mutators
 				MyItems = new[] { new TestItem { Name = "A" } }
 			};
 
-			var entityMapper = new EntityMapper<ValidAttributeUseModel>();
+			var connection = TestConfiguration.GetConnection();
 			var mutator = new EntityAttributeMutator<ValidAttributeUseModel>();
 
 			Assert.AreEqual(1, entity.MyItems.Count());
 
-			mutator.MutateEntity(entity, MutatorType.Insert, entityMapper, null);
+			mutator.MutateEntity(entity, MutatorType.Insert, connection);
 
 			var expected = new[] { new TestItem { Name = "A" }, new TestItem(), new TestItem(), new TestItem(), new TestItem() };
 
@@ -97,12 +97,12 @@ namespace MongoFramework.Tests.Infrastructure.Mutation.Mutators
 				MyItems = new[] { new TestItem(), new TestItem(), new TestItem(), new TestItem(), new TestItem(), new TestItem() }
 			};
 
-			var entityMapper = new EntityMapper<ValidAttributeUseModel>();
+			var connection = TestConfiguration.GetConnection();
 			var mutator = new EntityAttributeMutator<ValidAttributeUseModel>();
 
 			Assert.AreEqual(6, entity.MyItems.Count());
 
-			mutator.MutateEntity(entity, MutatorType.Insert, entityMapper, null);
+			mutator.MutateEntity(entity, MutatorType.Insert, connection);
 
 			var expected = new[] { new TestItem(), new TestItem(), new TestItem(), new TestItem(), new TestItem(), new TestItem() };
 
@@ -115,27 +115,28 @@ namespace MongoFramework.Tests.Infrastructure.Mutation.Mutators
 		public void InvalidNumberOfItems()
 		{
 			var entity = new InvalidNumberOfItemsModel();
-			var entityMapper = new EntityMapper<InvalidNumberOfItemsModel>();
+			var connection = TestConfiguration.GetConnection();
+			var entityMapper = connection.GetEntityMapper(typeof(InvalidNumberOfItemsModel));
 		}
 
 		[TestMethod, ExpectedException(typeof(ArgumentException))]
 		public void WrongPropertyType()
 		{
 			var entity = new AltogetherWrongTypeModel();
-			var entityMapper = new EntityMapper<AltogetherWrongTypeModel>();
+			var connection = TestConfiguration.GetConnection();
 			var mutator = new EntityAttributeMutator<AltogetherWrongTypeModel>();
 
-			mutator.MutateEntity(entity, MutatorType.Insert, entityMapper, null);
+			mutator.MutateEntity(entity, MutatorType.Insert, connection);
 		}
 
 		[TestMethod, ExpectedException(typeof(ArgumentException))]
 		public void HiddenGenericType()
 		{
 			var entity = new GenericTypeHiddenModel();
-			var entityMapper = new EntityMapper<GenericTypeHiddenModel>();
+			var connection = TestConfiguration.GetConnection();
 			var mutator = new EntityAttributeMutator<GenericTypeHiddenModel>();
 
-			mutator.MutateEntity(entity, MutatorType.Insert, entityMapper, null);
+			mutator.MutateEntity(entity, MutatorType.Insert, connection);
 		}
 	}
 }

@@ -14,7 +14,8 @@ namespace MongoFramework.Tests.Infrastructure.DefinitionHelpers
 	{
 		private BsonDocument PerformUpdateAgainstServer(BsonDocument original, UpdateDefinition<BsonDocument> updateDefinition)
 		{
-			var collection = TestConfiguration.GetDatabase().GetCollection<BsonDocument>("UpdateDefinitionHelperTests");
+			var connection = TestConfiguration.GetConnection();
+			var collection = connection.GetDatabase().GetCollection<BsonDocument>("UpdateDefinitionHelperTests");
 			collection.InsertOne(original);
 
 			var idFilter = Builders<BsonDocument>.Filter.Eq("_id", original["_id"]);

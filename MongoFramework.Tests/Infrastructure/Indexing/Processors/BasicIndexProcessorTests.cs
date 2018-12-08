@@ -62,8 +62,9 @@ namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 		[TestMethod]
 		public void IndexNaming()
 		{
+			var connection = TestConfiguration.GetConnection();
 			var processor = new BasicIndexProcessor();
-			var entityIndexMapper = new EntityIndexMapper<IndexNamingModel>();
+			var entityIndexMapper = new EntityIndexMapper<IndexNamingModel>(connection.GetEntityMapper(typeof(IndexNamingModel)));
 			var indexMapping = entityIndexMapper.GetIndexMapping();
 
 			var indexModel = processor.BuildIndexModel<IndexNamingModel>(indexMapping);
@@ -76,8 +77,9 @@ namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 		[TestMethod]
 		public void AppliesIndexSortOrder()
 		{
+			var connection = TestConfiguration.GetConnection();
 			var processor = new BasicIndexProcessor();
-			var entityIndexMapper = new EntityIndexMapper<IndexSortOrderModel>();
+			var entityIndexMapper = new EntityIndexMapper<IndexSortOrderModel>(connection.GetEntityMapper(typeof(IndexSortOrderModel)));
 			var indexMapping = entityIndexMapper.GetIndexMapping();
 
 			var indexModel = processor.BuildIndexModel<IndexSortOrderModel>(indexMapping);
@@ -92,8 +94,9 @@ namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 		[TestMethod]
 		public void AppliesUniqueConstraint()
 		{
+			var connection = TestConfiguration.GetConnection();
 			var processor = new BasicIndexProcessor();
-			var entityIndexMapper = new EntityIndexMapper<UniqueConstraintModel>();
+			var entityIndexMapper = new EntityIndexMapper<UniqueConstraintModel>(connection.GetEntityMapper(typeof(UniqueConstraintModel)));
 			var indexMapping = entityIndexMapper.GetIndexMapping();
 
 			var indexModel = processor.BuildIndexModel<UniqueConstraintModel>(indexMapping);
@@ -106,8 +109,9 @@ namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 		[TestMethod]
 		public void CompoundIndex()
 		{
+			var connection = TestConfiguration.GetConnection();
 			var processor = new BasicIndexProcessor();
-			var entityIndexMapper = new EntityIndexMapper<CompoundIndexModel>();
+			var entityIndexMapper = new EntityIndexMapper<CompoundIndexModel>(connection.GetEntityMapper(typeof(CompoundIndexModel)));
 			var indexMapping = entityIndexMapper.GetIndexMapping();
 
 			var indexModel = processor.BuildIndexModel<CompoundIndexModel>(indexMapping);
@@ -127,8 +131,9 @@ namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 		[TestMethod]
 		public void NestedCompoundIndex()
 		{
+			var connection = TestConfiguration.GetConnection();
 			var processor = new BasicIndexProcessor();
-			var entityIndexMapper = new EntityIndexMapper<NestedIndexBaseModel>();
+			var entityIndexMapper = new EntityIndexMapper<NestedIndexBaseModel>(connection.GetEntityMapper(typeof(NestedIndexBaseModel)));
 			var indexMapping = entityIndexMapper.GetIndexMapping();
 
 			var indexModel = processor.BuildIndexModel<NestedIndexBaseModel>(indexMapping);

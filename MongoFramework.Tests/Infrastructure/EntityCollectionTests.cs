@@ -17,7 +17,8 @@ namespace MongoFramework.Tests.Infrastructure
 		[TestMethod]
 		public void AddNewEntry()
 		{
-			var entityCollection = new EntityCollection<EntityCollectionModel>();
+			var connection = TestConfiguration.GetConnection();
+			var entityCollection = new EntityCollection<EntityCollectionModel>(connection.GetEntityMapper(typeof(EntityCollectionModel)));
 			var entity = new EntityCollectionModel
 			{
 				Title = "DbEntityCollectionTests.AddNewEntry"
@@ -30,7 +31,8 @@ namespace MongoFramework.Tests.Infrastructure
 		[TestMethod]
 		public void UpdateExistingEntryIdMatch()
 		{
-			var entityCollection = new EntityCollection<EntityCollectionModel>();
+			var connection = TestConfiguration.GetConnection();
+			var entityCollection = new EntityCollection<EntityCollectionModel>(connection.GetEntityMapper(typeof(EntityCollectionModel)));
 			var entity = new EntityCollectionModel
 			{
 				Id = "123",
@@ -53,7 +55,8 @@ namespace MongoFramework.Tests.Infrastructure
 		[TestMethod]
 		public void UpdateExistingEntryInstanceMatch()
 		{
-			var entityCollection = new EntityCollection<EntityCollectionModel>();
+			var connection = TestConfiguration.GetConnection();
+			var entityCollection = new EntityCollection<EntityCollectionModel>(connection.GetEntityMapper(typeof(EntityCollectionModel)));
 			var entity = new EntityCollectionModel
 			{
 				Title = "DbEntityCollectionTests.UpdateExistingEntryWithoutId"
@@ -68,7 +71,8 @@ namespace MongoFramework.Tests.Infrastructure
 		[TestMethod]
 		public void RemoveRange()
 		{
-			var entityCollection = new EntityCollection<EntityCollectionModel>();
+			var connection = TestConfiguration.GetConnection();
+			var entityCollection = new EntityCollection<EntityCollectionModel>(connection.GetEntityMapper(typeof(EntityCollectionModel)));
 			var entities = new[]
 			{
 				new EntityCollectionModel
@@ -98,7 +102,8 @@ namespace MongoFramework.Tests.Infrastructure
 		[TestMethod]
 		public void ClearTracker()
 		{
-			var entityCollection = new EntityCollection<EntityCollectionModel>();
+			var connection = TestConfiguration.GetConnection();
+			var entityCollection = new EntityCollection<EntityCollectionModel>(connection.GetEntityMapper(typeof(EntityCollectionModel)));
 			var entity = new EntityCollectionModel
 			{
 				Title = "DbEntityCollectionTests.ClearTracker"
@@ -113,14 +118,16 @@ namespace MongoFramework.Tests.Infrastructure
 		[TestMethod]
 		public void RemoveNonExistentEntities()
 		{
-			var entityCollection = new EntityCollection<EntityCollectionModel>();
+			var connection = TestConfiguration.GetConnection();
+			var entityCollection = new EntityCollection<EntityCollectionModel>(connection.GetEntityMapper(typeof(EntityCollectionModel)));
 			Assert.IsFalse(entityCollection.Remove(new EntityCollectionModel { }));
 		}
 
 		[TestMethod]
 		public void ContainsExactEntity()
 		{
-			var entityCollection = new EntityCollection<EntityCollectionModel>();
+			var connection = TestConfiguration.GetConnection();
+			var entityCollection = new EntityCollection<EntityCollectionModel>(connection.GetEntityMapper(typeof(EntityCollectionModel)));
 			var entity = new EntityCollectionModel
 			{
 				Id = "ABC"
@@ -133,7 +140,8 @@ namespace MongoFramework.Tests.Infrastructure
 		[TestMethod]
 		public void ContainsEntityById()
 		{
-			var entityCollection = new EntityCollection<EntityCollectionModel>();
+			var connection = TestConfiguration.GetConnection();
+			var entityCollection = new EntityCollection<EntityCollectionModel>(connection.GetEntityMapper(typeof(EntityCollectionModel)));
 			var entity = new EntityCollectionModel
 			{
 				Id = "ABC",
@@ -153,7 +161,8 @@ namespace MongoFramework.Tests.Infrastructure
 		[ExpectedException(typeof(ArgumentNullException))]
 		public void CopyToInvalidArray()
 		{
-			var entityCollection = new EntityCollection<EntityCollectionModel>();
+			var connection = TestConfiguration.GetConnection();
+			var entityCollection = new EntityCollection<EntityCollectionModel>(connection.GetEntityMapper(typeof(EntityCollectionModel)));
 			EntityCollectionModel[] array = null;
 			entityCollection.CopyTo(array, 0);
 		}
@@ -162,7 +171,8 @@ namespace MongoFramework.Tests.Infrastructure
 		[ExpectedException(typeof(IndexOutOfRangeException))]
 		public void CopyToIndexOutOfRangeLow()
 		{
-			var entityCollection = new EntityCollection<EntityCollectionModel>();
+			var connection = TestConfiguration.GetConnection();
+			var entityCollection = new EntityCollection<EntityCollectionModel>(connection.GetEntityMapper(typeof(EntityCollectionModel)));
 			var array = new EntityCollectionModel[4];
 			entityCollection.CopyTo(array, -1);
 		}
@@ -171,7 +181,8 @@ namespace MongoFramework.Tests.Infrastructure
 		[ExpectedException(typeof(IndexOutOfRangeException))]
 		public void CopyToIndexOutOfRangeHigh()
 		{
-			var entityCollection = new EntityCollection<EntityCollectionModel>
+			var connection = TestConfiguration.GetConnection();
+			var entityCollection = new EntityCollection<EntityCollectionModel>(connection.GetEntityMapper(typeof(EntityCollectionModel)))
 			{
 				new EntityCollectionModel { },
 				new EntityCollectionModel { },

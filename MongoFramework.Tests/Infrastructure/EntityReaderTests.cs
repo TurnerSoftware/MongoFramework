@@ -20,10 +20,10 @@ namespace MongoFramework.Tests.Infrastructure
 		[TestMethod]
 		public void ReadMixedEntities()
 		{
-			var database = TestConfiguration.GetDatabase();
-			var entityContainer = new EntityCollection<A>();
-			var reader = new EntityReader<A>(database);
-			var writer = new EntityWriter<A>(database);
+			var connection = TestConfiguration.GetConnection();
+			var entityContainer = new EntityCollection<A>(connection.GetEntityMapper(typeof(A)));
+			var reader = new EntityReader<A>(connection);
+			var writer = new EntityWriter<A>(connection);
 
 			entityContainer.Update(new A
 			{

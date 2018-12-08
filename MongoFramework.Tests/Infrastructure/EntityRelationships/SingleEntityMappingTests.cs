@@ -65,8 +65,9 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		[TestMethod]
 		public void ForeignKeyAttributeOnId()
 		{
-			var entityMapper = new EntityMapper<BaseEntityModel>();
-			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper);
+			var connection = TestConfiguration.GetConnection();
+			var entityMapper = connection.GetEntityMapper(typeof(BaseEntityModel));
+			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper, connection);
 
 			var createdByIdProperty = typeof(BaseEntityModel).GetProperty("CreatedById");
 			var attributeOnIdRelationship = relationships.Where(r => r.IdProperty == createdByIdProperty).FirstOrDefault();
@@ -79,8 +80,9 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		[TestMethod]
 		public void ForeignKeyAttributeOnNavigationProperty()
 		{
-			var entityMapper = new EntityMapper<BaseEntityModel>();
-			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper);
+			var connection = TestConfiguration.GetConnection();
+			var entityMapper = connection.GetEntityMapper(typeof(BaseEntityModel));
+			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper, connection);
 
 			var updatedByIdProperty = typeof(BaseEntityModel).GetProperty("UpdatedById");
 			var attributeOnIdRelationship = relationships.Where(r => r.IdProperty == updatedByIdProperty).FirstOrDefault();
@@ -93,8 +95,9 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		[TestMethod]
 		public void IdentifyRelationshipsWithOtherIdTypes()
 		{
-			var entityMapper = new EntityMapper<BaseVariedIdModel>();
-			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper);
+			var connection = TestConfiguration.GetConnection();
+			var entityMapper = connection.GetEntityMapper(typeof(BaseVariedIdModel));
+			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper, connection);
 			Assert.AreEqual(2, relationships.Count());
 		}
 
@@ -102,22 +105,25 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		[ExpectedException(typeof(MongoFrameworkMappingException))]
 		public void UnsupportedIdTypeOnRelationship()
 		{
-			var entityMapper = new EntityMapper<UnsupportedIdModel>();
-			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper).ToArray();
+			var connection = TestConfiguration.GetConnection();
+			var entityMapper = connection.GetEntityMapper(typeof(UnsupportedIdModel));
+			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper, connection).ToArray();
 		}
 
 		[TestMethod]
 		[ExpectedException(typeof(MongoFrameworkMappingException))]
 		public void InvalidForeignKeyOnRelationship()
 		{
-			var entityMapper = new EntityMapper<InvalidForeignKeyModel>();
-			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper).ToArray();
+			var connection = TestConfiguration.GetConnection();
+			var entityMapper = connection.GetEntityMapper(typeof(InvalidForeignKeyModel));
+			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper, connection).ToArray();
 		}
 
 		[TestMethod]
 		public void NavigationPropertiesUnmap()
 		{
-			var entityMapper = new EntityMapper<BaseEntityModel>();
+			var connection = TestConfiguration.GetConnection();
+			var entityMapper = connection.GetEntityMapper(typeof(BaseEntityModel));
 			Assert.IsFalse(entityMapper.GetEntityMapping().Any(e => e.FullPath == "CreatedBy" || e.FullPath == "UpdatedBy"));
 		}
 	}

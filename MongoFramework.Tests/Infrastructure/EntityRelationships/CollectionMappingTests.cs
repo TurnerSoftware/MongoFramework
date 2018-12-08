@@ -51,8 +51,9 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		[TestMethod]
 		public void IdentifyCollectionRelationships()
 		{
-			var entityMapper = new EntityMapper<CollectionMappingModel>();
-			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper);
+			var connection = TestConfiguration.GetConnection();
+			var entityMapper = connection.GetEntityMapper(typeof(CollectionMappingModel));
+			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper, connection);
 
 			Assert.IsTrue(relationships.All(r => r.IsCollection));
 
@@ -67,8 +68,9 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		[TestMethod]
 		public void ValidInversePropertyMapping()
 		{
-			var entityMapper = new EntityMapper<ValidInversePropertyModel>();
-			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper);
+			var connection = TestConfiguration.GetConnection();
+			var entityMapper = connection.GetEntityMapper(typeof(ValidInversePropertyModel));
+			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper, connection);
 
 			Assert.IsTrue(relationships.Any(r => r.IsCollection && r.IdProperty.Name == "SecondaryId"));
 		}
@@ -77,16 +79,18 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		[ExpectedException(typeof(MongoFrameworkMappingException))]
 		public void InversePropertyMappingNonExistantProperty()
 		{
-			var entityMapper = new EntityMapper<InversePropertyNonExistantPropertyModel>();
-			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper);
+			var connection = TestConfiguration.GetConnection();
+			var entityMapper = connection.GetEntityMapper(typeof(InversePropertyNonExistantPropertyModel));
+			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper, connection);
 		}
 
 		[TestMethod]
 		[ExpectedException(typeof(MongoFrameworkMappingException))]
 		public void InversePropertyMappingInvalidPropertyType()
 		{
-			var entityMapper = new EntityMapper<InversePropertyMappingInvalidPropertyTypeModel>();
-			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper);
+			var connection = TestConfiguration.GetConnection();
+			var entityMapper = connection.GetEntityMapper(typeof(InversePropertyMappingInvalidPropertyTypeModel));
+			var relationships = EntityMapperExtensions.GetEntityRelationships(entityMapper, connection);
 		}
 	}
 }

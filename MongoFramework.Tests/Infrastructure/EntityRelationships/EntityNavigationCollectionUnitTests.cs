@@ -12,20 +12,29 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		[TestMethod, ExpectedException(typeof(ArgumentNullException))]
 		public void NullForeignKeyThrowsException()
 		{
-			new EntityNavigationCollection<StringIdModel>(null);
+			var connection = TestConfiguration.GetConnection();
+			new EntityNavigationCollection<StringIdModel>(null, connection);
+		}
+
+		[TestMethod, ExpectedException(typeof(ArgumentNullException))]
+		public void NullConnectionThrowsException()
+		{
+			new EntityNavigationCollection<StringIdModel>("Id", null);
 		}
 
 		[TestMethod, ExpectedException(typeof(ArgumentNullException))]
 		public void AddForeignIdWithNull()
 		{
-			var collection = new EntityNavigationCollection<StringIdModel>("Id");
+			var connection = TestConfiguration.GetConnection();
+			var collection = new EntityNavigationCollection<StringIdModel>("Id", connection);
 			collection.AddForeignId(null);
 		}
 
 		[TestMethod]
 		public void AddForeignIdWithRightType()
 		{
-			var collection = new EntityNavigationCollection<StringIdModel>("Id");
+			var connection = TestConfiguration.GetConnection();
+			var collection = new EntityNavigationCollection<StringIdModel>("Id", connection);
 			collection.AddForeignId("12345678");
 			Assert.AreEqual(1, collection.UnloadedCount);
 		}
@@ -33,14 +42,16 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		[TestMethod, ExpectedException(typeof(InvalidOperationException))]
 		public void AddForeignIdWithWrongType()
 		{
-			var collection = new EntityNavigationCollection<StringIdModel>("Id");
+			var connection = TestConfiguration.GetConnection();
+			var collection = new EntityNavigationCollection<StringIdModel>("Id", connection);
 			collection.AddForeignId(ObjectId.GenerateNewId());
 		}
 
 		[TestMethod]
 		public void AddMultipleForeignIds()
 		{
-			var collection = new EntityNavigationCollection<ObjectIdIdModel>("Id");
+			var connection = TestConfiguration.GetConnection();
+			var collection = new EntityNavigationCollection<ObjectIdIdModel>("Id", connection);
 			collection.AddForeignIds(new object[] { ObjectId.GenerateNewId(), ObjectId.GenerateNewId() });
 			Assert.AreEqual(2, collection.UnloadedCount);
 		}

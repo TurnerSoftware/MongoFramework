@@ -27,13 +27,12 @@ namespace MongoFramework.Tests.Infrastructure.Indexing
 		[TestMethod]
 		public void WriteIndexSync()
 		{
-			var database = TestConfiguration.GetDatabase();
-			var indexMapper = new EntityIndexMapper<IndexModel>();
-			var indexWriter = new EntityIndexWriter<IndexModel>(database, indexMapper);
+			var connection = TestConfiguration.GetConnection();
+			var indexWriter = new EntityIndexWriter<IndexModel>(connection);
 
 			indexWriter.ApplyIndexing();
 
-			var collection = database.GetCollection<IndexModel>("IndexModel");
+			var collection = connection.GetDatabase().GetCollection<IndexModel>("IndexModel");
 			var dbIndexes = collection.Indexes.List().ToList();
 			Assert.AreEqual(3, dbIndexes.Count);
 		}
@@ -41,13 +40,12 @@ namespace MongoFramework.Tests.Infrastructure.Indexing
 		[TestMethod]
 		public async Task WriteIndexAsync()
 		{
-			var database = TestConfiguration.GetDatabase();
-			var indexMapper = new EntityIndexMapper<IndexModel>();
-			var indexWriter = new EntityIndexWriter<IndexModel>(database, indexMapper);
+			var connection = TestConfiguration.GetConnection();
+			var indexWriter = new EntityIndexWriter<IndexModel>(connection);
 
 			await indexWriter.ApplyIndexingAsync().ConfigureAwait(false);
 
-			var collection = database.GetCollection<IndexModel>("IndexModel");
+			var collection = connection.GetDatabase().GetCollection<IndexModel>("IndexModel");
 			var dbIndexes = await collection.Indexes.List().ToListAsync().ConfigureAwait(false);
 			Assert.AreEqual(3, dbIndexes.Count);
 		}
@@ -55,9 +53,8 @@ namespace MongoFramework.Tests.Infrastructure.Indexing
 		[TestMethod]
 		public void NoIndexSync()
 		{
-			var database = TestConfiguration.GetDatabase();
-			var indexMapper = new EntityIndexMapper<NoIndexModel>();
-			var indexWriter = new EntityIndexWriter<NoIndexModel>(database, indexMapper);
+			var connection = TestConfiguration.GetConnection();
+			var indexWriter = new EntityIndexWriter<NoIndexModel>(connection);
 
 			AssertExtensions.DoesNotThrow<Exception>(() => indexWriter.ApplyIndexing());
 		}
@@ -65,9 +62,8 @@ namespace MongoFramework.Tests.Infrastructure.Indexing
 		[TestMethod]
 		public async Task NoIndexAsync()
 		{
-			var database = TestConfiguration.GetDatabase();
-			var indexMapper = new EntityIndexMapper<NoIndexModel>();
-			var indexWriter = new EntityIndexWriter<NoIndexModel>(database, indexMapper);
+			var connection = TestConfiguration.GetConnection();
+			var indexWriter = new EntityIndexWriter<NoIndexModel>(connection);
 
 			await AssertExtensions.DoesNotThrowAsync<Exception>(async () => await indexWriter.ApplyIndexingAsync().ConfigureAwait(false)).ConfigureAwait(false);
 		}

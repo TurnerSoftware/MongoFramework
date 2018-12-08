@@ -12,50 +12,13 @@ namespace MongoFramework.Tests.Infrastructure
 		{
 			public string Id { get; set; }
 		}
-#if !NETCOREAPP2_0
-		[TestMethod]
-		public void UrlFromConfigFound()
-		{
-			var url = MongoDbUtility.GetMongoUrlFromConfig("MongoFrameworkTests");
-			Assert.IsNotNull(url);
-		}
-
-		[TestMethod]
-		public void UrlFromConfigMissing()
-		{
-			var url = MongoDbUtility.GetMongoUrlFromConfig("ThisConnectionStringDoesntExist");
-			Assert.IsNull(url);
-		}
-
-		[TestMethod]
-		public void DatabaseFromUrl()
-		{
-			var url = MongoDbUtility.GetMongoUrlFromConfig("MongoFrameworkTests");
-			var database = MongoDbUtility.GetDatabase(url);
-			Assert.IsNotNull(database);
-		}
-#endif
-
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentNullException), "ArgumentNullException")]
-		public void DatabaseFromNullUrl()
-		{
-			MongoDbUtility.GetDatabase((MongoDB.Driver.MongoUrl)null);
-		}
-
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentNullException), "ArgumentNullException")]
-		public void DatabaseFromNullOptions()
-		{
-			MongoDbUtility.GetDatabase((IMongoDbConnection)null);
-		}
 
 		[TestMethod]
 		public void ValidObjectId()
 		{
-			var database = TestConfiguration.GetDatabase();
-			var entityContainer = new EntityCollection<MongoDbUtilityModel>();
-			var writer = new EntityWriter<MongoDbUtilityModel>(database);
+			var connection = TestConfiguration.GetConnection();
+			var entityContainer = new EntityCollection<MongoDbUtilityModel>(connection.GetEntityMapper(typeof(MongoDbUtilityModel)));
+			var writer = new EntityWriter<MongoDbUtilityModel>(connection);
 
 			var entity = new MongoDbUtilityModel();
 			entityContainer.Update(entity, EntityEntryState.Added);

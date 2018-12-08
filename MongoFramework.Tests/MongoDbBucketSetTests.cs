@@ -39,12 +39,11 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public void SuccessfullyInsertAndQueryBackEntityBuckets()
 		{
-			var database = TestConfiguration.GetDatabase();
 			var dbSet = new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
 			{
 				BucketSize = 100
 			});
-			dbSet.SetConnection(database);
+			dbSet.SetConnection(TestConfiguration.GetConnection());
 
 			dbSet.Add(new EntityGroup
 			{
@@ -62,12 +61,11 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public async Task SuccessfullyInsertAndQueryBackEntityBucketsAsync()
 		{
-			var database = TestConfiguration.GetDatabase();
 			var dbSet = new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
 			{
 				BucketSize = 100
 			});
-			dbSet.SetConnection(database);
+			dbSet.SetConnection(TestConfiguration.GetConnection());
 
 			dbSet.Add(new EntityGroup
 			{
@@ -94,12 +92,11 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public void FillIntoAdditionalBuckets()
 		{
-			var database = TestConfiguration.GetDatabase();
 			var dbSet = new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
 			{
 				BucketSize = 2
 			});
-			dbSet.SetConnection(database);
+			dbSet.SetConnection(TestConfiguration.GetConnection());
 
 			dbSet.AddRange(new EntityGroup
 			{
@@ -128,12 +125,11 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public void BackfillIntoExistingBucket()
 		{
-			var database = TestConfiguration.GetDatabase();
 			var dbSet = new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
 			{
 				BucketSize = 2
 			});
-			dbSet.SetConnection(database);
+			dbSet.SetConnection(TestConfiguration.GetConnection());
 
 			dbSet.Add(new EntityGroup
 			{
@@ -175,12 +171,11 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public void ContinuousSubEntityAccessAcrossBuckets()
 		{
-			var database = TestConfiguration.GetDatabase();
 			var dbSet = new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
 			{
 				BucketSize = 2
 			});
-			dbSet.SetConnection(database);
+			dbSet.SetConnection(TestConfiguration.GetConnection());
 			
 			dbSet.AddRange(new EntityGroup
 			{
@@ -227,12 +222,11 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public void DistinctGroups()
 		{
-			var database = TestConfiguration.GetDatabase();
 			var dbSet = new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
 			{
 				BucketSize = 2
 			});
-			dbSet.SetConnection(database);
+			dbSet.SetConnection(TestConfiguration.GetConnection());
 
 			dbSet.AddRange(new EntityGroup
 			{
@@ -282,12 +276,11 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public void IterateQueryable()
 		{
-			var database = TestConfiguration.GetDatabase();
 			var dbSet = new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
 			{
 				BucketSize = 2
 			});
-			dbSet.SetConnection(database);
+			dbSet.SetConnection(TestConfiguration.GetConnection());
 
 			dbSet.Add(new EntityGroup
 			{
@@ -333,12 +326,11 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public void ValueTypeSubEntity()
 		{
-			var database = TestConfiguration.GetDatabase();
 			var dbSet = new MongoDbBucketSet<EntityGroup, int>(new BucketSetOptions
 			{
 				BucketSize = 2
 			});
-			dbSet.SetConnection(database);
+			dbSet.SetConnection(TestConfiguration.GetConnection());
 
 			dbSet.AddRange(new EntityGroup
 			{

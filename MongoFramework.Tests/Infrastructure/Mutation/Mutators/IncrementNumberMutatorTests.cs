@@ -22,10 +22,10 @@ namespace MongoFramework.Tests.Infrastructure.Mutation.Mutators
 		private IncrementalEntity Mutate(MutatorType type, IncrementalEntity entity = null)
 		{
 			entity = entity ?? new IncrementalEntity();
-			var entityMapper = new EntityMapper<IncrementalEntity>();
+			var connection = TestConfiguration.GetConnection();
 			var mutator = new EntityAttributeMutator<IncrementalEntity>();
 
-			mutator.MutateEntity(entity, type, entityMapper, null);
+			mutator.MutateEntity(entity, type, connection);
 			return entity;
 		}
 

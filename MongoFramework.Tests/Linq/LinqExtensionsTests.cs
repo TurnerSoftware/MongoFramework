@@ -35,9 +35,10 @@ namespace MongoFramework.Tests.Linq
 		[TestMethod]
 		public void ValidToQuery()
 		{
-			var collection = TestConfiguration.GetDatabase().GetCollection<LinqExtensionsModel>("LinqExtensionsModel");
+			var connection = TestConfiguration.GetConnection();
+			var collection = connection.GetDatabase().GetCollection<LinqExtensionsModel>(nameof(LinqExtensionsModel));
 			var underlyingQueryable = collection.AsQueryable();
-			var queryable = new MongoFrameworkQueryable<LinqExtensionsModel, LinqExtensionsModel>(underlyingQueryable);
+			var queryable = new MongoFrameworkQueryable<LinqExtensionsModel, LinqExtensionsModel>(connection, underlyingQueryable);
 			var result = LinqExtensions.ToQuery(queryable);
 
 			Assert.AreEqual("db.LinqExtensionsModel.aggregate([])", result);
@@ -53,10 +54,9 @@ namespace MongoFramework.Tests.Linq
 		[TestMethod]
 		public void WhereIdMatchesGuids()
 		{
-			var database = TestConfiguration.GetDatabase();
-
-			var dbEntityWriter = new EntityWriter<WhereIdMatchesGuidModel>(database);
-			var entityCollection = new EntityCollection<WhereIdMatchesGuidModel>
+			var connection = TestConfiguration.GetConnection();
+			var dbEntityWriter = new EntityWriter<WhereIdMatchesGuidModel>(TestConfiguration.GetConnection());
+			var entityCollection = new EntityCollection<WhereIdMatchesGuidModel>(connection.GetEntityMapper(typeof(WhereIdMatchesGuidModel)))
 			{
 				new WhereIdMatchesGuidModel { Description = "1" },
 				new WhereIdMatchesGuidModel { Description = "2" },
@@ -65,9 +65,9 @@ namespace MongoFramework.Tests.Linq
 			};
 			dbEntityWriter.Write(entityCollection);
 
-			var collection = TestConfiguration.GetDatabase().GetCollection<WhereIdMatchesGuidModel>("WhereIdMatchesGuidModel");
+			var collection = TestConfiguration.GetConnection().GetDatabase().GetCollection<WhereIdMatchesGuidModel>(nameof(WhereIdMatchesGuidModel));
 			var underlyingQueryable = collection.AsQueryable();
-			var queryable = new MongoFrameworkQueryable<WhereIdMatchesGuidModel, WhereIdMatchesGuidModel>(underlyingQueryable);
+			var queryable = new MongoFrameworkQueryable<WhereIdMatchesGuidModel, WhereIdMatchesGuidModel>(connection, underlyingQueryable);
 
 			var entityIds = entityCollection.Select(e => e.Id).Take(2);
 
@@ -80,10 +80,9 @@ namespace MongoFramework.Tests.Linq
 		[TestMethod]
 		public void WhereIdMatchesObjectIds()
 		{
-			var database = TestConfiguration.GetDatabase();
-
-			var dbEntityWriter = new EntityWriter<WhereIdMatchesObjectIdModel>(database);
-			var entityCollection = new EntityCollection<WhereIdMatchesObjectIdModel>
+			var connection = TestConfiguration.GetConnection();
+			var dbEntityWriter = new EntityWriter<WhereIdMatchesObjectIdModel>(connection);
+			var entityCollection = new EntityCollection<WhereIdMatchesObjectIdModel>(connection.GetEntityMapper(typeof(WhereIdMatchesObjectIdModel)))
 			{
 				new WhereIdMatchesObjectIdModel { Description = "1" },
 				new WhereIdMatchesObjectIdModel { Description = "2" },
@@ -92,9 +91,9 @@ namespace MongoFramework.Tests.Linq
 			};
 			dbEntityWriter.Write(entityCollection);
 
-			var collection = TestConfiguration.GetDatabase().GetCollection<WhereIdMatchesObjectIdModel>("WhereIdMatchesObjectIdModel");
+			var collection = connection.GetDatabase().GetCollection<WhereIdMatchesObjectIdModel>(nameof(WhereIdMatchesObjectIdModel));
 			var underlyingQueryable = collection.AsQueryable();
-			var queryable = new MongoFrameworkQueryable<WhereIdMatchesObjectIdModel, WhereIdMatchesObjectIdModel>(underlyingQueryable);
+			var queryable = new MongoFrameworkQueryable<WhereIdMatchesObjectIdModel, WhereIdMatchesObjectIdModel>(connection, underlyingQueryable);
 
 			var entityIds = entityCollection.Select(e => e.Id).Take(2);
 
@@ -107,10 +106,9 @@ namespace MongoFramework.Tests.Linq
 		[TestMethod]
 		public void WhereIdMatchesStringIds()
 		{
-			var database = TestConfiguration.GetDatabase();
-
-			var dbEntityWriter = new EntityWriter<WhereIdMatchesStringModel>(database);
-			var entityCollection = new EntityCollection<WhereIdMatchesStringModel>
+			var connection = TestConfiguration.GetConnection();
+			var dbEntityWriter = new EntityWriter<WhereIdMatchesStringModel>(connection);
+			var entityCollection = new EntityCollection<WhereIdMatchesStringModel>(connection.GetEntityMapper(typeof(WhereIdMatchesStringModel)))
 			{
 				new WhereIdMatchesStringModel { Description = "1" },
 				new WhereIdMatchesStringModel { Description = "2" },
@@ -119,9 +117,9 @@ namespace MongoFramework.Tests.Linq
 			};
 			dbEntityWriter.Write(entityCollection);
 
-			var collection = TestConfiguration.GetDatabase().GetCollection<WhereIdMatchesStringModel>("WhereIdMatchesStringModel");
+			var collection = connection.GetDatabase().GetCollection<WhereIdMatchesStringModel>(nameof(WhereIdMatchesStringModel));
 			var underlyingQueryable = collection.AsQueryable();
-			var queryable = new MongoFrameworkQueryable<WhereIdMatchesStringModel, WhereIdMatchesStringModel>(underlyingQueryable);
+			var queryable = new MongoFrameworkQueryable<WhereIdMatchesStringModel, WhereIdMatchesStringModel>(connection, underlyingQueryable);
 
 			var entityIds = entityCollection.Select(e => e.Id).Take(2);
 

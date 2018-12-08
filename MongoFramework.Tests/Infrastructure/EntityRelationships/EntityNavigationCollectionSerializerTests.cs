@@ -15,7 +15,8 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		[TestMethod]
 		public void DeserializingNullReturnsCollection()
 		{
-			var serializer = new EntityNavigationCollectionSerializer<StringIdModel>("Id");
+			var connection = TestConfiguration.GetConnection();
+			var serializer = new EntityNavigationCollectionSerializer<StringIdModel>("Id", connection);
 
 			var document = new BsonDocument(new Dictionary<string, object>
 			{
@@ -41,7 +42,8 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		[ExpectedException(typeof(NotSupportedException))]
 		public void DeserializingInvalidTypeThrowsException()
 		{
-			var serializer = new EntityNavigationCollectionSerializer<StringIdModel>("Id");
+			var connection = TestConfiguration.GetConnection();
+			var serializer = new EntityNavigationCollectionSerializer<StringIdModel>("Id", connection);
 
 			var document = new BsonDocument(new Dictionary<string, object>
 			{
@@ -63,9 +65,10 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		[TestMethod]
 		public void ReserializingStringIdEntityMaintainsStateExceptNulls()
 		{
-			var serializer = new EntityNavigationCollectionSerializer<StringIdModel>("Id");
+			var connection = TestConfiguration.GetConnection();
+			var serializer = new EntityNavigationCollectionSerializer<StringIdModel>("Id", connection);
 
-			var initialCollection = new EntityNavigationCollection<StringIdModel>("Id")
+			var initialCollection = new EntityNavigationCollection<StringIdModel>("Id", connection)
 			{
 				new StringIdModel
 				{
@@ -113,9 +116,10 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		[TestMethod]
 		public void ReserializingObjectIdIdEntityMaintainsState()
 		{
-			var serializer = new EntityNavigationCollectionSerializer<ObjectIdIdModel>("Id");
+			var connection = TestConfiguration.GetConnection();
+			var serializer = new EntityNavigationCollectionSerializer<ObjectIdIdModel>("Id", connection);
 
-			var initialCollection = new EntityNavigationCollection<ObjectIdIdModel>("Id")
+			var initialCollection = new EntityNavigationCollection<ObjectIdIdModel>("Id", connection)
 			{
 				new ObjectIdIdModel
 				{
@@ -159,7 +163,8 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		[TestMethod]
 		public void SerializeICollectionCompatibleButIsntEntityNavigationCollection()
 		{
-			var serializer = new EntityNavigationCollectionSerializer<ObjectIdIdModel>("Id");
+			var connection = TestConfiguration.GetConnection();
+			var serializer = new EntityNavigationCollectionSerializer<ObjectIdIdModel>("Id", connection);
 
 			var initialCollection = new List<ObjectIdIdModel>
 			{
@@ -203,7 +208,8 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		[TestMethod, ExpectedException(typeof(NotSupportedException))]
 		public void SerializeUnsupportedType()
 		{
-			var serializer = new EntityNavigationCollectionSerializer<ObjectIdIdModel>("Id");
+			var connection = TestConfiguration.GetConnection();
+			var serializer = new EntityNavigationCollectionSerializer<ObjectIdIdModel>("Id", connection);
 
 			var initialCollection = new List<DateTime>
 			{
