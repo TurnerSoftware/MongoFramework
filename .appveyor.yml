@@ -13,6 +13,7 @@ install:
 
 
 build_script:
+  - dotnet-install.ps1 -Channel release/v3.0.0-preview1
   - dotnet build -c Debug
   - dotnet build -c Release
 test_script:
