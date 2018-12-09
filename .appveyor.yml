@@ -10,7 +10,7 @@ services:
   - mongodb
 install:
   - choco install opencover codecov
-  - ps: dotnet-dependencies.ps1
+  - ps: .\dotnet-dependencies.ps1
 
 
 build_script:
