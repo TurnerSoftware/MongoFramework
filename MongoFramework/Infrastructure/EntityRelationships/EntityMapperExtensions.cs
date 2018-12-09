@@ -29,7 +29,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 
 					if (linkedProperty == null)
 					{
-						throw new MongoFrameworkMappingException($"Can't find property {foreignKeyAttr.Name} in {entityType.Name} as indicated by the ForeignKeyAttribute.");
+						throw new InvalidOperationException($"Can't find property {foreignKeyAttr.Name} in {entityType.Name} as indicated by the ForeignKeyAttribute.");
 					}
 					else if (IdTypes.Contains(currentProperty.PropertyType))
 					{
@@ -51,7 +51,7 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 					}
 					else
 					{
-						throw new MongoFrameworkMappingException($"Unable to determine the Id property between {currentProperty.Name} and {linkedProperty.Name}. Check the types for these properties are correct.");
+						throw new InvalidOperationException($"Unable to determine the Id property between {currentProperty.Name} and {linkedProperty.Name}. Check the types for these properties are correct.");
 					}
 
 					continue;
@@ -73,11 +73,11 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 
 						if (idProperty == null)
 						{
-							throw new MongoFrameworkMappingException($"Can't find property {inversePropertyAttr.Property} in {collectionEntityType} as indicated by the InversePropertyAttribute on {currentProperty.Name} in {entityType}");
+							throw new InvalidOperationException($"Can't find property {inversePropertyAttr.Property} in {collectionEntityType} as indicated by the InversePropertyAttribute on {currentProperty.Name} in {entityType}");
 						}
 						else if (!IdTypes.Contains(idProperty.PropertyType))
 						{
-							throw new MongoFrameworkMappingException($"The Id property {inversePropertyAttr.Property} in {collectionEntityType.Name} isn't of a compatible type.");
+							throw new InvalidOperationException($"The Id property {inversePropertyAttr.Property} in {collectionEntityType.Name} isn't of a compatible type.");
 						}
 					}
 					else

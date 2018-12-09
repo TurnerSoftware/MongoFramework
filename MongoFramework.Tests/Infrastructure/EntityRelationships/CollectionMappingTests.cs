@@ -76,7 +76,7 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(MongoFrameworkMappingException))]
+		[ExpectedExceptionPattern(typeof(InvalidOperationException), "Can't find property .+ in .+ as indicated by the InversePropertyAttribute on .+ in .+")]
 		public void InversePropertyMappingNonExistantProperty()
 		{
 			var connection = TestConfiguration.GetConnection();
@@ -85,7 +85,7 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(MongoFrameworkMappingException))]
+		[ExpectedExceptionPattern(typeof(InvalidOperationException), "Can't find property .+ in .+ as indicated by the InversePropertyAttribute on .+ in .+")]
 		public void InversePropertyMappingInvalidPropertyType()
 		{
 			var connection = TestConfiguration.GetConnection();
