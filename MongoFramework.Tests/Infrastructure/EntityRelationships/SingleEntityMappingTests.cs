@@ -102,7 +102,7 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(MongoFrameworkMappingException))]
+		[ExpectedExceptionPattern(typeof(InvalidOperationException), @"Unable to determine the Id property between .+ and .+\. Check the types for these properties are correct\.")]
 		public void UnsupportedIdTypeOnRelationship()
 		{
 			var connection = TestConfiguration.GetConnection();
@@ -111,7 +111,7 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(MongoFrameworkMappingException))]
+		[ExpectedExceptionPattern(typeof(InvalidOperationException), @"Can't find property .+ in .+ as indicated by the ForeignKeyAttribute.")]
 		public void InvalidForeignKeyOnRelationship()
 		{
 			var connection = TestConfiguration.GetConnection();
