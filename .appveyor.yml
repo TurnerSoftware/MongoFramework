@@ -10,11 +10,10 @@ services:
   - mongodb
 install:
   - choco install opencover codecov
-  - ps: .\dotnet-dependencies.ps1
+  - ps: .\build\dotnet-install.ps1 -Version 3.0.100-preview-009812
 
 
 build_script:
-  - dotnet build -c Debug
   - dotnet build -c Release
 test_script:
   - OpenCover.Console.exe -register:user -target:"C:\Users\appveyor\AppData\Local\Microsoft\dotnet\dotnet.exe" -targetargs:"test MongoFramework.Tests/MongoFramework.Tests.csproj" -filter:"+[MongoFramework]* -[MongoFramework.Tests]*" -output:".\coverage.xml" -oldstyle
@@ -22,11 +21,8 @@ test_script:
 
 
 artifacts:
-  - path: 'MongoFramework\bin\Debug\*.nupkg'
-    name: NuGet Package (Debug)
-
   - path: 'MongoFramework\bin\Release\*.nupkg'
-    name: NuGet Package (Release)
+    name: NuGet Package
 
   - path: coverage.xml
     name: Coverage Report

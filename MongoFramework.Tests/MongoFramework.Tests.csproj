@@ -7,8 +7,16 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(TargetFramework)'=='netcoreapp2.0'">
     <DefineConstants>NETCOREAPP2_0</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)'=='netcoreapp3.0'">
+    <DefineConstants>NETCOREAPP3_0</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
