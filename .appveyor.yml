@@ -1,9 +1,13 @@
 version: '0.9.0+{build}'
 image: Visual Studio 2017
 skip_branch_with_pr: true
+branches:
+  only:
+    - master
 skip_commits:
   files:
   - '**/*.md'
+
 build:
   verbosity: minimal
 services:
@@ -13,7 +17,6 @@ install:
 
 
 build_script:
-  - dotnet build -c Debug
   - dotnet build -c Release
 test_script:
   - OpenCover.Console.exe -register:user -target:"C:\Program Files\dotnet\dotnet.exe" -targetargs:"test MongoFramework.Tests/MongoFramework.Tests.csproj" -filter:"+[MongoFramework]* -[MongoFramework.Tests]*" -output:".\coverage.xml" -oldstyle
@@ -21,11 +24,8 @@ test_script:
 
 
 artifacts:
-  - path: 'MongoFramework\bin\Debug\*.nupkg'
-    name: NuGet Package (Debug)
-
   - path: 'MongoFramework\bin\Release\*.nupkg'
-    name: NuGet Package (Release)
+    name: NuGet Package
 
   - path: coverage.xml
     name: Coverage Report
