@@ -58,5 +58,115 @@ namespace MongoFramework.Tests
 			await dbSet.SaveChangesAsync().ConfigureAwait(false);
 			Assert.IsTrue(dbSet.Any(m => m.RequiredField == "ValueAsync"));
 		}
+
+		[TestMethod]
+		public void SuccessfullyUpdateEntity()
+		{
+			var dbSet = new MongoDbSet<MongoDbSetValidationModel>();
+			dbSet.SetConnection(TestConfiguration.GetConnection());
+
+			var entity = new MongoDbSetValidationModel
+			{
+				RequiredField = "SuccessfullyUpdateEntity"
+			};
+
+			dbSet.Add(entity);
+			dbSet.SaveChanges();
+
+			dbSet.SetConnection(TestConfiguration.GetConnection());
+
+			entity.RequiredField = "SuccessfullyUpdateEntity-Updated";
+			dbSet.Update(entity);
+
+			Assert.IsFalse(dbSet.Any(m => m.RequiredField == "SuccessfullyUpdateEntity-Updated"));
+			dbSet.SaveChanges();
+			Assert.IsTrue(dbSet.Any(m => m.RequiredField == "SuccessfullyUpdateEntity-Updated"));
+		}
+
+		[TestMethod]
+		public void SuccessfullyUpdateRange()
+		{
+			var dbSet = new MongoDbSet<MongoDbSetValidationModel>();
+			dbSet.SetConnection(TestConfiguration.GetConnection());
+
+			var entities = new[] {
+				new MongoDbSetValidationModel
+				{
+					RequiredField = "SuccessfullyUpdateRange.1"
+				},
+				new MongoDbSetValidationModel
+				{
+					RequiredField = "SuccessfullyUpdateRange.2"
+				}
+			};
+
+			dbSet.AddRange(entities);
+			dbSet.SaveChanges();
+
+			dbSet.SetConnection(TestConfiguration.GetConnection());
+
+			entities[0].RequiredField = "SuccessfullyUpdateRange.1-Updated";
+			entities[1].RequiredField = "SuccessfullyUpdateRange.2-Updated";
+			dbSet.UpdateRange(entities);
+
+			Assert.IsFalse(dbSet.Any(m => m.RequiredField == "SuccessfullyUpdateRange.1-Updated" || m.RequiredField == "SuccessfullyUpdateRange.2-Updated"));
+			dbSet.SaveChanges();
+			Assert.IsTrue(dbSet.Any(m => m.RequiredField == "SuccessfullyUpdateRange.1-Updated"));
+			Assert.IsTrue(dbSet.Any(m => m.RequiredField == "SuccessfullyUpdateRange.2-Updated"));
+		}
+
+		[TestMethod]
+		public void SuccessfullyRemoveEntity()
+		{
+			var dbSet = new MongoDbSet<MongoDbSetValidationModel>();
+			dbSet.SetConnection(TestConfiguration.GetConnection());
+
+			var entity = new MongoDbSetValidationModel
+			{
+				RequiredField = "SuccessfullyRemoveEntity"
+			};
+
+			dbSet.Add(entity);
+			dbSet.SaveChanges();
+
+			dbSet.SetConnection(TestConfiguration.GetConnection());
+
+			dbSet.Remove(entity);
+
+			Assert.IsTrue(dbSet.Any(m => m.RequiredField == "SuccessfullyRemoveEntity"));
+			dbSet.SaveChanges();
+			Assert.IsFalse(dbSet.Any(m => m.RequiredField == "SuccessfullyRemoveEntity"));
+		}
+
+		[TestMethod]
+		public void SuccessfullyRemoveRange()
+		{
+			var dbSet = new MongoDbSet<MongoDbSetValidationModel>();
+			dbSet.SetConnection(TestConfiguration.GetConnection());
+
+			var entities = new[] {
+				new MongoDbSetValidationModel
+				{
+					RequiredField = "SuccessfullyRemoveRange.1"
+				},
+				new MongoDbSetValidationModel
+				{
+					RequiredField = "SuccessfullyRemoveRange.2"
+				}
+			};
+
+			dbSet.AddRange(entities);
+			dbSet.SaveChanges();
+
+			dbSet.SetConnection(TestConfiguration.GetConnection());
+
+			dbSet.RemoveRange(entities);
+
+			Assert.IsTrue(dbSet.Any(m => m.RequiredField == "SuccessfullyRemoveRange.1"));
+			Assert.IsTrue(dbSet.Any(m => m.RequiredField == "SuccessfullyRemoveRange.2"));
+			dbSet.SaveChanges();
+			Assert.IsFalse(dbSet.Any(m => m.RequiredField == "SuccessfullyRemoveRange.1"));
+			Assert.IsFalse(dbSet.Any(m => m.RequiredField == "SuccessfullyRemoveRange.2"));
+		}
 	}
 }
