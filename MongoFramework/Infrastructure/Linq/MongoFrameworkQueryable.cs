@@ -36,17 +36,74 @@ namespace MongoFramework.Infrastructure.Linq
 
 		public IEnumerator<TOutput> GetEnumerator()
 		{
-			var result = (IEnumerable<TOutput>)InternalProvider.Execute(Expression);
-			using (var enumerator = result.GetEnumerator())
+			var commandId = Guid.NewGuid();
+
+			var errored = false;
+			try
 			{
-				while (enumerator.MoveNext())
+				Connection.DiagnosticListener.OnNext(new ReadDiagnosticCommand
 				{
-					var item = enumerator.Current;
-					if (item is TEntity)
+					CommandId = commandId,
+					Source = $"{nameof(MongoFrameworkQueryable<TEntity, TOutput>)}.{nameof(GetEnumerator)}",
+					CommandState = CommandState.Start,
+					EntityType = typeof(TEntity),
+					Queryable = this
+				});
+
+				IEnumerable<TOutput> result;
+				try
+				{
+					result = (IEnumerable<TOutput>)InternalProvider.Execute(Expression);
+					Connection.DiagnosticListener.OnNext(new ReadDiagnosticCommand
 					{
-						EntityProcessors.ProcessEntity((TEntity)(object)item);
+						CommandId = commandId,
+						Source = $"{nameof(MongoFrameworkQueryable<TEntity, TOutput>)}.{nameof(GetEnumerator)}",
+						CommandState = CommandState.FirstResult, //Note: May need to move this around to actually be after the first "MoveNext" or something
+						EntityType = typeof(TEntity),
+						Queryable = this
+					});
+				}
+				catch (Exception ex)
+				{
+					errored = true;
+					Connection.DiagnosticListener.OnNext(new ReadDiagnosticCommand
+					{
+						CommandId = commandId,
+						Source = $"{nameof(MongoFrameworkQueryable<TEntity, TOutput>)}.{nameof(GetEnumerator)}",
+						CommandState = CommandState.Error,
+						EntityType = typeof(TEntity),
+						Queryable = this
+					});
+					Connection.DiagnosticListener.OnError(ex);
+
+					throw;
+				}
+
+				using (var enumerator = result.GetEnumerator())
+				{
+					while (enumerator.MoveNext())
+					{
+						var item = enumerator.Current;
+						if (item is TEntity)
+						{
+							EntityProcessors.ProcessEntity((TEntity)(object)item);
+						}
+						yield return item;
 					}
-					yield return item;
+				}
+			}
+			finally
+			{
+				if (!errored)
+				{
+					Connection.DiagnosticListener.OnNext(new ReadDiagnosticCommand
+					{
+						CommandId = commandId,
+						Source = $"{nameof(MongoFrameworkQueryable<TEntity, TOutput>)}.{nameof(GetEnumerator)}",
+						CommandState = CommandState.End,
+						EntityType = typeof(TEntity),
+						Queryable = this
+					});
 				}
 			}
 		}

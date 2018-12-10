@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using MongoDB.Driver;
+using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Indexing;
 using MongoFramework.Infrastructure.Mapping;
 
@@ -33,6 +34,8 @@ namespace MongoFramework
 		}
 
 		private ConcurrentDictionary<Type, IEntityMapper> EntityMapperCache { get; } = new ConcurrentDictionary<Type, IEntityMapper>();
+
+		public IDiagnosticListener DiagnosticListener { get; set; } = new NoOpDiagnosticListener();
 
 		public static MongoDbConnection FromUrl(MongoUrl mongoUrl)
 		{

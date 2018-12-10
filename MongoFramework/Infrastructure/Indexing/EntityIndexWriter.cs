@@ -1,4 +1,5 @@
 ﻿using MongoDB.Driver;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -35,7 +36,38 @@ namespace MongoFramework.Infrastructure.Indexing
 			var indexModel = GenerateIndexModel();
 			if (indexModel.Any())
 			{
-				GetCollection().Indexes.CreateMany(indexModel);
+				var commandId = Guid.NewGuid();
+				try
+				{
+					Connection.DiagnosticListener.OnNext(new IndexDiagnosticCommand<TEntity>
+					{
+						CommandId = commandId,
+						Source = $"{nameof(EntityIndexWriter<TEntity>)}.{nameof(ApplyIndexing)}",
+						CommandState = CommandState.Start,
+						IndexModel = indexModel
+					});
+					GetCollection().Indexes.CreateMany(indexModel);
+					Connection.DiagnosticListener.OnNext(new IndexDiagnosticCommand<TEntity>
+					{
+						CommandId = commandId,
+						Source = $"{nameof(EntityIndexWriter<TEntity>)}.{nameof(ApplyIndexing)}",
+						CommandState = CommandState.End,
+						IndexModel = indexModel
+					});
+				}
+				catch (Exception ex)
+				{
+					Connection.DiagnosticListener.OnNext(new IndexDiagnosticCommand<TEntity>
+					{
+						CommandId = commandId,
+						Source = $"{nameof(EntityIndexWriter<TEntity>)}.{nameof(ApplyIndexing)}",
+						CommandState = CommandState.Error,
+						IndexModel = indexModel
+					});
+					Connection.DiagnosticListener.OnError(ex);
+
+					throw;
+				}
 			}
 		}
 
@@ -44,7 +76,38 @@ namespace MongoFramework.Infrastructure.Indexing
 			var indexModel = GenerateIndexModel();
 			if (indexModel.Any())
 			{
-				await GetCollection().Indexes.CreateManyAsync(indexModel, cancellationToken).ConfigureAwait(false);
+				var commandId = Guid.NewGuid();
+				try
+				{
+					Connection.DiagnosticListener.OnNext(new IndexDiagnosticCommand<TEntity>
+					{
+						CommandId = commandId,
+						Source = $"{nameof(EntityIndexWriter<TEntity>)}.{nameof(ApplyIndexingAsync)}",
+						CommandState = CommandState.Start,
+						IndexModel = indexModel
+					});
+					await GetCollection().Indexes.CreateManyAsync(indexModel, cancellationToken).ConfigureAwait(false);
+					Connection.DiagnosticListener.OnNext(new IndexDiagnosticCommand<TEntity>
+					{
+						CommandId = commandId,
+						Source = $"{nameof(EntityIndexWriter<TEntity>)}.{nameof(ApplyIndexingAsync)}",
+						CommandState = CommandState.End,
+						IndexModel = indexModel
+					});
+				}
+				catch (Exception ex)
+				{
+					Connection.DiagnosticListener.OnNext(new IndexDiagnosticCommand<TEntity>
+					{
+						CommandId = commandId,
+						Source = $"{nameof(EntityIndexWriter<TEntity>)}.{nameof(ApplyIndexingAsync)}",
+						CommandState = CommandState.Error,
+						IndexModel = indexModel
+					});
+					Connection.DiagnosticListener.OnError(ex);
+
+					throw;
+				}
 			}
 		}
 	}

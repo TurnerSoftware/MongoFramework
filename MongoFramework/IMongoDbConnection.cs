@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using MongoDB.Driver;
+using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Indexing;
 using MongoFramework.Infrastructure.Mapping;
 
@@ -11,5 +12,6 @@ namespace MongoFramework
 	{
 		IMongoClient Client { get; }
 		IMongoDatabase GetDatabase();
+		IDiagnosticListener DiagnosticListener { get; }
 	}
 }

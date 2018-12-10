@@ -25,7 +25,8 @@ test_script:
 
 artifacts:
   - path: 'MongoFramework\bin\Release\*.nupkg'
-    name: NuGet Package
+
+  - path: 'MongoFramework.Profiling.MiniProfiler\bin\Release\*.nupkg'
 
   - path: coverage.xml
     name: Coverage Report
