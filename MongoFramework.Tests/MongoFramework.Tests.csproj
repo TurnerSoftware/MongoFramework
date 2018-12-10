@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MongoFramework.Profiling.MiniProfiler\MongoFramework.Profiling.MiniProfiler.csproj" />
     <ProjectReference Include="..\MongoFramework\MongoFramework.csproj" />
   </ItemGroup>
 </Project>
