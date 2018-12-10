@@ -17,6 +17,7 @@ namespace MongoFramework.Infrastructure
 	public enum CommandState
 	{
 		Start,
+		FirstResult,
 		End,
 		Error
 	}

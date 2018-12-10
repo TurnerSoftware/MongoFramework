@@ -54,6 +54,14 @@ namespace MongoFramework.Infrastructure.Linq
 				try
 				{
 					result = (IEnumerable<TOutput>)InternalProvider.Execute(Expression);
+					Connection.DiagnosticListener.OnNext(new ReadDiagnosticCommand
+					{
+						CommandId = commandId,
+						Source = $"{nameof(MongoFrameworkQueryable<TEntity, TOutput>)}.{nameof(GetEnumerator)}",
+						CommandState = CommandState.FirstResult, //Note: May need to move this around to actually be after the first "MoveNext" or something
+						EntityType = typeof(TEntity),
+						Queryable = this
+					});
 				}
 				catch (Exception ex)
 				{
