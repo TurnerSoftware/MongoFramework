@@ -70,8 +70,38 @@ namespace MongoFramework.Infrastructure
 
 			if (writeModel.Any())
 			{
-				//TODO: Add support for Transactions with MongoDB Server 4.0
-				GetCollection().BulkWrite(writeModel);
+				var commandId = Guid.NewGuid();
+				try
+				{
+					Connection.DiagnosticListener.OnNext(new WriteDiagnosticCommand<TEntity>
+					{
+						CommandId = commandId,
+						Source = $"{nameof(EntityWriter<TEntity>)}.{nameof(Write)}",
+						CommandState = CommandState.Start,
+						WriteModel = writeModel
+					});
+					GetCollection().BulkWrite(writeModel);
+					Connection.DiagnosticListener.OnNext(new WriteDiagnosticCommand<TEntity>
+					{
+						CommandId = commandId,
+						Source = $"{nameof(EntityWriter<TEntity>)}.{nameof(Write)}",
+						CommandState = CommandState.End,
+						WriteModel = writeModel
+					});
+				}
+				catch (Exception ex)
+				{
+					Connection.DiagnosticListener.OnNext(new WriteDiagnosticCommand<TEntity>
+					{
+						CommandId = commandId,
+						Source = $"{nameof(EntityWriter<TEntity>)}.{nameof(Write)}",
+						CommandState = CommandState.Error,
+						WriteModel = writeModel
+					});
+					Connection.DiagnosticListener.OnError(ex);
+
+					throw;
+				}
 			}
 		}
 
@@ -83,8 +113,41 @@ namespace MongoFramework.Infrastructure
 
 			if (writeModel.Any())
 			{
-				//TODO: Add support for Transactions with MongoDB Server 4.0
-				await GetCollection().BulkWriteAsync(writeModel, null, cancellationToken).ConfigureAwait(false);
+				var commandId = Guid.NewGuid();
+				try
+				{
+					Connection.DiagnosticListener.OnNext(new WriteDiagnosticCommand<TEntity>
+					{
+						CommandId = commandId,
+						Source = $"{nameof(EntityWriter<TEntity>)}.{nameof(WriteAsync)}",
+						CommandState = CommandState.Start,
+						EntityType = typeof(TEntity),
+						WriteModel = writeModel
+					});
+					await GetCollection().BulkWriteAsync(writeModel, null, cancellationToken).ConfigureAwait(false);
+					Connection.DiagnosticListener.OnNext(new WriteDiagnosticCommand<TEntity>
+					{
+						CommandId = commandId,
+						Source = $"{nameof(EntityWriter<TEntity>)}.{nameof(WriteAsync)}",
+						CommandState = CommandState.End,
+						EntityType = typeof(TEntity),
+						WriteModel = writeModel
+					});
+				}
+				catch (Exception ex)
+				{
+					Connection.DiagnosticListener.OnNext(new WriteDiagnosticCommand<TEntity>
+					{
+						CommandId = commandId,
+						Source = $"{nameof(EntityWriter<TEntity>)}.{nameof(WriteAsync)}",
+						CommandState = CommandState.Error,
+						EntityType = typeof(TEntity),
+						WriteModel = writeModel
+					});
+					Connection.DiagnosticListener.OnError(ex);
+
+					throw;
+				}
 			}
 		}
 	}
