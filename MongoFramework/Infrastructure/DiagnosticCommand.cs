@@ -27,12 +27,14 @@ namespace MongoFramework.Infrastructure
 		public IMongoFrameworkQueryable Queryable { get; set; }
 	}
 
-	public class WriteDiagnosticCommand<TEntity> : DiagnosticCommand
+	public abstract class WriteDiagnosticCommandBase : DiagnosticCommand { }
+	public class WriteDiagnosticCommand<TEntity> : WriteDiagnosticCommandBase
 	{
 		public IEnumerable<WriteModel<TEntity>> WriteModel { get; set; }
 	}
 
-	public class IndexDiagnosticCommand<TEntity> : DiagnosticCommand
+	public abstract class IndexDiagnosticCommandBase : DiagnosticCommand { }
+	public class IndexDiagnosticCommand<TEntity> : IndexDiagnosticCommandBase
 	{
 		public IEnumerable<CreateIndexModel<TEntity>> IndexModel { get; set; }
 	}
