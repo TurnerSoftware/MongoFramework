@@ -11,7 +11,7 @@ using MongoDB.Driver;
 using MongoFramework.Infrastructure;
 using StackExchange.Profiling;
 
-namespace MongoFramework.MiniProfilerTest
+namespace MongoFramework.Profiling.MiniProfiler
 {
 	public class MiniProfilerDiagnosticListener : IDiagnosticListener
 	{
@@ -23,7 +23,7 @@ namespace MongoFramework.MiniProfilerTest
 
 		public void OnNext(DiagnosticCommand value)
 		{
-			if (MiniProfiler.Current == null)
+			if (StackExchange.Profiling.MiniProfiler.Current == null)
 			{
 				return;
 			}
@@ -32,7 +32,7 @@ namespace MongoFramework.MiniProfilerTest
 			{
 				if (readCommand.CommandState == CommandState.Start)
 				{
-					Commands[value.CommandId] = MiniProfiler.Current.CustomTiming("mongoframework", readCommand.Queryable.ToQuery(), readCommand.Source);
+					Commands[value.CommandId] = StackExchange.Profiling.MiniProfiler.Current.CustomTiming("mongoframework", readCommand.Queryable.ToQuery(), readCommand.Source);
 				}
 				else if (Commands.TryRemove(value.CommandId, out var current))
 				{
@@ -72,7 +72,7 @@ namespace MongoFramework.MiniProfilerTest
 				var queryList = command.WriteModel.GroupBy(w => w.ModelType)
 					.Select(g => g.Key.ToString() + "\n" + string.Join("\n", g.Select(w => GetWriteModelAsString(w))));
 				var writeModelString = string.Join("; ", queryList);
-				Commands[command.CommandId] = MiniProfiler.Current.CustomTiming("mongoframework", writeModelString, command.Source);
+				Commands[command.CommandId] = StackExchange.Profiling.MiniProfiler.Current.CustomTiming("mongoframework", writeModelString, command.Source);
 			}
 			else if (Commands.TryRemove(command.CommandId, out var current))
 			{
@@ -125,7 +125,7 @@ namespace MongoFramework.MiniProfilerTest
 			if (command.CommandState == CommandState.Start)
 			{
 				var indexModelString = string.Join("; ", command.IndexModel.Select(w => w.ToBsonDocument()));
-				Commands[command.CommandId] = MiniProfiler.Current.CustomTiming("mongoframework", indexModelString, command.Source);
+				Commands[command.CommandId] = StackExchange.Profiling.MiniProfiler.Current.CustomTiming("mongoframework", indexModelString, command.Source);
 			}
 			else if (Commands.TryRemove(command.CommandId, out var current))
 			{
