@@ -3,11 +3,28 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2024
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MongoFramework", "MongoFramework\MongoFramework.csproj", "{D871CD75-CC1E-4482-934F-42E74B2BF255}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MongoFramework", "src\MongoFramework\MongoFramework.csproj", "{D871CD75-CC1E-4482-934F-42E74B2BF255}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MongoFramework.Tests", "MongoFramework.Tests\MongoFramework.Tests.csproj", "{FAAAAE78-22D5-42EB-824F-4B8CEB109023}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MongoFramework.Tests", "tests\MongoFramework.Tests\MongoFramework.Tests.csproj", "{FAAAAE78-22D5-42EB-824F-4B8CEB109023}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoFramework.Profiling.MiniProfiler", "MongoFramework.Profiling.MiniProfiler\MongoFramework.Profiling.MiniProfiler.csproj", "{A8438535-7E88-4578-B47A-D1A016E43416}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MongoFramework.Profiling.MiniProfiler", "src\MongoFramework.Profiling.MiniProfiler\MongoFramework.Profiling.MiniProfiler.csproj", "{A8438535-7E88-4578-B47A-D1A016E43416}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D007577A-7BDB-4658-BCB6-7CA96908058F}"
+	ProjectSection(SolutionItems) = preProject
+		src\Directory.build.props = src\Directory.build.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{9CBF5A6D-EC65-4289-B2C9-875BDB654FC4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "global", "global", "{BA117612-DD9B-4296-8F56-5D790AB07D72}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.appveyor.yml = .appveyor.yml
+		.codecov.yml = .codecov.yml
+		LICENSE = LICENSE
+		CodeCoverage.runsettings
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,6 +47,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D871CD75-CC1E-4482-934F-42E74B2BF255} = {D007577A-7BDB-4658-BCB6-7CA96908058F}
+		{FAAAAE78-22D5-42EB-824F-4B8CEB109023} = {9CBF5A6D-EC65-4289-B2C9-875BDB654FC4}
+		{A8438535-7E88-4578-B47A-D1A016E43416} = {D007577A-7BDB-4658-BCB6-7CA96908058F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A202BFC6-FE6A-4ED0-AD06-90C7BAB29E28}

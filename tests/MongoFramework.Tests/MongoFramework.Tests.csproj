@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AssemblyName>MongoFramework.Tests</AssemblyName>
@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MongoFramework.Profiling.MiniProfiler\MongoFramework.Profiling.MiniProfiler.csproj" />
-    <ProjectReference Include="..\MongoFramework\MongoFramework.csproj" />
+    <ProjectReference Include="..\..\src\MongoFramework.Profiling.MiniProfiler\MongoFramework.Profiling.MiniProfiler.csproj" />
+    <ProjectReference Include="..\..\src\MongoFramework\MongoFramework.csproj" />
   </ItemGroup>
 </Project>
