@@ -78,6 +78,7 @@ namespace MongoFramework.Infrastructure
 						CommandId = commandId,
 						Source = $"{nameof(EntityWriter<TEntity>)}.{nameof(Write)}",
 						CommandState = CommandState.Start,
+						EntityType = typeof(TEntity),
 						WriteModel = writeModel
 					});
 					GetCollection().BulkWrite(writeModel);
@@ -86,6 +87,7 @@ namespace MongoFramework.Infrastructure
 						CommandId = commandId,
 						Source = $"{nameof(EntityWriter<TEntity>)}.{nameof(Write)}",
 						CommandState = CommandState.End,
+						EntityType = typeof(TEntity),
 						WriteModel = writeModel
 					});
 				}
@@ -96,6 +98,7 @@ namespace MongoFramework.Infrastructure
 						CommandId = commandId,
 						Source = $"{nameof(EntityWriter<TEntity>)}.{nameof(Write)}",
 						CommandState = CommandState.Error,
+						EntityType = typeof(TEntity),
 						WriteModel = writeModel
 					});
 					Connection.DiagnosticListener.OnError(ex);
