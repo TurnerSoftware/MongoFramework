@@ -18,15 +18,14 @@ install:
 
 build_script:
   - dotnet build -c Release
+  - dotnet pack --no-build -c Release /p:PackageOutputPath=..\..\.nupkgs
 test_script:
-  - OpenCover.Console.exe -register:user -target:"C:\Program Files\dotnet\dotnet.exe" -targetargs:"test MongoFramework.Tests/MongoFramework.Tests.csproj" -filter:"+[MongoFramework]* -[MongoFramework.Tests]*" -output:".\coverage.xml" -oldstyle
+  - OpenCover.Console.exe -register:user -target:"C:\Program Files\dotnet\dotnet.exe" -targetargs:"test tests/MongoFramework.Tests/MongoFramework.Tests.csproj /p:DebugType=Full" -filter:"+[MongoFramework]* -[MongoFramework.Tests]*" -output:".\coverage.xml" -oldstyle
   - codecov -f coverage.xml
 
 
 artifacts:
-  - path: 'MongoFramework\bin\Release\*.nupkg'
-
-  - path: 'MongoFramework.Profiling.MiniProfiler\bin\Release\*.nupkg'
+  - path: '.nupkgs\*.nupkg'
 
   - path: coverage.xml
     name: Coverage Report

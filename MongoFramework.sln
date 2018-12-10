@@ -18,11 +18,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{9CBF5A6D
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "global", "global", "{BA117612-DD9B-4296-8F56-5D790AB07D72}"
 	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
 		.appveyor.yml = .appveyor.yml
 		.codecov.yml = .codecov.yml
+		.editorconfig = .editorconfig
 		LICENSE = LICENSE
-		CodeCoverage.runsettings
 		README.md = README.md
 	EndProjectSection
 EndProject

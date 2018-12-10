@@ -1,0 +1,37 @@
+<Project>
+  <PropertyGroup>
+    <VersionPrefix>0.9.0</VersionPrefix>
+
+    <RootNamespace>MongoFramework</RootNamespace>
+
+    <Company>Turner Software</Company>
+
+    <PackageId>$(AssemblyName)</PackageId>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseUrl>https://github.com/TurnerSoftware/MongoFramework/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/TurnerSoftware/MongoFramework</PackageProjectUrl>
+    <PackageBaseTags>mongo;mongodb</PackageBaseTags>
+    
+    <RepositoryUrl>https://github.com/TurnerSoftware/MongoFramework.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryBranch>master</RepositoryBranch>
+
+    <!-- SourceLink Support -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-63127-02" PrivateAssets="All" />
+  </ItemGroup>
+  
+</Project>
