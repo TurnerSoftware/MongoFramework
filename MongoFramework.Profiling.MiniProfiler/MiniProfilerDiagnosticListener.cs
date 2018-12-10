@@ -52,10 +52,6 @@ namespace MongoFramework.Profiling.MiniProfiler
 			{
 				OnNextWriteCommand(writeCommandBase);
 			}
-			else if (value is IndexDiagnosticCommandBase indexCommandBase)
-			{
-				OnNextIndexCommand(indexCommandBase);
-			}
 		}
 
 		private void OnNextWriteCommand(WriteDiagnosticCommandBase commandBase)
@@ -112,27 +108,5 @@ namespace MongoFramework.Profiling.MiniProfiler
 				return $"Can't render {writeModel.ModelType} to a string";
 			}
 		}
-
-		private void OnNextIndexCommand(IndexDiagnosticCommandBase commandBase)
-		{
-			var onNextIndexCommand = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
-				.Where(m => m.IsGenericMethod && m.Name == "OnNextIndexCommand").FirstOrDefault();
-			onNextIndexCommand.MakeGenericMethod(commandBase.EntityType).Invoke(this, new[] { commandBase });
-		}
-#pragma warning disable CRR0026 // Unused member
-		private void OnNextIndexCommand<TEntity>(IndexDiagnosticCommand<TEntity> command)
-		{
-			if (command.CommandState == CommandState.Start)
-			{
-				var indexModelString = string.Join("; ", command.IndexModel.Select(w => w.ToBsonDocument()));
-				Commands[command.CommandId] = StackExchange.Profiling.MiniProfiler.Current.CustomTiming("mongoframework", indexModelString, command.Source);
-			}
-			else if (Commands.TryRemove(command.CommandId, out var current))
-			{
-				current.Errored = command.CommandState == CommandState.Error;
-				current.Stop();
-			}
-		}
-#pragma warning restore CRR0026 // Unused member
 	}
 }
