@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MiniProfiler.Shared" Version="4.0.138" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MongoFramework\MongoFramework.csproj" />
+  </ItemGroup>
+
+</Project>
