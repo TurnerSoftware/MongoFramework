@@ -48,7 +48,10 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			{
 				var dbSet = new MongoDbSet<TRelatedEntity>();
 				dbSet.SetConnection(Connection);
-				dbSet.AddRange(collection);
+				var newEntities = collection.GetEntries().Where(e => e.State == EntityEntryState.Added).Select(e => e.Entity);
+				dbSet.AddRange(newEntities);
+				var updatedEntities = collection.GetEntries().Where(e => e.State == EntityEntryState.Updated).Select(e => e.Entity);
+				dbSet.UpdateRange(updatedEntities);
 				dbSet.SaveChanges();
 			}
 
@@ -70,7 +73,10 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 			{
 				var dbSet = new MongoDbSet<TRelatedEntity>();
 				dbSet.SetConnection(Connection);
-				dbSet.AddRange(collection);
+				var newEntities = collection.GetEntries().Where(e => e.State == EntityEntryState.Added).Select(e => e.Entity);
+				dbSet.AddRange(newEntities);
+				var updatedEntities = collection.GetEntries().Where(e => e.State == EntityEntryState.Updated).Select(e => e.Entity);
+				dbSet.UpdateRange(updatedEntities);
 				await dbSet.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 			}
 
@@ -114,6 +120,10 @@ namespace MongoFramework.Infrastructure.EntityRelationships
 				if (Equals(entityId, defaultId))
 				{
 					collection.Add(relatedEntity);
+				}
+				else
+				{
+					collection.Update(relatedEntity, EntityEntryState.Updated);
 				}
 			}
 

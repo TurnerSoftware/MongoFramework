@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson;
+using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.EntityRelationships;
 using System;
 using System.Collections.Generic;
@@ -191,6 +192,32 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 
 			Assert.AreEqual(2, navigationCollection.LoadedCount);
 			Assert.AreEqual(0, navigationCollection.UnloadedCount);
+		}
+
+		[TestMethod]
+		public void UpdateRelationshipEntityProperties()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var item = new StringIdModel
+			{
+				Description = "UpdateRelationshipEntity-RelatedItem"
+			};
+			var entity = new CollectionIntegrationModel
+			{
+				StringModelEntities = new[] { item }
+			};
+
+			var entityRelationshipWriter = new EntityRelationshipWriter<CollectionIntegrationModel>(connection);
+			entityRelationshipWriter.CommitEntityRelationships(new[] { entity });
+			Assert.AreEqual("UpdateRelationshipEntity-RelatedItem", item.Description);
+
+			item.Description = "UpdateRelationshipEntity-RelatedItem-Updated";
+			entityRelationshipWriter.CommitEntityRelationships(new[] { entity });
+			Assert.AreEqual("UpdateRelationshipEntity-RelatedItem-Updated", item.Description);
+
+			var reader = new EntityReader<StringIdModel>(connection);
+			var relatedItem = reader.AsQueryable().FirstOrDefault(e => e.Id == item.Id);
+			Assert.AreEqual("UpdateRelationshipEntity-RelatedItem-Updated", relatedItem.Description);
 		}
 	}
 }

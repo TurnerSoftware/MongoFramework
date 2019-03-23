@@ -88,5 +88,30 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 
 			Assert.AreEqual("LoadRelationship-RelatedItem", entity.RelatedItem.Description);
 		}
+		
+		[TestMethod]
+		public void UpdateRelationshipEntityProperties()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var entity = new SingleEntityIntegrationModel
+			{
+				RelatedItem = new StringIdModel
+				{
+					Description = "UpdateRelationshipEntity-RelatedItem"
+				}
+			};
+			
+			var entityRelationshipWriter = new EntityRelationshipWriter<SingleEntityIntegrationModel>(connection);
+			entityRelationshipWriter.CommitEntityRelationships(new[] { entity });
+			Assert.AreEqual("UpdateRelationshipEntity-RelatedItem", entity.RelatedItem.Description);
+
+			entity.RelatedItem.Description = "UpdateRelationshipEntity-RelatedItem-Updated";
+			entityRelationshipWriter.CommitEntityRelationships(new[] { entity });
+			Assert.AreEqual("UpdateRelationshipEntity-RelatedItem-Updated", entity.RelatedItem.Description);
+
+			var reader = new EntityReader<StringIdModel>(connection);
+			var relatedItem = reader.AsQueryable().FirstOrDefault(e => e.Id == entity.RelatedItemId);
+			Assert.AreEqual("UpdateRelationshipEntity-RelatedItem-Updated", relatedItem.Description);
+		}
 	}
 }
