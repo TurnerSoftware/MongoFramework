@@ -2,8 +2,6 @@
 using MongoDB.Driver;
 using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Linq;
-using MongoFramework.Infrastructure.Mapping;
-using System;
 using System.Linq;
 
 namespace MongoFramework.Tests.Infrastructure.Linq

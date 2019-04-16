@@ -1,6 +1,4 @@
-﻿using MongoDB.Driver;
-using MongoFramework.Attributes;
-using MongoFramework.Infrastructure.Mapping;
+﻿using MongoFramework.Attributes;
 using System.Linq;
 using System.Reflection;
 

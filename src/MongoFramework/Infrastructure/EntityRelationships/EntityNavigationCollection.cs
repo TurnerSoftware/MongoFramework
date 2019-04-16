@@ -1,5 +1,4 @@
-﻿using MongoDB.Driver;
-using MongoFramework.Infrastructure.Mapping;
+﻿using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Linq;
 using System;
 using System.Collections;

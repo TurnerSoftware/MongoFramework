@@ -1,5 +1,4 @@
 ﻿using MongoFramework.Infrastructure.Linq;
-using MongoFramework.Infrastructure.Mapping;
 using System;
 using System.Collections;
 using System.Linq;

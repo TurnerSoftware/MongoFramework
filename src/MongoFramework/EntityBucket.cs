@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace MongoFramework
+﻿namespace MongoFramework
 {
 	public class EntityBucket<TGroup, TSubEntity> where TGroup : class
 	{

@@ -1,5 +1,4 @@
-﻿using MongoDB.Driver;
-using MongoFramework.Infrastructure.Mutation;
+﻿using MongoFramework.Infrastructure.Mutation;
 
 namespace MongoFramework.Infrastructure.Linq.Processors
 {

@@ -1,6 +1,4 @@
-﻿using MongoDB.Driver;
-using MongoFramework.Infrastructure.EntityRelationships;
-using MongoFramework.Infrastructure.Mapping;
+﻿using MongoFramework.Infrastructure.EntityRelationships;
 using MongoFramework.Linq;
 using System;
 using System.Linq;

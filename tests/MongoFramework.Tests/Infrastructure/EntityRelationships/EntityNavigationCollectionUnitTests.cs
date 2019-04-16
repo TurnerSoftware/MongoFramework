@@ -2,7 +2,6 @@
 using MongoDB.Bson;
 using MongoFramework.Infrastructure.EntityRelationships;
 using System;
-using System.Linq;
 
 namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 {

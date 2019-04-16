@@ -5,7 +5,6 @@ using MongoDB.Driver;
 using MongoFramework.Infrastructure.DefinitionHelpers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MongoFramework.Tests.Infrastructure.DefinitionHelpers
 {

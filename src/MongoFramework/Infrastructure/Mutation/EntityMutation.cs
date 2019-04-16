@@ -1,6 +1,4 @@
-﻿using MongoDB.Driver;
-using MongoFramework.Infrastructure.Mapping;
-using MongoFramework.Infrastructure.Mutation.Mutators;
+﻿using MongoFramework.Infrastructure.Mutation.Mutators;
 using System.Collections.Generic;
 
 namespace MongoFramework.Infrastructure.Mutation

@@ -1,5 +1,4 @@
 ﻿using MongoDB.Bson.Serialization;
-using MongoFramework.Infrastructure;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
