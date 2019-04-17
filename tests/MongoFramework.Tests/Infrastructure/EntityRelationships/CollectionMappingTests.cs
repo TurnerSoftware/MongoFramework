@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Infrastructure.EntityRelationships;
-using MongoFramework.Infrastructure.Mapping;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;

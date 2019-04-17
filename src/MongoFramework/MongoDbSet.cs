@@ -1,10 +1,8 @@
-﻿using MongoDB.Driver;
-using MongoFramework.Infrastructure;
+﻿using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.EntityRelationships;
 using MongoFramework.Infrastructure.Indexing;
 using MongoFramework.Infrastructure.Linq;
 using MongoFramework.Infrastructure.Linq.Processors;
-using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mutation;
 using System;
 using System.Collections;

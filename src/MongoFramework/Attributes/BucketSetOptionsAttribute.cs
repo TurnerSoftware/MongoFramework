@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using MongoFramework.Infrastructure;
 
 namespace MongoFramework.Attributes
 {
-	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
+	[AttributeUsage(AttributeTargets.Property)]
 	public class BucketSetOptionsAttribute : DbSetOptionsAttribute
 	{
 		public int BucketSize { get; private set; }

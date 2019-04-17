@@ -3,13 +3,8 @@ using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoFramework.Attributes;
-using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mapping.Serialization;
-using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 
 namespace MongoFramework.Tests.Infrastructure.Mapping.Serialization
 {

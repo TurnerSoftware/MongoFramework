@@ -1,8 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Infrastructure.Indexing;
-using MongoFramework.Infrastructure.Mapping;
 using System;
-using System.Linq;
 
 namespace MongoFramework.Tests.Infrastructure.Indexing
 {

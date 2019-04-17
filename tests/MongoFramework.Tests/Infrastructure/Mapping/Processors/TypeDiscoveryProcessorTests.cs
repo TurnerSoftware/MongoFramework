@@ -3,8 +3,6 @@ using MongoDB.Bson.Serialization;
 using MongoFramework.Attributes;
 using MongoFramework.Infrastructure.Mapping.Processors;
 using MongoFramework.Infrastructure.Mapping.Serialization;
-using System;
-using System.Linq;
 
 namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 {

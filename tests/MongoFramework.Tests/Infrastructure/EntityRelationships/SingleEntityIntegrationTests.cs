@@ -1,12 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.EntityRelationships;
-using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mutation;
 using MongoFramework.Infrastructure.Mutation.Mutators;
-using System;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MongoFramework.Tests.Infrastructure.EntityRelationships
