@@ -55,11 +55,7 @@ namespace MongoFramework.Infrastructure
 						var sliceSize = Math.Min(bucket.BucketSize - bucket.ItemCount, remainingEntitiesCount);
 						var sliceEntities = entityList.Take(sliceSize).ToArray();
 
-						for (int i = 0, l = sliceEntities.Length; i < l; i++)
-						{
-							bucket.Items[bucket.ItemCount + i] = sliceEntities[i];
-						}
-
+						bucket.Items.AddRange(sliceEntities);
 						bucket.ItemCount += sliceSize;
 
 						entityCollection.Update(bucket, EntityEntryState.Updated);
@@ -74,17 +70,7 @@ namespace MongoFramework.Infrastructure
 				while (remainingEntitiesCount > 0)
 				{
 					var sliceSize = Math.Min(BucketSize, remainingEntitiesCount);
-					var sliceEntities = entityList.Skip(sliceAt).Take(sliceSize).ToArray();
-
-					var remainingSpace = BucketSize - sliceSize;
-					if (remainingSpace > 0)
-					{
-						Array.Resize(ref sliceEntities, BucketSize);
-						for (int i = sliceSize, l = BucketSize; i < l; i++)
-						{
-							sliceEntities[i] = Activator.CreateInstance<TSubEntity>();
-						}
-					}
+					var sliceEntities = entityList.Skip(sliceAt).Take(sliceSize).ToList();
 
 					entityCollection.Add(new EntityBucket<TGroup, TSubEntity>
 					{
