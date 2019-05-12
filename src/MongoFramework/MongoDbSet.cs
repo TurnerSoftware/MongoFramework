@@ -1,5 +1,4 @@
 ﻿using MongoFramework.Infrastructure;
-using MongoFramework.Infrastructure.EntityRelationships;
 using MongoFramework.Infrastructure.Indexing;
 using MongoFramework.Infrastructure.Linq;
 using MongoFramework.Infrastructure.Linq.Processors;
@@ -47,7 +46,7 @@ namespace MongoFramework
 			EntityReader = new EntityReader<TEntity>(connection);
 			EntityIndexWriter = new EntityIndexWriter<TEntity>(connection);
 			EntityRelationshipWriter = new EntityRelationshipWriter<TEntity>(connection);
-			ChangeTracker = new EntityChangeTracker<TEntity>(connection.GetEntityMapper(typeof(TEntity)));
+			ChangeTracker = new EntityChangeTracker<TEntity>();
 		}
 
 		public virtual TEntity Create()

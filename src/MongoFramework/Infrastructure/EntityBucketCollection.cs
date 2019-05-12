@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using MongoFramework.Infrastructure.Mapping;
 
 namespace MongoFramework.Infrastructure
 {
@@ -9,16 +8,14 @@ namespace MongoFramework.Infrastructure
 	{
 		private Dictionary<TGroup, List<TSubEntity>> SubEntityStaging { get; }
 		private IEntityReader<EntityBucket<TGroup, TSubEntity>> EntityReader { get; }
-		private IEntityMapper EntityMapper { get; }
 
 		public int BucketSize { get; }
 
-		public EntityBucketCollection(IEntityReader<EntityBucket<TGroup, TSubEntity>> entityReader, int bucketSize, IEntityMapper entityMapper)
+		public EntityBucketCollection(IEntityReader<EntityBucket<TGroup, TSubEntity>> entityReader, int bucketSize)
 		{
 			SubEntityStaging = new Dictionary<TGroup, List<TSubEntity>>(new ShallowPropertyEqualityComparer<TGroup>());
 			EntityReader = entityReader;
 			BucketSize = bucketSize;
-			EntityMapper = entityMapper;
 		}
 
 		public void AddEntity(TGroup group, TSubEntity entity)
@@ -35,7 +32,7 @@ namespace MongoFramework.Infrastructure
 
 		public IEntityCollection<EntityBucket<TGroup, TSubEntity>> AsEntityCollection()
 		{
-			var entityCollection = new EntityCollection<EntityBucket<TGroup, TSubEntity>>(EntityMapper);
+			var entityCollection = new EntityCollection<EntityBucket<TGroup, TSubEntity>>();
 
 			foreach (var grouping in SubEntityStaging)
 			{

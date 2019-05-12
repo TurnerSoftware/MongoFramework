@@ -10,8 +10,10 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 {
 	public class EntityIdProcessor : IMappingProcessor
 	{
-		public void ApplyMapping(Type entityType, BsonClassMap classMap, IMongoDbConnection connection)
+		public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
 		{
+			var entityType = definition.EntityType;
+
 			//If no Id member map exists, find the first property with the "Key" attribute or is named "Id" and use that
 			if (classMap.IdMemberMap == null)
 			{
@@ -22,7 +24,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 					classMap.MapIdMember(idProperty);
 				}
 			}
-
+			
 			//If there is no Id generator, set a default based on the member type
 			if (classMap.IdMemberMap != null && classMap.IdMemberMap.IdGenerator == null)
 			{

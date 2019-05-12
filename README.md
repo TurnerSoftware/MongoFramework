@@ -70,12 +70,8 @@ Populates the property with the current date/time on insert. _Note: The property
 
 Populates the property with the current date/time on update. _Note: The property must be of type `DateTime`_
 
-`[IncrementNumber(int incrementAmount = 1, bool onUpdateOnly = false)]`
-
-Updates the value of a property by the defined increment amount on insert or update.
-
 ## Example
-```
+```csharp
 using MongoFramework;
 using System.ComponentModel.DataAnnotations;
 
@@ -88,16 +84,19 @@ public class MyEntity
 
 public class MyContext : MongoDbContext
 {
-  public MyContext() : base("MyContext") { }
+  public MyContext(IMongoDbConnection connection) : base(connection) { }
   public MongoDbSet<MyEntity> MyEntities { get; set; }
   public MongoDbSet<MyOtherEntity> MyOtherEntities { get; set; }
 }
 
-using (var myContext = new MyContext())
+...
+
+var connection = MongoDbConnection.FromConnectionString("YOUR_CONNECTION_STRING");
+using (var myContext = new MyContext(connection))
 {
   var myEntity = myContext.MyEntities.Where(myEntity => myEntity.Name == "James").FirstOrDefault();
   myEntity.Address = "123 SomeAddress Road, SomeSuburb";
-  myContext.SaveChanges();
+  await myContext.SaveChangesAsync();
 }
 
 ```

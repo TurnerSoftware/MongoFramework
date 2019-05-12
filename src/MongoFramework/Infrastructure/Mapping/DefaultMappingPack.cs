@@ -11,14 +11,17 @@ namespace MongoFramework.Infrastructure.Mapping
 		{
 			Processors = new List<IMappingProcessor>
 			{
+				new CollectionNameProcessor(),
 				new HierarchyProcessor(),
 				new EntityIdProcessor(),
 				new MappedPropertiesProcessor(),
 				new NestedPropertyProcessor(),
 				new ExtraElementsProcessor(),
-				new NavigationPropertyProcessor(),
 				new TypeDiscoveryProcessor(),
-				new BsonKnownTypesProcessor()
+				new BsonKnownTypesProcessor(),
+				new PropertiesProcessor(),
+				new IndexProcessor(),
+				new EntityRelationshipProcessor()
 			};
 		}
 

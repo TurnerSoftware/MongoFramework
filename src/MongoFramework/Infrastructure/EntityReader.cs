@@ -10,25 +10,24 @@ namespace MongoFramework.Infrastructure
 	public class EntityReader<TEntity> : IEntityReader<TEntity> where TEntity : class
 	{
 		public IMongoDbConnection Connection { get; }
-		public IEntityMapper EntityMapper { get; private set; }
+		private IEntityDefinition EntityDefinition { get; }
 		
 		public EntityReader(IMongoDbConnection connection)
 		{
 			Connection = connection ?? throw new ArgumentNullException(nameof(connection));
-			EntityMapper = connection.GetEntityMapper(typeof(TEntity));
+			EntityDefinition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
 		}
 
 		private IMongoCollection<TEntity> GetCollection()
 		{
-			var collectionName = EntityMapper.GetCollectionName();
-			return Connection.GetDatabase().GetCollection<TEntity>(collectionName);
+			return Connection.GetDatabase().GetCollection<TEntity>(EntityDefinition.CollectionName);
 		}
 
 		public IQueryable<TEntity> AsQueryable()
 		{
 			var underlyingQueryable = GetCollection().AsQueryable();
 			var queryable = new MongoFrameworkQueryable<TEntity, TEntity>(Connection, underlyingQueryable);
-			queryable.EntityProcessors.Add(new EntityMutationProcessor<TEntity>(Connection));
+			queryable.EntityProcessors.Add(new EntityMutationProcessor<TEntity>());
 			return queryable;
 		}
 	}

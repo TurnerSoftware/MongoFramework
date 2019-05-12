@@ -56,7 +56,7 @@ namespace MongoFramework.Tests.Linq
 		{
 			var connection = TestConfiguration.GetConnection();
 			var dbEntityWriter = new EntityWriter<WhereIdMatchesGuidModel>(TestConfiguration.GetConnection());
-			var entityCollection = new EntityCollection<WhereIdMatchesGuidModel>(connection.GetEntityMapper(typeof(WhereIdMatchesGuidModel)))
+			var entityCollection = new EntityCollection<WhereIdMatchesGuidModel>()
 			{
 				new WhereIdMatchesGuidModel { Description = "1" },
 				new WhereIdMatchesGuidModel { Description = "2" },
@@ -82,7 +82,7 @@ namespace MongoFramework.Tests.Linq
 		{
 			var connection = TestConfiguration.GetConnection();
 			var dbEntityWriter = new EntityWriter<WhereIdMatchesObjectIdModel>(connection);
-			var entityCollection = new EntityCollection<WhereIdMatchesObjectIdModel>(connection.GetEntityMapper(typeof(WhereIdMatchesObjectIdModel)))
+			var entityCollection = new EntityCollection<WhereIdMatchesObjectIdModel>()
 			{
 				new WhereIdMatchesObjectIdModel { Description = "1" },
 				new WhereIdMatchesObjectIdModel { Description = "2" },
@@ -108,7 +108,7 @@ namespace MongoFramework.Tests.Linq
 		{
 			var connection = TestConfiguration.GetConnection();
 			var dbEntityWriter = new EntityWriter<WhereIdMatchesStringModel>(connection);
-			var entityCollection = new EntityCollection<WhereIdMatchesStringModel>(connection.GetEntityMapper(typeof(WhereIdMatchesStringModel)))
+			var entityCollection = new EntityCollection<WhereIdMatchesStringModel>()
 			{
 				new WhereIdMatchesStringModel { Description = "1" },
 				new WhereIdMatchesStringModel { Description = "2" },

@@ -1,5 +1,4 @@
 ﻿using MongoDB.Driver.Linq;
-using MongoFramework.Infrastructure.Linq.Processors;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
@@ -38,7 +37,7 @@ namespace MongoFramework.Infrastructure.Linq
 
 			if (result is TEntity)
 			{
-				EntityProcessors.ProcessEntity((TEntity)result);
+				EntityProcessors.ProcessEntity((TEntity)result, Connection);
 			}
 
 			return result;

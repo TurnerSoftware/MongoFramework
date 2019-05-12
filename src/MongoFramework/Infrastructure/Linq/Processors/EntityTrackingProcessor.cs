@@ -9,7 +9,7 @@
 			ChangeTracker = changeSet;
 		}
 
-		public void ProcessEntity(TEntity entity)
+		public void ProcessEntity(TEntity entity, IMongoDbConnection connection)
 		{
 			ChangeTracker.Update(entity, EntityEntryState.NoChanges);
 		}

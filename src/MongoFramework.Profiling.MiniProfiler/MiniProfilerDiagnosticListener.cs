@@ -7,6 +7,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using MongoFramework.Infrastructure;
+using MongoFramework.Infrastructure.Diagnostics;
 using StackExchange.Profiling;
 
 namespace MongoFramework.Profiling.MiniProfiler

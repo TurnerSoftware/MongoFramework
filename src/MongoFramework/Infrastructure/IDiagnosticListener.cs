@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MongoFramework.Infrastructure.Diagnostics;
+using System;
 
 namespace MongoFramework.Infrastructure
 {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson.Serialization;
+using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mapping.Processors;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Linq;
 namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 {
 	[TestClass]
-	public class NestedPropertyProcessorTests : TestBase
+	public class NestedPropertyProcessorTests : MappingTestBase
 	{
 		public class CollectionBaseModel
 		{
@@ -32,35 +33,19 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void MapsNestedStandardPropertyModel()
 		{
-			var connection = TestConfiguration.GetConnection();
-			var processor = new NestedPropertyProcessor();
-			var classMap = new BsonClassMap<PropertyBaseModel>();
-			classMap.AutoMap();
-
-			var registeredClassMaps = BsonClassMap.GetRegisteredClassMaps();
-			Assert.IsFalse(registeredClassMaps.Any(m => m.ClassType == typeof(PropertyNestedModel)));
-
-			processor.ApplyMapping(typeof(PropertyBaseModel), classMap, connection);
-
-			registeredClassMaps = BsonClassMap.GetRegisteredClassMaps();
-			Assert.IsTrue(registeredClassMaps.Any(m => m.ClassType == typeof(PropertyNestedModel)));
+			EntityMapping.AddMappingProcessor(new NestedPropertyProcessor());
+			Assert.IsFalse(BsonClassMap.IsClassMapRegistered(typeof(PropertyNestedModel)));
+			EntityMapping.RegisterType(typeof(PropertyBaseModel));
+			Assert.IsTrue(BsonClassMap.IsClassMapRegistered(typeof(PropertyNestedModel)));
 		}
 
 		[TestMethod]
 		public void MapsNestedCollectionPropertyModel()
 		{
-			var connection = TestConfiguration.GetConnection();
-			var processor = new NestedPropertyProcessor();
-			var classMap = new BsonClassMap<CollectionBaseModel>();
-			classMap.AutoMap();
-
-			var registeredClassMaps = BsonClassMap.GetRegisteredClassMaps();
-			Assert.IsFalse(registeredClassMaps.Any(m => m.ClassType == typeof(CollectionNestedModel)));
-
-			processor.ApplyMapping(typeof(CollectionBaseModel), classMap, connection);
-
-			registeredClassMaps = BsonClassMap.GetRegisteredClassMaps();
-			Assert.IsTrue(registeredClassMaps.Any(m => m.ClassType == typeof(CollectionNestedModel)));
+			EntityMapping.AddMappingProcessor(new NestedPropertyProcessor());
+			Assert.IsFalse(BsonClassMap.IsClassMapRegistered(typeof(CollectionNestedModel)));
+			EntityMapping.RegisterType(typeof(CollectionBaseModel));
+			Assert.IsTrue(BsonClassMap.IsClassMapRegistered(typeof(CollectionNestedModel)));
 		}
 	}
 }

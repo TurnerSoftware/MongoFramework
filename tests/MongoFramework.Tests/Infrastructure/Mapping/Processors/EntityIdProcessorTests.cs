@@ -2,14 +2,16 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.IdGenerators;
+using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mapping.Processors;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 {
 	[TestClass]
-	public class EntityIdProcessorTests : TestBase
+	public class EntityIdProcessorTests : MappingTestBase
 	{
 		public class GuidIdGeneratorTestModel
 		{
@@ -38,22 +40,19 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void IdMapsOnAttribute()
 		{
-			var connection = TestConfiguration.GetConnection();
-			var processor = new EntityIdProcessor();
-			var classMap = new BsonClassMap<IdByAttributeTestModel>();
-			processor.ApplyMapping(typeof(IdByAttributeTestModel), classMap, connection);
-
-			var entityMapper = connection.GetEntityMapper(typeof(IdByAttributeTestModel));
-			Assert.AreEqual("MyCustomId", entityMapper.GetIdName());
+			EntityMapping.AddMappingProcessor(new EntityIdProcessor());
+			var definition = EntityMapping.RegisterType(typeof(IdByAttributeTestModel));
+			Assert.AreEqual("MyCustomId", definition.GetIdName());
 		}
 
 		[TestMethod]
 		public void StringIdGeneratorOnStringProperty()
 		{
-			var connection = TestConfiguration.GetConnection();
-			var processor = new EntityIdProcessor();
-			var classMap = new BsonClassMap<StringIdGeneratorTestModel>();
-			processor.ApplyMapping(typeof(StringIdGeneratorTestModel), classMap, connection);
+			EntityMapping.AddMappingProcessor(new EntityIdProcessor());
+			EntityMapping.RegisterType(typeof(StringIdGeneratorTestModel));
+
+			var classMap = BsonClassMap.GetRegisteredClassMaps()
+				.Where(cm => cm.ClassType == typeof(StringIdGeneratorTestModel)).FirstOrDefault();
 
 			Assert.AreEqual(typeof(StringObjectIdGenerator), classMap.IdMemberMap.IdGenerator?.GetType());
 		}
@@ -61,10 +60,11 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void GuidIdGeneratorOnGuidProperty()
 		{
-			var connection = TestConfiguration.GetConnection();
-			var processor = new EntityIdProcessor();
-			var classMap = new BsonClassMap<GuidIdGeneratorTestModel>();
-			processor.ApplyMapping(typeof(GuidIdGeneratorTestModel), classMap, connection);
+			EntityMapping.AddMappingProcessor(new EntityIdProcessor());
+			EntityMapping.RegisterType(typeof(GuidIdGeneratorTestModel));
+
+			var classMap = BsonClassMap.GetRegisteredClassMaps()
+				.Where(cm => cm.ClassType == typeof(GuidIdGeneratorTestModel)).FirstOrDefault();
 
 			Assert.AreEqual(typeof(CombGuidGenerator), classMap.IdMemberMap.IdGenerator?.GetType());
 		}
@@ -72,10 +72,11 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void ObjectIdGeneratorOnObjectIdProperty()
 		{
-			var connection = TestConfiguration.GetConnection();
-			var processor = new EntityIdProcessor();
-			var classMap = new BsonClassMap<ObjectIdGeneratorTestModel>();
-			processor.ApplyMapping(typeof(ObjectIdGeneratorTestModel), classMap, connection);
+			EntityMapping.AddMappingProcessor(new EntityIdProcessor());
+			EntityMapping.RegisterType(typeof(ObjectIdGeneratorTestModel));
+
+			var classMap = BsonClassMap.GetRegisteredClassMaps()
+				.Where(cm => cm.ClassType == typeof(ObjectIdGeneratorTestModel)).FirstOrDefault();
 
 			Assert.AreEqual(typeof(ObjectIdGenerator), classMap.IdMemberMap.IdGenerator?.GetType());
 		}

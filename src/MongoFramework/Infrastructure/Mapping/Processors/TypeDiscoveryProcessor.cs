@@ -2,7 +2,7 @@
 using MongoDB.Bson.Serialization;
 using System.Reflection;
 using MongoFramework.Attributes;
-using MongoFramework.Infrastructure.Mapping.Serialization;
+using MongoFramework.Infrastructure.Serialization;
 
 namespace MongoFramework.Infrastructure.Mapping.Processors
 {
@@ -10,15 +10,14 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 	{
 		private static bool ProviderAdded { get; set; }
 
-		public void ApplyMapping(Type entityType, BsonClassMap classMap, IMongoDbConnection connection)
+		public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
 		{
+			var entityType = definition.EntityType;
 			if (!ProviderAdded && entityType.GetCustomAttribute<RuntimeTypeDiscoveryAttribute>() != null)
 			{
 				ProviderAdded = true;
 				BsonSerializer.RegisterSerializationProvider(TypeDiscoverySerializationProvider.Instance);
 			}
-
-			TypeDiscoverySerializationProvider.Instance.AddMapping(entityType, connection);
 		}
 	}
 }

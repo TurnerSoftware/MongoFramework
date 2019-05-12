@@ -1,13 +1,15 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson.Serialization;
 using MongoFramework.Attributes;
+using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mapping.Processors;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 {
 	[TestClass]
-	public class ExtraElementsProcessorTests : TestBase
+	public class ExtraElementsProcessorTests : MappingTestBase
 	{
 		public class ExtraElementsModel
 		{
@@ -25,25 +27,33 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void ObeysIgnoreExtraElementsAttribute()
 		{
-			var connection = TestConfiguration.GetConnection();
-			var processor = new ExtraElementsProcessor();
-			var classMap = new BsonClassMap<IgnoreExtraElementsModel>();
-			classMap.AutoMap();
-			processor.ApplyMapping(typeof(IgnoreExtraElementsModel), classMap, connection);
+			EntityMapping.AddMappingProcessor(new ExtraElementsProcessor());
+			EntityMapping.RegisterType(typeof(IgnoreExtraElementsModel));
 
+			var classMap = BsonClassMap.GetRegisteredClassMaps()
+				.Where(cm => cm.ClassType == typeof(IgnoreExtraElementsModel)).FirstOrDefault();
 			Assert.IsTrue(classMap.IgnoreExtraElements);
+
+			EntityMapping.RegisterType(typeof(ExtraElementsModel));
+			classMap = BsonClassMap.GetRegisteredClassMaps()
+				.Where(cm => cm.ClassType == typeof(ExtraElementsModel)).FirstOrDefault();
+			Assert.IsFalse(classMap.IgnoreExtraElements);
 		}
 
 		[TestMethod]
 		public void ObeysExtraElementsAttribute()
 		{
-			var connection = TestConfiguration.GetConnection();
-			var processor = new ExtraElementsProcessor();
-			var classMap = new BsonClassMap<ExtraElementsModel>();
-			classMap.AutoMap();
-			processor.ApplyMapping(typeof(ExtraElementsModel), classMap, connection);
+			EntityMapping.AddMappingProcessor(new ExtraElementsProcessor());
+			EntityMapping.RegisterType(typeof(ExtraElementsModel));
 
-			Assert.AreEqual("AdditionalElements", classMap.ExtraElementsMemberMap?.ElementName);
+			var classMap = BsonClassMap.GetRegisteredClassMaps()
+				.Where(cm => cm.ClassType == typeof(ExtraElementsModel)).FirstOrDefault();
+			Assert.AreEqual("AdditionalElements", classMap.ExtraElementsMemberMap.ElementName);
+
+			EntityMapping.RegisterType(typeof(IgnoreExtraElementsModel));
+			classMap = BsonClassMap.GetRegisteredClassMaps()
+				.Where(cm => cm.ClassType == typeof(IgnoreExtraElementsModel)).FirstOrDefault();
+			Assert.AreEqual(null, classMap.ExtraElementsMemberMap);
 		}
 	}
 }

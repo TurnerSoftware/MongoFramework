@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Infrastructure;
-using MongoFramework.Infrastructure.EntityRelationships;
 using MongoFramework.Infrastructure.Mutation;
 using MongoFramework.Infrastructure.Mutation.Mutators;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -70,7 +69,7 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 				Description = "LoadRelationship-RelatedItem"
 			};
 			var dbEntityWriter = new EntityWriter<StringIdModel>(connection);
-			var collection = new EntityCollection<StringIdModel>(connection.GetEntityMapper(typeof(StringIdModel)))
+			var collection = new EntityCollection<StringIdModel>()
 			{
 				relatedEntity
 			};

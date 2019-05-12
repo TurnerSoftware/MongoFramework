@@ -1,5 +1,6 @@
 ﻿using MongoDB.Driver.Linq;
-using MongoFramework.Infrastructure.Linq.Processors;
+using MongoFramework.Infrastructure.Diagnostics;
+using MongoFramework.Infrastructure.Mapping;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -82,12 +83,7 @@ namespace MongoFramework.Infrastructure.Linq
 				{
 					while (enumerator.MoveNext())
 					{
-						var item = enumerator.Current;
-						if (item is TEntity)
-						{
-							EntityProcessors.ProcessEntity((TEntity)(object)item);
-						}
-						yield return item;
+						yield return enumerator.Current;
 					}
 				}
 			}
@@ -115,8 +111,8 @@ namespace MongoFramework.Infrastructure.Linq
 		public string ToQuery()
 		{
 			var executionModel = InternalProvider.UnderlyingQueryable.GetExecutionModel();
-			var entityMapper = Connection.GetEntityMapper(typeof(TEntity));
-			return $"db.{entityMapper.GetCollectionName()}.{executionModel}";
+			var definition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
+			return $"db.{definition.CollectionName}.{executionModel}";
 		}
 	}
 }
