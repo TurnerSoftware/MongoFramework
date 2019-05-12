@@ -28,6 +28,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		public void ObeysNotMappedAttribute()
 		{
 			EntityMapping.AddMappingProcessor(new MappedPropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
 			var definition = EntityMapping.RegisterType(typeof(NotMappedPropertiesModel));
 			Assert.IsFalse(definition.Properties.Any(p => p.ElementName == "NotMapped"));
 		}
@@ -36,6 +37,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		public void ObeysColumnAttributeRemap()
 		{
 			EntityMapping.AddMappingProcessor(new MappedPropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
 			var definition = EntityMapping.RegisterType(typeof(ColumnAttributePropertyModel));
 			Assert.IsTrue(definition.Properties.Any(p => p.ElementName == "CustomPropertyName"));
 		}

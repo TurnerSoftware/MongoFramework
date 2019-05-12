@@ -18,7 +18,8 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 					Property = p,
 					IndexName = a.Name,
 					IsUnique = a.IsUnique,
-					SortOrder = a.SortOrder
+					SortOrder = a.SortOrder,
+					IndexPriority = a.IndexPriority
 				})
 			);
 		}

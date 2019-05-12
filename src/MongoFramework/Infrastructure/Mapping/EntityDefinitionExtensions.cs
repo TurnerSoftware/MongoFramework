@@ -17,7 +17,7 @@ namespace MongoFramework.Infrastructure.Mapping
 
 		public static string GetIdName(this IEntityDefinition definition)
 		{
-			return definition.Properties.Where(m => m.IsKey).Select(m => m.ElementName).FirstOrDefault();
+			return definition.GetIdProperty()?.ElementName;
 		}
 
 		public static object GetIdValue(this IEntityDefinition definition, object entity)
@@ -27,8 +27,8 @@ namespace MongoFramework.Infrastructure.Mapping
 
 		public static object GetDefaultId(this IEntityDefinition definition)
 		{
-			var idPropertyType = definition.GetIdProperty().PropertyType;
-			if (idPropertyType.IsValueType)
+			var idPropertyType = definition.GetIdProperty()?.PropertyType;
+			if (idPropertyType != null && idPropertyType.IsValueType)
 			{
 				return Activator.CreateInstance(idPropertyType);
 			}
@@ -38,13 +38,15 @@ namespace MongoFramework.Infrastructure.Mapping
 		public static IEnumerable<IEntityProperty> GetInheritedProperties(this IEntityDefinition definition)
 		{
 			var currentType = definition.EntityType.BaseType;
-			while (currentType != typeof(object))
+			while (currentType != typeof(object) && currentType != null)
 			{
-				var properties = EntityMapping.GetOrCreateDefinition(currentType).Properties;
-				foreach (var property in properties)
+				var currentDefinition = EntityMapping.GetOrCreateDefinition(currentType);
+				foreach (var property in currentDefinition.Properties)
 				{
 					yield return property;
 				}
+
+				currentType = currentType.BaseType;
 			}
 		}
 

@@ -26,7 +26,7 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		[TestMethod]
 		public void AddForeignIdWithRightType()
 		{
-			var foreignProperty = EntityMapping.GetOrCreateDefinition(typeof(ObjectIdIdModel)).GetIdProperty();
+			var foreignProperty = EntityMapping.GetOrCreateDefinition(typeof(StringIdModel)).GetIdProperty();
 			var collection = new EntityNavigationCollection<StringIdModel>(foreignProperty);
 			collection.AddForeignId("12345678");
 			Assert.AreEqual(1, collection.UnloadedCount);
@@ -35,7 +35,7 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		[TestMethod, ExpectedException(typeof(InvalidOperationException))]
 		public void AddForeignIdWithWrongType()
 		{
-			var foreignProperty = EntityMapping.GetOrCreateDefinition(typeof(ObjectIdIdModel)).GetIdProperty();
+			var foreignProperty = EntityMapping.GetOrCreateDefinition(typeof(StringIdModel)).GetIdProperty();
 			var collection = new EntityNavigationCollection<StringIdModel>(foreignProperty);
 			collection.AddForeignId(ObjectId.GenerateNewId());
 		}

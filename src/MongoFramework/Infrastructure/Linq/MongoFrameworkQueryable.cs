@@ -83,7 +83,12 @@ namespace MongoFramework.Infrastructure.Linq
 				{
 					while (enumerator.MoveNext())
 					{
-						yield return enumerator.Current;
+						var item = enumerator.Current;
+						if (item is TEntity)
+						{
+							EntityProcessors.ProcessEntity((TEntity)(object)item, Connection);
+						}
+						yield return item;
 					}
 				}
 			}

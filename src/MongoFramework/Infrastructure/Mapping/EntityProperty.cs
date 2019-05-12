@@ -12,6 +12,21 @@ namespace MongoFramework.Infrastructure.Mapping
 		public Type PropertyType { get; set; }
 		public PropertyInfo PropertyInfo { get; set; }
 
+		public bool Equals(IEntityProperty other)
+		{
+			if (other == null)
+			{
+				return false;
+			}
+
+			return EntityType == other.EntityType &&
+				IsKey == other.IsKey &&
+				ElementName == other.ElementName &&
+				FullPath == other.FullPath &&
+				PropertyType == other.PropertyType &&
+				PropertyInfo == other.PropertyInfo;
+		}
+
 		public object GetValue(object entity)
 		{
 			return PropertyInfo.GetValue(entity);

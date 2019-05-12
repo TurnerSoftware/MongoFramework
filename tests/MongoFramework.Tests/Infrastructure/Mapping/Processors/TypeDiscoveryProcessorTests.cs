@@ -25,13 +25,11 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		public void TypeDiscoverySerializerWhenAttributeIsDefined()
 		{
 			EntityMapping.AddMappingProcessor(new TypeDiscoveryProcessor());
-
-			var serializer = BsonSerializer.LookupSerializer<TypeDiscoveryAttributeModel>();
-			Assert.AreNotEqual(typeof(TypeDiscoverySerializer<>), serializer.GetType().GetGenericTypeDefinition());
+			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
 
 			EntityMapping.RegisterType(typeof(TypeDiscoveryAttributeModel));
 
-			serializer = BsonSerializer.LookupSerializer<TypeDiscoveryAttributeModel>();
+			var serializer = BsonSerializer.LookupSerializer<TypeDiscoveryAttributeModel>();
 			Assert.AreEqual(typeof(TypeDiscoverySerializer<>), serializer.GetType().GetGenericTypeDefinition());
 		}
 
@@ -39,13 +37,11 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		public void NotTypeDiscoverySerializerWhenAttributeNotDefined()
 		{
 			EntityMapping.AddMappingProcessor(new TypeDiscoveryProcessor());
-
-			var serializer = BsonSerializer.LookupSerializer<NoTypeDiscoveryAttributeModel>();
-			Assert.AreNotEqual(typeof(TypeDiscoverySerializer<>), serializer.GetType().GetGenericTypeDefinition());
+			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
 
 			EntityMapping.RegisterType(typeof(NoTypeDiscoveryAttributeModel));
 
-			serializer = BsonSerializer.LookupSerializer<NoTypeDiscoveryAttributeModel>();
+			var serializer = BsonSerializer.LookupSerializer<NoTypeDiscoveryAttributeModel>();
 			Assert.AreNotEqual(typeof(TypeDiscoverySerializer<>), serializer.GetType().GetGenericTypeDefinition());;
 		}
 	}

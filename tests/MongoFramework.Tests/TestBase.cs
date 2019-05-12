@@ -17,6 +17,9 @@ namespace MongoFramework.Tests
 		{
 			ResetMongoDbDriver();
 			EntityMapping.RemoveAllDefinitions();
+
+			EntityMapping.RemoveAllMappingProcessors();
+			EntityMapping.AddMappingProcessors(DefaultMappingPack.Instance.Processors);
 		}
 
 		private static void ResetMongoDbDriver()

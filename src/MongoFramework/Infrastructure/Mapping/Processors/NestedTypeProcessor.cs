@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace MongoFramework.Infrastructure.Mapping.Processors
 {
-	public class NestedPropertyProcessor : IMappingProcessor
+	public class NestedTypeProcessor : IMappingProcessor
 	{
 		public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
 		{

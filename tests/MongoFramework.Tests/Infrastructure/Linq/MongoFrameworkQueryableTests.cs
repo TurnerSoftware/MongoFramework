@@ -2,6 +2,7 @@
 using MongoDB.Driver;
 using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Linq;
+using MongoFramework.Infrastructure.Mapping;
 using System.Linq;
 
 namespace MongoFramework.Tests.Infrastructure.Linq
@@ -28,6 +29,8 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 		[TestMethod]
 		public void EnumerateQueryable()
 		{
+			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
+
 			var connection = TestConfiguration.GetConnection();
 			var collection = connection.GetDatabase().GetCollection<MongoFrameworkQueryableModel>(nameof(MongoFrameworkQueryableModel));
 			var underlyingQueryable = collection.AsQueryable();
@@ -47,6 +50,8 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 		[TestMethod]
 		public void EntityProcessorsFiresOnEnumerationOfTEntity()
 		{
+			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
+
 			var connection = TestConfiguration.GetConnection();
 			var collection = connection.GetDatabase().GetCollection<MongoFrameworkQueryableModel>(nameof(MongoFrameworkQueryableModel));
 			var underlyingQueryable = collection.AsQueryable();
@@ -71,6 +76,8 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 		[TestMethod]
 		public void EntityProcessorsNotFiredWhenNotTEntity()
 		{
+			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
+
 			var connection = TestConfiguration.GetConnection();
 			var collection = connection.GetDatabase().GetCollection<MongoFrameworkQueryableModel>(nameof(MongoFrameworkQueryableModel));
 			var underlyingQueryable = collection.AsQueryable();

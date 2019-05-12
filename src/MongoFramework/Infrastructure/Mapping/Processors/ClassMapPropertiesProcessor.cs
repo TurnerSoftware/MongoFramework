@@ -7,7 +7,7 @@ using MongoDB.Bson.Serialization;
 
 namespace MongoFramework.Infrastructure.Mapping.Processors
 {
-	public class PropertiesProcessor : IMappingProcessor
+	public class ClassMapPropertiesProcessor : IMappingProcessor
 	{
 		public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
 		{

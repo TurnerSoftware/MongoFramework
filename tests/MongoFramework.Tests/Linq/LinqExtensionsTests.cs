@@ -3,6 +3,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Linq;
+using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Linq;
 using System;
 using System.Linq;
@@ -35,6 +36,8 @@ namespace MongoFramework.Tests.Linq
 		[TestMethod]
 		public void ValidToQuery()
 		{
+			EntityMapping.RegisterType(typeof(LinqExtensionsModel));
+
 			var connection = TestConfiguration.GetConnection();
 			var collection = connection.GetDatabase().GetCollection<LinqExtensionsModel>(nameof(LinqExtensionsModel));
 			var underlyingQueryable = collection.AsQueryable();

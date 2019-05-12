@@ -13,12 +13,12 @@ namespace MongoFramework.Infrastructure.Mapping
 	{
 		private static ReaderWriterLockSlim MappingLock { get; } = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 		private static ConcurrentDictionary<Type, IEntityDefinition> EntityDefinitions { get; }
-		private static ConcurrentDictionary<Type, IMappingProcessor> MappingProcessors { get; }
+		private static List<IMappingProcessor> MappingProcessors { get; }
 
 		static EntityMapping()
 		{
 			EntityDefinitions = new ConcurrentDictionary<Type, IEntityDefinition>();
-			MappingProcessors = new ConcurrentDictionary<Type, IMappingProcessor>();
+			MappingProcessors = new List<IMappingProcessor>();
 
 			AddMappingProcessors(DefaultMappingPack.Instance.Processors);
 		}
@@ -76,7 +76,7 @@ namespace MongoFramework.Infrastructure.Mapping
 						BsonClassMap.RegisterClassMap(classMap);
 						classMap.AutoMap();
 
-						foreach (var processor in MappingProcessors.Values)
+						foreach (var processor in MappingProcessors)
 						{
 							processor.ApplyMapping(definition, classMap);
 						}
@@ -105,18 +105,19 @@ namespace MongoFramework.Infrastructure.Mapping
 
 		public static void AddMappingProcessors(IEnumerable<IMappingProcessor> mappingProcessors)
 		{
-			foreach (var processor in mappingProcessors)
-			{
-				MappingProcessors.TryAdd(processor.GetType(), processor);
-			}
+			MappingProcessors.AddRange(mappingProcessors);
 		}
-		public static void AddMappingProcessor<TProcessor>(TProcessor mappingProcessor) where TProcessor : IMappingProcessor
+		public static void AddMappingProcessor(IMappingProcessor mappingProcessor)
 		{
-			MappingProcessors.TryAdd(typeof(TProcessor), mappingProcessor);
+			MappingProcessors.Add(mappingProcessor);
 		}
 		public static void RemoveMappingProcessor<TProcessor>() where TProcessor : IMappingProcessor
 		{
-			MappingProcessors.TryRemove(typeof(TProcessor), out _);
+			var matchingItems = MappingProcessors.Where(p => p.GetType() == typeof(TProcessor)).ToArray();
+			foreach (var matchingItem in matchingItems)
+			{
+				MappingProcessors.Remove(matchingItem);
+			}
 		}
 		public static void RemoveAllMappingProcessors()
 		{

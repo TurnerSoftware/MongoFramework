@@ -8,7 +8,7 @@ using System.Linq;
 namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 {
 	[TestClass]
-	public class NestedPropertyProcessorTests : MappingTestBase
+	public class NestedTypeProcessorTests : MappingTestBase
 	{
 		public class CollectionBaseModel
 		{
@@ -33,7 +33,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void MapsNestedStandardPropertyModel()
 		{
-			EntityMapping.AddMappingProcessor(new NestedPropertyProcessor());
+			EntityMapping.AddMappingProcessor(new NestedTypeProcessor());
 			Assert.IsFalse(BsonClassMap.IsClassMapRegistered(typeof(PropertyNestedModel)));
 			EntityMapping.RegisterType(typeof(PropertyBaseModel));
 			Assert.IsTrue(BsonClassMap.IsClassMapRegistered(typeof(PropertyNestedModel)));
@@ -42,7 +42,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void MapsNestedCollectionPropertyModel()
 		{
-			EntityMapping.AddMappingProcessor(new NestedPropertyProcessor());
+			EntityMapping.AddMappingProcessor(new NestedTypeProcessor());
 			Assert.IsFalse(BsonClassMap.IsClassMapRegistered(typeof(CollectionNestedModel)));
 			EntityMapping.RegisterType(typeof(CollectionBaseModel));
 			Assert.IsTrue(BsonClassMap.IsClassMapRegistered(typeof(CollectionNestedModel)));

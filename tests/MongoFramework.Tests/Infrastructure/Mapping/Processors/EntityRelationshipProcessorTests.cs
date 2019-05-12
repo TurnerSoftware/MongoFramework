@@ -107,41 +107,39 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void ForeignKeyAttributeOnId()
 		{
-			EntityMapping.AddMappingProcessor(new PropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
 			EntityMapping.AddMappingProcessor(new EntityRelationshipProcessor());
 
 			var definition = EntityMapping.RegisterType(typeof(BaseEntityModel));
 			var relationships = definition.Relationships;
 
-			var createdByIdProperty = definition.GetProperty("CreatedById");
-			var attributeOnIdRelationship = relationships.Where(r => r.IdProperty == createdByIdProperty).FirstOrDefault();
+			var attributeOnIdRelationship = relationships.Where(r => r.IdProperty.ElementName == "CreatedById").FirstOrDefault();
 
 			Assert.IsFalse(attributeOnIdRelationship.IsCollection);
 			Assert.AreEqual(typeof(UserEntityModel), attributeOnIdRelationship.EntityType);
-			Assert.AreEqual(definition.GetProperty("CreatedBy"), attributeOnIdRelationship.NavigationProperty);
+			Assert.AreEqual("CreatedBy", attributeOnIdRelationship.NavigationProperty.ElementName);
 		}
 
 		[TestMethod]
 		public void ForeignKeyAttributeOnNavigationProperty()
 		{
-			EntityMapping.AddMappingProcessor(new PropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
 			EntityMapping.AddMappingProcessor(new EntityRelationshipProcessor());
 
 			var definition = EntityMapping.RegisterType(typeof(BaseEntityModel));
 			var relationships = definition.Relationships;
 
-			var updatedByIdProperty = definition.GetProperty("UpdatedById");
-			var attributeOnIdRelationship = relationships.Where(r => r.IdProperty == updatedByIdProperty).FirstOrDefault();
+			var attributeOnIdRelationship = relationships.Where(r => r.IdProperty.ElementName == "UpdatedById").FirstOrDefault();
 
 			Assert.IsFalse(attributeOnIdRelationship.IsCollection);
 			Assert.AreEqual(typeof(UserEntityModel), attributeOnIdRelationship.EntityType);
-			Assert.AreEqual(definition.GetProperty("UpdatedBy"), attributeOnIdRelationship.NavigationProperty);
+			Assert.AreEqual("UpdatedBy", attributeOnIdRelationship.NavigationProperty.ElementName);
 		}
 
 		[TestMethod]
 		public void IdentifyRelationshipsWithOtherIdTypes()
 		{
-			EntityMapping.AddMappingProcessor(new PropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
 			EntityMapping.AddMappingProcessor(new EntityRelationshipProcessor());
 
 			var relationships = EntityMapping.RegisterType(typeof(BaseVariedIdModel)).Relationships;
@@ -149,10 +147,10 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		}
 
 		[TestMethod]
-		[ExpectedExceptionPattern(typeof(InvalidOperationException), @"Unable to determine the Id property between .+ and .+\. Check the types for these properties are correct\.")]
+		[ExpectedExceptionPattern(typeof(InvalidOperationException), @"Unable to determine the Id property between .+ and .+\. Check the types for these properties are valid\.")]
 		public void UnsupportedIdTypeOnRelationship()
 		{
-			EntityMapping.AddMappingProcessor(new PropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
 			EntityMapping.AddMappingProcessor(new EntityRelationshipProcessor());
 
 			EntityMapping.RegisterType(typeof(UnsupportedIdModel));
@@ -162,7 +160,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[ExpectedExceptionPattern(typeof(InvalidOperationException), @"Can't find property .+ in .+ as indicated by the ForeignKeyAttribute.")]
 		public void InvalidForeignKeyOnRelationship()
 		{
-			EntityMapping.AddMappingProcessor(new PropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
 			EntityMapping.AddMappingProcessor(new EntityRelationshipProcessor());
 
 			EntityMapping.RegisterType(typeof(InvalidForeignKeyModel));
@@ -171,7 +169,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void NavigationPropertiesUnmap()
 		{
-			EntityMapping.AddMappingProcessor(new PropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
 			EntityMapping.AddMappingProcessor(new EntityRelationshipProcessor());
 
 			var definition = EntityMapping.RegisterType(typeof(BaseEntityModel));
@@ -182,7 +180,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void IdentifyCollectionRelationships()
 		{
-			EntityMapping.AddMappingProcessor(new PropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
 			EntityMapping.AddMappingProcessor(new EntityRelationshipProcessor());
 
 			var definition = EntityMapping.RegisterType(typeof(CollectionMappingModel));
@@ -195,29 +193,38 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 
 			Assert.IsTrue(relationship.IsCollection);
 			Assert.AreEqual(typeof(StringIdModel), relationship.EntityType);
-			Assert.AreEqual(stringIdModelDefinition.GetProperty("Id"), relationship.IdProperty);
-			Assert.AreEqual(definition.GetProperty("StringModelEntities"), relationship.NavigationProperty);
+			Assert.IsTrue(stringIdModelDefinition.GetProperty("Id").Equals(relationship.IdProperty));
+			Assert.IsTrue(definition.GetProperty("StringModelEntities").Equals(relationship.NavigationProperty));
 		}
 
 		[TestMethod]
 		public void ValidInversePropertyMapping()
 		{
+			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new EntityRelationshipProcessor());
+
 			var relationships = EntityMapping.RegisterType(typeof(ValidInversePropertyModel)).Relationships;
 
 			Assert.IsTrue(relationships.Any(r => r.IsCollection && r.IdProperty.PropertyInfo.Name == "SecondaryId"));
 		}
 
 		[TestMethod]
-		[ExpectedExceptionPattern(typeof(InvalidOperationException), "Can't find property .+ in .+ as indicated by the InversePropertyAttribute on .+ in .+")]
+		[ExpectedExceptionPattern(typeof(InvalidOperationException), "Can't find property .+ in .+ as indicated by the InversePropertyAttribute on .+")]
 		public void InversePropertyMappingNonExistantProperty()
 		{
+			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new EntityRelationshipProcessor());
+
 			EntityMapping.RegisterType(typeof(InversePropertyNonExistantPropertyModel));
 		}
 
 		[TestMethod]
-		[ExpectedExceptionPattern(typeof(InvalidOperationException), "Can't find property .+ in .+ as indicated by the InversePropertyAttribute on .+ in .+")]
+		[ExpectedExceptionPattern(typeof(InvalidOperationException), "Can't find property .+ in .+ as indicated by the InversePropertyAttribute on .+")]
 		public void InversePropertyMappingInvalidPropertyType()
 		{
+			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new EntityRelationshipProcessor());
+
 			EntityMapping.RegisterType(typeof(InversePropertyMappingInvalidPropertyTypeModel));
 		}
 	}
