@@ -2,16 +2,16 @@
 {
 	public class EntityTrackingProcessor<TEntity> : ILinqProcessor<TEntity> where TEntity : class
 	{
-		public IEntityChangeTracker<TEntity> ChangeTracker { get; private set; }
+		public IEntityCollection<TEntity> EntityCollection { get; private set; }
 
-		public EntityTrackingProcessor(IEntityChangeTracker<TEntity> changeSet)
+		public EntityTrackingProcessor(IEntityCollection<TEntity> collection)
 		{
-			ChangeTracker = changeSet;
+			EntityCollection = collection;
 		}
 
 		public void ProcessEntity(TEntity entity, IMongoDbConnection connection)
 		{
-			ChangeTracker.Update(entity, EntityEntryState.NoChanges);
+			EntityCollection.Update(entity, EntityEntryState.NoChanges);
 		}
 	}
 }

@@ -68,12 +68,13 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 			{
 				Description = "LoadRelationship-RelatedItem"
 			};
-			var dbEntityWriter = new EntityWriter<StringIdModel>(connection);
-			var collection = new EntityCollection<StringIdModel>()
+			var writerPipeline = new EntityWriterPipeline<StringIdModel>(connection);
+			var entityCollection = new EntityCollection<StringIdModel>()
 			{
 				relatedEntity
 			};
-			dbEntityWriter.Write(collection);
+			writerPipeline.AddCollection(entityCollection);
+			writerPipeline.Write();
 
 			var entity = new SingleEntityIntegrationModel
 			{

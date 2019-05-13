@@ -31,5 +31,20 @@ namespace MongoFramework.Infrastructure.Mutation
 				}
 			}
 		}
+
+		public static void MutateEntities(IEntityCollection<TEntity> entities, IMongoDbConnection connection)
+		{
+			foreach (var entry in entities.GetEntries())
+			{
+				if (entry.State == EntityEntryState.Added)
+				{
+					MutateEntity(entry.Entity, MutatorType.Insert, connection);
+				}
+				else if (entry.State == EntityEntryState.Updated)
+				{
+					MutateEntity(entry.Entity, MutatorType.Update, connection);
+				}
+			}
+		}
 	}
 }

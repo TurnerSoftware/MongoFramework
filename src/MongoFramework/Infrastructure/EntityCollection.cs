@@ -126,7 +126,7 @@ namespace MongoFramework.Infrastructure
 
 		public IEnumerator<TEntity> GetEnumerator()
 		{
-			var result = Entries.Select(e => e.Entity);
+			var result = GetEntries().Select(e => e.Entity);
 			using (var enumerator = result.GetEnumerator())
 			{
 				while (enumerator.MoveNext())

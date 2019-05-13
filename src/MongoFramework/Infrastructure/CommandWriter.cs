@@ -1,4 +1,5 @@
 ﻿using MongoDB.Driver;
+using MongoFramework.Infrastructure.Commands;
 using MongoFramework.Infrastructure.DefinitionHelpers;
 using MongoFramework.Infrastructure.Diagnostics;
 using MongoFramework.Infrastructure.Mapping;
@@ -11,12 +12,12 @@ using System.Threading.Tasks;
 
 namespace MongoFramework.Infrastructure
 {
-	public class EntityWriter<TEntity> : IEntityWriter<TEntity> where TEntity : class
+	public class CommandWriter<TEntity> : ICommandWriter<TEntity> where TEntity : class
 	{
 		public IMongoDbConnection Connection { get; }
 		private IEntityDefinition EntityDefinition { get; }
 		
-		public EntityWriter(IMongoDbConnection connection)
+		public CommandWriter(IMongoDbConnection connection)
 		{
 			Connection = connection ?? throw new ArgumentNullException(nameof(connection));
 			EntityDefinition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
@@ -27,46 +28,9 @@ namespace MongoFramework.Infrastructure
 			return Connection.GetDatabase().GetCollection<TEntity>(EntityDefinition.CollectionName);
 		}
 
-		private IEnumerable<WriteModel<TEntity>> BuildWriteModel(IEntityCollection<TEntity> entityCollection)
+		public void Write(IEnumerable<IWriteCommand<TEntity>> writeCommands)
 		{
-			var idFieldName = EntityDefinition.GetIdName();
-			var writeModel = new List<WriteModel<TEntity>>();
-
-			foreach (var entry in entityCollection.GetEntries())
-			{
-				if (entry.State == EntityEntryState.Added)
-				{
-					EntityMutation<TEntity>.MutateEntity(entry.Entity, MutatorType.Insert, Connection);
-					writeModel.Add(new InsertOneModel<TEntity>(entry.Entity));
-				}
-				else if (entry.State == EntityEntryState.Updated)
-				{
-					EntityMutation<TEntity>.MutateEntity(entry.Entity, MutatorType.Update, Connection);
-					var idFieldValue = EntityDefinition.GetIdValue(entry.Entity);
-					var filter = Builders<TEntity>.Filter.Eq(idFieldName, idFieldValue);
-					var updateDefintion = UpdateDefinitionHelper.CreateFromDiff<TEntity>(entry.OriginalValues, entry.CurrentValues);
-
-					//MongoDB doesn't like it if an UpdateDefinition is empty.
-					//This is primarily to work around a mutation that may set an entity to its default state.
-					if (updateDefintion.HasChanges())
-					{
-						writeModel.Add(new UpdateOneModel<TEntity>(filter, updateDefintion));
-					}
-				}
-				else if (entry.State == EntityEntryState.Deleted)
-				{
-					var idFieldValue = EntityDefinition.GetIdValue(entry.Entity);
-					var filter = Builders<TEntity>.Filter.Eq(idFieldName, idFieldValue);
-					writeModel.Add(new DeleteOneModel<TEntity>(filter));
-				}
-			}
-
-			return writeModel;
-		}
-
-		public void Write(IEntityCollection<TEntity> entityCollection)
-		{
-			var writeModel = BuildWriteModel(entityCollection);
+			var writeModel = writeCommands.SelectMany(c => c.GetModel());
 
 			if (writeModel.Any())
 			{
@@ -76,7 +40,7 @@ namespace MongoFramework.Infrastructure
 					Connection.DiagnosticListener.OnNext(new WriteDiagnosticCommand<TEntity>
 					{
 						CommandId = commandId,
-						Source = $"{nameof(EntityWriter<TEntity>)}.{nameof(Write)}",
+						Source = $"{nameof(CommandWriter<TEntity>)}.{nameof(Write)}",
 						CommandState = CommandState.Start,
 						EntityType = typeof(TEntity),
 						WriteModel = writeModel
@@ -85,7 +49,7 @@ namespace MongoFramework.Infrastructure
 					Connection.DiagnosticListener.OnNext(new WriteDiagnosticCommand<TEntity>
 					{
 						CommandId = commandId,
-						Source = $"{nameof(EntityWriter<TEntity>)}.{nameof(Write)}",
+						Source = $"{nameof(CommandWriter<TEntity>)}.{nameof(Write)}",
 						CommandState = CommandState.End,
 						EntityType = typeof(TEntity),
 						WriteModel = writeModel
@@ -96,7 +60,7 @@ namespace MongoFramework.Infrastructure
 					Connection.DiagnosticListener.OnNext(new WriteDiagnosticCommand<TEntity>
 					{
 						CommandId = commandId,
-						Source = $"{nameof(EntityWriter<TEntity>)}.{nameof(Write)}",
+						Source = $"{nameof(CommandWriter<TEntity>)}.{nameof(Write)}",
 						CommandState = CommandState.Error,
 						EntityType = typeof(TEntity),
 						WriteModel = writeModel
@@ -108,9 +72,9 @@ namespace MongoFramework.Infrastructure
 			}
 		}
 
-		public async Task WriteAsync(IEntityCollection<TEntity> entityCollection, CancellationToken cancellationToken = default(CancellationToken))
+		public async Task WriteAsync(IEnumerable<IWriteCommand<TEntity>> writeCommands, CancellationToken cancellationToken = default(CancellationToken))
 		{
-			var writeModel = BuildWriteModel(entityCollection);
+			var writeModel = writeCommands.SelectMany(c => c.GetModel());
 
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -122,7 +86,7 @@ namespace MongoFramework.Infrastructure
 					Connection.DiagnosticListener.OnNext(new WriteDiagnosticCommand<TEntity>
 					{
 						CommandId = commandId,
-						Source = $"{nameof(EntityWriter<TEntity>)}.{nameof(WriteAsync)}",
+						Source = $"{nameof(CommandWriter<TEntity>)}.{nameof(WriteAsync)}",
 						CommandState = CommandState.Start,
 						EntityType = typeof(TEntity),
 						WriteModel = writeModel
@@ -131,7 +95,7 @@ namespace MongoFramework.Infrastructure
 					Connection.DiagnosticListener.OnNext(new WriteDiagnosticCommand<TEntity>
 					{
 						CommandId = commandId,
-						Source = $"{nameof(EntityWriter<TEntity>)}.{nameof(WriteAsync)}",
+						Source = $"{nameof(CommandWriter<TEntity>)}.{nameof(WriteAsync)}",
 						CommandState = CommandState.End,
 						EntityType = typeof(TEntity),
 						WriteModel = writeModel
@@ -142,7 +106,7 @@ namespace MongoFramework.Infrastructure
 					Connection.DiagnosticListener.OnNext(new WriteDiagnosticCommand<TEntity>
 					{
 						CommandId = commandId,
-						Source = $"{nameof(EntityWriter<TEntity>)}.{nameof(WriteAsync)}",
+						Source = $"{nameof(CommandWriter<TEntity>)}.{nameof(WriteAsync)}",
 						CommandState = CommandState.Error,
 						EntityType = typeof(TEntity),
 						WriteModel = writeModel
