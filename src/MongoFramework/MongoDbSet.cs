@@ -20,10 +20,10 @@ namespace MongoFramework
 	/// <typeparam name="TEntity"></typeparam>
 	public class MongoDbSet<TEntity> : IMongoDbSet<TEntity> where TEntity : class
 	{
-		public IEntityChangeTracker<TEntity> ChangeTracker { get; private set; }
+		public IEntityCollection<TEntity> ChangeTracker { get; private set; }
 
 		private IMongoDbConnection Connection { get; set; }
-		private IEntityWriter<TEntity> EntityWriter { get; set; }
+		private IEntityWriterPipeline<TEntity> EntityWriterPipeline { get; set; }
 		private IEntityReader<TEntity> EntityReader { get; set; }
 		private IEntityIndexWriter<TEntity> EntityIndexWriter { get; set; }
 		private IEntityRelationshipWriter<TEntity> EntityRelationshipWriter { get; set; }
@@ -42,11 +42,13 @@ namespace MongoFramework
 		public void SetConnection(IMongoDbConnection connection)
 		{
 			Connection = connection;
-			EntityWriter = new EntityWriter<TEntity>(connection);
+			EntityWriterPipeline = new EntityWriterPipeline<TEntity>(connection);
 			EntityReader = new EntityReader<TEntity>(connection);
 			EntityIndexWriter = new EntityIndexWriter<TEntity>(connection);
 			EntityRelationshipWriter = new EntityRelationshipWriter<TEntity>(connection);
-			ChangeTracker = new EntityChangeTracker<TEntity>();
+			ChangeTracker = new EntityCollection<TEntity>();
+
+			EntityWriterPipeline.AddCollection(ChangeTracker);
 		}
 
 		public virtual TEntity Create()
@@ -147,22 +149,6 @@ namespace MongoFramework
 			}
 		}
 
-		private void CheckEntityValidation()
-		{
-			if (PerformEntityValidation)
-			{
-				var savingEntities = ChangeTracker.GetEntries()
-					.Where(e => e.State == EntityEntryState.Added || e.State == EntityEntryState.Updated)
-					.Select(e => e.Entity);
-
-				foreach (var savingEntity in savingEntities)
-				{
-					var validationContext = new ValidationContext(savingEntity);
-					Validator.ValidateObject(savingEntity, validationContext);
-				}
-			}
-		}
-
 		/// <summary>
 		/// Writes all of the items in the changeset to the database.
 		/// </summary>
@@ -171,10 +157,7 @@ namespace MongoFramework
 		{
 			EntityIndexWriter.ApplyIndexing();
 			EntityRelationshipWriter.CommitEntityRelationships(ChangeTracker);
-			ChangeTracker.DetectChanges();
-			CheckEntityValidation();
-			EntityWriter.Write(ChangeTracker);
-			ChangeTracker.CommitChanges();
+			EntityWriterPipeline.Write();
 		}
 
 		/// <summary>
@@ -187,11 +170,7 @@ namespace MongoFramework
 			cancellationToken.ThrowIfCancellationRequested();
 			await EntityRelationshipWriter.CommitEntityRelationshipsAsync(ChangeTracker, cancellationToken).ConfigureAwait(false);
 			cancellationToken.ThrowIfCancellationRequested();
-			ChangeTracker.DetectChanges();
-			CheckEntityValidation();
-			cancellationToken.ThrowIfCancellationRequested();
-			await EntityWriter.WriteAsync(ChangeTracker, cancellationToken).ConfigureAwait(false);
-			ChangeTracker.CommitChanges();
+			await EntityWriterPipeline.WriteAsync(cancellationToken).ConfigureAwait(false);
 		}
 
 		#region IQueryable Implementation

@@ -21,6 +21,13 @@ namespace MongoFramework.Tests
 		}
 #endif
 
+		[TestMethod]
+		public void ConnectionFromConnectionString()
+		{
+			var connection = MongoDbConnection.FromConnectionString("mongodb://localhost:27017/MongoFrameworkTests");
+			Assert.IsNotNull(connection);
+		}
+
 		[TestMethod, ExpectedException(typeof(ArgumentNullException))]
 		public void NullUrlThrowsException()
 		{

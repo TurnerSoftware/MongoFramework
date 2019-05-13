@@ -58,7 +58,7 @@ namespace MongoFramework.Tests.Linq
 		public void WhereIdMatchesGuids()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var dbEntityWriter = new EntityWriter<WhereIdMatchesGuidModel>(TestConfiguration.GetConnection());
+			var writerPipeline = new EntityWriterPipeline<WhereIdMatchesGuidModel>(TestConfiguration.GetConnection());
 			var entityCollection = new EntityCollection<WhereIdMatchesGuidModel>()
 			{
 				new WhereIdMatchesGuidModel { Description = "1" },
@@ -66,7 +66,8 @@ namespace MongoFramework.Tests.Linq
 				new WhereIdMatchesGuidModel { Description = "3" },
 				new WhereIdMatchesGuidModel { Description = "4" }
 			};
-			dbEntityWriter.Write(entityCollection);
+			writerPipeline.AddCollection(entityCollection);
+			writerPipeline.Write();
 
 			var collection = TestConfiguration.GetConnection().GetDatabase().GetCollection<WhereIdMatchesGuidModel>(nameof(WhereIdMatchesGuidModel));
 			var underlyingQueryable = collection.AsQueryable();
@@ -84,7 +85,7 @@ namespace MongoFramework.Tests.Linq
 		public void WhereIdMatchesObjectIds()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var dbEntityWriter = new EntityWriter<WhereIdMatchesObjectIdModel>(connection);
+			var writerPipeline = new EntityWriterPipeline<WhereIdMatchesObjectIdModel>(connection);
 			var entityCollection = new EntityCollection<WhereIdMatchesObjectIdModel>()
 			{
 				new WhereIdMatchesObjectIdModel { Description = "1" },
@@ -92,7 +93,8 @@ namespace MongoFramework.Tests.Linq
 				new WhereIdMatchesObjectIdModel { Description = "3" },
 				new WhereIdMatchesObjectIdModel { Description = "4" }
 			};
-			dbEntityWriter.Write(entityCollection);
+			writerPipeline.AddCollection(entityCollection);
+			writerPipeline.Write();
 
 			var collection = connection.GetDatabase().GetCollection<WhereIdMatchesObjectIdModel>(nameof(WhereIdMatchesObjectIdModel));
 			var underlyingQueryable = collection.AsQueryable();
@@ -110,7 +112,7 @@ namespace MongoFramework.Tests.Linq
 		public void WhereIdMatchesStringIds()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var dbEntityWriter = new EntityWriter<WhereIdMatchesStringModel>(connection);
+			var writerPipeline = new EntityWriterPipeline<WhereIdMatchesStringModel>(connection);
 			var entityCollection = new EntityCollection<WhereIdMatchesStringModel>()
 			{
 				new WhereIdMatchesStringModel { Description = "1" },
@@ -118,7 +120,8 @@ namespace MongoFramework.Tests.Linq
 				new WhereIdMatchesStringModel { Description = "3" },
 				new WhereIdMatchesStringModel { Description = "4" }
 			};
-			dbEntityWriter.Write(entityCollection);
+			writerPipeline.AddCollection(entityCollection);
+			writerPipeline.Write();
 
 			var collection = connection.GetDatabase().GetCollection<WhereIdMatchesStringModel>(nameof(WhereIdMatchesStringModel));
 			var underlyingQueryable = collection.AsQueryable();

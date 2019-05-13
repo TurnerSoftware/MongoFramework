@@ -14,12 +14,12 @@ namespace MongoFramework
 {
 	public class MongoDbBucketSet<TGroup, TSubEntity> : IMongoDbBucketSet<TGroup, TSubEntity> where TGroup : class
 	{
-		private IEntityWriter<EntityBucket<TGroup, TSubEntity>> EntityWriter { get; set; }
+		private IEntityWriterPipeline<EntityBucket<TGroup, TSubEntity>> EntityWriterPipeline { get; set; }
 		private IEntityReader<EntityBucket<TGroup, TSubEntity>> EntityReader { get; set; }
 		private IEntityIndexWriter<EntityBucket<TGroup, TSubEntity>> EntityIndexWriter { get; set; }
 
-		private EntityBucketCollection<TGroup, TSubEntity> BucketCollection { get; set; }
-		private IEntityChangeTracker<EntityBucket<TGroup, TSubEntity>> ChangeTracker { get; set; }
+		private EntityBucketStagingCollection<TGroup, TSubEntity> BucketStagingCollection { get; set; }
+		private IEntityCollection<EntityBucket<TGroup, TSubEntity>> ChangeTracker { get; set; }
 
 		public int BucketSize { get; }
 
@@ -41,11 +41,14 @@ namespace MongoFramework
 
 		public void SetConnection(IMongoDbConnection connection)
 		{
-			EntityWriter = new EntityWriter<EntityBucket<TGroup, TSubEntity>>(connection);
+			EntityWriterPipeline = new EntityWriterPipeline<EntityBucket<TGroup, TSubEntity>>(connection);
 			EntityReader = new EntityReader<EntityBucket<TGroup, TSubEntity>>(connection);
 			EntityIndexWriter = new EntityIndexWriter<EntityBucket<TGroup, TSubEntity>>(connection);
-			BucketCollection = new EntityBucketCollection<TGroup, TSubEntity>(EntityReader, BucketSize);
-			ChangeTracker = new EntityChangeTracker<EntityBucket<TGroup, TSubEntity>>();
+			BucketStagingCollection = new EntityBucketStagingCollection<TGroup, TSubEntity>(EntityReader, BucketSize);
+			ChangeTracker = new EntityCollection<EntityBucket<TGroup, TSubEntity>>();
+
+			EntityWriterPipeline.AddCollection(ChangeTracker);
+			EntityWriterPipeline.AddCollection(BucketStagingCollection);
 		}
 
 		public virtual void Add(TGroup group, TSubEntity entity)
@@ -55,7 +58,7 @@ namespace MongoFramework
 				throw new ArgumentNullException(nameof(group));
 			}
 
-			BucketCollection.AddEntity(group, entity);
+			BucketStagingCollection.AddEntity(group, entity);
 		}
 
 		public virtual void AddRange(TGroup group, IEnumerable<TSubEntity> entities)
@@ -72,7 +75,7 @@ namespace MongoFramework
 
 			foreach (var entity in entities)
 			{
-				BucketCollection.AddEntity(group, entity);
+				BucketStagingCollection.AddEntity(group, entity);
 			}
 		}
 
@@ -90,22 +93,16 @@ namespace MongoFramework
 		public virtual void SaveChanges()
 		{
 			EntityIndexWriter.ApplyIndexing();
-			var entityCollection = BucketCollection.AsEntityCollection();
-			EntityWriter.Write(entityCollection);
-			EntityWriter.Write(ChangeTracker);
-			BucketCollection.Clear();
-			ChangeTracker.CommitChanges();
+			EntityWriterPipeline.Write();
+			BucketStagingCollection.Clear();
 		}
 
-		public virtual async Task SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
+		public virtual async Task SaveChangesAsync(CancellationToken cancellationToken = default)
 		{
 			await EntityIndexWriter.ApplyIndexingAsync();
 			cancellationToken.ThrowIfCancellationRequested();
-			var entityCollection = BucketCollection.AsEntityCollection();
-			await EntityWriter.WriteAsync(entityCollection);
-			await EntityWriter.WriteAsync(ChangeTracker);
-			BucketCollection.Clear();
-			ChangeTracker.CommitChanges();
+			await EntityWriterPipeline.WriteAsync(cancellationToken).ConfigureAwait(false);
+			BucketStagingCollection.Clear();
 		}
 
 		#region IQueryable Implementation

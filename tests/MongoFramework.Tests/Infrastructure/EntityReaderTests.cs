@@ -21,23 +21,24 @@ namespace MongoFramework.Tests.Infrastructure
 		public void ReadMixedEntities()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var entityContainer = new EntityCollection<A>();
+			var entityCollection = new EntityCollection<A>();
 			var reader = new EntityReader<A>(connection);
-			var writer = new EntityWriter<A>(connection);
+			var writerPipeline = new EntityWriterPipeline<A>(connection);
+			writerPipeline.AddCollection(entityCollection);
 
-			entityContainer.Update(new A
+			entityCollection.Update(new A
 			{
 				Description = "DbEntityReaderTests.ReadMixedEntities"
 			}, EntityEntryState.Added);
 
-			entityContainer.Update(new B
+			entityCollection.Update(new B
 			{
 				BIsForBoolean = true,
 				Description = "DbEntityReaderTests.ReadMixedEntities"
 			}, EntityEntryState.Added);
 
 
-			writer.Write(entityContainer);
+			writerPipeline.Write();
 
 			var readMixedEntitiesQuery =
 				reader.AsQueryable().Where(e => e.Description == "DbEntityReaderTests.ReadMixedEntities");

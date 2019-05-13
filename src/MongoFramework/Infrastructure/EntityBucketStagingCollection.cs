@@ -1,19 +1,24 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using MongoFramework.Infrastructure.Linq;
+using MongoFramework.Infrastructure.Linq.Processors;
 
 namespace MongoFramework.Infrastructure
 {
-	public class EntityBucketCollection<TGroup, TSubEntity> where TGroup : class
+	public class EntityBucketStagingCollection<TGroup, TSubEntity> : IEntityCollectionBase<EntityBucket<TGroup, TSubEntity>> where TGroup : class
 	{
 		private Dictionary<TGroup, List<TSubEntity>> SubEntityStaging { get; }
+		private IEntityCollection<EntityBucket<TGroup, TSubEntity>> ChangeTracker { get; }
 		private IEntityReader<EntityBucket<TGroup, TSubEntity>> EntityReader { get; }
 
 		public int BucketSize { get; }
 
-		public EntityBucketCollection(IEntityReader<EntityBucket<TGroup, TSubEntity>> entityReader, int bucketSize)
+		public EntityBucketStagingCollection(IEntityReader<EntityBucket<TGroup, TSubEntity>> entityReader, int bucketSize)
 		{
 			SubEntityStaging = new Dictionary<TGroup, List<TSubEntity>>(new ShallowPropertyEqualityComparer<TGroup>());
+			ChangeTracker = new EntityCollection<EntityBucket<TGroup, TSubEntity>>();
 			EntityReader = entityReader;
 			BucketSize = bucketSize;
 		}
@@ -30,10 +35,21 @@ namespace MongoFramework.Infrastructure
 			}
 		}
 
-		public IEntityCollection<EntityBucket<TGroup, TSubEntity>> AsEntityCollection()
+		public void Clear()
 		{
-			var entityCollection = new EntityCollection<EntityBucket<TGroup, TSubEntity>>();
+			ChangeTracker.Clear();
+			SubEntityStaging.Clear();
+		}
 
+		private IQueryable<EntityBucket<TGroup, TSubEntity>> QueryDatabase()
+		{
+			var queryable = EntityReader.AsQueryable() as IMongoFrameworkQueryable<EntityBucket<TGroup, TSubEntity>, EntityBucket<TGroup, TSubEntity>>;
+			queryable.EntityProcessors.Add(new EntityTrackingProcessor<EntityBucket<TGroup, TSubEntity>>(ChangeTracker));
+			return queryable;
+		}
+
+		public IEnumerable<EntityEntry<EntityBucket<TGroup, TSubEntity>>> GetEntries()
+		{
 			foreach (var grouping in SubEntityStaging)
 			{
 				var entityList = grouping.Value;
@@ -43,7 +59,7 @@ namespace MongoFramework.Infrastructure
 				var remainingEntitiesCount = entityList.Count;
 
 				//Identify last bucket of the group for the last index and to potentially backfill into it (if there is space)
-				var bucket = EntityReader.AsQueryable().Where(e => e.Group == grouping.Key).OrderByDescending(e => e.Index).FirstOrDefault();
+				var bucket = QueryDatabase().Where(e => e.Group == grouping.Key).OrderByDescending(e => e.Index).FirstOrDefault();
 				if (bucket != null)
 				{
 					//Check if there is room to backfill into the existing bucket
@@ -55,7 +71,7 @@ namespace MongoFramework.Infrastructure
 						bucket.Items.AddRange(sliceEntities);
 						bucket.ItemCount += sliceSize;
 
-						entityCollection.Update(bucket, EntityEntryState.Updated);
+						yield return new EntityEntry<EntityBucket<TGroup, TSubEntity>>(bucket, EntityEntryState.Updated);
 
 						sliceAt += sliceSize;
 						remainingEntitiesCount -= sliceSize;
@@ -69,14 +85,14 @@ namespace MongoFramework.Infrastructure
 					var sliceSize = Math.Min(BucketSize, remainingEntitiesCount);
 					var sliceEntities = entityList.Skip(sliceAt).Take(sliceSize).ToList();
 
-					entityCollection.Add(new EntityBucket<TGroup, TSubEntity>
+					yield return new EntityEntry<EntityBucket<TGroup, TSubEntity>>(new EntityBucket<TGroup, TSubEntity>
 					{
 						Group = grouping.Key,
 						Index = currentBucketIndex,
 						ItemCount = sliceSize,
 						BucketSize = BucketSize,
 						Items = sliceEntities
-					});
+					}, EntityEntryState.Added);
 
 					currentBucketIndex++;
 
@@ -84,13 +100,20 @@ namespace MongoFramework.Infrastructure
 					remainingEntitiesCount -= sliceSize;
 				}
 			}
-
-			return entityCollection;
 		}
 
-		public void Clear()
+		public EntityEntry<EntityBucket<TGroup, TSubEntity>> GetEntry(EntityBucket<TGroup, TSubEntity> entity)
 		{
-			SubEntityStaging.Clear();
+			throw new NotImplementedException();
+		}
+
+		public void Update(EntityBucket<TGroup, TSubEntity> entity, EntityEntryState state)
+		{
+			throw new NotImplementedException();
+		}
+		public bool Remove(EntityBucket<TGroup, TSubEntity> entity)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

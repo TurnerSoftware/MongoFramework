@@ -21,13 +21,13 @@ namespace MongoFramework.Infrastructure.Mutation.Mutators
 				else if (mutationType == MutatorType.Create && relationship.IsCollection)
 				{
 					var navigationCollectionType = typeof(EntityNavigationCollection<>).MakeGenericType(relationship.EntityType);
-					var navigationCollection = Activator.CreateInstance(navigationCollectionType, relationship.IdProperty) as IEntityNavigationCollection;
+					var navigationCollection = Activator.CreateInstance(navigationCollectionType, relationship.IdProperty) as IEntityNavigationCollectionBase;
 					navigationCollection.SetConnection(connection);
 					relationship.NavigationProperty.SetValue(entity, navigationCollection);
 				}
 				else if (mutationType == MutatorType.Select && relationship.IsCollection)
 				{
-					if (relationship.NavigationProperty.GetValue(entity) is IEntityNavigationCollection navigationCollection)
+					if (relationship.NavigationProperty.GetValue(entity) is IEntityNavigationCollectionBase navigationCollection)
 					{
 						navigationCollection.SetConnection(connection);
 					}
