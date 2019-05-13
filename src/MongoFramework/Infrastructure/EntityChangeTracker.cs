@@ -1,12 +1,9 @@
 ﻿using System.Linq;
-using MongoFramework.Infrastructure.Mapping;
 
 namespace MongoFramework.Infrastructure
 {
 	public class EntityChangeTracker<TEntity> : EntityCollection<TEntity>, IEntityChangeTracker<TEntity> where TEntity : class
 	{
-		public EntityChangeTracker(IEntityMapper entityMapper) : base(entityMapper) { }
-
 		public void DetectChanges()
 		{
 			var entries = Entries.Where(e => e.State == EntityEntryState.NoChanges || e.State == EntityEntryState.Updated);

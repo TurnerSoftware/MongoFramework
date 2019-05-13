@@ -1,5 +1,6 @@
 ﻿using MongoDB.Driver;
 using MongoFramework.Infrastructure.DefinitionHelpers;
+using MongoFramework.Infrastructure.Diagnostics;
 using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mutation;
 using System;
@@ -13,23 +14,22 @@ namespace MongoFramework.Infrastructure
 	public class EntityWriter<TEntity> : IEntityWriter<TEntity> where TEntity : class
 	{
 		public IMongoDbConnection Connection { get; }
-		public IEntityMapper EntityMapper { get; }
+		private IEntityDefinition EntityDefinition { get; }
 		
 		public EntityWriter(IMongoDbConnection connection)
 		{
 			Connection = connection ?? throw new ArgumentNullException(nameof(connection));
-			EntityMapper = connection.GetEntityMapper(typeof(TEntity));
+			EntityDefinition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
 		}
 
 		private IMongoCollection<TEntity> GetCollection()
 		{
-			var collectionName = EntityMapper.GetCollectionName();
-			return Connection.GetDatabase().GetCollection<TEntity>(collectionName);
+			return Connection.GetDatabase().GetCollection<TEntity>(EntityDefinition.CollectionName);
 		}
 
 		private IEnumerable<WriteModel<TEntity>> BuildWriteModel(IEntityCollection<TEntity> entityCollection)
 		{
-			var idFieldName = EntityMapper.GetIdName();
+			var idFieldName = EntityDefinition.GetIdName();
 			var writeModel = new List<WriteModel<TEntity>>();
 
 			foreach (var entry in entityCollection.GetEntries())
@@ -42,7 +42,7 @@ namespace MongoFramework.Infrastructure
 				else if (entry.State == EntityEntryState.Updated)
 				{
 					EntityMutation<TEntity>.MutateEntity(entry.Entity, MutatorType.Update, Connection);
-					var idFieldValue = EntityMapper.GetIdValue(entry.Entity);
+					var idFieldValue = EntityDefinition.GetIdValue(entry.Entity);
 					var filter = Builders<TEntity>.Filter.Eq(idFieldName, idFieldValue);
 					var updateDefintion = UpdateDefinitionHelper.CreateFromDiff<TEntity>(entry.OriginalValues, entry.CurrentValues);
 
@@ -55,7 +55,7 @@ namespace MongoFramework.Infrastructure
 				}
 				else if (entry.State == EntityEntryState.Deleted)
 				{
-					var idFieldValue = EntityMapper.GetIdValue(entry.Entity);
+					var idFieldValue = EntityDefinition.GetIdValue(entry.Entity);
 					var filter = Builders<TEntity>.Filter.Eq(idFieldName, idFieldValue);
 					writeModel.Add(new DeleteOneModel<TEntity>(filter));
 				}

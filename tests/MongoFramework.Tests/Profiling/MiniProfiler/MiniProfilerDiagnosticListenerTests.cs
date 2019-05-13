@@ -10,7 +10,7 @@ namespace MongoFramework.Tests.Profiling.MiniProfiler
 	{
 		private IMongoDbConnection GetConnection()
 		{
-			var connection = MongoDbConnection.FromConnectionString(TestConfiguration.ConnectionString, TestConfiguration.GetDatabaseName());
+			var connection = TestConfiguration.GetConnection();
 			connection.DiagnosticListener = new MiniProfilerDiagnosticListener();
 			return connection;
 		}

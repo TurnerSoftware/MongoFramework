@@ -9,8 +9,10 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 {
 	public class ExtraElementsProcessor : IMappingProcessor
 	{
-		public void ApplyMapping(Type entityType, BsonClassMap classMap, IMongoDbConnection connection)
+		public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
 		{
+			var entityType = definition.EntityType;
+
 			//Ignore extra elements when the "IgnoreExtraElementsAttribute" is on the Entity
 			var ignoreExtraElements = entityType.GetCustomAttribute<IgnoreExtraElementsAttribute>();
 			if (ignoreExtraElements != null)

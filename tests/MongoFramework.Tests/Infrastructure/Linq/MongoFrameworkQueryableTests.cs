@@ -2,6 +2,7 @@
 using MongoDB.Driver;
 using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Linq;
+using MongoFramework.Infrastructure.Mapping;
 using System.Linq;
 
 namespace MongoFramework.Tests.Infrastructure.Linq
@@ -13,7 +14,7 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 		{
 			public bool EntityProcessed { get; private set; }
 
-			public void ProcessEntity(TEntity entity)
+			public void ProcessEntity(TEntity entity, IMongoDbConnection connection)
 			{
 				EntityProcessed = true;
 			}
@@ -28,13 +29,14 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 		[TestMethod]
 		public void EnumerateQueryable()
 		{
+			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
+
 			var connection = TestConfiguration.GetConnection();
-			//new EntityMapper<MongoFrameworkQueryableModel>();
 			var collection = connection.GetDatabase().GetCollection<MongoFrameworkQueryableModel>(nameof(MongoFrameworkQueryableModel));
 			var underlyingQueryable = collection.AsQueryable();
 			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel, MongoFrameworkQueryableModel>(connection, underlyingQueryable);
 
-			var entityContainer = new EntityCollection<MongoFrameworkQueryableModel>(connection.GetEntityMapper(typeof(MongoFrameworkQueryableModel)));
+			var entityContainer = new EntityCollection<MongoFrameworkQueryableModel>();
 			var writer = new EntityWriter<MongoFrameworkQueryableModel>(connection);
 			entityContainer.Update(new MongoFrameworkQueryableModel { Title = "EnumerateQueryable" }, EntityEntryState.Added);
 			writer.Write(entityContainer);
@@ -48,8 +50,9 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 		[TestMethod]
 		public void EntityProcessorsFiresOnEnumerationOfTEntity()
 		{
+			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
+
 			var connection = TestConfiguration.GetConnection();
-			//new EntityMapper<MongoFrameworkQueryableModel>();
 			var collection = connection.GetDatabase().GetCollection<MongoFrameworkQueryableModel>(nameof(MongoFrameworkQueryableModel));
 			var underlyingQueryable = collection.AsQueryable();
 			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel, MongoFrameworkQueryableModel>(connection, underlyingQueryable);
@@ -57,7 +60,7 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 			var processor = new TestProcessor<MongoFrameworkQueryableModel>();
 			queryable.EntityProcessors.Add(processor);
 
-			var entityContainer = new EntityCollection<MongoFrameworkQueryableModel>(connection.GetEntityMapper(typeof(MongoFrameworkQueryableModel)));
+			var entityContainer = new EntityCollection<MongoFrameworkQueryableModel>();
 			var writer = new EntityWriter<MongoFrameworkQueryableModel>(connection);
 			entityContainer.Update(new MongoFrameworkQueryableModel { Title = "EntityProcessorFireTest" }, EntityEntryState.Added);
 			writer.Write(entityContainer);
@@ -73,8 +76,9 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 		[TestMethod]
 		public void EntityProcessorsNotFiredWhenNotTEntity()
 		{
+			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
+
 			var connection = TestConfiguration.GetConnection();
-			//new EntityMapper<MongoFrameworkQueryableModel>();
 			var collection = connection.GetDatabase().GetCollection<MongoFrameworkQueryableModel>(nameof(MongoFrameworkQueryableModel));
 			var underlyingQueryable = collection.AsQueryable();
 			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel, MongoFrameworkQueryableModel>(connection, underlyingQueryable);
@@ -82,7 +86,7 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 			var processor = new TestProcessor<MongoFrameworkQueryableModel>();
 			queryable.EntityProcessors.Add(processor);
 
-			var entityContainer = new EntityCollection<MongoFrameworkQueryableModel>(connection.GetEntityMapper(typeof(MongoFrameworkQueryableModel)));
+			var entityContainer = new EntityCollection<MongoFrameworkQueryableModel>();
 			var writer = new EntityWriter<MongoFrameworkQueryableModel>(connection);
 			entityContainer.Update(new MongoFrameworkQueryableModel { Title = "EntityProcessorNoFireTest" }, EntityEntryState.Added);
 			writer.Write(entityContainer);

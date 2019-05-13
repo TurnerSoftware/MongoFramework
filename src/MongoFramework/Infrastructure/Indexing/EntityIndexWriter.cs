@@ -1,4 +1,6 @@
 ﻿using MongoDB.Driver;
+using MongoFramework.Infrastructure.Diagnostics;
+using MongoFramework.Infrastructure.Mapping;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,30 +12,22 @@ namespace MongoFramework.Infrastructure.Indexing
 	public class EntityIndexWriter<TEntity> : IEntityIndexWriter<TEntity> where TEntity : class
 	{
 		private IMongoDbConnection Connection { get; }
-		private IEntityIndexMapper IndexMapper { get; set; }
+		private IEntityDefinition EntityDefinition { get; set; }
 
 		public EntityIndexWriter(IMongoDbConnection connection)
 		{
 			Connection = connection;
-			IndexMapper = connection.GetIndexMapper(typeof(TEntity));
+			EntityDefinition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
 		}
 
 		private IMongoCollection<TEntity> GetCollection()
 		{
-			var collectionName = IndexMapper.GetCollectionName();
-			return Connection.GetDatabase().GetCollection<TEntity>(collectionName);
+			return Connection.GetDatabase().GetCollection<TEntity>(EntityDefinition.CollectionName);
 		}
-
-		private IEnumerable<CreateIndexModel<TEntity>> GenerateIndexModel()
-		{
-			var indexMapping = IndexMapper.GetIndexMapping();
-			var processors = DefaultIndexingPack.Instance.Processors;
-			return processors.SelectMany(d => d.BuildIndexModel<TEntity>(indexMapping));
-		}
-
+		
 		public void ApplyIndexing()
 		{
-			var indexModel = GenerateIndexModel();
+			var indexModel = IndexModelBuilder<TEntity>.BuildModel();
 			if (indexModel.Any())
 			{
 				var commandId = Guid.NewGuid();
@@ -71,9 +65,9 @@ namespace MongoFramework.Infrastructure.Indexing
 			}
 		}
 
-		public async Task ApplyIndexingAsync(CancellationToken cancellationToken = default(CancellationToken))
+		public async Task ApplyIndexingAsync(CancellationToken cancellationToken = default)
 		{
-			var indexModel = GenerateIndexModel();
+			var indexModel = IndexModelBuilder<TEntity>.BuildModel();
 			if (indexModel.Any())
 			{
 				var commandId = Guid.NewGuid();

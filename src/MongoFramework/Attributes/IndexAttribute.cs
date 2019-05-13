@@ -1,10 +1,9 @@
-﻿using MongoFramework.Infrastructure.Indexing;
-using System;
+﻿using System;
 
 namespace MongoFramework.Attributes
 {
 	[AttributeUsage(AttributeTargets.Property)]
-	public class IndexAttribute : Attribute, IEntityIndex
+	public class IndexAttribute : Attribute
 	{
 		public string Name { get; private set; }
 		public bool IsUnique { get; set; }

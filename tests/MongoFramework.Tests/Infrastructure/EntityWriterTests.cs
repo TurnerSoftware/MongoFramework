@@ -23,7 +23,7 @@ namespace MongoFramework.Tests.Infrastructure
 		public void AddEntity()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var entityContainer = new EntityCollection<EntityWriterModel>(connection.GetEntityMapper(typeof(EntityWriterModel)));
+			var entityContainer = new EntityCollection<EntityWriterModel>();
 			var writer = new EntityWriter<EntityWriterModel>(connection);
 
 			var entity = new EntityWriterModel
@@ -41,7 +41,7 @@ namespace MongoFramework.Tests.Infrastructure
 		public void AddMixedTypeEntities()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var entityContainer = new EntityCollection<EntityWriterModel>(connection.GetEntityMapper(typeof(EntityWriterModel)));
+			var entityContainer = new EntityCollection<EntityWriterModel>();
 			var writer = new EntityWriter<EntityWriterModel>(connection);
 			var entities = new[]
 			{
@@ -71,7 +71,7 @@ namespace MongoFramework.Tests.Infrastructure
 		public void UpdateEntity()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var entityContainer = new EntityCollection<EntityWriterModel>(connection.GetEntityMapper(typeof(EntityWriterModel)));
+			var entityContainer = new EntityCollection<EntityWriterModel>();
 			var writer = new EntityWriter<EntityWriterModel>(connection);
 			var reader = new EntityReader<EntityWriterModel>(connection);
 
@@ -103,7 +103,7 @@ namespace MongoFramework.Tests.Infrastructure
 		public void RemoveEntity()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var entityContainer = new EntityCollection<EntityWriterModel>(connection.GetEntityMapper(typeof(EntityWriterModel)));
+			var entityContainer = new EntityCollection<EntityWriterModel>();
 			var writer = new EntityWriter<EntityWriterModel>(connection);
 			var reader = new EntityReader<EntityWriterModel>(connection);
 
@@ -128,7 +128,7 @@ namespace MongoFramework.Tests.Infrastructure
 		public void MixedActionWrite()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var entityContainer = new EntityCollection<EntityWriterModel>(connection.GetEntityMapper(typeof(EntityWriterModel)));
+			var entityContainer = new EntityCollection<EntityWriterModel>();
 			var writer = new EntityWriter<EntityWriterModel>(connection);
 			var reader = new EntityReader<EntityWriterModel>(connection);
 
@@ -166,7 +166,7 @@ namespace MongoFramework.Tests.Infrastructure
 		public async Task MixedActionWriteAsync()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var entityContainer = new EntityCollection<EntityWriterModel>(connection.GetEntityMapper(typeof(EntityWriterModel)));
+			var entityContainer = new EntityCollection<EntityWriterModel>();
 			var writer = new EntityWriter<EntityWriterModel>(connection);
 			var reader = new EntityReader<EntityWriterModel>(connection);
 

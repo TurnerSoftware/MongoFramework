@@ -7,14 +7,18 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 {
 	public class BsonKnownTypesProcessor : IMappingProcessor
 	{
-		public void ApplyMapping(Type entityType, BsonClassMap classMap, IMongoDbConnection connection)
+		public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
 		{
+			var entityType = definition.EntityType;
 			var bsonKnownTypesAttribute = entityType.GetCustomAttribute<BsonKnownTypesAttribute>();
 			if (bsonKnownTypesAttribute != null)
 			{
 				foreach (var type in bsonKnownTypesAttribute.KnownTypes)
 				{
-					connection.GetEntityMapper(type);
+					if (!EntityMapping.IsRegistered(type))
+					{
+						EntityMapping.RegisterType(type);
+					}
 				}
 			}
 		}

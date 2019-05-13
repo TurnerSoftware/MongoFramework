@@ -2,6 +2,6 @@
 {
 	public interface ILinqProcessor<TEntity> where TEntity : class
 	{
-		void ProcessEntity(TEntity entity);
+		void ProcessEntity(TEntity entity, IMongoDbConnection connection);
 	}
 }

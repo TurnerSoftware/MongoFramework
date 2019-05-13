@@ -10,11 +10,11 @@ namespace MongoFramework.Infrastructure
 	{
 		protected List<EntityEntry<TEntity>> Entries { get; } = new List<EntityEntry<TEntity>>();
 
-		private IEntityMapper EntityMapper { get; }
+		private IEntityDefinition EntityDefinition { get; }
 
-		public EntityCollection(IEntityMapper entityMapper)
+		public EntityCollection()
 		{
-			EntityMapper = entityMapper;
+			EntityDefinition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
 		}
 
 		public int Count => Entries.Count;
@@ -23,8 +23,8 @@ namespace MongoFramework.Infrastructure
 
 		public EntityEntry<TEntity> GetEntry(TEntity entity)
 		{
-			var entityId = EntityMapper.GetIdValue(entity);
-			var defaultIdValue = EntityMapper.GetDefaultId();
+			var entityId = EntityDefinition.GetIdValue(entity);
+			var defaultIdValue = EntityDefinition.GetDefaultId();
 
 			foreach (var entry in Entries)
 			{
@@ -34,7 +34,7 @@ namespace MongoFramework.Infrastructure
 				}
 				else
 				{
-					var entryEntityId = EntityMapper.GetIdValue(entry.Entity);
+					var entryEntityId = EntityDefinition.GetIdValue(entry.Entity);
 					if (!Equals(entryEntityId, defaultIdValue) && entryEntityId.Equals(entityId))
 					{
 						return entry;
@@ -89,8 +89,16 @@ namespace MongoFramework.Infrastructure
 
 		public void Add(TEntity item)
 		{
-			//TODO: Check the ID value is a default value - if not, mark it as non-changed
-			Update(item, EntityEntryState.Added);
+			var defaultId = EntityDefinition.GetDefaultId();
+			var entityId = EntityDefinition.GetIdValue(item);
+			if (Equals(entityId, defaultId))
+			{
+				Update(item, EntityEntryState.Added);
+			}
+			else
+			{
+				Update(item, EntityEntryState.NoChanges);
+			}
 		}
 
 		public bool Contains(TEntity item)

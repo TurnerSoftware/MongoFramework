@@ -5,11 +5,12 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 {
 	public class HierarchyProcessor : IMappingProcessor
 	{
-		public void ApplyMapping(Type entityType, BsonClassMap classMap, IMongoDbConnection connection)
+		public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
 		{
-			if (entityType != typeof(object) && entityType.BaseType != typeof(object))
+			var entityType = definition.EntityType;
+			if (entityType != typeof(object) && entityType != typeof(object) && !EntityMapping.IsRegistered(entityType.BaseType))
 			{
-				connection.GetEntityMapper(entityType.BaseType);
+				EntityMapping.RegisterType(entityType.BaseType);
 			}
 			else
 			{

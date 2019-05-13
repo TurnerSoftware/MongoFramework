@@ -44,10 +44,8 @@ namespace MongoFramework
 			EntityWriter = new EntityWriter<EntityBucket<TGroup, TSubEntity>>(connection);
 			EntityReader = new EntityReader<EntityBucket<TGroup, TSubEntity>>(connection);
 			EntityIndexWriter = new EntityIndexWriter<EntityBucket<TGroup, TSubEntity>>(connection);
-
-			var entityMapper = connection.GetEntityMapper(typeof(EntityBucket<TGroup, TSubEntity>));
-			BucketCollection = new EntityBucketCollection<TGroup, TSubEntity>(EntityReader, BucketSize, entityMapper);
-			ChangeTracker = new EntityChangeTracker<EntityBucket<TGroup, TSubEntity>>(entityMapper);
+			BucketCollection = new EntityBucketCollection<TGroup, TSubEntity>(EntityReader, BucketSize);
+			ChangeTracker = new EntityChangeTracker<EntityBucket<TGroup, TSubEntity>>();
 		}
 
 		public virtual void Add(TGroup group, TSubEntity entity)

@@ -21,7 +21,7 @@ namespace MongoFramework.Tests.Infrastructure
 		public void ReadMixedEntities()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var entityContainer = new EntityCollection<A>(connection.GetEntityMapper(typeof(A)));
+			var entityContainer = new EntityCollection<A>();
 			var reader = new EntityReader<A>(connection);
 			var writer = new EntityWriter<A>(connection);
 

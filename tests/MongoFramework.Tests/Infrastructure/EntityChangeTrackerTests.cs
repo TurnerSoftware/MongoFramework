@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Infrastructure;
-using MongoFramework.Infrastructure.Mapping;
 using System.Linq;
 
 namespace MongoFramework.Tests.Infrastructure
@@ -17,8 +16,7 @@ namespace MongoFramework.Tests.Infrastructure
 		[TestMethod]
 		public void DetectChangesDoesntCountAddedEntries()
 		{
-			var entityMapper = new EntityMapper<ChangeTrackerModel>(TestConfiguration.GetConnection());
-			var changeTracker = new EntityChangeTracker<ChangeTrackerModel>(entityMapper);
+			var changeTracker = new EntityChangeTracker<ChangeTrackerModel>();
 			var entity = new ChangeTrackerModel
 			{
 				Title = "DbChangeTrackerTests.DetectChangesWhenNoneExist"
@@ -33,8 +31,7 @@ namespace MongoFramework.Tests.Infrastructure
 		[TestMethod]
 		public void DetectAnyChanges()
 		{
-			var entityMapper = new EntityMapper<ChangeTrackerModel>(TestConfiguration.GetConnection());
-			var changeTracker = new EntityChangeTracker<ChangeTrackerModel>(entityMapper);
+			var changeTracker = new EntityChangeTracker<ChangeTrackerModel>();
 			var entity = new ChangeTrackerModel
 			{
 				Title = "DbChangeTrackerTests.DetectAnyChanges"
@@ -51,8 +48,7 @@ namespace MongoFramework.Tests.Infrastructure
 		[TestMethod]
 		public void DetectAnyChangesThenChangedBackToOriginal()
 		{
-			var entityMapper = new EntityMapper<ChangeTrackerModel>(TestConfiguration.GetConnection());
-			var changeTracker = new EntityChangeTracker<ChangeTrackerModel>(entityMapper);
+			var changeTracker = new EntityChangeTracker<ChangeTrackerModel>();
 			var entity = new ChangeTrackerModel
 			{
 				Title = "DbChangeTrackerTests.DetectAnyChangesThenChangedBackToOriginal"
@@ -73,8 +69,7 @@ namespace MongoFramework.Tests.Infrastructure
 		[TestMethod]
 		public void CommittedChangesAreUpdated()
 		{
-			var entityMapper = new EntityMapper<ChangeTrackerModel>(TestConfiguration.GetConnection());
-			var changeTracker = new EntityChangeTracker<ChangeTrackerModel>(entityMapper);
+			var changeTracker = new EntityChangeTracker<ChangeTrackerModel>();
 
 			var addedEntity = new ChangeTrackerModel();
 			var updatedEntity = new ChangeTrackerModel();

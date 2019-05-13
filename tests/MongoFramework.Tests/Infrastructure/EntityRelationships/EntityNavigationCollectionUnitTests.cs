@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson;
-using MongoFramework.Infrastructure.EntityRelationships;
+using MongoFramework.Infrastructure;
+using MongoFramework.Infrastructure.Mapping;
 using System;
 
 namespace MongoFramework.Tests.Infrastructure.EntityRelationships
@@ -11,29 +12,22 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		[TestMethod, ExpectedException(typeof(ArgumentNullException))]
 		public void NullForeignKeyThrowsException()
 		{
-			var connection = TestConfiguration.GetConnection();
-			new EntityNavigationCollection<StringIdModel>(null, connection);
-		}
-
-		[TestMethod, ExpectedException(typeof(ArgumentNullException))]
-		public void NullConnectionThrowsException()
-		{
-			new EntityNavigationCollection<StringIdModel>("Id", null);
+			new EntityNavigationCollection<StringIdModel>(null);
 		}
 
 		[TestMethod, ExpectedException(typeof(ArgumentNullException))]
 		public void AddForeignIdWithNull()
 		{
-			var connection = TestConfiguration.GetConnection();
-			var collection = new EntityNavigationCollection<StringIdModel>("Id", connection);
+			var foreignProperty = EntityMapping.GetOrCreateDefinition(typeof(ObjectIdIdModel)).GetIdProperty();
+			var collection = new EntityNavigationCollection<StringIdModel>(foreignProperty);
 			collection.AddForeignId(null);
 		}
 
 		[TestMethod]
 		public void AddForeignIdWithRightType()
 		{
-			var connection = TestConfiguration.GetConnection();
-			var collection = new EntityNavigationCollection<StringIdModel>("Id", connection);
+			var foreignProperty = EntityMapping.GetOrCreateDefinition(typeof(StringIdModel)).GetIdProperty();
+			var collection = new EntityNavigationCollection<StringIdModel>(foreignProperty);
 			collection.AddForeignId("12345678");
 			Assert.AreEqual(1, collection.UnloadedCount);
 		}
@@ -41,16 +35,16 @@ namespace MongoFramework.Tests.Infrastructure.EntityRelationships
 		[TestMethod, ExpectedException(typeof(InvalidOperationException))]
 		public void AddForeignIdWithWrongType()
 		{
-			var connection = TestConfiguration.GetConnection();
-			var collection = new EntityNavigationCollection<StringIdModel>("Id", connection);
+			var foreignProperty = EntityMapping.GetOrCreateDefinition(typeof(StringIdModel)).GetIdProperty();
+			var collection = new EntityNavigationCollection<StringIdModel>(foreignProperty);
 			collection.AddForeignId(ObjectId.GenerateNewId());
 		}
 
 		[TestMethod]
 		public void AddMultipleForeignIds()
 		{
-			var connection = TestConfiguration.GetConnection();
-			var collection = new EntityNavigationCollection<ObjectIdIdModel>("Id", connection);
+			var foreignProperty = EntityMapping.GetOrCreateDefinition(typeof(ObjectIdIdModel)).GetIdProperty();
+			var collection = new EntityNavigationCollection<ObjectIdIdModel>(foreignProperty);
 			collection.AddForeignIds(new object[] { ObjectId.GenerateNewId(), ObjectId.GenerateNewId() });
 			Assert.AreEqual(2, collection.UnloadedCount);
 		}

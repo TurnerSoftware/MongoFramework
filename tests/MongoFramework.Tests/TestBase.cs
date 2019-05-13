@@ -2,6 +2,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
+using MongoFramework.Infrastructure.Mapping;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -12,7 +13,16 @@ namespace MongoFramework.Tests
 	[TestClass]
 	public abstract class TestBase
 	{
-		protected static void ResetMongoDbMapping()
+		protected static void ResetMongoDb()
+		{
+			ResetMongoDbDriver();
+			EntityMapping.RemoveAllDefinitions();
+
+			EntityMapping.RemoveAllMappingProcessors();
+			EntityMapping.AddMappingProcessors(DefaultMappingPack.Instance.Processors);
+		}
+
+		private static void ResetMongoDbDriver()
 		{
 			//Primarily introduced to better test TypeDiscoverySerializer, this is designed to reset the MongoDB driver
 			//as if the assembly just loaded. It is likely incomplete and would be easily subject to breaking in future 
@@ -46,11 +56,11 @@ namespace MongoFramework.Tests
 			client.DropDatabase(TestConfiguration.GetDatabaseName());
 		}
 
-		[TestCleanup]
-		public void Cleanup()
+		[TestInitialize]
+		public void Initialise()
 		{
+			ResetMongoDb();
 			ClearDatabase();
-			ResetMongoDbMapping();
 		}
 
 		[AssemblyCleanup]

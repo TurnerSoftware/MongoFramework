@@ -2,8 +2,7 @@
 using System.Collections.Concurrent;
 using MongoDB.Driver;
 using MongoFramework.Infrastructure;
-using MongoFramework.Infrastructure.Indexing;
-using MongoFramework.Infrastructure.Mapping;
+using MongoFramework.Infrastructure.Diagnostics;
 
 namespace MongoFramework
 {
@@ -31,8 +30,6 @@ namespace MongoFramework
 			}
 		}
 
-		private ConcurrentDictionary<Type, IEntityMapper> EntityMapperCache { get; } = new ConcurrentDictionary<Type, IEntityMapper>();
-
 		public IDiagnosticListener DiagnosticListener { get; set; } = new NoOpDiagnosticListener();
 
 		public static MongoDbConnection FromUrl(MongoUrl mongoUrl)
@@ -48,14 +45,9 @@ namespace MongoFramework
 			};
 		}
 
-		public static MongoDbConnection FromConnectionString(string connectionString, string databaseName)
+		public static MongoDbConnection FromConnectionString(string connectionString)
 		{
-			var urlBuilder = new MongoUrlBuilder(connectionString)
-			{
-				DatabaseName = databaseName
-			};
-
-			return FromUrl(urlBuilder.ToMongoUrl());
+			return FromUrl(new MongoUrl(connectionString));
 		}
 
 #if !NETCOREAPP2_0
@@ -81,30 +73,6 @@ namespace MongoFramework
 			}
 
 			return Client.GetDatabase(Url.DatabaseName);
-		}
-
-		public IEntityMapper GetEntityMapper(Type entityType)
-		{
-			if (IsDisposed)
-			{
-				throw new ObjectDisposedException(nameof(MongoDbConnection));
-			}
-
-			return EntityMapperCache.GetOrAdd(entityType, (type) =>
-			{
-				return new EntityMapper(type, this);
-			});
-		}
-
-		public IEntityIndexMapper GetIndexMapper(Type entityType)
-		{
-			if (IsDisposed)
-			{
-				throw new ObjectDisposedException(nameof(MongoDbConnection));
-			}
-
-			var entityMapper = GetEntityMapper(entityType);
-			return new EntityIndexMapper(entityMapper);
 		}
 
 		public void Dispose()

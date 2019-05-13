@@ -1,12 +1,13 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson.Serialization;
+using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mapping.Processors;
 using System.Linq;
 
 namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 {
 	[TestClass]
-	public class HierarchyProcessorTests : TestBase
+	public class HierarchyProcessorTests : MappingTestBase
 	{
 		public class ParentTestModel
 		{
@@ -19,29 +20,46 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		}
 
 		[TestMethod]
+		public void ParentClassIsMapped()
+		{
+			EntityMapping.AddMappingProcessor(new HierarchyProcessor());
+
+			Assert.IsFalse(BsonClassMap.IsClassMapRegistered(typeof(ChildTestModel)));
+			Assert.IsFalse(BsonClassMap.IsClassMapRegistered(typeof(ParentTestModel)));
+
+			EntityMapping.RegisterType(typeof(ChildTestModel));
+
+			Assert.IsTrue(BsonClassMap.IsClassMapRegistered(typeof(ChildTestModel)));
+			Assert.IsTrue(BsonClassMap.IsClassMapRegistered(typeof(ParentTestModel)));
+		}
+
+		[TestMethod]
 		public void AccessToInherittedProperty()
 		{
-			var connection = TestConfiguration.GetConnection();
-			var processor = new HierarchyProcessor();
-			var classMap = new BsonClassMap<ChildTestModel>();
-			processor.ApplyMapping(typeof(ChildTestModel), classMap, connection);
+			EntityMapping.AddMappingProcessor(new HierarchyProcessor());
+			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
 
-			var entityMapper = connection.GetEntityMapper(typeof(ChildTestModel));
-			var mappedProperties = entityMapper.GetEntityMapping();
-			Assert.IsTrue(mappedProperties.Any(p => p.ElementName == "Id"));
+			var definition = EntityMapping.RegisterType(typeof(ChildTestModel));
+
+			var allProperties = definition.GetAllProperties();
+			Assert.IsTrue(allProperties.Any(p => p.ElementName == "Id"));
+
+			var declaredProperties = definition.Properties;
+			Assert.IsFalse(declaredProperties.Any(p => p.ElementName == "Id"));
 		}
 
 		[TestMethod]
 		public void AccessToDeclaredProperty()
 		{
-			var connection = TestConfiguration.GetConnection();
-			var processor = new HierarchyProcessor();
-			var classMap = new BsonClassMap<ChildTestModel>();
-			processor.ApplyMapping(typeof(ChildTestModel), classMap, connection);
+			EntityMapping.AddMappingProcessor(new HierarchyProcessor());
+			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
+			var definition = EntityMapping.RegisterType(typeof(ChildTestModel));
 
-			var entityMapper = connection.GetEntityMapper(typeof(ChildTestModel));
-			var mappedProperties = entityMapper.GetEntityMapping();
+			var mappedProperties = definition.GetAllProperties();
 			Assert.IsTrue(mappedProperties.Any(p => p.ElementName == "DeclaredProperty"));
+
+			var inherittedProperties = definition.GetInheritedProperties();
+			Assert.IsFalse(inherittedProperties.Any(p => p.ElementName == "DeclaredProperty"));
 		}
 	}
 }

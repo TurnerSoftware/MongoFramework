@@ -1,4 +1,4 @@
-﻿using MongoFramework.Infrastructure.EntityRelationships;
+﻿using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Linq;
 using System;
 using System.Linq;
@@ -10,7 +10,7 @@ namespace MongoFramework.Infrastructure.Mutation.Mutators
 	{
 		public void MutateEntity(TEntity entity, MutatorType mutationType, IMongoDbConnection connection)
 		{
-			var relationships = connection.GetEntityMapper(typeof(TEntity)).GetEntityRelationships(connection);
+			var relationships = EntityMapping.GetOrCreateDefinition(typeof(TEntity)).Relationships;
 			foreach (var relationship in relationships)
 			{
 				if (mutationType == MutatorType.Select && !relationship.IsCollection)
@@ -21,14 +21,22 @@ namespace MongoFramework.Infrastructure.Mutation.Mutators
 				else if (mutationType == MutatorType.Create && relationship.IsCollection)
 				{
 					var navigationCollectionType = typeof(EntityNavigationCollection<>).MakeGenericType(relationship.EntityType);
-					var navigationCollection = Activator.CreateInstance(navigationCollectionType, relationship.IdProperty.Name, connection) as IEntityNavigationCollection;
+					var navigationCollection = Activator.CreateInstance(navigationCollectionType, relationship.IdProperty) as IEntityNavigationCollection;
+					navigationCollection.SetConnection(connection);
 					relationship.NavigationProperty.SetValue(entity, navigationCollection);
+				}
+				else if (mutationType == MutatorType.Select && relationship.IsCollection)
+				{
+					if (relationship.NavigationProperty.GetValue(entity) is IEntityNavigationCollection navigationCollection)
+					{
+						navigationCollection.SetConnection(connection);
+					}
 				}
 			}
 		}
 
 #pragma warning disable CRR0026 // Unused member - called through Reflection
-		private static void InitialiseSingleEntityRelationship<TRelatedEntity>(TEntity targetEntity, EntityRelationship relationship, IMongoDbConnection connection) where TRelatedEntity : class
+		private static void InitialiseSingleEntityRelationship<TRelatedEntity>(TEntity targetEntity, IEntityRelationship relationship, IMongoDbConnection connection) where TRelatedEntity : class
 		{
 			var dbEntityReader = new EntityReader<TRelatedEntity>(connection);
 			var relationshipIdValue = relationship.IdProperty.GetValue(targetEntity);

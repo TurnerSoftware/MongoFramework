@@ -1,4 +1,5 @@
 ﻿using System;
+using MongoDB.Driver;
 
 namespace MongoFramework.Tests
 {
@@ -20,7 +21,11 @@ namespace MongoFramework.Tests
 
 		public static IMongoDbConnection GetConnection()
 		{
-			return MongoDbConnection.FromConnectionString(ConnectionString, GetDatabaseName());
+			var urlBuilder = new MongoUrlBuilder(ConnectionString)
+			{
+				DatabaseName = GetDatabaseName()
+			};
+			return MongoDbConnection.FromUrl(urlBuilder.ToMongoUrl());
 		}
 	}
 }
