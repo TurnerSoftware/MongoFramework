@@ -14,7 +14,7 @@ namespace MongoFramework.Infrastructure
 	{
 		public IMongoDbConnection Connection { get; }
 		private ICommandWriter<TEntity> CommandWriter { get; }
-		private List<IEntityCollection<TEntity>> ManagedCollections { get; } = new List<IEntityCollection<TEntity>>();
+		private List<IEntityCollectionBase<TEntity>> ManagedCollections { get; } = new List<IEntityCollectionBase<TEntity>>();
 		private List<IWriteCommand<TEntity>> StagedCommands { get; } = new List<IWriteCommand<TEntity>>();
 
 		public EntityWriterPipeline(IMongoDbConnection connection)
@@ -23,7 +23,7 @@ namespace MongoFramework.Infrastructure
 			CommandWriter = new CommandWriter<TEntity>(connection);
 		}
 
-		public void AddCollection(IEntityCollection<TEntity> collection)
+		public void AddCollection(IEntityCollectionBase<TEntity> collection)
 		{
 			if (collection == null)
 			{
@@ -35,7 +35,7 @@ namespace MongoFramework.Infrastructure
 				ManagedCollections.Add(collection);
 			}
 		}
-		public void RemoveCollection(IEntityCollection<TEntity> collection)
+		public void RemoveCollection(IEntityCollectionBase<TEntity> collection)
 		{
 			if (collection == null)
 			{

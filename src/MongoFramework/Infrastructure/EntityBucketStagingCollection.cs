@@ -7,17 +7,13 @@ using MongoFramework.Infrastructure.Linq.Processors;
 
 namespace MongoFramework.Infrastructure
 {
-	public class EntityBucketStagingCollection<TGroup, TSubEntity> : IEntityCollection<EntityBucket<TGroup, TSubEntity>> where TGroup : class
+	public class EntityBucketStagingCollection<TGroup, TSubEntity> : IEntityCollectionBase<EntityBucket<TGroup, TSubEntity>> where TGroup : class
 	{
 		private Dictionary<TGroup, List<TSubEntity>> SubEntityStaging { get; }
 		private IEntityCollection<EntityBucket<TGroup, TSubEntity>> ChangeTracker { get; }
 		private IEntityReader<EntityBucket<TGroup, TSubEntity>> EntityReader { get; }
 
 		public int BucketSize { get; }
-
-		public int Count => throw new NotImplementedException();
-
-		public bool IsReadOnly => false;
 
 		public EntityBucketStagingCollection(IEntityReader<EntityBucket<TGroup, TSubEntity>> entityReader, int bucketSize)
 		{
@@ -115,42 +111,9 @@ namespace MongoFramework.Infrastructure
 		{
 			throw new NotImplementedException();
 		}
-
-		public void Add(EntityBucket<TGroup, TSubEntity> item)
+		public bool Remove(EntityBucket<TGroup, TSubEntity> entity)
 		{
 			throw new NotImplementedException();
-		}
-
-		public bool Contains(EntityBucket<TGroup, TSubEntity> item)
-		{
-			throw new NotImplementedException();
-		}
-
-		public void CopyTo(EntityBucket<TGroup, TSubEntity>[] array, int arrayIndex)
-		{
-			throw new NotImplementedException();
-		}
-
-		public bool Remove(EntityBucket<TGroup, TSubEntity> item)
-		{
-			throw new NotImplementedException();
-		}
-
-		public IEnumerator<EntityBucket<TGroup, TSubEntity>> GetEnumerator()
-		{
-			var result = GetEntries().Select(e => e.Entity);
-			using (var enumerator = result.GetEnumerator())
-			{
-				while (enumerator.MoveNext())
-				{
-					yield return enumerator.Current;
-				}
-			}
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
 		}
 	}
 }
