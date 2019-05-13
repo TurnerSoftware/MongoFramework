@@ -23,6 +23,8 @@
     
     <DebugSymbols>true</DebugSymbols>
     <DebugType>embedded</DebugType>
+
+    <LangVersion>Latest</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug' ">
