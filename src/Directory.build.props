@@ -8,7 +8,7 @@
 
     <PackageId>$(AssemblyName)</PackageId>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageLicenseUrl>https://github.com/TurnerSoftware/MongoFramework/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseFile>License.txt</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/TurnerSoftware/MongoFramework</PackageProjectUrl>
     <PackageBaseTags>mongo;mongodb</PackageBaseTags>
     
@@ -34,6 +34,10 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-63127-02" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\License.txt" Pack="true" PackagePath="$(PackageLicenseFile)"/>
   </ItemGroup>
   
 </Project>
