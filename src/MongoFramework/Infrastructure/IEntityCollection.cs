@@ -4,8 +4,8 @@ namespace MongoFramework.Infrastructure
 {
 	public interface IEntityCollectionBase<TEntity> where TEntity : class
 	{
-		EntityEntry<TEntity> GetEntry(TEntity entity);
-		IEnumerable<EntityEntry<TEntity>> GetEntries();
+		EntityEntry GetEntry(TEntity entity);
+		IEnumerable<EntityEntry> GetEntries();
 		void Update(TEntity entity, EntityEntryState state);
 		bool Remove(TEntity entity);
 	}

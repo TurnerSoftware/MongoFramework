@@ -47,7 +47,7 @@ namespace MongoFramework.Tests.Infrastructure
 			entityCollection.Update(updatedEntity, EntityEntryState.Updated);
 			Assert.IsFalse(entityCollection.GetEntries().Any(e => e.Entity == entity));
 			Assert.IsTrue(entityCollection.GetEntries()
-				.Any(e => e.Entity == updatedEntity && e.Entity.Title == "DbEntityCollectionTests.UpdateExistingEntryWithId-2"));
+				.Any(e => e.Entity == updatedEntity && (e.Entity as EntityCollectionModel).Title == "DbEntityCollectionTests.UpdateExistingEntryWithId-2"));
 		}
 
 		[TestMethod]

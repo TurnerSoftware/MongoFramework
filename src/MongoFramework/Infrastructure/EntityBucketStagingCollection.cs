@@ -48,7 +48,7 @@ namespace MongoFramework.Infrastructure
 			return queryable;
 		}
 
-		public IEnumerable<EntityEntry<EntityBucket<TGroup, TSubEntity>>> GetEntries()
+		public IEnumerable<EntityEntry> GetEntries()
 		{
 			foreach (var grouping in SubEntityStaging)
 			{
@@ -71,7 +71,7 @@ namespace MongoFramework.Infrastructure
 						bucket.Items.AddRange(sliceEntities);
 						bucket.ItemCount += sliceSize;
 
-						yield return new EntityEntry<EntityBucket<TGroup, TSubEntity>>(bucket, EntityEntryState.Updated);
+						yield return new EntityEntry(bucket, EntityEntryState.Updated);
 
 						sliceAt += sliceSize;
 						remainingEntitiesCount -= sliceSize;
@@ -85,7 +85,7 @@ namespace MongoFramework.Infrastructure
 					var sliceSize = Math.Min(BucketSize, remainingEntitiesCount);
 					var sliceEntities = entityList.Skip(sliceAt).Take(sliceSize).ToList();
 
-					yield return new EntityEntry<EntityBucket<TGroup, TSubEntity>>(new EntityBucket<TGroup, TSubEntity>
+					yield return new EntityEntry(new EntityBucket<TGroup, TSubEntity>
 					{
 						Group = grouping.Key,
 						Index = currentBucketIndex,
@@ -102,7 +102,7 @@ namespace MongoFramework.Infrastructure
 			}
 		}
 
-		public EntityEntry<EntityBucket<TGroup, TSubEntity>> GetEntry(EntityBucket<TGroup, TSubEntity> entity)
+		public EntityEntry GetEntry(EntityBucket<TGroup, TSubEntity> entity)
 		{
 			throw new NotImplementedException();
 		}

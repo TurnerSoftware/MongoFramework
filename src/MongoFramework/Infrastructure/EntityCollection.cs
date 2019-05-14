@@ -8,7 +8,7 @@ namespace MongoFramework.Infrastructure
 {
 	public class EntityCollection<TEntity> : IEntityCollection<TEntity> where TEntity : class
 	{
-		protected List<EntityEntry<TEntity>> Entries { get; } = new List<EntityEntry<TEntity>>();
+		protected List<EntityEntry> Entries { get; } = new List<EntityEntry>();
 
 		private IEntityDefinition EntityDefinition { get; }
 
@@ -21,7 +21,7 @@ namespace MongoFramework.Infrastructure
 
 		public bool IsReadOnly => false;
 
-		public EntityEntry<TEntity> GetEntry(TEntity entity)
+		public EntityEntry GetEntry(TEntity entity)
 		{
 			var entityId = EntityDefinition.GetIdValue(entity);
 			var defaultIdValue = EntityDefinition.GetDefaultId();
@@ -45,7 +45,7 @@ namespace MongoFramework.Infrastructure
 			return null;
 		}
 
-		public IEnumerable<EntityEntry<TEntity>> GetEntries()
+		public IEnumerable<EntityEntry> GetEntries()
 		{
 			return Entries;
 		}
@@ -62,12 +62,12 @@ namespace MongoFramework.Infrastructure
 				else
 				{
 					Entries.Remove(entry);
-					Entries.Add(new EntityEntry<TEntity>(entity, state));
+					Entries.Add(new EntityEntry(entity, state));
 				}
 			}
 			else
 			{
-				Entries.Add(new EntityEntry<TEntity>(entity, state));
+				Entries.Add(new EntityEntry(entity, state));
 			}
 		}
 
@@ -120,7 +120,7 @@ namespace MongoFramework.Infrastructure
 
 			for (var i = 0; i < Count; i++)
 			{
-				array[i + arrayIndex] = Entries[i].Entity;
+				array[i + arrayIndex] = Entries[i].Entity as TEntity;
 			}
 		}
 
@@ -131,7 +131,7 @@ namespace MongoFramework.Infrastructure
 			{
 				while (enumerator.MoveNext())
 				{
-					yield return enumerator.Current;
+					yield return enumerator.Current as TEntity;
 				}
 			}
 		}

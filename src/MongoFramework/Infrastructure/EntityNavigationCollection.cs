@@ -89,7 +89,7 @@ namespace MongoFramework.Infrastructure
 			{
 				while (enumerator.MoveNext())
 				{
-					yield return enumerator.Current;
+					yield return enumerator.Current as TEntity;
 				}
 			}
 

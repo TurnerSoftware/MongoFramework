@@ -2,10 +2,10 @@
 
 namespace MongoFramework.Infrastructure
 {
-	public class EntityEntry<TEntity> where TEntity : class
+	public class EntityEntry
 	{
 		/// <summary>
-		/// The state of the entity in this <see cref="EntityEntry{TEntity}"/> object.
+		/// The state of the entity in this <see cref="EntityEntry"/> object.
 		/// </summary>
 		public EntityEntryState State { get; set; }
 
@@ -17,14 +17,14 @@ namespace MongoFramework.Infrastructure
 		/// <summary>
 		/// The entity that forms this <see cref="EntityEntry{TEntity}"/> object.
 		/// </summary>
-		public TEntity Entity { get; private set; }
+		public object Entity { get; private set; }
 
 		/// <summary>
-		/// Creates a new <see cref="EntityEntry{TEntity}"/> with the specified entity and state information.
+		/// Creates a new <see cref="EntityEntry"/> with the specified entity and state information.
 		/// </summary>
 		/// <param name="entity"></param>
 		/// <param name="state"></param>
-		public EntityEntry(TEntity entity, EntityEntryState state)
+		public EntityEntry(object entity, EntityEntryState state)
 		{
 			State = state;
 			Entity = entity;
@@ -47,7 +47,7 @@ namespace MongoFramework.Infrastructure
 		/// Update the original values to reflect the state of the provided entity.
 		/// </summary>
 		/// <param name="entity"></param>
-		public void Refresh(TEntity entity)
+		public void Refresh(object entity)
 		{
 			OriginalValues = entity.ToBsonDocument();
 			State = this.HasChanges() ? EntityEntryState.Updated : EntityEntryState.NoChanges;

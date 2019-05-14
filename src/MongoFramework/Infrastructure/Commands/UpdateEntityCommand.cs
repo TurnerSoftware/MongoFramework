@@ -9,9 +9,9 @@ namespace MongoFramework.Infrastructure.Commands
 {
 	public class UpdateEntityCommand<TEntity> : IWriteCommand<TEntity> where TEntity : class
 	{
-		private EntityEntry<TEntity> EntityEntry { get; }
+		private EntityEntry EntityEntry { get; }
 
-		public UpdateEntityCommand(EntityEntry<TEntity> entityEntry)
+		public UpdateEntityCommand(EntityEntry entityEntry)
 		{
 			EntityEntry = entityEntry;
 		}
@@ -25,7 +25,7 @@ namespace MongoFramework.Infrastructure.Commands
 			//This is primarily to work around a mutation that may set an entity to its default state.
 			if (updateDefintion.HasChanges())
 			{
-				yield return new UpdateOneModel<TEntity>(definition.CreateIdFilterFromEntity(EntityEntry.Entity), updateDefintion);
+				yield return new UpdateOneModel<TEntity>(definition.CreateIdFilterFromEntity(EntityEntry.Entity as TEntity), updateDefintion);
 			}
 		}
 	}
