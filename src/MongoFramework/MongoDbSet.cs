@@ -28,11 +28,6 @@ namespace MongoFramework
 		private IEntityIndexWriter<TEntity> EntityIndexWriter { get; set; }
 		private IEntityRelationshipWriter<TEntity> EntityRelationshipWriter { get; set; }
 
-		/// <summary>
-		/// Whether any entity validation is performed prior to saving changes. (Default is true)
-		/// </summary>
-		public bool PerformEntityValidation { get; set; } = true;
-
 		public MongoDbSet() { }
 
 		/// <summary>
