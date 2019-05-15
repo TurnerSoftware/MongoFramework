@@ -167,5 +167,28 @@ namespace MongoFramework.Tests
 			Assert.IsFalse(dbSet.Any(m => m.RequiredField == "SuccessfullyRemoveRange.1"));
 			Assert.IsFalse(dbSet.Any(m => m.RequiredField == "SuccessfullyRemoveRange.2"));
 		}
+		
+		[TestMethod]
+		public void SuccessfullyRemoveEntityById()
+		{
+			var dbSet = new MongoDbSet<MongoDbSetValidationModel>();
+			dbSet.SetConnection(TestConfiguration.GetConnection());
+
+			var entity = new MongoDbSetValidationModel
+			{
+				RequiredField = "SuccessfullyRemoveEntityById"
+			};
+
+			dbSet.Add(entity);
+			dbSet.SaveChanges();
+
+			dbSet.SetConnection(TestConfiguration.GetConnection());
+
+			dbSet.RemoveById(entity.Id);
+
+			Assert.IsTrue(dbSet.Any(m => m.RequiredField == "SuccessfullyRemoveEntityById"));
+			dbSet.SaveChanges();
+			Assert.IsFalse(dbSet.Any(m => m.RequiredField == "SuccessfullyRemoveEntityById"));
+		}
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using MongoFramework.Infrastructure;
+using MongoFramework.Infrastructure.Commands;
 using MongoFramework.Infrastructure.Indexing;
 using MongoFramework.Infrastructure.Linq;
 using MongoFramework.Infrastructure.Linq.Processors;
@@ -142,6 +143,14 @@ namespace MongoFramework
 			{
 				ChangeTracker.Update(entity, EntityEntryState.Deleted);
 			}
+		}
+		/// <summary>
+		/// Stages a deletion for the entity that matches the specified ID
+		/// </summary>
+		/// <param name="entityId"></param>
+		public virtual void RemoveById(object entityId)
+		{
+			EntityWriterPipeline.StageCommand(new RemoveEntityByIdCommand<TEntity>(entityId));
 		}
 
 		/// <summary>
