@@ -8,6 +8,11 @@ skip_commits:
   files:
   - '**/*.md'
 
+dotnet_csproj:
+  patch: true
+  file: 'src\*.props'
+  version: '{version}'
+
 build:
   verbosity: minimal
 services:
@@ -17,8 +22,7 @@ install:
 
 
 build_script:
-  - dotnet build -c Release /p:VersionPrefix={version}
-  - dotnet pack --no-build -c Release --version-suffix build.{build} /p:PackageOutputPath=..\..\.nupkgs
+  - dotnet build -c Release
   - dotnet pack --no-build -c Release /p:PackageOutputPath=..\..\.nupkgs
 test_script:
   - OpenCover.Console.exe -register:user -target:"C:\Program Files\dotnet\dotnet.exe" -targetargs:"test tests/MongoFramework.Tests/MongoFramework.Tests.csproj /p:DebugType=Full" -filter:"+[MongoFramework]* -[MongoFramework.Tests]*" -output:".\coverage.xml" -oldstyle
