@@ -8,6 +8,9 @@ skip_commits:
   files:
   - '**/*.md'
 
+cache:
+  - packages -> **\*.csproj
+
 build:
   verbosity: minimal
 services:
