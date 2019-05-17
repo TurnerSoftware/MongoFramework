@@ -9,7 +9,8 @@ skip_commits:
   - '**/*.md'
 
 cache:
-  - packages -> **\*.csproj
+  - %localappdata%\NuGet\v3-cache -> **\*.csproj
+  - %userprofile%\.nuget\packages -> **\*.csproj
 
 build:
   verbosity: minimal
