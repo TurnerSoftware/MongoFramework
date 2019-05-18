@@ -19,6 +19,7 @@ services:
   - mongodb
 install:
   - choco install opencover codecov
+  - ps: .\build\dotnet-install.ps1 -Version 3.0.100-preview5-011568
 
 
 build_script:
