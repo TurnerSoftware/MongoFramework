@@ -29,16 +29,28 @@ namespace MongoFramework.Tests
 			//driver updates. If someone knows a better way to reset the MongoDB driver, please open a pull request!
 
 			var classMapField = typeof(BsonClassMap).GetField("__classMaps", BindingFlags.NonPublic | BindingFlags.Static);
-			classMapField.SetValue(null, new Dictionary<Type, BsonClassMap>());
+			if (classMapField.GetValue(null) is Dictionary<Type, BsonClassMap> classMaps)
+			{
+				classMaps.Clear();
+			}
 
 			var knownTypesField = typeof(BsonSerializer).GetField("__typesWithRegisteredKnownTypes", BindingFlags.NonPublic | BindingFlags.Static);
-			knownTypesField.SetValue(null, new HashSet<Type>());
+			if (knownTypesField.GetValue(null) is HashSet<Type> knownTypes)
+			{
+				knownTypes.Clear();
+			}
 
 			var discriminatorTypesField = typeof(BsonSerializer).GetField("__discriminatedTypes", BindingFlags.NonPublic | BindingFlags.Static);
-			discriminatorTypesField.SetValue(null, new HashSet<Type>());
+			if (discriminatorTypesField.GetValue(null) is HashSet<Type> discriminatorTypes)
+			{
+				discriminatorTypes.Clear();
+			}
 
 			var discriminatorsField = typeof(BsonSerializer).GetField("__discriminators", BindingFlags.NonPublic | BindingFlags.Static);
-			discriminatorsField.SetValue(null, new Dictionary<BsonValue, HashSet<Type>>());
+			if (discriminatorsField.GetValue(null) is Dictionary<BsonValue, HashSet<Type>> discriminators)
+			{
+				discriminators.Clear();
+			}
 
 			var serializerRegistryField = typeof(BsonSerializer).GetField("__serializerRegistry", BindingFlags.NonPublic | BindingFlags.Static);
 			if (serializerRegistryField.GetValue(null) is BsonSerializerRegistry registry)
