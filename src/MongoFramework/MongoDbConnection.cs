@@ -50,7 +50,7 @@ namespace MongoFramework
 			return FromUrl(new MongoUrl(connectionString));
 		}
 
-#if !NETCOREAPP2_0
+#if (!NETCOREAPP2_0 && !NETCOREAPP3_0)
 		public static MongoDbConnection FromConfig(string connectionName)
 		{
 			var connectionStringConfig = System.Configuration.ConfigurationManager.ConnectionStrings[connectionName];

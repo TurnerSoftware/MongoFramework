@@ -6,7 +6,7 @@ namespace MongoFramework.Tests
 	[TestClass]
 	public class MongoDbConnectionTests
 	{
-#if !NETCOREAPP2_0
+#if (!NETCOREAPP2_0 && !NETCOREAPP3_0)
 		[TestMethod]
 		public void ConnectionFromConfig()
 		{
