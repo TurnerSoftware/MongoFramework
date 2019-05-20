@@ -18,11 +18,11 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 
 			if (tableAttribute == null && entityType.IsGenericType && entityType.GetGenericTypeDefinition() == typeof(EntityBucket<,>))
 			{
-				var groupProperty = entityType.GetProperty("Group", BindingFlags.Public | BindingFlags.Instance);
-				tableAttribute = groupProperty.GetCustomAttribute<TableAttribute>();
+				var groupType = entityType.GetGenericArguments()[0];
+				tableAttribute = groupType.GetCustomAttribute<TableAttribute>();
 				if (tableAttribute == null)
 				{
-					collectionName = groupProperty.PropertyType.Name;
+					collectionName = groupType.Name;
 				}
 			}
 

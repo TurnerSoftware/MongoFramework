@@ -27,12 +27,14 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		{
 		}
 
-
 		[TestMethod]
 		public void CollectionNameFromClassName()
 		{
 			EntityMapping.AddMappingProcessor(new CollectionNameProcessor());
 			var definition = EntityMapping.RegisterType(typeof(DefaultCollectionNameModel));
+			Assert.AreEqual("DefaultCollectionNameModel", definition.CollectionName);
+
+			definition = EntityMapping.RegisterType(typeof(EntityBucket<DefaultCollectionNameModel, string>));
 			Assert.AreEqual("DefaultCollectionNameModel", definition.CollectionName);
 		}
 
@@ -42,6 +44,9 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 			EntityMapping.AddMappingProcessor(new CollectionNameProcessor());
 			var definition = EntityMapping.RegisterType(typeof(CustomCollectionModel));
 			Assert.AreEqual("CustomCollection", definition.CollectionName);
+
+			definition = EntityMapping.RegisterType(typeof(EntityBucket<CustomCollectionModel, string>));
+			Assert.AreEqual("CustomCollection", definition.CollectionName);
 		}
 
 		[TestMethod]
@@ -49,6 +54,9 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		{
 			EntityMapping.AddMappingProcessor(new CollectionNameProcessor());
 			var definition = EntityMapping.RegisterType(typeof(CustomCollectionAndSchemaModel));
+			Assert.AreEqual("CustomSchema.CustomCollection", definition.CollectionName);
+
+			definition = EntityMapping.RegisterType(typeof(EntityBucket<CustomCollectionAndSchemaModel, string>));
 			Assert.AreEqual("CustomSchema.CustomCollection", definition.CollectionName);
 		}
 	}
