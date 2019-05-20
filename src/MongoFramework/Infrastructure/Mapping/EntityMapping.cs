@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace MongoFramework.Infrastructure.Mapping
 {
-	public class EntityMapping
+	public static class EntityMapping
 	{
 		private static ReaderWriterLockSlim MappingLock { get; } = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 		private static ConcurrentDictionary<Type, IEntityDefinition> EntityDefinitions { get; }
