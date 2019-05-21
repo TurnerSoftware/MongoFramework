@@ -11,6 +11,16 @@ namespace MongoFramework.Tests.Infrastructure.Mapping
 	[TestClass]
 	public class EntityDefinitionExtensionTests : TestBase
 	{
+		public class IdNameParentModel
+		{
+			public string Id { get; set; }
+		}
+
+		public class IdNameChildModel : IdNameParentModel
+		{
+			public string Description { get; set; }
+		}
+
 		public class TraverseMappingModel
 		{
 			public string Id { get; set; }
@@ -28,6 +38,16 @@ namespace MongoFramework.Tests.Infrastructure.Mapping
 		{
 			public string InnerMostProperty { get; set; }
 			public TraverseMappingModel NestedRecursionType { get; set; }
+		}
+
+		[TestMethod]
+		public void GetIdNameChecksInheritence()
+		{
+			var definition = EntityMapping.RegisterType(typeof(IdNameChildModel));
+			var parentDefinition = EntityMapping.GetOrCreateDefinition(typeof(IdNameParentModel));
+
+			Assert.AreEqual("Id", definition.GetIdName());
+			Assert.AreEqual("Id", parentDefinition.GetIdName());
 		}
 
 		[TestMethod]

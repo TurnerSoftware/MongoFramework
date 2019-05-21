@@ -12,7 +12,7 @@ namespace MongoFramework.Infrastructure.Mapping
 	{
 		public static IEntityProperty GetIdProperty(this IEntityDefinition definition)
 		{
-			return definition.Properties.Where(m => m.IsKey).FirstOrDefault();
+			return definition.GetAllProperties().Where(m => m.IsKey).FirstOrDefault();
 		}
 
 		public static string GetIdName(this IEntityDefinition definition)
