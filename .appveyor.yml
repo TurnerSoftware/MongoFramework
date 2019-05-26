@@ -46,7 +46,6 @@
       artifact: /.*nupkg/
       api_key:
         secure: eCdbkZMnfQfn//yoFtvyHHVUkoIX1yUfs6qRtOGsRxQq95pDPNMUMD0+XN9itbKp
-    
     - provider: GitHub
       artifact: /.*nupkg/
       draft: true
