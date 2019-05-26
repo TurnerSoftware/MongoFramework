@@ -24,7 +24,7 @@
 
 
 - 
-  version: '{APPVEYOR_REPO_TAG_NAME}+{build}'
+  version: '$(APPVEYOR_REPO_TAG_NAME)+{build}'
   image: Visual Studio 2017
   skip_non_tags: true
 #  branches:
