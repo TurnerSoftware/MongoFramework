@@ -16,7 +16,7 @@
     - ps: .\build\dotnet-install.ps1 -Version 3.0.100-preview5-011568
 
   build_script:
-    - ps: .\build.ps1 -CheckCoverage $True
+    - ps: .\build.ps1 -CheckCoverage $True -RunTests $False
 
   test: false
   artifacts:
