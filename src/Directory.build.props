@@ -1,6 +1,12 @@
 <Project>
+
   <PropertyGroup>
-    <Version></Version>
+    <BuildNumber Condition="'$(APPVEYOR_BUILD_NUMBER)' != ''">$(APPVEYOR_BUILD_NUMBER)</BuildNumber>
+    <BuildNumber Condition="'$(APPVEYOR_BUILD_NUMBER)' == ''">0</BuildNumber>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Version>0.11.1+$(BuildNumber)</Version>
 
     <RootNamespace>MongoFramework</RootNamespace>
 
@@ -24,7 +30,6 @@
 
     <LangVersion>Latest</LangVersion>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-18618-05" PrivateAssets="All" />
   </ItemGroup>
