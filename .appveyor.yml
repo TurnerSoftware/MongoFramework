@@ -24,7 +24,7 @@
 
 
 - 
-  version: '$APPVEYOR_REPO_TAG_NAME+{build}'
+  version: '{build}'
   image: Visual Studio 2017
   skip_non_tags: true
 #  branches:
@@ -44,19 +44,19 @@
   artifacts:
     - path: '.\build-artifacts\*'
 
-#  deploy:
+  deploy:
 #    - provider: NuGet
 #      artifact: /.*nupkg/
 #      api_key:
 #        secure: eCdbkZMnfQfn//yoFtvyHHVUkoIX1yUfs6qRtOGsRxQq95pDPNMUMD0+XN9itbKp
 #    
-#    - provider: GitHub
-#      artifact: /.*nupkg/
-#      draft: true
-#      release: $(APPVEYOR_REPO_TAG_NAME)
-#      description: 'Release Description'
-#      auth_token:
-#        secure: 8WGv8noklaCJAQEBpcs+VShk/Hql5zbyx0VPhMvzUw0RcG7rAd2KxKIh4gazXlBi
-#      on:
-#        branch: master
-#        APPVEYOR_REPO_TAG: true
+    - provider: GitHub
+      artifact: /.*nupkg/
+      draft: true
+      release: $(APPVEYOR_REPO_TAG_NAME)
+      description: 'Release Description'
+      auth_token:
+        secure: 8WGv8noklaCJAQEBpcs+VShk/Hql5zbyx0VPhMvzUw0RcG7rAd2KxKIh4gazXlBi
+      on:
+        branch: master
+        APPVEYOR_REPO_TAG: true
