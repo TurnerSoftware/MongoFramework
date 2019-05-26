@@ -27,9 +27,9 @@
   version: '{build}'
   image: Visual Studio 2017
   skip_non_tags: true
-#  branches:
-#    only:
-#      - master
+  branches:
+    only:
+      - master
 
   services:
     - mongodb
@@ -45,11 +45,11 @@
     - path: '.\build-artifacts\*'
 
   deploy:
-#    - provider: NuGet
-#      artifact: /.*nupkg/
-#      api_key:
-#        secure: eCdbkZMnfQfn//yoFtvyHHVUkoIX1yUfs6qRtOGsRxQq95pDPNMUMD0+XN9itbKp
-#    
+    - provider: NuGet
+      artifact: /.*nupkg/
+      api_key:
+        secure: eCdbkZMnfQfn//yoFtvyHHVUkoIX1yUfs6qRtOGsRxQq95pDPNMUMD0+XN9itbKp
+    
     - provider: GitHub
       artifact: /.*nupkg/
       draft: true
