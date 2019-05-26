@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>0.11.1+$(BuildNumber)</Version>
+    <Version>0.11.2+$(BuildNumber)</Version>
 
     <RootNamespace>MongoFramework</RootNamespace>
 
