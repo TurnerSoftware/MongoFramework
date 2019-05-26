@@ -1,22 +1,19 @@
 [CmdletBinding(PositionalBinding=$false)]
 param(
-    [bool] $CreatePackages,
     [bool] $RunTests = $true,
 	[bool] $CheckCoverage,
-    [string] $PullRequestNumber
+    [bool] $CreatePackages
 )
-
-Write-Host "Run Parameters:" -ForegroundColor Cyan
-Write-Host "  CreatePackages: $CreatePackages"
-Write-Host "  RunTests: $RunTests"
-Write-Host "  dotnet --version:" (dotnet --version)
 
 $packageOutputFolder = "$PSScriptRoot\build-artifacts"
 
-if ($PullRequestNumber) {
-    Write-Host "Building for a pull request (#$PullRequestNumber), skipping packaging." -ForegroundColor Yellow
-    $CreatePackages = $false
-}
+Write-Host "Run Parameters:" -ForegroundColor Cyan
+Write-Host "  RunTests: $RunTests"
+Write-Host "  CheckCoverage: $CheckCoverage"
+Write-Host "  CreatePackages: $CreatePackages"
+Write-Host "Environment:" -ForegroundColor Cyan
+Write-Host "  .NET Version:" (dotnet --version)
+Write-Host "  Artifact Path: $packageOutputFolder"
 
 Write-Host "Building solution... " -ForegroundColor "Magenta"
 dotnet build -c Release
