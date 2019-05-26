@@ -27,9 +27,6 @@
   version: '{build}'
   image: Visual Studio 2017
   skip_non_tags: true
-  branches:
-    only:
-      - master
 
   services:
     - mongodb
