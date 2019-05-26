@@ -6,6 +6,7 @@ param(
 )
 
 $packageOutputFolder = "$PSScriptRoot\build-artifacts"
+mkdir -Force $packageOutputFolder | Out-Null
 
 Write-Host "Run Parameters:" -ForegroundColor Cyan
 Write-Host "  RunTests: $RunTests"
@@ -52,7 +53,6 @@ if ($CheckCoverage) {
 }
 
 if ($CreatePackages) {
-    mkdir -Force $packageOutputFolder | Out-Null
     Write-Host "Clearing existing $packageOutputFolder... " -NoNewline
     Get-ChildItem $packageOutputFolder | Remove-Item
     Write-Host "Packages cleared!" -ForegroundColor "Green"
