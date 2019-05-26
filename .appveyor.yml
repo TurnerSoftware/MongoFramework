@@ -1,39 +1,59 @@
-version: '0.11.1+{build}'
-image: Visual Studio 2017
-skip_branch_with_pr: true
-branches:
-  only:
-    - master
-skip_commits:
-  files:
-  - '**/*.md'
+- 
+  version: '{build}'
+  image: Visual Studio 2017
+  skip_tags: true
+  branches:
+    only:
+      - master
+  skip_commits:
+    files:
+    - '**/*.md'
 
-dotnet_csproj:
-  patch: true
-  file: 'src\*.props'
-  version: '{version}'
+  services:
+    - mongodb
+  install:
+    - choco install opencover codecov
+    - ps: .\build\dotnet-install.ps1 -Version 3.0.100-preview5-011568
 
-build:
-  verbosity: minimal
-services:
-  - mongodb
-install:
-  - choco install opencover codecov
-  - ps: .\build\dotnet-install.ps1 -Version 3.0.100-preview5-011568
+  build_script:
+    - ps: .\build.ps1 -CheckCoverage $True
 
-
-build_script:
-  - dotnet build -c Release
-  - dotnet pack --no-build -c Release /p:PackageOutputPath=..\..\.nupkgs
-test_script:
-  - OpenCover.Console.exe -register:user -target:"%LocalAppData%\Microsoft\dotnet\dotnet.exe" -targetargs:"test tests/MongoFramework.Tests/MongoFramework.Tests.csproj /p:DebugType=Full" -filter:"+[MongoFramework]* -[MongoFramework.Tests]*" -output:".\coverage.xml" -oldstyle
-  - codecov -f coverage.xml
+  test: false
+  artifacts:
+    - path: '.\build-artifacts\*'
 
 
-artifacts:
-  - path: '.nupkgs\*.nupkg'
+- 
+  version: '{build}'
+  image: Visual Studio 2017
+  skip_non_tags: true
+  branches:
+    only:
+      - master
 
-  - path: '.nupkgs\*.snupkg'
+  services:
+    - mongodb
+  install:
+    - choco install opencover codecov
+    - ps: .\build\dotnet-install.ps1 -Version 3.0.100-preview5-011568
 
-  - path: coverage.xml
-    name: Coverage Report
+  build_script:
+    - ps: .\build.ps1 -CreatePackages $True
+
+  test: false
+  artifacts:
+    - path: '.\build-artifacts\*'
+
+  deploy:
+    - provider: NuGet
+      artifact: /.*nupkg/
+      api_key:
+        secure: eCdbkZMnfQfn//yoFtvyHHVUkoIX1yUfs6qRtOGsRxQq95pDPNMUMD0+XN9itbKp
+    
+    - provider: GitHub
+      artifact: /.*nupkg/
+      draft: true
+      release: $(APPVEYOR_REPO_TAG_NAME)
+      description: 'Release Description'
+      auth_token:
+        secure: 8WGv8noklaCJAQEBpcs+VShk/Hql5zbyx0VPhMvzUw0RcG7rAd2KxKIh4gazXlBi

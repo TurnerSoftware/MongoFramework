@@ -253,3 +253,5 @@ paket-files/
 
 # Coderush
 /.cr
+
+/build-artifacts
