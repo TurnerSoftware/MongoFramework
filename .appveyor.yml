@@ -1,55 +1,33 @@
-- 
-  version: '{build}'
-  image: Visual Studio 2017
-  skip_tags: true
-  branches:
-    only:
-      - master
-  skip_commits:
-    files:
-    - '**/*.md'
+version: '{build}'
+image: Visual Studio 2017
+skip_branch_with_pr: true
 
-  services:
-    - mongodb
-  install:
-    - choco install opencover codecov
-    - ps: .\build\dotnet-install.ps1 -Version 3.0.100-preview5-011568
+services:
+  - mongodb
+install:
+  - choco install opencover codecov
+  - ps: .\build\dotnet-install.ps1 -Version 3.0.100-preview5-011568
 
-  build_script:
-    - ps: .\build.ps1 -CheckCoverage $True
+build_script:
+  - ps: .\build.appveyor.ps1 -IsTagBuild $$env:APPVEYOR_REPO_TAG
 
-  test: false
-  artifacts:
-    - path: '.\build-artifacts\*'
+test: false
+artifacts:
+  - path: '.\build-artifacts\*'
 
-
-- 
-  version: '{build}'
-  image: Visual Studio 2017
-  skip_non_tags: true
-
-  services:
-    - mongodb
-  install:
-    - choco install opencover codecov
-    - ps: .\build\dotnet-install.ps1 -Version 3.0.100-preview5-011568
-
-  build_script:
-    - ps: .\build.ps1 -CreatePackages $True
-
-  test: false
-  artifacts:
-    - path: '.\build-artifacts\*'
-
-  deploy:
-    - provider: NuGet
-      artifact: /.*nupkg/
-      api_key:
-        secure: eCdbkZMnfQfn//yoFtvyHHVUkoIX1yUfs6qRtOGsRxQq95pDPNMUMD0+XN9itbKp
-    - provider: GitHub
-      artifact: /.*nupkg/
-      draft: true
-      release: $(APPVEYOR_REPO_TAG_NAME)
-      description: 'Release Description'
-      auth_token:
-        secure: 8WGv8noklaCJAQEBpcs+VShk/Hql5zbyx0VPhMvzUw0RcG7rAd2KxKIh4gazXlBi
+deploy:
+  - provider: NuGet
+    artifact: /.*nupkg/
+    api_key:
+      secure: eCdbkZMnfQfn//yoFtvyHHVUkoIX1yUfs6qRtOGsRxQq95pDPNMUMD0+XN9itbKp
+    on:
+      APPVEYOR_REPO_TAG: true
+  - provider: GitHub
+    artifact: /.*nupkg/
+    draft: true
+    release: $(APPVEYOR_REPO_TAG_NAME)
+    description: 'TODO'
+    auth_token:
+      secure: 8WGv8noklaCJAQEBpcs+VShk/Hql5zbyx0VPhMvzUw0RcG7rAd2KxKIh4gazXlBi
+    on:
+      APPVEYOR_REPO_TAG: true
