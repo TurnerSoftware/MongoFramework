@@ -22,6 +22,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "global", "global", "{BA1176
 		.codecov.yml = .codecov.yml
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
+		build.appveyor.ps1 = build.appveyor.ps1
 		build.ps1 = build.ps1
 		License.txt = License.txt
 		README.md = README.md
