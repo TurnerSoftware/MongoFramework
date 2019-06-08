@@ -6,7 +6,6 @@ using System.Reflection;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
-using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Diagnostics;
 using StackExchange.Profiling;
 
@@ -27,34 +26,39 @@ namespace MongoFramework.Profiling.MiniProfiler
 				return;
 			}
 
-			if (value is ReadDiagnosticCommand readCommand)
+			if (value.CommandState == CommandState.Start)
 			{
-				if (readCommand.CommandState == CommandState.Start)
+				if (value is ReadDiagnosticCommand readCommand)
 				{
-					Commands[value.CommandId] = StackExchange.Profiling.MiniProfiler.Current.CustomTiming("mongoframework", readCommand.Queryable.ToQuery(), readCommand.Source);
+					OnNextReadCommand(readCommand);
 				}
-				else if (Commands.TryRemove(value.CommandId, out var current))
+				else if (value is WriteDiagnosticCommandBase writeCommandBase)
 				{
-					if (readCommand.CommandState == CommandState.FirstResult)
-					{
-						Commands[value.CommandId] = current;
-						current.FirstFetchCompleted();
-					}
-					else
-					{
-						current.Errored = readCommand.CommandState == CommandState.Error;
-						current.Stop();
-					}
+					OnNextWriteCommand(writeCommandBase);
+				}
+				else if (value is IndexDiagnosticCommandBase indexCommandBase)
+				{
+					OnNextIndexCommand(indexCommandBase);
 				}
 			}
-			else if (value is WriteDiagnosticCommandBase writeCommandBase)
+			else if (Commands.TryRemove(value.CommandId, out var current))
 			{
-				OnNextWriteCommand(writeCommandBase);
+				if (value.CommandState == CommandState.FirstResult)
+				{
+					Commands[value.CommandId] = current;
+					current.FirstFetchCompleted();
+				}
+				else
+				{
+					current.Errored = value.CommandState == CommandState.Error;
+					current.Stop();
+				}
 			}
-			else if (value is IndexDiagnosticCommandBase indexCommandBase)
-			{
-				OnNextIndexCommand(indexCommandBase);
-			}
+		}
+
+		private void OnNextReadCommand(ReadDiagnosticCommand command)
+		{
+			Commands[command.CommandId] = StackExchange.Profiling.MiniProfiler.Current.CustomTiming("mongodb", command.Query, "Read");
 		}
 
 		private void OnNextWriteCommand(WriteDiagnosticCommandBase commandBase)
@@ -66,18 +70,10 @@ namespace MongoFramework.Profiling.MiniProfiler
 #pragma warning disable CRR0026 // Unused member
 		private void OnNextWriteCommand<TEntity>(WriteDiagnosticCommand<TEntity> command)
 		{
-			if (command.CommandState == CommandState.Start)
-			{
-				var queryList = command.WriteModel.GroupBy(w => w.ModelType)
+			var queryList = command.WriteModel.GroupBy(w => w.ModelType)
 					.Select(g => g.Key.ToString() + "\n" + string.Join("\n", g.Select(w => GetWriteModelAsString(w))));
-				var writeModelString = string.Join("; ", queryList);
-				Commands[command.CommandId] = StackExchange.Profiling.MiniProfiler.Current.CustomTiming("mongoframework", writeModelString, command.Source);
-			}
-			else if (Commands.TryRemove(command.CommandId, out var current))
-			{
-				current.Errored = command.CommandState == CommandState.Error;
-				current.Stop();
-			}
+			var writeModelString = string.Join("; ", queryList);
+			Commands[command.CommandId] = StackExchange.Profiling.MiniProfiler.Current.CustomTiming("mongodb", writeModelString, "Write");
 		}
 #pragma warning restore CRR0026 // Unused member
 		private string GetWriteModelAsString<TEntity>(WriteModel<TEntity> writeModel)
@@ -121,18 +117,10 @@ namespace MongoFramework.Profiling.MiniProfiler
 #pragma warning disable CRR0026 // Unused member
 		private void OnNextIndexCommand<TEntity>(IndexDiagnosticCommand<TEntity> command)
 		{
-			if (command.CommandState == CommandState.Start)
-			{
-				var queryList = command.IndexModel.GroupBy(w => w.Options.Name)
+			var queryList = command.IndexModel.GroupBy(w => w.Options.Name)
 					.Select(g => g.Key.ToString() + "\n" + string.Join("\n", g.Select(w => GetIndexModelAsString(w))));
-				var indexModelString = string.Join("; ", queryList);
-				Commands[command.CommandId] = StackExchange.Profiling.MiniProfiler.Current.CustomTiming("mongoframework", indexModelString, command.Source);
-			}
-			else if (Commands.TryRemove(command.CommandId, out var current))
-			{
-				current.Errored = command.CommandState == CommandState.Error;
-				current.Stop();
-			}
+			var indexModelString = string.Join("; ", queryList);
+			Commands[command.CommandId] = StackExchange.Profiling.MiniProfiler.Current.CustomTiming("mongodb", indexModelString, "Index");
 		}
 #pragma warning restore CRR0026 // Unused member
 		private string GetIndexModelAsString<TEntity>(CreateIndexModel<TEntity> indexModel)

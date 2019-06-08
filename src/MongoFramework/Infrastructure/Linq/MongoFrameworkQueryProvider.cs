@@ -1,5 +1,8 @@
 ﻿using MongoDB.Driver.Linq;
+using MongoFramework.Infrastructure.Diagnostics;
+using MongoFramework.Infrastructure.Mapping;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -33,20 +36,76 @@ namespace MongoFramework.Infrastructure.Linq
 
 		public virtual object Execute(Expression expression)
 		{
-			var result = UnderlyingQueryable.Provider.Execute(expression);
-
-			if (result is TEntity)
+			using (var diagnostics = DiagnosticRunner.Start(Connection, this))
 			{
-				EntityProcessors.ProcessEntity((TEntity)result, Connection);
-			}
+				object result;
+				try
+				{
+					result = UnderlyingQueryable.Provider.Execute(expression);
+				}
+				catch (Exception exception)
+				{
+					diagnostics.Error(exception);
+					throw;
+				}
 
-			return result;
+				if (result is TEntity)
+				{
+					EntityProcessors.ProcessEntity((TEntity)result, Connection);
+				}
+
+				return result;
+			}
 		}
 
 		public virtual TResult Execute<TResult>(Expression expression)
 		{
 			var result = Execute(expression);
 			return (TResult)result;
+		}
+
+		public virtual IEnumerable<TOutput> ExecuteEnumerable(Expression expression)
+		{
+			using (var diagnostics = DiagnosticRunner.Start(Connection, this))
+			{
+				IEnumerable<TOutput> result;
+				try
+				{
+					result = (IEnumerable<TOutput>)UnderlyingQueryable.Provider.Execute(expression);
+				}
+				catch (Exception exception)
+				{
+					diagnostics.Error(exception);
+					throw;
+				}
+
+				using (var enumerator = result.GetEnumerator())
+				{
+					var hasFirstResult = false;
+					while (enumerator.MoveNext())
+					{
+						if (!hasFirstResult)
+						{
+							hasFirstResult = true;
+							diagnostics.FirstReadResult<TOutput>();
+						}
+
+						var item = enumerator.Current;
+						if (item is TEntity)
+						{
+							EntityProcessors.ProcessEntity((TEntity)(object)item, Connection);
+						}
+						yield return item;
+					}
+				}
+			}
+		}
+
+		public string ToQuery()
+		{
+			var executionModel = UnderlyingQueryable.GetExecutionModel();
+			var definition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
+			return $"db.{definition.CollectionName}.{executionModel}";
 		}
 	}
 }

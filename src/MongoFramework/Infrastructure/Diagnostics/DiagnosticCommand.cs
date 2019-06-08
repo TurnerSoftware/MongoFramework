@@ -5,10 +5,9 @@ using MongoFramework.Infrastructure.Linq;
 
 namespace MongoFramework.Infrastructure.Diagnostics
 {
-	public abstract class DiagnosticCommand
+	public class DiagnosticCommand
 	{
 		public Guid CommandId { get; set; }
-		public string Source { get; set; }
 		public CommandState CommandState { get; set; }
 		public Type EntityType { get; set; }
 	}
@@ -23,7 +22,7 @@ namespace MongoFramework.Infrastructure.Diagnostics
 
 	public class ReadDiagnosticCommand : DiagnosticCommand
 	{
-		public IMongoFrameworkQueryable Queryable { get; set; }
+		public string Query { get; set; }
 	}
 
 	public abstract class WriteDiagnosticCommandBase : DiagnosticCommand { }
