@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MongoFramework.Attributes;
 using MongoFramework.Profiling.MiniProfiler;
 using SEProfiling = StackExchange.Profiling;
 
@@ -19,14 +20,22 @@ namespace MongoFramework.Tests.Profiling.MiniProfiler
 		{
 			public TestContext(IMongoDbConnection connection) : base(connection) { }
 
-			public MongoDbSet<Person> People { get; set; }
+			public MongoDbSet<GeneralProfileModel> GeneralProfiling { get; set; }
+			public MongoDbSet<ProfileIndexModel> IndexProfiling { get; set; }
 		}
 
-		class Person
+		class GeneralProfileModel
 		{
 			public string Id { get; set; }
 			public string Name { get; set; }
-			public int Age { get; set; }
+			public int Number { get; set; }
+		}
+
+		class ProfileIndexModel
+		{
+			public string Id { get; set; }
+			[Index("TestIndex", IndexSortOrder.Ascending)]
+			public string IndexSpecificDescriptionField { get; set; }
 		}
 
 		[TestMethod]
@@ -35,14 +44,14 @@ namespace MongoFramework.Tests.Profiling.MiniProfiler
 			using (var context = new TestContext(GetConnection()))
 			{
 				var profiler = SEProfiling.MiniProfiler.StartNew();
-				context.People.Add(new Person
+				context.GeneralProfiling.Add(new GeneralProfileModel
 				{
 					Name = "ProfilingInsert",
 				});
-				context.SaveChanges();
+				context.GeneralProfiling.SaveChanges();
 
-				Assert.IsTrue(profiler.Root.CustomTimings.ContainsKey("mongoframework"));
-				var timings = profiler.Root.CustomTimings["mongoframework"];
+				Assert.IsTrue(profiler.Root.CustomTimings.ContainsKey("mongodb"));
+				var timings = profiler.Root.CustomTimings["mongodb"];
 				Assert.IsTrue(timings[0].CommandString.Contains("InsertOne"));
 				Assert.IsTrue(timings[0].CommandString.Contains("ProfilingInsert"));
 			}
@@ -53,20 +62,20 @@ namespace MongoFramework.Tests.Profiling.MiniProfiler
 		{
 			using (var context = new TestContext(GetConnection()))
 			{
-				var entity = new Person
+				var entity = new GeneralProfileModel
 				{
 					Name = "ProfilingUpdate",
 				};
-				context.People.Add(entity);
-				context.SaveChanges();
+				context.GeneralProfiling.Add(entity);
+				context.GeneralProfiling.SaveChanges();
 
 				var profiler = SEProfiling.MiniProfiler.StartNew();
 
 				entity.Name = "ProfilingUpdate-Updated";
-				context.SaveChanges();
+				context.GeneralProfiling.SaveChanges();
 
-				Assert.IsTrue(profiler.Root.CustomTimings.ContainsKey("mongoframework"));
-				var timings = profiler.Root.CustomTimings["mongoframework"];
+				Assert.IsTrue(profiler.Root.CustomTimings.ContainsKey("mongodb"));
+				var timings = profiler.Root.CustomTimings["mongodb"];
 				Assert.IsTrue(timings[0].CommandString.Contains("UpdateOne"));
 				Assert.IsTrue(timings[0].CommandString.Contains("ProfilingUpdate-Updated"));
 			}
@@ -77,20 +86,20 @@ namespace MongoFramework.Tests.Profiling.MiniProfiler
 		{
 			using (var context = new TestContext(GetConnection()))
 			{
-				var entity = new Person
+				var entity = new GeneralProfileModel
 				{
 					Name = "ProfilingDelete",
 				};
-				context.People.Add(entity);
-				context.SaveChanges();
+				context.GeneralProfiling.Add(entity);
+				context.GeneralProfiling.SaveChanges();
 
 				var profiler = SEProfiling.MiniProfiler.StartNew();
 
-				context.People.Remove(entity);
-				context.SaveChanges();
+				context.GeneralProfiling.Remove(entity);
+				context.GeneralProfiling.SaveChanges();
 
-				Assert.IsTrue(profiler.Root.CustomTimings.ContainsKey("mongoframework"));
-				var timings = profiler.Root.CustomTimings["mongoframework"];
+				Assert.IsTrue(profiler.Root.CustomTimings.ContainsKey("mongodb"));
+				var timings = profiler.Root.CustomTimings["mongodb"];
 				Assert.IsTrue(timings[0].CommandString.Contains("DeleteOne"));
 				Assert.IsTrue(timings[0].CommandString.Contains(entity.Id));
 			}
@@ -103,25 +112,41 @@ namespace MongoFramework.Tests.Profiling.MiniProfiler
 			{
 				for (int i = 0, l = 100; i < l; i++)
 				{
-					context.People.Add(new Person
+					context.GeneralProfiling.Add(new GeneralProfileModel
 					{
-						Age = i,
+						Number = i,
 						Name = "ProfilingRead"
 					});
 				}
 				
-				context.SaveChanges();
+				context.GeneralProfiling.SaveChanges();
 
 				var profiler = SEProfiling.MiniProfiler.StartNew();
 
-				var queryable = context.People.Skip(78);
+				var queryable = context.GeneralProfiling.Skip(78);
 				foreach (var entity in queryable)
 				{ }
 
-				Assert.IsTrue(profiler.Root.CustomTimings.ContainsKey("mongoframework"));
-				var timings = profiler.Root.CustomTimings["mongoframework"];
+				Assert.IsTrue(profiler.Root.CustomTimings.ContainsKey("mongodb"));
+				var timings = profiler.Root.CustomTimings["mongodb"];
 				Assert.IsTrue(timings[0].CommandString.Contains("$skip"));
 				Assert.IsTrue(timings[0].CommandString.Contains("78"));
+			}
+		}
+
+		[TestMethod]
+		public void ProfilingIndex()
+		{
+			using (var context = new TestContext(GetConnection()))
+			{
+				var profiler = SEProfiling.MiniProfiler.StartNew();
+
+				context.IndexProfiling.SaveChanges();
+
+				Assert.IsTrue(profiler.Root.CustomTimings.ContainsKey("mongodb"));
+				var timings = profiler.Root.CustomTimings["mongodb"];
+				Assert.IsTrue(timings[0].CommandString.Contains("TestIndex"));
+				Assert.IsTrue(timings[0].CommandString.Contains("IndexSpecificDescriptionField"));
 			}
 		}
 	}

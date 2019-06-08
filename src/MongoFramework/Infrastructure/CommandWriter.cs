@@ -34,40 +34,17 @@ namespace MongoFramework.Infrastructure
 
 			if (writeModel.Any())
 			{
-				var commandId = Guid.NewGuid();
-				try
+				using (var diagnostics = DiagnosticRunner.Start(Connection, writeModel))
 				{
-					Connection.DiagnosticListener.OnNext(new WriteDiagnosticCommand<TEntity>
+					try
 					{
-						CommandId = commandId,
-						Source = $"{nameof(CommandWriter<TEntity>)}.{nameof(Write)}",
-						CommandState = CommandState.Start,
-						EntityType = typeof(TEntity),
-						WriteModel = writeModel
-					});
-					GetCollection().BulkWrite(writeModel);
-					Connection.DiagnosticListener.OnNext(new WriteDiagnosticCommand<TEntity>
+						GetCollection().BulkWrite(writeModel);
+					}
+					catch (Exception exception)
 					{
-						CommandId = commandId,
-						Source = $"{nameof(CommandWriter<TEntity>)}.{nameof(Write)}",
-						CommandState = CommandState.End,
-						EntityType = typeof(TEntity),
-						WriteModel = writeModel
-					});
-				}
-				catch (Exception ex)
-				{
-					Connection.DiagnosticListener.OnNext(new WriteDiagnosticCommand<TEntity>
-					{
-						CommandId = commandId,
-						Source = $"{nameof(CommandWriter<TEntity>)}.{nameof(Write)}",
-						CommandState = CommandState.Error,
-						EntityType = typeof(TEntity),
-						WriteModel = writeModel
-					});
-					Connection.DiagnosticListener.OnError(ex);
-
-					throw;
+						diagnostics.Error(exception);
+						throw;
+					}
 				}
 			}
 		}
@@ -80,40 +57,17 @@ namespace MongoFramework.Infrastructure
 
 			if (writeModel.Any())
 			{
-				var commandId = Guid.NewGuid();
-				try
+				using (var diagnostics = DiagnosticRunner.Start(Connection, writeModel))
 				{
-					Connection.DiagnosticListener.OnNext(new WriteDiagnosticCommand<TEntity>
+					try
 					{
-						CommandId = commandId,
-						Source = $"{nameof(CommandWriter<TEntity>)}.{nameof(WriteAsync)}",
-						CommandState = CommandState.Start,
-						EntityType = typeof(TEntity),
-						WriteModel = writeModel
-					});
-					await GetCollection().BulkWriteAsync(writeModel, null, cancellationToken).ConfigureAwait(false);
-					Connection.DiagnosticListener.OnNext(new WriteDiagnosticCommand<TEntity>
+						await GetCollection().BulkWriteAsync(writeModel, null, cancellationToken).ConfigureAwait(false);
+					}
+					catch (Exception exception)
 					{
-						CommandId = commandId,
-						Source = $"{nameof(CommandWriter<TEntity>)}.{nameof(WriteAsync)}",
-						CommandState = CommandState.End,
-						EntityType = typeof(TEntity),
-						WriteModel = writeModel
-					});
-				}
-				catch (Exception ex)
-				{
-					Connection.DiagnosticListener.OnNext(new WriteDiagnosticCommand<TEntity>
-					{
-						CommandId = commandId,
-						Source = $"{nameof(CommandWriter<TEntity>)}.{nameof(WriteAsync)}",
-						CommandState = CommandState.Error,
-						EntityType = typeof(TEntity),
-						WriteModel = writeModel
-					});
-					Connection.DiagnosticListener.OnError(ex);
-
-					throw;
+						diagnostics.Error(exception);
+						throw;
+					}
 				}
 			}
 		}

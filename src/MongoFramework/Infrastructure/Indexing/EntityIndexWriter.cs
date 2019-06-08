@@ -30,37 +30,17 @@ namespace MongoFramework.Infrastructure.Indexing
 			var indexModel = IndexModelBuilder<TEntity>.BuildModel();
 			if (indexModel.Any())
 			{
-				var commandId = Guid.NewGuid();
-				try
+				using (var diagnostics = DiagnosticRunner.Start(Connection, indexModel))
 				{
-					Connection.DiagnosticListener.OnNext(new IndexDiagnosticCommand<TEntity>
+					try
 					{
-						CommandId = commandId,
-						Source = $"{nameof(EntityIndexWriter<TEntity>)}.{nameof(ApplyIndexing)}",
-						CommandState = CommandState.Start,
-						IndexModel = indexModel
-					});
-					GetCollection().Indexes.CreateMany(indexModel);
-					Connection.DiagnosticListener.OnNext(new IndexDiagnosticCommand<TEntity>
+						GetCollection().Indexes.CreateMany(indexModel);
+					}
+					catch (Exception exception)
 					{
-						CommandId = commandId,
-						Source = $"{nameof(EntityIndexWriter<TEntity>)}.{nameof(ApplyIndexing)}",
-						CommandState = CommandState.End,
-						IndexModel = indexModel
-					});
-				}
-				catch (Exception ex)
-				{
-					Connection.DiagnosticListener.OnNext(new IndexDiagnosticCommand<TEntity>
-					{
-						CommandId = commandId,
-						Source = $"{nameof(EntityIndexWriter<TEntity>)}.{nameof(ApplyIndexing)}",
-						CommandState = CommandState.Error,
-						IndexModel = indexModel
-					});
-					Connection.DiagnosticListener.OnError(ex);
-
-					throw;
+						diagnostics.Error(exception);
+						throw;
+					}
 				}
 			}
 		}
@@ -70,37 +50,17 @@ namespace MongoFramework.Infrastructure.Indexing
 			var indexModel = IndexModelBuilder<TEntity>.BuildModel();
 			if (indexModel.Any())
 			{
-				var commandId = Guid.NewGuid();
-				try
+				using (var diagnostics = DiagnosticRunner.Start(Connection, indexModel))
 				{
-					Connection.DiagnosticListener.OnNext(new IndexDiagnosticCommand<TEntity>
+					try
 					{
-						CommandId = commandId,
-						Source = $"{nameof(EntityIndexWriter<TEntity>)}.{nameof(ApplyIndexingAsync)}",
-						CommandState = CommandState.Start,
-						IndexModel = indexModel
-					});
-					await GetCollection().Indexes.CreateManyAsync(indexModel, cancellationToken).ConfigureAwait(false);
-					Connection.DiagnosticListener.OnNext(new IndexDiagnosticCommand<TEntity>
+						await GetCollection().Indexes.CreateManyAsync(indexModel, cancellationToken).ConfigureAwait(false);
+					}
+					catch (Exception exception)
 					{
-						CommandId = commandId,
-						Source = $"{nameof(EntityIndexWriter<TEntity>)}.{nameof(ApplyIndexingAsync)}",
-						CommandState = CommandState.End,
-						IndexModel = indexModel
-					});
-				}
-				catch (Exception ex)
-				{
-					Connection.DiagnosticListener.OnNext(new IndexDiagnosticCommand<TEntity>
-					{
-						CommandId = commandId,
-						Source = $"{nameof(EntityIndexWriter<TEntity>)}.{nameof(ApplyIndexingAsync)}",
-						CommandState = CommandState.Error,
-						IndexModel = indexModel
-					});
-					Connection.DiagnosticListener.OnError(ex);
-
-					throw;
+						diagnostics.Error(exception);
+						throw;
+					}
 				}
 			}
 		}
