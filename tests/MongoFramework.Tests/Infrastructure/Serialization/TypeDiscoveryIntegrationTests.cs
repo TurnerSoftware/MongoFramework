@@ -25,6 +25,17 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 			public string AdditionProperty { get; set; }
 		}
 
+		public class UnknownPropertyTypeModel
+		{
+			public string Id { get; set; }
+			public object UnknownItem { get; set; }
+		}
+
+		public class UnknownPropertyTypeChildModel
+		{
+			public string Description { get; set; }
+		}
+
 		[TestMethod]
 		public void ReadAndWriteRootEntity()
 		{
@@ -52,11 +63,50 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 
 			var dbRootEntity = dbSet.Where(e => e.Id == rootEntity.Id).FirstOrDefault();
 			Assert.IsNotNull(dbRootEntity);
-			Assert.AreEqual(typeof(RootKnownBaseModel), dbRootEntity.GetType());
+			Assert.IsInstanceOfType(dbRootEntity, typeof(RootKnownBaseModel));
 
 			var dbChildEntity = dbSet.Where(e => e.Id == childEntity.Id).FirstOrDefault();
 			Assert.IsNotNull(dbChildEntity);
-			Assert.AreEqual(typeof(UnknownChildToRootModel), dbChildEntity.GetType());
+			Assert.IsInstanceOfType(dbChildEntity, typeof(UnknownChildToRootModel));
+		}
+
+		[TestMethod]
+		public void ReadAndWriteUnknownPropertyTypeEntity()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var dbSet = new MongoDbSet<UnknownPropertyTypeModel>();
+			dbSet.SetConnection(connection);
+
+			var entities = new[]
+			{
+				new UnknownPropertyTypeModel(),
+				new UnknownPropertyTypeModel
+				{
+					UnknownItem = new UnknownPropertyTypeChildModel
+					{
+						Description = "UnknownPropertyTypeChildModel"
+					}
+				},
+				new UnknownPropertyTypeModel
+				{
+					UnknownItem = new Dictionary<string, int>
+					{
+						{ "Age", 1 }
+					}
+				}
+			};
+
+			dbSet.AddRange(entities);
+			dbSet.SaveChanges();
+
+			ResetMongoDb();
+			dbSet = new MongoDbSet<UnknownPropertyTypeModel>();
+			dbSet.SetConnection(connection);
+
+			var dbEntities = dbSet.ToArray();
+			Assert.IsNull(dbEntities[0].UnknownItem);
+			Assert.IsInstanceOfType(dbEntities[1].UnknownItem, typeof(UnknownPropertyTypeChildModel));
+			Assert.IsInstanceOfType(dbEntities[2].UnknownItem, typeof(Dictionary<string, object>));
 		}
 	}
 }

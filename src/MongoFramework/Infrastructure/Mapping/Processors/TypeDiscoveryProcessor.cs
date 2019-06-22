@@ -12,8 +12,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 
 		public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
 		{
-			var entityType = definition.EntityType;
-			if (!ProviderAdded && entityType.GetCustomAttribute<RuntimeTypeDiscoveryAttribute>() != null)
+			if (!ProviderAdded)
 			{
 				ProviderAdded = true;
 				BsonSerializer.RegisterSerializationProvider(TypeDiscoverySerializationProvider.Instance);

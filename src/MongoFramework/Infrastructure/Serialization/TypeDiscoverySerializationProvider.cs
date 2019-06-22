@@ -19,7 +19,7 @@ namespace MongoFramework.Infrastructure.Serialization
 				throw new ArgumentNullException(nameof(type));
 			}
 
-			if (Enabled && type.GetCustomAttribute<RuntimeTypeDiscoveryAttribute>() != null)
+			if (Enabled && (type.GetCustomAttribute<RuntimeTypeDiscoveryAttribute>() != null || type == typeof(object)))
 			{
 				var serializerType = typeof(TypeDiscoverySerializer<>).MakeGenericType(type);
 				return (IBsonSerializer)Activator.CreateInstance(serializerType);

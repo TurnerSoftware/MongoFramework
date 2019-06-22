@@ -7,13 +7,72 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using MongoFramework.Infrastructure.Mapping;
+using System.Collections.Generic;
 
 namespace MongoFramework.Infrastructure.Serialization
 {
-	public class TypeDiscoverySerializer<TEntity> : IBsonSerializer<TEntity>, IBsonDocumentSerializer, IBsonIdProvider where TEntity : class
+	public static class TypeDiscovery
 	{
 		private static ReaderWriterLockSlim TypeCacheLock { get; } = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
-		private static ConcurrentBag<Type> AssignableTypes { get; } = new ConcurrentBag<Type>();
+		private static ConcurrentBag<Type> AssignableTypes { get; set; } = new ConcurrentBag<Type>();
+
+		public static void ClearCache()
+		{
+			TypeCacheLock.EnterWriteLock();
+
+			try
+			{
+				AssignableTypes = new ConcurrentBag<Type>();
+			}
+			finally
+			{
+				TypeCacheLock.ExitWriteLock();
+			}
+		}
+
+		public static Type FindTypeByDiscriminator(string name, Type expectedAssignableType)
+		{
+			TypeCacheLock.EnterUpgradeableReadLock();
+
+			try
+			{
+				var cachedType = AssignableTypes
+					.Where(t => t.Name == name && expectedAssignableType.IsAssignableFrom(t))
+					.FirstOrDefault();
+
+				if (cachedType == null)
+				{
+					TypeCacheLock.EnterWriteLock();
+					try
+					{
+						var assignableType = AppDomain.CurrentDomain.GetAssemblies()
+							.Where(a => !a.IsDynamic)
+							.SelectMany(a => a.GetTypes())
+							.Where(t => t.Name == name && expectedAssignableType.IsAssignableFrom(t))
+							.FirstOrDefault();
+
+						AssignableTypes.Add(assignableType);
+
+						return assignableType;
+					}
+					finally
+					{
+						TypeCacheLock.ExitWriteLock();
+					}
+				}
+
+				return cachedType;
+			}
+			finally
+			{
+				TypeCacheLock.ExitUpgradeableReadLock();
+			}
+		}
+	}
+
+	public class TypeDiscoverySerializer<TEntity> : IBsonSerializer<TEntity>, IBsonDocumentSerializer, IBsonIdProvider where TEntity : class
+	{
+		private static Type[] DictionaryTypes { get; } = new[] { typeof(IDictionary<,>), typeof(Dictionary<,>) };
 
 		public Type ValueType => typeof(TEntity);
 
@@ -35,7 +94,7 @@ namespace MongoFramework.Infrastructure.Serialization
 					}
 					if (discriminator.IsString)
 					{
-						actualType = FindTypeByName(discriminator.AsString);
+						actualType = TypeDiscovery.FindTypeByDiscriminator(discriminator.AsString, args.NominalType);
 					}
 				}
 				context.Reader.ReturnToBookmark(bookmark);
@@ -55,55 +114,38 @@ namespace MongoFramework.Infrastructure.Serialization
 			}
 		}
 
-		private Type FindTypeByName(string name)
-		{
-			TypeCacheLock.EnterUpgradeableReadLock();
-
-			try
-			{
-				var cachedType = AssignableTypes.Where(t => t.Name == name).FirstOrDefault();
-
-				if (cachedType == null)
-				{
-					TypeCacheLock.EnterWriteLock();
-					try
-					{
-						var assignableType = AppDomain.CurrentDomain.GetAssemblies()
-							.Where(a => !a.IsDynamic)
-							.SelectMany(a => a.GetTypes())
-							.Where(t => t.Name == name && typeof(TEntity).IsAssignableFrom(t))
-							.FirstOrDefault();
-
-						AssignableTypes.Add(assignableType);
-
-						return assignableType;
-					}
-					finally
-					{
-						TypeCacheLock.ExitWriteLock();
-					}
-				}
-
-				return cachedType;
-			}
-			finally
-			{
-				TypeCacheLock.ExitUpgradeableReadLock();
-			}
-		}
-
 		private IBsonSerializer GetRealSerializer(Type type)
 		{
-			//Force the type to be processed by the Entity Mapper
-			if (!EntityMapping.IsRegistered(type))
+			if (type == typeof(object))
 			{
-				EntityMapping.RegisterType(type);
+				return new DictionaryInterfaceImplementerSerializer<Dictionary<string, object>>();
 			}
+			else if (type.IsGenericType && DictionaryTypes.Contains(type.GetGenericTypeDefinition()))
+			{
+				var serializerType = typeof(DictionaryInterfaceImplementerSerializer<>).MakeGenericType(type);
+				var serializer = (IBsonSerializer)Activator.CreateInstance(serializerType);
+				return serializer;
+			}
+			else
+			{
+				if (type.IsClass && type != typeof(string))
+				{
+					//Force the type to be processed by the Entity Mapper
+					if (!EntityMapping.IsRegistered(type))
+					{
+						EntityMapping.RegisterType(type);
+					}
 
-			var classMap = BsonClassMap.LookupClassMap(type);
-			var serializerType = typeof(BsonClassMapSerializer<>).MakeGenericType(type);
-			var serializer = (IBsonSerializer)Activator.CreateInstance(serializerType, classMap);
-			return serializer;
+					var classMap = BsonClassMap.LookupClassMap(type);
+					var serializerType = typeof(BsonClassMapSerializer<>).MakeGenericType(type);
+					var serializer = (IBsonSerializer)Activator.CreateInstance(serializerType, classMap);
+					return serializer;
+				}
+				else
+				{
+					return BsonSerializer.LookupSerializer(type);
+				}
+			}
 		}
 
 		public void Serialize(BsonSerializationContext context, BsonSerializationArgs args, object value)
@@ -119,7 +161,7 @@ namespace MongoFramework.Infrastructure.Serialization
 
 		public bool TryGetMemberSerializationInfo(string memberName, out BsonSerializationInfo serializationInfo)
 		{
-			var classMap = BsonClassMap.LookupClassMap(typeof(TEntity));
+			var classMap = BsonClassMap.LookupClassMap(ValueType);
 			return new BsonClassMapSerializer<TEntity>(classMap).TryGetMemberSerializationInfo(memberName, out serializationInfo);
 		}
 
@@ -130,13 +172,13 @@ namespace MongoFramework.Infrastructure.Serialization
 
 		public bool GetDocumentId(object document, out object id, out Type idNominalType, out IIdGenerator idGenerator)
 		{
-			var classMap = BsonClassMap.LookupClassMap(typeof(TEntity));
+			var classMap = BsonClassMap.LookupClassMap(ValueType);
 			return new BsonClassMapSerializer<TEntity>(classMap).GetDocumentId(document, out id, out idNominalType, out idGenerator);
 		}
 
 		public void SetDocumentId(object document, object id)
 		{
-			var classMap = BsonClassMap.LookupClassMap(typeof(TEntity));
+			var classMap = BsonClassMap.LookupClassMap(ValueType);
 			new BsonClassMapSerializer<TEntity>(classMap).SetDocumentId(document, id);
 		}
 	}
