@@ -31,6 +31,15 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 		{
 		}
 
+		public class UnknownPropertyTypeSerializationModel
+		{
+			public object UnknownPropertyType { get; set; }
+		}
+
+		public class UnknownPropertyTypeChildSerializationModel
+		{
+		}
+
 		[TestMethod]
 		public void NullDeserialization()
 		{
@@ -57,7 +66,7 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 				deserializedResult = (KnownBaseModel)serializer.Deserialize(context);
 			}
 
-			Assert.AreEqual(null, deserializedResult);
+			Assert.IsNull(deserializedResult);
 		}
 
 		[TestMethod]
@@ -72,7 +81,7 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 			};
 
 			var deserializedResult = BsonSerializer.Deserialize<KnownBaseModel>(document);
-			Assert.AreEqual(typeof(UnknownChildModel), deserializedResult.GetType());
+			Assert.IsInstanceOfType(deserializedResult, typeof(UnknownChildModel));
 		}
 
 		[TestMethod]
@@ -87,7 +96,7 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 			};
 
 			var deserializedResult = BsonSerializer.Deserialize<KnownBaseModel>(document);
-			Assert.AreEqual(typeof(UnknownGrandChildModel), deserializedResult.GetType());
+			Assert.IsInstanceOfType(deserializedResult, typeof(UnknownGrandChildModel));
 		}
 
 		[TestMethod]
@@ -104,7 +113,7 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 			};
 
 			var deserializedResult = BsonSerializer.Deserialize<KnownBaseModel>(document);
-			Assert.AreNotEqual(typeof(UnknownChildModel), deserializedResult.GetType());
+			Assert.IsNotInstanceOfType(deserializedResult, typeof(UnknownChildModel));
 
 			TypeDiscoverySerializationProvider.Instance.Enabled = true;
 		}
@@ -139,9 +148,9 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 			};
 
 			var deserializedResult = BsonSerializer.Deserialize<CollectionBaseModel>(document);
-			Assert.AreEqual(typeof(KnownBaseModel), deserializedResult.KnownList[0].GetType());
-			Assert.AreEqual(typeof(UnknownChildModel), deserializedResult.KnownList[1].GetType());
-			Assert.AreEqual(typeof(UnknownGrandChildModel), deserializedResult.KnownList[2].GetType());
+			Assert.IsInstanceOfType(deserializedResult.KnownList[0], typeof(KnownBaseModel));
+			Assert.IsInstanceOfType(deserializedResult.KnownList[1], typeof(UnknownChildModel));
+			Assert.IsInstanceOfType(deserializedResult.KnownList[2], typeof(UnknownGrandChildModel));
 		}
 
 		[TestMethod]
@@ -170,9 +179,73 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 			var deserializedResult = BsonSerializer.Deserialize<CollectionBaseModel>(document);
 
 			Assert.AreEqual(3, deserializedResult.KnownList.Count);
-			Assert.AreEqual(typeof(KnownBaseModel), deserializedResult.KnownList[0].GetType());
-			Assert.AreEqual(typeof(UnknownChildModel), deserializedResult.KnownList[1].GetType());
-			Assert.AreEqual(typeof(UnknownGrandChildModel), deserializedResult.KnownList[2].GetType());
+			Assert.IsInstanceOfType(deserializedResult.KnownList[0], typeof(KnownBaseModel));
+			Assert.IsInstanceOfType(deserializedResult.KnownList[1], typeof(UnknownChildModel));
+			Assert.IsInstanceOfType(deserializedResult.KnownList[2], typeof(UnknownGrandChildModel));
+		}
+
+		[TestMethod]
+		public void DeserializeNullForUnknownPropertyType()
+		{
+			EntityMapping.AddMappingProcessor(new TypeDiscoveryProcessor());
+			EntityMapping.RegisterType(typeof(UnknownPropertyTypeSerializationModel));
+
+			var document = new BsonDocument
+			{
+				{ "_t", "UnknownPropertyTypeSerializationModel" },
+				{ "UnknownPropertyType", BsonNull.Value }
+			};
+
+			var deserializedResult = BsonSerializer.Deserialize<UnknownPropertyTypeSerializationModel>(document);
+			Assert.IsNull(deserializedResult.UnknownPropertyType);
+		}
+
+		[TestMethod]
+		public void DeserializeDictionaryForUnknownPropertyType()
+		{
+			EntityMapping.AddMappingProcessor(new TypeDiscoveryProcessor());
+			EntityMapping.RegisterType(typeof(UnknownPropertyTypeSerializationModel));
+
+			var document = new BsonDocument
+			{
+				{ "_t", "UnknownPropertyTypeSerializationModel" },
+				{
+					"UnknownPropertyType",
+					new BsonDocument
+					{
+						{ "ThisIsA", "Dictionary" }
+					}
+				}
+			};
+
+			var deserializedResult = BsonSerializer.Deserialize<UnknownPropertyTypeSerializationModel>(document);
+			Assert.IsInstanceOfType(deserializedResult.UnknownPropertyType, typeof(Dictionary<string, object>));
+
+			var dictionary = deserializedResult.UnknownPropertyType as Dictionary<string, object>;
+			Assert.IsTrue(dictionary.ContainsKey("ThisIsA"));
+			Assert.AreEqual("Dictionary", dictionary["ThisIsA"]);
+		}
+
+		[TestMethod]
+		public void DeserializeSpecifiedForUnknownPropertyType()
+		{
+			EntityMapping.AddMappingProcessor(new TypeDiscoveryProcessor());
+			EntityMapping.RegisterType(typeof(UnknownPropertyTypeSerializationModel));
+
+			var document = new BsonDocument
+			{
+				{ "_t", "UnknownPropertyTypeSerializationModel" },
+				{
+					"UnknownPropertyType",
+					new BsonDocument
+					{
+						{ "_t", "UnknownPropertyTypeChildSerializationModel" }
+					}
+				}
+			};
+
+			var deserializedResult = BsonSerializer.Deserialize<UnknownPropertyTypeSerializationModel>(document);
+			Assert.IsInstanceOfType(deserializedResult.UnknownPropertyType, typeof(UnknownPropertyTypeChildSerializationModel));
 		}
 	}
 }

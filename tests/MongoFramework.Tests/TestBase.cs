@@ -3,6 +3,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using MongoFramework.Infrastructure.Mapping;
+using MongoFramework.Infrastructure.Serialization;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -20,6 +21,8 @@ namespace MongoFramework.Tests
 
 			EntityMapping.RemoveAllMappingProcessors();
 			EntityMapping.AddMappingProcessors(DefaultMappingPack.Instance.Processors);
+
+			TypeDiscovery.ClearCache();
 		}
 
 		private static void ResetMongoDbDriver()
