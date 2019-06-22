@@ -25,12 +25,14 @@ These extensions are official packages that enhance the functionality of MongoFr
 
 ### MongoFramework.Profiling.MiniProfiler
 [![NuGet](https://img.shields.io/nuget/v/MongoFramework.Profiling.MiniProfiler.svg)](https://www.nuget.org/packages/MongoFramework.Profiling.MiniProfiler/)
+
 Supports profiling database reads and writes, pushing the data into [MiniProfiler](https://github.com/MiniProfiler/dotnet/).
 
-## Basic Documentation
+## Documentation
 
 ### Core Entity Mapping
 The core mapping of entities and their properties is automatic however there are certain attributes you can apply to your properties to alter this behaviour.
+These attributes (and a few others) are part of the `System.ComponentModel.Annotations` package.
 
 |Attribute|Description|
 |---------|-----------|
@@ -43,7 +45,7 @@ The core mapping of entities and their properties is automatic however there are
 MongoFramework supports indexing specified through the `IndexAttribute` class. This is applied to the properties you want indexed and will apply the changes to the database when the context is saved.
 
 ```csharp
-class IndexExample
+public class IndexExample
 {
   public string Id { get; set; }
 
@@ -92,13 +94,13 @@ Entity buckets are a method of storing many smaller documents in fewer larger do
 A typical setup for using an entity bucket might look like:
 
 ```csharp
-class MyBucketGrouping
+public class MyBucketGrouping
 {
   public string ClientId { get; set; }
   public DateTime FiledDate { get; set; }
 }
 
-class MyBucketItem
+public class MyBucketItem
 {
   public string Name { get; set; }
   public decimal Amount { get; set; }
@@ -122,24 +124,24 @@ using (var context = new MyContext(MongoDbConnection.FromConnectionString("mongo
   context.MyBuckets.AddRange(new MyBucketGrouping
   {
     ClientId = "ABC123",
-	FiledDate = DateTime.Today
+    FiledDate = DateTime.Today
   }, new []
   {
     new MyBucketItem
-	{
-	  Name = "Foo",
-	  Amount = 123
-	},
+    {
+      Name = "Foo",
+      Amount = 123
+    },
     new MyBucketItem
-	{
-	  Name = "Bar",
-	  Amount = 456
-	},
+    {
+      Name = "Bar",
+      Amount = 456
+    },
     new MyBucketItem
-	{
-	  Name = "Baz",
-	  Amount = 789
-	}
+    {
+      Name = "Baz",
+      Amount = 789
+    }
   });
 
   await context.SaveChangesAsync();
@@ -157,8 +159,8 @@ MongoFramework has a built-in mutation system used during reads and writes that 
 
 #### Built-in Attribute Mutators
 
-|Name       |Functionality   |
-|-----------|----------------|
+|Attribute|Description|
+|---------|-----------|
 |`[CreatedDate]`|Populates the property with the current date/time on insert. _Note: The property must be of type `DateTime`_|
 |`[UpdatedDate]`|Populates the property with the current date/time on insert. _Note: The property must be of type `DateTime`_|
 
