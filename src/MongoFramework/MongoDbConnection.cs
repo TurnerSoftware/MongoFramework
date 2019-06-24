@@ -39,7 +39,7 @@ namespace MongoFramework
 				throw new ArgumentNullException(nameof(mongoUrl));
 			}
 
-			return new MongoDbConnection()
+			return new MongoDbConnection
 			{
 				Url = mongoUrl
 			};
