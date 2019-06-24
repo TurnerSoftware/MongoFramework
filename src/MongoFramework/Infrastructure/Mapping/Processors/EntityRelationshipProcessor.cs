@@ -11,7 +11,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 {
 	public class EntityRelationshipProcessor : IMappingProcessor
 	{
-		public static readonly Type[] IdTypes = new[] { typeof(string), typeof(Guid), typeof(ObjectId) };
+		private static readonly Type[] IdTypes = new[] { typeof(string), typeof(Guid), typeof(ObjectId) };
 		public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
 		{
 			definition.Relationships = GetEntityRelationships(definition).ToArray();
