@@ -29,8 +29,6 @@ namespace MongoFramework
 		private IEntityIndexWriter<TEntity> EntityIndexWriter { get; set; }
 		private IEntityRelationshipWriter<TEntity> EntityRelationshipWriter { get; set; }
 
-		public MongoDbSet() { }
-
 		/// <summary>
 		/// Initialise a new entity reader and writer to the specified database.
 		/// </summary>
