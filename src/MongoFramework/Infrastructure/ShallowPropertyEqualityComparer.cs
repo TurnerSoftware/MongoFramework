@@ -24,11 +24,11 @@ namespace MongoFramework.Infrastructure
 
 		public bool Equals(TObject x, TObject y)
 		{
-			if (x == null && y == null)
+			if (object.Equals(x, default(TObject)) && object.Equals(y, default(TObject)))
 			{
 				return true;
 			}
-			else if (x == null || y == null)
+			else if (object.Equals(x, default(TObject)) || object.Equals(y, default(TObject)))
 			{
 				return false;
 			}
