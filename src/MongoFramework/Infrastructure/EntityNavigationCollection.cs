@@ -19,7 +19,7 @@ namespace MongoFramework.Infrastructure
 		public int LoadedCount => Entries.Count;
 		public int UnloadedCount => UnloadedIds.Count;
 		
-		public EntityNavigationCollection(IEntityProperty foreignProperty) : base()
+		public EntityNavigationCollection(IEntityProperty foreignProperty)
 		{
 			ForeignProperty = foreignProperty ?? throw new ArgumentNullException(nameof(foreignProperty));
 		}

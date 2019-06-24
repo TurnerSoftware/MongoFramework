@@ -15,7 +15,7 @@ namespace MongoFramework.Profiling.MiniProfiler
 	{
 		private ConcurrentDictionary<Guid, CustomTiming> Commands { get; } = new ConcurrentDictionary<Guid, CustomTiming>();
 
-		public void OnCompleted() { }
+		public void OnCompleted() { /* OnCompleted is never called in MongoFramework as commands have a state */ }
 
 		public void OnError(Exception error) => Trace.WriteLine(error);
 

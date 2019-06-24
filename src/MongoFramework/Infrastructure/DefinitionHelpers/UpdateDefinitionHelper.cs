@@ -16,35 +16,42 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 			var documentAProperties = documentA?.Names ?? Enumerable.Empty<string>();
 			var documentBProperties = documentB?.Names ?? Enumerable.Empty<string>();
 			var propertyNames = documentAProperties.Union(documentBProperties);
-
-			if (name != string.Empty)
+			
+			var baseName = name;
+			if (baseName != string.Empty)
 			{
-				name += ".";
+				baseName += ".";
 			}
+
+			var resultDefinition = definition;
 
 			foreach (var propertyName in propertyNames)
 			{
-				var fullName = name + propertyName;
+				var fullName = baseName + propertyName;
 
 				if (documentB == null || !documentB.Contains(propertyName))
 				{
-					definition = definition.Unset(new StringFieldDefinition<TEntity>(fullName));
+					resultDefinition = resultDefinition.Unset(new StringFieldDefinition<TEntity>(fullName));
 				}
 				else if (documentA == null || !documentA.Contains(propertyName))
 				{
-					definition = definition.Set(fullName, documentB[propertyName]);
+					resultDefinition = resultDefinition.Set(fullName, documentB[propertyName]);
 				}
 				else
 				{
-					definition = CreateFromDiff(definition, fullName, documentA[propertyName], documentB[propertyName]);
+					resultDefinition = CreateFromDiff(resultDefinition, fullName, documentA[propertyName], documentB[propertyName]);
 				}
 			}
 
-			return definition;
+			return resultDefinition;
 		}
 		private static UpdateDefinition<TEntity> CreateFromDiff<TEntity>(UpdateDefinition<TEntity> definition, string name, BsonValue valueA, BsonValue valueB) where TEntity : class
 		{
-			if (valueA?.BsonType != valueB?.BsonType)
+			if (valueB == null)
+			{
+				return definition.Set(name, BsonNull.Value);
+			}
+			else if (valueA?.BsonType != valueB?.BsonType)
 			{
 				return definition.Set(name, valueB);
 			}
@@ -60,7 +67,7 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 			}
 			else if (valueA != valueB)
 			{
-				definition = definition.Set(name, valueB);
+				return definition.Set(name, valueB);
 			}
 
 			return definition;
@@ -69,6 +76,8 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 		{
 			var arrayACount = arrayA.Count;
 			var arrayBCount = arrayB.Count;
+
+			var resultDefinition = definition;
 
 			//Due to limitations of MongoDB, we can't pull/push at the same time.
 			//As highlighted on task SERVER-1014 (MongoDB Jira), you can't pull at an index, only at a value match.
@@ -82,15 +91,15 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 				for (int i = 0, l = arrayBCount; i < l; i++)
 				{
 					var fullName = name + "." + i;
-					definition = CreateFromDiff(definition, fullName, arrayA[i], arrayB[i]);
+					resultDefinition = CreateFromDiff(resultDefinition, fullName, arrayA[i], arrayB[i]);
 				}
 			}
 			else
 			{
-				definition = definition.Set(name, arrayB);
+				resultDefinition = resultDefinition.Set(name, arrayB);
 			}
 
-			return definition;
+			return resultDefinition;
 		}
 	}
 }

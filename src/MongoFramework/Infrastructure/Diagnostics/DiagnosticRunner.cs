@@ -12,7 +12,7 @@ namespace MongoFramework.Infrastructure.Diagnostics
 	{
 		public Guid CommandId { get; } = Guid.NewGuid();
 		public IMongoDbConnection Connection { get; }
-		public bool HasErrored { get; private set; } = false;
+		public bool HasErrored { get; private set; }
 
 		private DiagnosticRunner(IMongoDbConnection connection)
 		{
