@@ -4,6 +4,7 @@ An "Entity Framework"-like interface for MongoDB
 [![AppVeyor](https://img.shields.io/appveyor/ci/Turnerj/mongoframework/master.svg)](https://ci.appveyor.com/project/Turnerj/mongoframework)
 [![Codecov](https://img.shields.io/codecov/c/github/turnersoftware/mongoframework/master.svg)](https://codecov.io/gh/TurnerSoftware/MongoFramework)
 [![NuGet](https://img.shields.io/nuget/v/MongoFramework.svg)](https://www.nuget.org/packages/MongoFramework/)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/62fa31c90bf94f3d8e201b9684a7a4ca)](https://www.codacy.com/app/Turnerj/MongoFramework)
 
 ## Overview
 MongoFramework tries to bring some of the nice features from Entity Framework into the world of MongoDB.
