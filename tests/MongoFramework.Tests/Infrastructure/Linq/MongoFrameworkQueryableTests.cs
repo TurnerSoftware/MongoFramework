@@ -101,5 +101,29 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 
 			Assert.IsFalse(processor.EntityProcessed);
 		}
+
+		[TestMethod]
+		public void EntityProcessorsRunWhenToDictionaryIsUsed()
+		{
+			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
+
+			var connection = TestConfiguration.GetConnection();
+			var collection = connection.GetDatabase().GetCollection<MongoFrameworkQueryableModel>(nameof(MongoFrameworkQueryableModel));
+			var underlyingQueryable = collection.AsQueryable();
+			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel, MongoFrameworkQueryableModel>(connection, underlyingQueryable);
+
+			var processor = new TestProcessor<MongoFrameworkQueryableModel>();
+			queryable.EntityProcessors.Add(processor);
+
+			var entityCollection = new EntityCollection<MongoFrameworkQueryableModel>();
+			var writerPipeline = new EntityWriterPipeline<MongoFrameworkQueryableModel>(connection);
+			writerPipeline.AddCollection(entityCollection);
+			entityCollection.Update(new MongoFrameworkQueryableModel { Title = "EntityProcessorsRunWithToDictionaryTest" }, EntityEntryState.Added);
+			writerPipeline.Write();
+
+			var result = queryable.ToDictionary(m => m.Id);
+			Assert.AreEqual("EntityProcessorsRunWithToDictionaryTest", result.FirstOrDefault().Value.Title);
+			Assert.IsTrue(processor.EntityProcessed);
+		}
 	}
 }
