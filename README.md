@@ -10,7 +10,8 @@ An "Entity Framework"-like interface for MongoDB
 MongoFramework tries to bring some of the nice features from Entity Framework into the world of MongoDB.
 
 Some of the major features include:
-- Smart entity mapping for collections, IDs and properties
+- Entity mapping for collections, IDs and properties through attributes
+- Indexing through attributes
 - Entity change tracking
 - Changeset support (allowing for queuing multiple DB updates to run at once)
 - Diff-updates (only _changes_ to an entity to be written)
@@ -57,7 +58,9 @@ public class IndexExample
 }
 ```
 
-To support [compound indexes](https://docs.mongodb.com/manual/core/index-compound/#compound-indexes), define indexes with the same name across multiple properties.
+[Single field](https://docs.mongodb.com/manual/core/index-single/), [compound](https://docs.mongodb.com/manual/core/index-compound/#compound-indexes) and [multikey indexes](https://docs.mongodb.com/manual/core/index-multikey/) are supported through the `IndexAttribute`.
+
+To support compound indexes, define indexes with the same name across multiple properties.
 When doing this, you will want to control the order of the individual items in the compound index which is available through the `IndexPriority` property on the attribute. 
 
 ### Contexts and Connections
