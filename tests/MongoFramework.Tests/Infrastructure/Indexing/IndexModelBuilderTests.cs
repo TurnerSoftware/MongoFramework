@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Attributes;
 using MongoFramework.Infrastructure.Indexing;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
@@ -56,6 +57,18 @@ namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 
 			[Index("MyCompoundIndex", IndexSortOrder.Ascending, IndexPriority = 2)]
 			public string SecondPriority { get; set; }
+		}
+
+		public class MultikeyIndexModel
+		{
+			public IEnumerable<MultikeyIndexChildModel> ChildEnumerable { get; set; }
+			public MultikeyIndexChildModel[] ChildArray { get; set; }
+			public List<MultikeyIndexChildModel> ChildList { get; set; }
+		}
+		public class MultikeyIndexChildModel
+		{
+			[Index(IndexSortOrder.Ascending)]
+			public string ChildId { get; set; }
 		}
 
 		[TestMethod]
@@ -121,6 +134,19 @@ namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 
 			Assert.AreEqual("ChildModel.FirstPriority", indexBsonDocument.ElementAt(0).Name);
 			Assert.AreEqual("SecondPriority", indexBsonDocument.ElementAt(1).Name);
+		}
+
+		[TestMethod]
+		public void MultikeyIndex()
+		{
+			var indexModel = IndexModelBuilder<MultikeyIndexModel>.BuildModel();
+
+			Assert.AreEqual(3, indexModel.Count());
+
+			var results = indexModel.Select(i => i.Keys.Render(null, null).ElementAt(0));
+			Assert.IsTrue(results.Any(e => e.Name == "ChildEnumerable.ChildId"));
+			Assert.IsTrue(results.Any(e => e.Name == "ChildArray.ChildId"));
+			Assert.IsTrue(results.Any(e => e.Name == "ChildList.ChildId"));
 		}
 	}
 }

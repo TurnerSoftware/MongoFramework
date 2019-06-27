@@ -83,9 +83,33 @@ namespace MongoFramework.Infrastructure.Mapping
 				{
 					yield return property;
 
-					if (property.PropertyType.IsClass && !state.SeenTypes.Contains(property.PropertyType))
+					var propertyType = property.PropertyType;
+
+					//Support traversal of array/enumerable item types
+					if (propertyType.IsArray)
 					{
-						var nestedProperties = EntityMapping.GetOrCreateDefinition(property.PropertyType)
+						propertyType = propertyType.GetElementType();
+					}
+					else if (propertyType.IsGenericType)
+					{
+						if (propertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+						{
+							propertyType = propertyType.GetGenericArguments()[0];
+						}
+						else
+						{
+							var compatibleInterfaces = propertyType.GetInterfaces().Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>));
+							var targetInterface = compatibleInterfaces.FirstOrDefault();
+							if (targetInterface != null)
+							{
+								propertyType = propertyType.GetGenericArguments()[0];
+							}
+						}
+					}
+
+					if (propertyType.IsClass && !state.SeenTypes.Contains(propertyType))
+					{
+						var nestedProperties = EntityMapping.GetOrCreateDefinition(propertyType)
 							.GetAllProperties()
 							.Select(p => new EntityProperty
 							{
@@ -101,7 +125,7 @@ namespace MongoFramework.Infrastructure.Mapping
 						{
 							SeenTypes = new HashSet<Type>(state.SeenTypes)
 							{
-								property.PropertyType
+								propertyType
 							},
 							Properties = nestedProperties
 						});

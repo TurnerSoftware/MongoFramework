@@ -27,6 +27,11 @@ namespace MongoFramework.Tests.Infrastructure.Mapping
 			public NestedTraverseMappingModel NestedModel { get; set; }
 			public NestedTraverseMappingModel RepeatedType { get; set; }
 			public TraverseMappingModel RecursionType { get; set; }
+			
+			public NestedTraverseMappingModel[] ArrayModel { get; set; }
+			public IEnumerable<NestedTraverseMappingModel> EnumerableModel { get; set; }
+			public List<NestedTraverseMappingModel> ListModel { get; set; }
+
 		}
 		public class NestedTraverseMappingModel
 		{
@@ -56,7 +61,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping
 			var definition = EntityMapping.RegisterType(typeof(TraverseMappingModel));
 			var result = definition.TraverseProperties().ToArray();
 
-			Assert.AreEqual(14, result.Length);
+			Assert.AreEqual(32, result.Length);
 			Assert.IsTrue(result.Any(m => m.EntityType == typeof(NestedTraverseMappingModel)));
 			Assert.IsTrue(result.Any(m => m.EntityType == typeof(InnerNestedTraverseMappingModel)));
 
@@ -67,12 +72,25 @@ namespace MongoFramework.Tests.Infrastructure.Mapping
 			Assert.IsTrue(result.Any(m => m.FullPath == "NestedModel.InnerModel.InnerMostProperty"));
 			Assert.IsTrue(result.Any(m => m.FullPath == "NestedModel.InnerModel.NestedRecursionType"));
 
-
 			Assert.IsTrue(result.Any(m => m.FullPath == "RepeatedType.PropertyOne"));
 			Assert.IsTrue(result.Any(m => m.FullPath == "RepeatedType.InnerModel"));
 			Assert.IsTrue(result.Any(m => m.FullPath == "RepeatedType.InnerModel.InnerMostProperty"));
 			Assert.IsTrue(result.Any(m => m.FullPath == "RepeatedType.InnerModel.NestedRecursionType"));
-		}
 
+			Assert.IsTrue(result.Any(m => m.FullPath == "ArrayModel"));
+			Assert.IsTrue(result.Any(m => m.FullPath == "ArrayModel.InnerModel"));
+			Assert.IsTrue(result.Any(m => m.FullPath == "ArrayModel.InnerModel.InnerMostProperty"));
+			Assert.IsTrue(result.Any(m => m.FullPath == "ArrayModel.InnerModel.NestedRecursionType"));
+
+			Assert.IsTrue(result.Any(m => m.FullPath == "EnumerableModel"));
+			Assert.IsTrue(result.Any(m => m.FullPath == "EnumerableModel.InnerModel"));
+			Assert.IsTrue(result.Any(m => m.FullPath == "EnumerableModel.InnerModel.InnerMostProperty"));
+			Assert.IsTrue(result.Any(m => m.FullPath == "EnumerableModel.InnerModel.NestedRecursionType"));
+
+			Assert.IsTrue(result.Any(m => m.FullPath == "ListModel"));
+			Assert.IsTrue(result.Any(m => m.FullPath == "ListModel.InnerModel"));
+			Assert.IsTrue(result.Any(m => m.FullPath == "ListModel.InnerModel.InnerMostProperty"));
+			Assert.IsTrue(result.Any(m => m.FullPath == "ListModel.InnerModel.NestedRecursionType"));
+		}
 	}
 }
