@@ -37,6 +37,13 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 			public string MyCustomId { get; set; }
 		}
 
+		public class ExplicitKeyOverridesImplicitIdModel
+		{
+			public string Id { get; set; }
+			[Key]
+			public string ActualKey { get; set; }
+		}
+
 		[TestMethod]
 		public void IdMapsOnAttribute()
 		{
@@ -80,6 +87,18 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 				.Where(cm => cm.ClassType == typeof(ObjectIdGeneratorTestModel)).FirstOrDefault();
 
 			Assert.AreEqual(typeof(ObjectIdGenerator), classMap.IdMemberMap.IdGenerator?.GetType());
+		}
+
+		[TestMethod]
+		public void ExplicitKeyOverridesImplicitId()
+		{
+			EntityMapping.AddMappingProcessor(new EntityIdProcessor());
+			EntityMapping.RegisterType(typeof(ExplicitKeyOverridesImplicitIdModel));
+
+			var classMap = BsonClassMap.GetRegisteredClassMaps()
+				.Where(cm => cm.ClassType == typeof(ExplicitKeyOverridesImplicitIdModel)).FirstOrDefault();
+
+			Assert.AreEqual("ActualKey", classMap.IdMemberMap.MemberName);
 		}
 	}
 }

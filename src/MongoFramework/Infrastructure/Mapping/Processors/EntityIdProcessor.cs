@@ -14,17 +14,14 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 		{
 			var entityType = definition.EntityType;
 
-			//If no Id member map exists, find the first property with the "Key" attribute or is named "Id" and use that
-			if (classMap.IdMemberMap == null)
+			//Find the first property with the "Key" attribute to use as the Id
+			var properties = entityType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+			var idProperty = properties.Where(p => p.GetCustomAttribute<KeyAttribute>() != null).FirstOrDefault();
+			if (idProperty != null)
 			{
-				var properties = entityType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-				var idProperty = properties.Where(p => p.GetCustomAttribute<KeyAttribute>() != null).FirstOrDefault();
-				if (idProperty != null)
-				{
-					classMap.MapIdMember(idProperty);
-				}
+				classMap.MapIdMember(idProperty);
 			}
-			
+
 			//If there is no Id generator, set a default based on the member type
 			if (classMap.IdMemberMap != null && classMap.IdMemberMap.IdGenerator == null)
 			{
