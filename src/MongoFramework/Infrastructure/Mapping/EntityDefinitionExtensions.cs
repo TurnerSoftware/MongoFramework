@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using MongoDB.Bson;
+using MongoFramework.Infrastructure.Internal;
 
 namespace MongoFramework.Infrastructure.Mapping
 {
@@ -84,28 +85,7 @@ namespace MongoFramework.Infrastructure.Mapping
 					yield return property;
 
 					var propertyType = property.PropertyType;
-
-					//Support traversal of array/enumerable item types
-					if (propertyType.IsArray)
-					{
-						propertyType = propertyType.GetElementType();
-					}
-					else if (propertyType.IsGenericType)
-					{
-						if (propertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-						{
-							propertyType = propertyType.GetGenericArguments()[0];
-						}
-						else
-						{
-							var compatibleInterfaces = propertyType.GetInterfaces().Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>));
-							var targetInterface = compatibleInterfaces.FirstOrDefault();
-							if (targetInterface != null)
-							{
-								propertyType = propertyType.GetGenericArguments()[0];
-							}
-						}
-					}
+					propertyType = propertyType.GetEnumerableItemTypeOrDefault();
 
 					if (propertyType.IsClass && !state.SeenTypes.Contains(propertyType))
 					{

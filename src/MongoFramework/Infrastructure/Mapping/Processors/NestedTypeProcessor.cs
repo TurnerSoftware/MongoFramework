@@ -1,4 +1,5 @@
 ﻿using MongoDB.Bson.Serialization;
+using MongoFramework.Infrastructure.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 			foreach (var property in properties)
 			{
 				var propertyType = property.PropertyType;
+				propertyType = propertyType.GetEnumerableItemTypeOrDefault();
 
 				//Maps the property type for handling property nesting
 				if (propertyType.IsClass && propertyType != entityType)
@@ -23,20 +25,6 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 					if (!EntityMapping.IsRegistered(propertyType))
 					{
 						EntityMapping.RegisterType(propertyType);
-					}
-				}
-				else if (
-					propertyType.IsGenericType && propertyType.GetGenericArguments().Count() == 1 &&
-					(
-						propertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>) ||
-						propertyType.GetInterfaces().Where(i => i.IsGenericType).Any(i => i.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-					)
-				)
-				{
-					var genericType = propertyType.GetGenericArguments()[0];
-					if (!EntityMapping.IsRegistered(genericType))
-					{
-						EntityMapping.RegisterType(genericType);
 					}
 				}
 			}
