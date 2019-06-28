@@ -19,7 +19,7 @@ namespace MongoFramework.Infrastructure.Indexing
 				{
 					d.IndexName,
 					d.IndexPriority,
-					IndexModel = GetBaseIndexModel(d)
+					IndexModel = CreateIndexModel(d)
 				})
 				.OrderBy(m => m.IndexPriority)
 				.GroupBy(m => m.IndexName)
@@ -42,13 +42,31 @@ namespace MongoFramework.Infrastructure.Indexing
 				}
 			}
 		}
-		private static CreateIndexModel<TEntity> GetBaseIndexModel(IEntityIndex indexDefinition)
+
+		private static CreateIndexModel<TEntity> CreateIndexModel(IEntityIndex indexDefinition)
 		{
 			var builder = Builders<TEntity>.IndexKeys;
-			var indexDefinitionModel = indexDefinition.SortOrder == IndexSortOrder.Ascending ?
-					builder.Ascending(indexDefinition.Property.FullPath) : builder.Descending(indexDefinition.Property.FullPath);
+			IndexKeysDefinition<TEntity> keyModel;
 
-			return new CreateIndexModel<TEntity>(indexDefinitionModel, new CreateIndexOptions
+			if (indexDefinition.IndexType == IndexType.Text)
+			{
+				keyModel = builder.Text(indexDefinition.Property.FullPath);
+			}
+			else if (indexDefinition.IndexType == IndexType._2dSphere)
+			{
+				keyModel = builder.Geo2DSphere(indexDefinition.Property.FullPath);
+			}
+			else if (indexDefinition.IndexType == IndexType.GeoHaystack)
+			{
+				keyModel = builder.GeoHaystack(indexDefinition.Property.FullPath);
+			}
+			else
+			{
+				keyModel = indexDefinition.SortOrder == IndexSortOrder.Ascending ?
+					builder.Ascending(indexDefinition.Property.FullPath) : builder.Descending(indexDefinition.Property.FullPath);
+			}
+
+			return new CreateIndexModel<TEntity>(keyModel, new CreateIndexOptions
 			{
 				Name = indexDefinition.IndexName,
 				Unique = indexDefinition.IsUnique,

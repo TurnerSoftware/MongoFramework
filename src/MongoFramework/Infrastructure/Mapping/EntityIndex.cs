@@ -8,5 +8,6 @@ namespace MongoFramework.Infrastructure.Mapping
 		public bool IsUnique { get; set; }
 		public IndexSortOrder SortOrder { get; set; }
 		public int IndexPriority { get; set; }
+		public IndexType IndexType { get; set; }
 	}
 }
