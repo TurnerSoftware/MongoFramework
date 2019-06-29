@@ -56,10 +56,6 @@ namespace MongoFramework.Infrastructure.Indexing
 			{
 				keyModel = builder.Geo2DSphere(indexDefinition.Property.FullPath);
 			}
-			else if (indexDefinition.IndexType == IndexType.GeoHaystack)
-			{
-				keyModel = builder.GeoHaystack(indexDefinition.Property.FullPath);
-			}
 			else
 			{
 				keyModel = indexDefinition.SortOrder == IndexSortOrder.Ascending ?

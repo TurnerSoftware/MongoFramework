@@ -8,7 +8,6 @@ namespace MongoFramework
 	{
 		Standard = 0,
 		Text = 1,
-		_2dSphere = 2,
-		GeoHaystack = 3
+		_2dSphere = 2
 	}
 }
