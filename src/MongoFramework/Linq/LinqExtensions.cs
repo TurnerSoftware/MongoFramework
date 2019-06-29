@@ -1,4 +1,7 @@
-﻿using MongoFramework.Infrastructure.Linq;
+﻿using MongoDB.Driver;
+using MongoDB.Driver.GeoJsonObjectModel;
+using MongoDB.Driver.Linq;
+using MongoFramework.Infrastructure.Linq;
 using MongoFramework.Infrastructure.Mapping;
 using System;
 using System.Collections;
@@ -46,6 +49,34 @@ namespace MongoFramework.Linq
 			);
 
 			return queryable.Where(expression);
+		}
+
+		private static IQueryable<TEntity> WhereFilter<TEntity>(this IQueryable<TEntity> queryable, Func<FilterDefinitionBuilder<TEntity>, FilterDefinition<TEntity>> queryFilter)
+		{
+			var definition = queryFilter.Invoke(Builders<TEntity>.Filter);
+			return queryable.Where(e => definition.Inject());
+		}
+
+		public static IQueryable<TEntity> SearchText<TEntity>(this IQueryable<TEntity> queryable, string search)
+		{
+			return queryable.WhereFilter(b => b.Text(search));
+		}
+
+		public static IQueryable<TEntity> SearchNear<TEntity>(this IQueryable<TEntity> queryable, Expression<Func<TEntity, object>> field, double x, double y, double? maxDistance = null, double? minDistance = null)
+		{
+			return queryable.WhereFilter(b => b.Near(field, x, y, maxDistance, minDistance));
+		}
+		public static IQueryable<TEntity> SearchNearSphere<TEntity>(this IQueryable<TEntity> queryable, Expression<Func<TEntity, object>> field, double x, double y, double? maxDistance = null, double? minDistance = null)
+		{
+			return queryable.WhereFilter(b => b.NearSphere(field, x, y, maxDistance, minDistance));
+		}
+		public static IQueryable<TEntity> SearchGeoWithinCenterSphere<TEntity>(this IQueryable<TEntity> queryable, Expression<Func<TEntity, object>> field, double x, double y, double radius)
+		{
+			return queryable.WhereFilter(b => b.GeoWithinCenterSphere(field, x, y, radius));
+		}
+		public static IQueryable<TEntity> SearchGeoIntersecting<TEntity, TCoordinates>(this IQueryable<TEntity> queryable, Expression<Func<TEntity, object>> field, GeoJsonGeometry<TCoordinates> geometry) where TCoordinates : GeoJsonCoordinates
+		{
+			return queryable.WhereFilter(b => b.GeoIntersects(field, geometry));
 		}
 	}
 }
