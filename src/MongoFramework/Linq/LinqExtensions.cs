@@ -62,15 +62,33 @@ namespace MongoFramework.Linq
 			return queryable.WhereFilter(b => b.Text(search));
 		}
 
-		public static IQueryable<TEntity> SearchNear<TEntity>(this IQueryable<TEntity> queryable, Expression<Func<TEntity, object>> field, double x, double y, double? maxDistance = null, double? minDistance = null)
+		public static IQueryable<TEntity> SearchNear<TEntity, TCoordinates>(this IQueryable<TEntity> queryable, Expression<Func<TEntity, object>> field, GeoJsonPoint<TCoordinates> point) where TCoordinates : GeoJsonCoordinates
 		{
-			return queryable.WhereFilter(b => b.Near(field, x, y, maxDistance, minDistance));
+			return queryable.WhereFilter(b => b.Near(field, point));
 		}
-		public static IQueryable<TEntity> SearchNearSphere<TEntity>(this IQueryable<TEntity> queryable, Expression<Func<TEntity, object>> field, double x, double y, double? maxDistance = null, double? minDistance = null)
+		public static IQueryable<TEntity> SearchNear<TEntity, TCoordinates>(this IQueryable<TEntity> queryable, Expression<Func<TEntity, object>> field, GeoJsonPoint<TCoordinates> point, double maxDistance) where TCoordinates : GeoJsonCoordinates
 		{
-			return queryable.WhereFilter(b => b.NearSphere(field, x, y, maxDistance, minDistance));
+			return queryable.WhereFilter(b => b.Near(field, point, maxDistance));
 		}
-		public static IQueryable<TEntity> SearchGeoWithinCenterSphere<TEntity>(this IQueryable<TEntity> queryable, Expression<Func<TEntity, object>> field, double x, double y, double radius)
+		public static IQueryable<TEntity> SearchNear<TEntity, TCoordinates>(this IQueryable<TEntity> queryable, Expression<Func<TEntity, object>> field, GeoJsonPoint<TCoordinates> point, double maxDistance, double minDistance) where TCoordinates : GeoJsonCoordinates
+		{
+			return queryable.WhereFilter(b => b.Near(field, point, maxDistance, minDistance));
+		}
+
+		public static IQueryable<TEntity> SearchNearSphere<TEntity, TCoordinates>(this IQueryable<TEntity> queryable, Expression<Func<TEntity, object>> field, GeoJsonPoint<TCoordinates> point) where TCoordinates : GeoJsonCoordinates
+		{
+			return queryable.WhereFilter(b => b.NearSphere(field, point));
+		}
+		public static IQueryable<TEntity> SearchNearSphere<TEntity, TCoordinates>(this IQueryable<TEntity> queryable, Expression<Func<TEntity, object>> field, GeoJsonPoint<TCoordinates> point, double maxDistance) where TCoordinates : GeoJsonCoordinates
+		{
+			return queryable.WhereFilter(b => b.NearSphere(field, point, maxDistance));
+		}
+		public static IQueryable<TEntity> SearchNearSphere<TEntity, TCoordinates>(this IQueryable<TEntity> queryable, Expression<Func<TEntity, object>> field, GeoJsonPoint<TCoordinates> point, double maxDistance, double minDistance) where TCoordinates : GeoJsonCoordinates
+		{
+			return queryable.WhereFilter(b => b.NearSphere(field, point, maxDistance, minDistance));
+		}
+
+		public static IQueryable<TEntity> SearchGeoWithinCenterSphere<TEntity, TCoordinates>(this IQueryable<TEntity> queryable, Expression<Func<TEntity, object>> field, double x, double y, double radius)
 		{
 			return queryable.WhereFilter(b => b.GeoWithinCenterSphere(field, x, y, radius));
 		}
