@@ -52,7 +52,7 @@ namespace MongoFramework.Infrastructure.Indexing
 			{
 				keyModel = builder.Text(indexDefinition.Property.FullPath);
 			}
-			else if (indexDefinition.IndexType == IndexType._2dSphere)
+			else if (indexDefinition.IndexType == IndexType.Geo2dSphere)
 			{
 				keyModel = builder.Geo2DSphere(indexDefinition.Property.FullPath);
 			}
