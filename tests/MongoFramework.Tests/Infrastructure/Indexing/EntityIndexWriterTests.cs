@@ -24,6 +24,14 @@ namespace MongoFramework.Tests.Infrastructure.Indexing
 			public GeoJsonPoint<GeoJson2DGeographicCoordinates> IndexedGeo { get; set; }
 		}
 
+		public class MultipleTextIndexModel
+		{
+			[Index(IndexType.Text)]
+			public string IndexedTextOne { get; set; }
+			[Index(IndexType.Text)]
+			public string IndexedTextTwo { get; set; }
+		}
+
 		public class NoIndexModel
 		{
 			public string Id { get; set; }
@@ -71,6 +79,16 @@ namespace MongoFramework.Tests.Infrastructure.Indexing
 			var indexWriter = new EntityIndexWriter<NoIndexModel>(connection);
 
 			await AssertExtensions.DoesNotThrowAsync<Exception>(async () => await indexWriter.ApplyIndexingAsync().ConfigureAwait(false)).ConfigureAwait(false);
+		}
+
+
+		[TestMethod, ExpectedException(typeof(Exception), AllowDerivedTypes = true)]
+		public void FailureFromMultipleTextIndexes()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var indexWriter = new EntityIndexWriter<MultipleTextIndexModel>(connection);
+
+			indexWriter.ApplyIndexing();
 		}
 	}
 }
