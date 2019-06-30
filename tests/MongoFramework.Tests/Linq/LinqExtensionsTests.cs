@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoFramework.Attributes;
 using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Linq;
 using MongoFramework.Infrastructure.Mapping;
@@ -31,6 +32,14 @@ namespace MongoFramework.Tests.Linq
 		{
 			public string Id { get; set; }
 			public string Description { get; set; }
+		}
+
+		public class SearchTextModel
+		{
+			public string Id { get; set; }
+			[Index(IndexType.Text)]
+			public string Text { get; set; }
+			public int MiscField { get; set; }
 		}
 
 		[TestMethod]
@@ -133,6 +142,32 @@ namespace MongoFramework.Tests.Linq
 
 			Assert.AreEqual(2, idMatchQueryable.Count());
 			Assert.IsTrue(idMatchQueryable.ToList().All(e => entityIds.Contains(e.Id)));
+		}
+
+		[TestMethod]
+		public void SearchText()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var dbSet = new MongoDbSet<SearchTextModel>();
+			dbSet.SetConnection(connection);
+
+			dbSet.AddRange(new SearchTextModel[]
+			{
+				new SearchTextModel { MiscField = 1, Text = "The quick brown fox jumps over the lazy dog." },
+				new SearchTextModel { MiscField = 2, Text = "The five boxing wizards jump quickly." },
+				new SearchTextModel { MiscField = 3, Text = "The quick brown fox jumps over the lazy dog." },
+				new SearchTextModel { MiscField = 4, Text = "Jived fox nymph grabs quick waltz." },
+			});
+			dbSet.SaveChanges();
+
+			Assert.AreEqual(4, dbSet.SearchText("quick").Count());
+			Assert.AreEqual(0, dbSet.SearchText("the").Count()); //Stop words aren't used in text indexes: https://docs.mongodb.com/manual/core/index-text/#supported-languages-and-stop-words
+			Assert.AreEqual(2, dbSet.SearchText("dog").Count());
+			Assert.AreEqual(1, dbSet.SearchText("jived").Count());
+
+			//The order of commands matter for building the pipeline
+			Assert.ThrowsException<MongoCommandException>(() => dbSet.Where(e => e.MiscField == 1).SearchText("quick").Count());
+			Assert.AreEqual(1, dbSet.SearchText("quick").Where(e => e.MiscField == 3).Count());
 		}
 	}
 }
