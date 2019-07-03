@@ -43,8 +43,9 @@ namespace MongoFramework.Infrastructure
 
 		private IQueryable<EntityBucket<TGroup, TSubEntity>> QueryDatabase()
 		{
-			var queryable = EntityReader.AsQueryable() as IMongoFrameworkQueryable<EntityBucket<TGroup, TSubEntity>, EntityBucket<TGroup, TSubEntity>>;
-			queryable.EntityProcessors.Add(new EntityTrackingProcessor<EntityBucket<TGroup, TSubEntity>>(ChangeTracker));
+			var queryable = EntityReader.AsQueryable();
+			var provider = queryable.Provider as IMongoFrameworkQueryProvider<EntityBucket<TGroup, TSubEntity>>;
+			provider.EntityProcessors.Add(new EntityTrackingProcessor<EntityBucket<TGroup, TSubEntity>>(ChangeTracker));
 			return queryable;
 		}
 

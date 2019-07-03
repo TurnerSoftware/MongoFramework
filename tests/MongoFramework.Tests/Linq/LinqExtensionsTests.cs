@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.GeoJsonObjectModel;
 using MongoFramework.Attributes;
 using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Linq;
@@ -42,15 +43,27 @@ namespace MongoFramework.Tests.Linq
 			public int MiscField { get; set; }
 		}
 
+		public class SearchGeoModel
+		{
+			public string Id { get; set; }
+			[Index("NearIndex", IndexType.Geo2dSphere)]
+			public GeoJsonPoint<GeoJson2DGeographicCoordinates> CoordinatesNear { get; set; }
+			[Index("NearSphereIndex", IndexType.Geo2dSphere)]
+			public GeoJsonPoint<GeoJson2DGeographicCoordinates> CoordinatesNearSphere { get; set; }
+			[Index("GeoWithinIndex", IndexType.Geo2dSphere)]
+			public GeoJsonPoint<GeoJson2DGeographicCoordinates> CoordinatesGeoWithin { get; set; }
+			[Index("GeoIntersectsIndex", IndexType.Geo2dSphere)]
+			public GeoJsonPoint<GeoJson2DGeographicCoordinates> CoordinatesGeoIntersects { get; set; }
+		}
+
 		[TestMethod]
 		public void ValidToQuery()
 		{
 			EntityMapping.RegisterType(typeof(LinqExtensionsModel));
 
 			var connection = TestConfiguration.GetConnection();
-			var collection = connection.GetDatabase().GetCollection<LinqExtensionsModel>(nameof(LinqExtensionsModel));
-			var underlyingQueryable = collection.AsQueryable();
-			var queryable = new MongoFrameworkQueryable<LinqExtensionsModel, LinqExtensionsModel>(connection, underlyingQueryable);
+			var provider = new MongoFrameworkQueryProvider<LinqExtensionsModel>(connection);
+			var queryable = new MongoFrameworkQueryable<LinqExtensionsModel>(provider);
 			var result = LinqExtensions.ToQuery(queryable);
 
 			Assert.AreEqual("db.LinqExtensionsModel.aggregate([])", result);
@@ -78,10 +91,9 @@ namespace MongoFramework.Tests.Linq
 			writerPipeline.AddCollection(entityCollection);
 			writerPipeline.Write();
 
-			var collection = TestConfiguration.GetConnection().GetDatabase().GetCollection<WhereIdMatchesGuidModel>(nameof(WhereIdMatchesGuidModel));
-			var underlyingQueryable = collection.AsQueryable();
-			var queryable = new MongoFrameworkQueryable<WhereIdMatchesGuidModel, WhereIdMatchesGuidModel>(connection, underlyingQueryable);
-
+			var provider = new MongoFrameworkQueryProvider<WhereIdMatchesGuidModel>(connection);
+			var queryable = new MongoFrameworkQueryable<WhereIdMatchesGuidModel>(provider);
+			
 			var entityIds = entityCollection.Select(e => e.Id).Take(2);
 
 			var idMatchQueryable = LinqExtensions.WhereIdMatches(queryable, entityIds);
@@ -105,10 +117,9 @@ namespace MongoFramework.Tests.Linq
 			writerPipeline.AddCollection(entityCollection);
 			writerPipeline.Write();
 
-			var collection = connection.GetDatabase().GetCollection<WhereIdMatchesObjectIdModel>(nameof(WhereIdMatchesObjectIdModel));
-			var underlyingQueryable = collection.AsQueryable();
-			var queryable = new MongoFrameworkQueryable<WhereIdMatchesObjectIdModel, WhereIdMatchesObjectIdModel>(connection, underlyingQueryable);
-
+			var provider = new MongoFrameworkQueryProvider<WhereIdMatchesObjectIdModel>(connection);
+			var queryable = new MongoFrameworkQueryable<WhereIdMatchesObjectIdModel>(provider);
+			
 			var entityIds = entityCollection.Select(e => e.Id).Take(2);
 
 			var idMatchQueryable = LinqExtensions.WhereIdMatches(queryable, entityIds);
@@ -132,10 +143,9 @@ namespace MongoFramework.Tests.Linq
 			writerPipeline.AddCollection(entityCollection);
 			writerPipeline.Write();
 
-			var collection = connection.GetDatabase().GetCollection<WhereIdMatchesStringModel>(nameof(WhereIdMatchesStringModel));
-			var underlyingQueryable = collection.AsQueryable();
-			var queryable = new MongoFrameworkQueryable<WhereIdMatchesStringModel, WhereIdMatchesStringModel>(connection, underlyingQueryable);
-
+			var provider = new MongoFrameworkQueryProvider<WhereIdMatchesStringModel>(connection);
+			var queryable = new MongoFrameworkQueryable<WhereIdMatchesStringModel>(provider);
+			
 			var entityIds = entityCollection.Select(e => e.Id).Take(2);
 
 			var idMatchQueryable = LinqExtensions.WhereIdMatches(queryable, entityIds);
@@ -168,6 +178,42 @@ namespace MongoFramework.Tests.Linq
 			//The order of commands matter for building the pipeline
 			Assert.ThrowsException<MongoCommandException>(() => dbSet.Where(e => e.MiscField == 1).SearchText("quick").Count());
 			Assert.AreEqual(1, dbSet.SearchText("quick").Where(e => e.MiscField == 3).Count());
+		}
+
+		[TestMethod]
+		public void SearchNear()
+		{
+			//var connection = TestConfiguration.GetConnection();
+			//var dbSet = new MongoDbSet<SearchGeoModel>();
+			//dbSet.SetConnection(connection);
+
+			//dbSet.AddRange(new SearchGeoModel[]
+			//{
+			//	new SearchGeoModel { CoordinatesNear = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
+			//		new GeoJson2DGeographicCoordinates(-73.944, 40.661)
+			//	) },
+			//	new SearchGeoModel { CoordinatesNear = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
+			//		new GeoJson2DGeographicCoordinates(138.601111, -34.928889)
+			//	) },
+			//	new SearchGeoModel { CoordinatesNear = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
+			//		new GeoJson2DGeographicCoordinates(144.963056, -37.813611)
+			//	) },
+			//	new SearchGeoModel { CoordinatesNear = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
+			//		new GeoJson2DGeographicCoordinates(151.209444, -33.865)
+			//	) }
+			//});
+			//dbSet.SaveChanges();
+
+			//SearchGeoModel[] results;
+
+			//var enumerable = dbSet.SearchGeoNear(q => q, e => e.CoordinatesNear, new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
+			//	new GeoJson2DGeographicCoordinates(135, 30)
+			//), true);
+
+
+			//results = enumerable.ToArray();
+			//Assert.AreEqual(4, results.Count());
+			//Assert.AreEqual(new GeoJson2DGeographicCoordinates(138.601111, -34.928889), results[0]);
 		}
 	}
 }

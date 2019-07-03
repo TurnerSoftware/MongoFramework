@@ -18,15 +18,15 @@ namespace MongoFramework.Infrastructure.Diagnostics
 		{
 			Connection = connection;
 		}
-		public static DiagnosticRunner Start<TEntity, TOutput>(IMongoDbConnection connection, IMongoFrameworkQueryProvider<TEntity, TOutput> provider) where TEntity : class
+		public static DiagnosticRunner Start<TEntity>(IMongoDbConnection connection, AggregateExecutionModel model) where TEntity : class
 		{
 			var runner = new DiagnosticRunner(connection);
 			connection.DiagnosticListener.OnNext(new ReadDiagnosticCommand
 			{
 				CommandId = runner.CommandId,
 				CommandState = CommandState.Start,
-				EntityType = typeof(TOutput),
-				Query = provider.ToQuery()
+				EntityType = model.Serializer.ValueType,
+				Query = QueryHelper.GetQuery<TEntity>(model)
 			});
 			return runner;
 		}

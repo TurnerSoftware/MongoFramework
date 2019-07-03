@@ -32,9 +32,8 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
 
 			var connection = TestConfiguration.GetConnection();
-			var collection = connection.GetDatabase().GetCollection<MongoFrameworkQueryableModel>(nameof(MongoFrameworkQueryableModel));
-			var underlyingQueryable = collection.AsQueryable();
-			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel, MongoFrameworkQueryableModel>(connection, underlyingQueryable);
+			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
+			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
 
 			var entityCollection = new EntityCollection<MongoFrameworkQueryableModel>();
 			var writerPipeline = new EntityWriterPipeline<MongoFrameworkQueryableModel>(connection);
@@ -54,12 +53,11 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
 
 			var connection = TestConfiguration.GetConnection();
-			var collection = connection.GetDatabase().GetCollection<MongoFrameworkQueryableModel>(nameof(MongoFrameworkQueryableModel));
-			var underlyingQueryable = collection.AsQueryable();
-			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel, MongoFrameworkQueryableModel>(connection, underlyingQueryable);
+			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
+			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
 
 			var processor = new TestProcessor<MongoFrameworkQueryableModel>();
-			queryable.EntityProcessors.Add(processor);
+			provider.EntityProcessors.Add(processor);
 
 			var entityCollection = new EntityCollection<MongoFrameworkQueryableModel>();
 			var writerPipeline = new EntityWriterPipeline<MongoFrameworkQueryableModel>(connection);
@@ -81,12 +79,11 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
 
 			var connection = TestConfiguration.GetConnection();
-			var collection = connection.GetDatabase().GetCollection<MongoFrameworkQueryableModel>(nameof(MongoFrameworkQueryableModel));
-			var underlyingQueryable = collection.AsQueryable();
-			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel, MongoFrameworkQueryableModel>(connection, underlyingQueryable);
+			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
+			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
 
 			var processor = new TestProcessor<MongoFrameworkQueryableModel>();
-			queryable.EntityProcessors.Add(processor);
+			provider.EntityProcessors.Add(processor);
 
 			var entityCollection = new EntityCollection<MongoFrameworkQueryableModel>();
 			var writerPipeline = new EntityWriterPipeline<MongoFrameworkQueryableModel>(connection);
@@ -108,12 +105,11 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
 
 			var connection = TestConfiguration.GetConnection();
-			var collection = connection.GetDatabase().GetCollection<MongoFrameworkQueryableModel>(nameof(MongoFrameworkQueryableModel));
-			var underlyingQueryable = collection.AsQueryable();
-			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel, MongoFrameworkQueryableModel>(connection, underlyingQueryable);
+			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
+			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
 
 			var processor = new TestProcessor<MongoFrameworkQueryableModel>();
-			queryable.EntityProcessors.Add(processor);
+			provider.EntityProcessors.Add(processor);
 
 			var entityCollection = new EntityCollection<MongoFrameworkQueryableModel>();
 			var writerPipeline = new EntityWriterPipeline<MongoFrameworkQueryableModel>(connection);
