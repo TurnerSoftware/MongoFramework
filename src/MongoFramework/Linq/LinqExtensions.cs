@@ -1,10 +1,13 @@
-﻿using MongoDB.Driver;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Driver;
 using MongoDB.Driver.GeoJsonObjectModel;
 using MongoDB.Driver.Linq;
 using MongoFramework.Infrastructure.Linq;
 using MongoFramework.Infrastructure.Mapping;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -57,44 +60,56 @@ namespace MongoFramework.Linq
 			return queryable.Where(e => definition.Inject());
 		}
 
-		public static IQueryable<TEntity> SearchText<TEntity>(this IQueryable<TEntity> queryable, string search)
+		public static IQueryable<TEntity> SearchText<TEntity>(this IMongoDbSet<TEntity> dbSet, string search) where TEntity : class
 		{
-			return queryable.WhereFilter(b => b.Text(search));
+			return dbSet.WhereFilter(b => b.Text(search));
 		}
 
-		public static IQueryable<TEntity> SearchNear<TEntity, TCoordinates>(this IQueryable<TEntity> queryable, Expression<Func<TEntity, object>> field, GeoJsonPoint<TCoordinates> point) where TCoordinates : GeoJsonCoordinates
-		{
-			return queryable.WhereFilter(b => b.Near(field, point));
-		}
-		public static IQueryable<TEntity> SearchNear<TEntity, TCoordinates>(this IQueryable<TEntity> queryable, Expression<Func<TEntity, object>> field, GeoJsonPoint<TCoordinates> point, double maxDistance) where TCoordinates : GeoJsonCoordinates
-		{
-			return queryable.WhereFilter(b => b.Near(field, point, maxDistance));
-		}
-		public static IQueryable<TEntity> SearchNear<TEntity, TCoordinates>(this IQueryable<TEntity> queryable, Expression<Func<TEntity, object>> field, GeoJsonPoint<TCoordinates> point, double maxDistance, double minDistance) where TCoordinates : GeoJsonCoordinates
-		{
-			return queryable.WhereFilter(b => b.Near(field, point, maxDistance, minDistance));
-		}
-
-		public static IQueryable<TEntity> SearchNearSphere<TEntity, TCoordinates>(this IQueryable<TEntity> queryable, Expression<Func<TEntity, object>> field, GeoJsonPoint<TCoordinates> point) where TCoordinates : GeoJsonCoordinates
-		{
-			return queryable.WhereFilter(b => b.NearSphere(field, point));
-		}
-		public static IQueryable<TEntity> SearchNearSphere<TEntity, TCoordinates>(this IQueryable<TEntity> queryable, Expression<Func<TEntity, object>> field, GeoJsonPoint<TCoordinates> point, double maxDistance) where TCoordinates : GeoJsonCoordinates
-		{
-			return queryable.WhereFilter(b => b.NearSphere(field, point, maxDistance));
-		}
-		public static IQueryable<TEntity> SearchNearSphere<TEntity, TCoordinates>(this IQueryable<TEntity> queryable, Expression<Func<TEntity, object>> field, GeoJsonPoint<TCoordinates> point, double maxDistance, double minDistance) where TCoordinates : GeoJsonCoordinates
-		{
-			return queryable.WhereFilter(b => b.NearSphere(field, point, maxDistance, minDistance));
-		}
-
-		public static IQueryable<TEntity> SearchGeoWithinCenterSphere<TEntity, TCoordinates>(this IQueryable<TEntity> queryable, Expression<Func<TEntity, object>> field, double x, double y, double radius)
-		{
-			return queryable.WhereFilter(b => b.GeoWithinCenterSphere(field, x, y, radius));
-		}
 		public static IQueryable<TEntity> SearchGeoIntersecting<TEntity, TCoordinates>(this IQueryable<TEntity> queryable, Expression<Func<TEntity, object>> field, GeoJsonGeometry<TCoordinates> geometry) where TCoordinates : GeoJsonCoordinates
 		{
 			return queryable.WhereFilter(b => b.GeoIntersects(field, geometry));
+		}
+
+
+		public static IQueryable<TEntity> SearchGeoNear<TEntity, TCoordinates>(this IMongoDbSet<TEntity> dbSet, Expression<Func<TEntity, object>> targetField, GeoJsonPoint<TCoordinates> point, Expression<Func<TEntity, object>> distanceResultField = null, bool spherical = true, double? maxDistance = null, double? minDistance = null) where TEntity : class where TCoordinates : GeoJsonCoordinates
+		{
+			var entitySerializer = BsonSerializer.LookupSerializer<TEntity>();
+			var keyExpressionField = new ExpressionFieldDefinition<TEntity>(targetField);
+			var keyStringField = keyExpressionField.Render(entitySerializer, BsonSerializer.SerializerRegistry);
+
+			var distanceFieldName = "Distance";
+			if (distanceResultField != null)
+			{
+				var distanceResultExpressionField = new ExpressionFieldDefinition<TEntity>(distanceResultField);
+				var distanceResultStringField = distanceResultExpressionField.Render(entitySerializer, BsonSerializer.SerializerRegistry);
+				distanceFieldName = distanceResultStringField.FieldName;
+			}
+			
+			var geoNearSettings = new BsonDocument
+			{
+				{ "near", point.ToBsonDocument() },
+				{ "spherical", spherical },
+				{ "key", keyStringField.FieldName },
+				{ "distanceField", distanceFieldName }
+			};
+
+			if (maxDistance.HasValue)
+			{
+				geoNearSettings.Add("maxDistance", maxDistance.Value);
+			}
+			if (minDistance.HasValue)
+			{
+				geoNearSettings.Add("minDistance", minDistance.Value);
+			}
+
+			var stage = new BsonDocument
+			{
+				{ "$geoNear", geoNearSettings }
+			};
+
+			var originalProvider = dbSet.Provider as IMongoFrameworkQueryProvider<TEntity>;
+			var provider = new MongoFrameworkQueryProvider<TEntity>(originalProvider, stage);
+			return new MongoFrameworkQueryable<TEntity>(provider);
 		}
 	}
 }
