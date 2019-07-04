@@ -32,7 +32,10 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 
 				if (extraElementsProperty != null && typeof(IDictionary<string, object>).IsAssignableFrom(extraElementsProperty.PropertyInfo.PropertyType))
 				{
-					classMap.SetExtraElementsMember(new BsonMemberMap(classMap, extraElementsProperty.PropertyInfo));
+					var memberMap = classMap.DeclaredMemberMaps
+						.Where(m => m.MemberInfo == extraElementsProperty.PropertyInfo)
+						.FirstOrDefault();
+					classMap.SetExtraElementsMember(memberMap);
 				}
 			}
 		}
