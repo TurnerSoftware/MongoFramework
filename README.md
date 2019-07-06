@@ -11,7 +11,7 @@ MongoFramework tries to bring some of the nice features from Entity Framework in
 
 Some of the major features include:
 - Entity mapping for collections, IDs and properties through attributes
-- Indexing through attributes
+- Indexing through attributes (including text and geospatial)
 - Entity change tracking
 - Changeset support (allowing for queuing multiple DB updates to run at once)
 - Diff-updates (only _changes_ to an entity to be written)
@@ -58,10 +58,19 @@ public class IndexExample
 }
 ```
 
-[Single field](https://docs.mongodb.com/manual/core/index-single/), [compound](https://docs.mongodb.com/manual/core/index-compound/#compound-indexes) and [multikey indexes](https://docs.mongodb.com/manual/core/index-multikey/) are supported through the `IndexAttribute`.
+The following variations of indexes are supported across various property types:
+- [Single field](https://docs.mongodb.com/manual/core/index-single/)
+- [Compound](https://docs.mongodb.com/manual/core/index-compound/#compound-indexes)
+- [Multikey indexes](https://docs.mongodb.com/manual/core/index-multikey/)
 
 To support compound indexes, define indexes with the same name across multiple properties.
 When doing this, you will want to control the order of the individual items in the compound index which is available through the `IndexPriority` property on the attribute. 
+
+#### Special Index Types
+MongoFramework supports [Text](https://docs.mongodb.com/manual/core/index-text/) and [2dSphere](https://docs.mongodb.com/manual/core/2dsphere/) special indexes.
+These special index types are selected through the `IndexType` property on the Index attribute.
+
+MongoDB does have restrictions on how these indexes are used, please consult MongoDB's documentation on when the indexes are appropriate and how they are restricted.
 
 ### Contexts and Connections
 Like Entity Framework, MongoFramework is built around contexts - specifically the `MongoDbContext`.
@@ -92,6 +101,18 @@ connection = MongoDbConnection.FromConnectionString("mongodb://localhost:27017/M
 //FromConfig (Note: .NET Framework only)
 connection = MongoDbConnection.FromConfig("MyConnectionStringName");
 ```
+
+### Special Queries
+You can perform text queries (against a Text index), geoNear queries (with a 2dSphere index) and geo intersecting queries.
+
+```csharp
+myContext.MyDbSet.SearchText("text to search");
+myContext.MyDbSet.SearchGeoIntersecting(e => e.FieldWithCoordinates, yourGeoJsonPolygon);
+myContext.MyDbSet.SearchGeoNear(e => e.FieldWithCoordinates, yourGeoJsonPoint);
+```
+
+Each of these returns an `IQueryable` which you can continue to narrow down the results.
+For `SearchGeoNear` specifically, there are optional parameters for setting the distance result field, the minimum distance and the maximum distance.
 
 ### Entity Buckets
 Entity buckets are a method of storing many smaller documents in fewer larger documents. MongoFramework provides various classes that help in creating and managing buckets.
