@@ -70,7 +70,7 @@ When doing this, you will want to control the order of the individual items in t
 MongoFramework supports [Text](https://docs.mongodb.com/manual/core/index-text/) and [2dSphere](https://docs.mongodb.com/manual/core/2dsphere/) special indexes.
 These special index types are selected through the `IndexType` property on the Index attribute.
 
-MongoDB does have restrictions on how these indexes are used, please consult MongoDB's documentation on when the indexes are appropriate and how they are restricted.
+Please consult MongoDB's documentation on when the indexes are appropriate and their restrictions.
 
 ### Contexts and Connections
 Like Entity Framework, MongoFramework is built around contexts - specifically the `MongoDbContext`.
@@ -103,7 +103,7 @@ connection = MongoDbConnection.FromConfig("MyConnectionStringName");
 ```
 
 ### Special Queries
-You can perform text queries (against a Text index), geoNear queries (with a 2dSphere index) and geo intersecting queries.
+You can perform text queries (with a Text index), geospatial distance queries (with a 2dSphere index) and geospatial intersecting queries.
 
 ```csharp
 myContext.MyDbSet.SearchText("text to search");
@@ -111,7 +111,7 @@ myContext.MyDbSet.SearchGeoIntersecting(e => e.FieldWithCoordinates, yourGeoJson
 myContext.MyDbSet.SearchGeoNear(e => e.FieldWithCoordinates, yourGeoJsonPoint);
 ```
 
-Each of these returns an `IQueryable` which you can continue to narrow down the results.
+Each of these returns an `IQueryable` which you can continue to narrow down the results like you would normally with LINQ.
 For `SearchGeoNear` specifically, there are optional parameters for setting the distance result field, the minimum distance and the maximum distance.
 
 ### Entity Buckets
