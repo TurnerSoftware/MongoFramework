@@ -71,7 +71,7 @@ namespace MongoFramework.Linq
 		}
 
 
-		public static IQueryable<TEntity> SearchGeoNear<TEntity, TCoordinates>(this IMongoDbSet<TEntity> dbSet, Expression<Func<TEntity, object>> targetField, GeoJsonPoint<TCoordinates> point, Expression<Func<TEntity, object>> distanceResultField = null, bool spherical = true, double? maxDistance = null, double? minDistance = null) where TEntity : class where TCoordinates : GeoJsonCoordinates
+		public static IQueryable<TEntity> SearchGeoNear<TEntity, TCoordinates>(this IMongoDbSet<TEntity> dbSet, Expression<Func<TEntity, object>> targetField, GeoJsonPoint<TCoordinates> point, Expression<Func<TEntity, object>> distanceResultField = null, double? maxDistance = null, double? minDistance = null) where TEntity : class where TCoordinates : GeoJsonCoordinates
 		{
 			var entitySerializer = BsonSerializer.LookupSerializer<TEntity>();
 			var keyExpressionField = new ExpressionFieldDefinition<TEntity>(targetField);
@@ -88,7 +88,6 @@ namespace MongoFramework.Linq
 			var geoNearSettings = new BsonDocument
 			{
 				{ "near", point.ToBsonDocument() },
-				{ "spherical", spherical },
 				{ "key", keyStringField.FieldName },
 				{ "distanceField", distanceFieldName }
 			};
