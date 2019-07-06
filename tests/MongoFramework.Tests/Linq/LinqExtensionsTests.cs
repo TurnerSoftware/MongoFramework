@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using MongoDB.Driver.GeoJsonObjectModel;
 using MongoFramework.Attributes;
 using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Linq;
@@ -42,20 +41,6 @@ namespace MongoFramework.Tests.Linq
 			[Index(IndexType.Text)]
 			public string Text { get; set; }
 			public int MiscField { get; set; }
-		}
-
-		public class SearchGeoModel
-		{
-			public string Id { get; set; }
-			public string Description { get; set; }
-			[Index(IndexType.Geo2dSphere)]
-			public GeoJsonPoint<GeoJson2DGeographicCoordinates> PrimaryCoordinates { get; set; }
-			[Index(IndexType.Geo2dSphere)]
-			public GeoJsonPoint<GeoJson2DGeographicCoordinates> SecondaryCoordinates { get; set; }
-
-			[ExtraElements]
-			public IDictionary<string, object> ExtraElements { get; set; }
-			public double CustomDistanceField { get; set; }
 		}
 
 		[TestMethod]
@@ -178,48 +163,6 @@ namespace MongoFramework.Tests.Linq
 			Assert.AreEqual(1, dbSet.SearchText("jived").Count());
 
 			Assert.AreEqual(1, dbSet.SearchText("quick").Where(e => e.MiscField == 3).Count());
-		}
-
-		[TestMethod]
-		public void SearchNear()
-		{
-			var connection = TestConfiguration.GetConnection();
-			var dbSet = new MongoDbSet<SearchGeoModel>();
-			dbSet.SetConnection(connection);
-
-			dbSet.AddRange(new SearchGeoModel[]
-			{
-				new SearchGeoModel { Description = "New York", PrimaryCoordinates = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
-					new GeoJson2DGeographicCoordinates(-74.005974, 40.712776)
-				) },
-				new SearchGeoModel { Description = "Adelaide", PrimaryCoordinates = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
-					new GeoJson2DGeographicCoordinates(138.600739, -34.928497)
-				) },
-				new SearchGeoModel { Description = "Perth", PrimaryCoordinates = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
-					new GeoJson2DGeographicCoordinates(115.860458, -31.950527)
-				) },
-				new SearchGeoModel { Description = "Hobart", PrimaryCoordinates = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
-					new GeoJson2DGeographicCoordinates(147.327194, -42.882137)
-				) }
-			});
-			dbSet.SaveChanges();
-
-			var classMap = MongoDB.Bson.Serialization.BsonClassMap.GetRegisteredClassMaps()
-				.Where(cm => cm.ClassType == typeof(SearchGeoModel)).FirstOrDefault();
-			var extraElements = classMap.ExtraElementsMemberMap;
-			var extraElementsMapIndex = typeof(MongoDB.Bson.Serialization.BsonClassMap).GetProperty("ExtraElementsMemberMapIndex", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(classMap);
-
-			var results = dbSet.SearchGeoNear(e => e.PrimaryCoordinates, new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
-				new GeoJson2DGeographicCoordinates(138, 30)
-			)).ToArray();
-
-			Assert.AreEqual(4, results.Count());
-			Assert.AreEqual(138.600739, results[0].PrimaryCoordinates.Coordinates.Longitude);
-			Assert.AreEqual(-34.928497, results[0].PrimaryCoordinates.Coordinates.Latitude);
-			Assert.AreEqual(-74.005974, results[3].PrimaryCoordinates.Coordinates.Longitude);
-			Assert.AreEqual(40.712776, results[3].PrimaryCoordinates.Coordinates.Latitude);
-
-			Assert.IsTrue(results[0].ExtraElements.ContainsKey("Distance"));
 		}
 	}
 }
