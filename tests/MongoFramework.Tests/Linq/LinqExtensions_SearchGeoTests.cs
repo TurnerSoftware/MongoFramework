@@ -145,6 +145,59 @@ namespace MongoFramework.Tests.Linq
 			Assert.IsTrue(results.Min(e => e.CustomDistanceField) > 600000);
 		}
 
+
+		[TestMethod]
+		public void SearchGeoNearRecordLimits()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var dbSet = new MongoDbSet<SearchGeoModel>();
+			dbSet.SetConnection(connection);
+
+			for (var i = 0; i < 100; i++)
+			{
+				dbSet.Add(new SearchGeoModel
+				{
+					Description = $"Adelaide ({i})",
+					PrimaryCoordinates = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
+						new GeoJson2DGeographicCoordinates(138.600739, -34.928497)
+					)
+				});
+			}
+
+			dbSet.AddRange(new SearchGeoModel[]
+			{
+				new SearchGeoModel { Description = "New York", PrimaryCoordinates = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
+					new GeoJson2DGeographicCoordinates(-74.005974, 40.712776)
+				) },
+				new SearchGeoModel { Description = "Perth", PrimaryCoordinates = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
+					new GeoJson2DGeographicCoordinates(115.860458, -31.950527)
+				) },
+				new SearchGeoModel { Description = "Hobart", PrimaryCoordinates = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
+					new GeoJson2DGeographicCoordinates(147.327194, -42.882137)
+				) }
+			});
+			dbSet.SaveChanges();
+
+			IQueryable<SearchGeoModel> WithGeoQuery()
+			{
+				return dbSet.SearchGeoNear(e => e.PrimaryCoordinates, new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
+					new GeoJson2DGeographicCoordinates(138, -30)
+				));
+			}
+
+			Assert.AreEqual(103, WithGeoQuery().Count());
+			Assert.AreEqual(3, WithGeoQuery().Skip(100).Count());
+
+			var afterSkipResult = WithGeoQuery().Skip(100).FirstOrDefault();
+			Assert.AreEqual(147.327194, afterSkipResult.PrimaryCoordinates.Coordinates.Longitude);
+			Assert.AreEqual(-42.882137, afterSkipResult.PrimaryCoordinates.Coordinates.Latitude);
+
+			var afterTakeResult = WithGeoQuery().Take(3).ToArray();
+			Assert.AreEqual(3, afterTakeResult.Length);
+			Assert.AreEqual(138.600739, afterTakeResult[0].PrimaryCoordinates.Coordinates.Longitude);
+			Assert.AreEqual(-34.928497, afterTakeResult[0].PrimaryCoordinates.Coordinates.Latitude);
+		}
+
 		[TestMethod]
 		public void SearchGeoIntersects()
 		{
