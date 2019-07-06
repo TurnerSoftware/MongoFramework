@@ -56,10 +56,8 @@ namespace MongoFramework.Tests.Linq
 			)).ToArray();
 
 			Assert.AreEqual(4, results.Count());
-			Assert.AreEqual(138.600739, results[0].PrimaryCoordinates.Coordinates.Longitude);
-			Assert.AreEqual(-34.928497, results[0].PrimaryCoordinates.Coordinates.Latitude);
-			Assert.AreEqual(-74.005974, results[3].PrimaryCoordinates.Coordinates.Longitude);
-			Assert.AreEqual(40.712776, results[3].PrimaryCoordinates.Coordinates.Latitude);
+			Assert.AreEqual("Adelaide", results[0].Description);
+			Assert.AreEqual("New York", results[3].Description);
 
 			Assert.IsTrue(results[0].ExtraElements.ContainsKey("Distance"));
 		}
@@ -189,19 +187,62 @@ namespace MongoFramework.Tests.Linq
 			Assert.AreEqual(3, WithGeoQuery().Skip(100).Count());
 
 			var afterSkipResult = WithGeoQuery().Skip(100).FirstOrDefault();
-			Assert.AreEqual(147.327194, afterSkipResult.PrimaryCoordinates.Coordinates.Longitude);
-			Assert.AreEqual(-42.882137, afterSkipResult.PrimaryCoordinates.Coordinates.Latitude);
+			Assert.AreEqual("Hobart", afterSkipResult.Description);
 
 			var afterTakeResult = WithGeoQuery().Take(3).ToArray();
 			Assert.AreEqual(3, afterTakeResult.Length);
-			Assert.AreEqual(138.600739, afterTakeResult[0].PrimaryCoordinates.Coordinates.Longitude);
-			Assert.AreEqual(-34.928497, afterTakeResult[0].PrimaryCoordinates.Coordinates.Latitude);
+			Assert.AreEqual("Adelaide (0)", afterTakeResult[0].Description);
 		}
 
 		[TestMethod]
 		public void SearchGeoIntersects()
 		{
+			var connection = TestConfiguration.GetConnection();
+			var dbSet = new MongoDbSet<SearchGeoModel>();
+			dbSet.SetConnection(connection);
 
+			dbSet.AddRange(new SearchGeoModel[]
+			{
+				new SearchGeoModel { Description = "New York", PrimaryCoordinates = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
+					new GeoJson2DGeographicCoordinates(-74.005974, 40.712776)
+				) },
+				new SearchGeoModel { Description = "Adelaide", PrimaryCoordinates = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
+					new GeoJson2DGeographicCoordinates(138.600739, -34.928497)
+				) },
+				new SearchGeoModel { Description = "Sydney", PrimaryCoordinates = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
+					new GeoJson2DGeographicCoordinates(151.209290, -33.868820)
+				) },
+				new SearchGeoModel { Description = "Melbourne", PrimaryCoordinates = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
+					new GeoJson2DGeographicCoordinates(144.963058, -37.813629)
+				) },
+				new SearchGeoModel { Description = "Darwin", PrimaryCoordinates = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
+					new GeoJson2DGeographicCoordinates(-95.582413, 37.095142)
+				) },
+				new SearchGeoModel { Description = "Brisbane", PrimaryCoordinates = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
+					new GeoJson2DGeographicCoordinates(153.025131, -27.469770)
+				) }
+			});
+			dbSet.SaveChanges();
+
+			var results = dbSet.SearchGeoIntersecting(e => e.PrimaryCoordinates, new GeoJsonPolygon<GeoJson2DGeographicCoordinates>(
+				new GeoJsonPolygonCoordinates<GeoJson2DGeographicCoordinates>(
+					new GeoJsonLinearRingCoordinates<GeoJson2DGeographicCoordinates>(
+						new[]
+						{
+							new GeoJson2DGeographicCoordinates(115.860458, -31.950527), //Perth
+							new GeoJson2DGeographicCoordinates(147.327194, -42.882137), //Hobart
+							new GeoJson2DGeographicCoordinates(153.399994, -28.016666), //Gold Coast
+							
+							new GeoJson2DGeographicCoordinates(115.860458, -31.950527) //Wrap back to first point
+						}
+					)
+				)
+			)).ToArray();
+
+			Assert.AreEqual(3, results.Count());
+			Assert.IsTrue(results.Any(e => e.Description == "Adelaide"));
+			Assert.IsTrue(results.Any(e => e.Description == "Melbourne"));
+			Assert.IsTrue(results.Any(e => e.Description == "Sydney"));
 		}
 	}
 }
