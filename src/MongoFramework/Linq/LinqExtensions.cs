@@ -1,7 +1,13 @@
-﻿using MongoFramework.Infrastructure.Linq;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Driver;
+using MongoDB.Driver.GeoJsonObjectModel;
+using MongoDB.Driver.Linq;
+using MongoFramework.Infrastructure.Linq;
 using MongoFramework.Infrastructure.Mapping;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -46,6 +52,67 @@ namespace MongoFramework.Linq
 			);
 
 			return queryable.Where(expression);
+		}
+
+		private static IQueryable<TEntity> WhereFilter<TEntity>(this IQueryable<TEntity> queryable, Func<FilterDefinitionBuilder<TEntity>, FilterDefinition<TEntity>> queryFilter)
+		{
+			var definition = queryFilter.Invoke(Builders<TEntity>.Filter);
+			return queryable.Where(e => definition.Inject());
+		}
+
+		public static IQueryable<TEntity> SearchText<TEntity>(this IMongoDbSet<TEntity> dbSet, string search) where TEntity : class
+		{
+			return dbSet.WhereFilter(b => b.Text(search));
+		}
+
+		public static IQueryable<TEntity> SearchGeoIntersecting<TEntity, TCoordinates>(this IQueryable<TEntity> queryable, Expression<Func<TEntity, object>> field, GeoJsonGeometry<TCoordinates> geometry) where TCoordinates : GeoJsonCoordinates
+		{
+			return queryable.WhereFilter(b => b.GeoIntersects(field, geometry));
+		}
+
+
+		public static IQueryable<TEntity> SearchGeoNear<TEntity, TCoordinates>(this IMongoDbSet<TEntity> dbSet, Expression<Func<TEntity, object>> targetField, GeoJsonPoint<TCoordinates> point, Expression<Func<TEntity, object>> distanceResultField = null, double? maxDistance = null, double? minDistance = null) where TEntity : class where TCoordinates : GeoJsonCoordinates
+		{
+			var entitySerializer = BsonSerializer.LookupSerializer<TEntity>();
+			var keyExpressionField = new ExpressionFieldDefinition<TEntity>(targetField);
+			var keyStringField = keyExpressionField.Render(entitySerializer, BsonSerializer.SerializerRegistry);
+
+			var distanceFieldName = "Distance";
+			if (distanceResultField != null)
+			{
+				var distanceResultExpressionField = new ExpressionFieldDefinition<TEntity>(distanceResultField);
+				var distanceResultStringField = distanceResultExpressionField.Render(entitySerializer, BsonSerializer.SerializerRegistry);
+				distanceFieldName = distanceResultStringField.FieldName;
+			}
+			
+			var geoNearSettings = new BsonDocument
+			{
+				{ "near", point.ToBsonDocument() },
+				{ "key", keyStringField.FieldName },
+				{ "distanceField", distanceFieldName },
+				
+				//Note: Limit here is maxed as an operational courtesy as future versions will eliminate it (see Jira SERVER-22949)
+				//		Additionally, $geoNear operations still have a 16MB document limit in aggregation (see Jira SERVER-18965)
+				{ "limit", int.MaxValue }
+			};
+
+			if (maxDistance.HasValue)
+			{
+				geoNearSettings.Add("maxDistance", maxDistance.Value);
+			}
+			if (minDistance.HasValue)
+			{
+				geoNearSettings.Add("minDistance", minDistance.Value);
+			}
+
+			var stage = new BsonDocument
+			{
+				{ "$geoNear", geoNearSettings }
+			};
+
+			var originalProvider = dbSet.Provider as IMongoFrameworkQueryProvider<TEntity>;
+			var provider = new MongoFrameworkQueryProvider<TEntity>(originalProvider, stage);
+			return new MongoFrameworkQueryable<TEntity>(provider);
 		}
 	}
 }

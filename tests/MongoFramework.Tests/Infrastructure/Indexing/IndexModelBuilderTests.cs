@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MongoDB.Driver.GeoJsonObjectModel;
 using MongoFramework.Attributes;
 using MongoFramework.Infrastructure.Indexing;
 using System.Collections.Generic;
@@ -69,6 +70,19 @@ namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 		{
 			[Index(IndexSortOrder.Ascending)]
 			public string ChildId { get; set; }
+		}
+
+		public class TextIndexModel
+		{
+			[Index("MyTextIndex", IndexType.Text)]
+			public string SomeTextField { get; set; }
+			[Index("MyTextIndex", IndexType.Text)]
+			public string AnotherTextField { get; set; }
+		}
+		public class Geo2dSphereIndexModel
+		{
+			[Index(IndexType.Geo2dSphere)]
+			public GeoJsonPoint<GeoJson2DGeographicCoordinates> SomeCoordinates { get; set; }
 		}
 
 		[TestMethod]
@@ -147,6 +161,29 @@ namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 			Assert.IsTrue(results.Any(e => e.Name == "ChildEnumerable.ChildId"));
 			Assert.IsTrue(results.Any(e => e.Name == "ChildArray.ChildId"));
 			Assert.IsTrue(results.Any(e => e.Name == "ChildList.ChildId"));
+		}
+
+		[TestMethod]
+		public void TextIndex()
+		{
+			var indexModel = IndexModelBuilder<TextIndexModel>.BuildModel();
+
+			Assert.AreEqual(1, indexModel.Count());
+
+			var results = indexModel.Select(i => i.Keys.Render(null, null)).FirstOrDefault();
+			Assert.IsTrue(results.Any(e => e.Name == "SomeTextField" && e.Value == "text"));
+			Assert.IsTrue(results.Any(e => e.Name == "AnotherTextField" && e.Value == "text"));
+		}
+
+		[TestMethod]
+		public void Geo2dSphereIndex()
+		{
+			var indexModel = IndexModelBuilder<Geo2dSphereIndexModel>.BuildModel();
+
+			Assert.AreEqual(1, indexModel.Count());
+
+			var results = indexModel.Select(i => i.Keys.Render(null, null)).FirstOrDefault();
+			Assert.IsTrue(results.Any(e => e.Name == "SomeCoordinates" && e.Value == "2dsphere"));
 		}
 	}
 }

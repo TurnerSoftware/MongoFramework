@@ -9,34 +9,30 @@ using System.Linq.Expressions;
 
 namespace MongoFramework.Infrastructure.Linq
 {
-	public class MongoFrameworkQueryable<TEntity, TOutput> : IMongoFrameworkQueryable<TEntity, TOutput> where TEntity : class
+	public class MongoFrameworkQueryable<TOutput> : IMongoFrameworkQueryable<TOutput>
 	{
-		private IMongoFrameworkQueryProvider<TEntity, TOutput> InternalProvider { get; set; }
+		private IMongoFrameworkQueryProvider InternalProvider { get; }
 
-		public IMongoDbConnection Connection { get; }
 		public Type ElementType => typeof(TOutput);
 		public Expression Expression { get; }
 		public IQueryProvider Provider => InternalProvider;
 
-		public EntityProcessorCollection<TEntity> EntityProcessors => InternalProvider.EntityProcessors;
-
-		public MongoFrameworkQueryable(IMongoDbConnection connection, IMongoQueryable<TOutput> underlyingQueryable)
+		public MongoFrameworkQueryable(IMongoFrameworkQueryProvider provider)
 		{
-			Connection = connection;
-			InternalProvider = new MongoFrameworkQueryProvider<TEntity, TOutput>(connection, underlyingQueryable);
-			Expression = Expression.Constant(underlyingQueryable, typeof(IMongoQueryable<TOutput>));
+			InternalProvider = provider;
+			Expression = provider.GetBaseExpression();
 		}
 
-		public MongoFrameworkQueryable(IMongoDbConnection connection, IMongoQueryable<TOutput> underlyingQueryable, Expression expression)
+		public MongoFrameworkQueryable(IMongoFrameworkQueryProvider provider, Expression expression)
 		{
-			Connection = connection;
-			InternalProvider = new MongoFrameworkQueryProvider<TEntity, TOutput>(connection, underlyingQueryable);
+			InternalProvider = provider;
 			Expression = expression;
 		}
 
 		public IEnumerator<TOutput> GetEnumerator()
 		{
-			return InternalProvider.ExecuteEnumerable(Expression).GetEnumerator();
+			var result = (IEnumerable<TOutput>)InternalProvider.Execute(Expression);
+			return result.GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
@@ -46,7 +42,7 @@ namespace MongoFramework.Infrastructure.Linq
 
 		public string ToQuery()
 		{
-			return InternalProvider.ToQuery();
+			return InternalProvider.ToQuery(Expression);
 		}
 	}
 }

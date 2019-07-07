@@ -4,12 +4,10 @@ namespace MongoFramework.Infrastructure.Linq
 {
 	public interface IMongoFrameworkQueryable : IOrderedQueryable
 	{
-		IMongoDbConnection Connection { get; }
 		string ToQuery();
 	}
 
-	public interface IMongoFrameworkQueryable<TEntity, TOutput> : IMongoFrameworkQueryable, IOrderedQueryable<TOutput> where TEntity : class
+	public interface IMongoFrameworkQueryable<TOutput> : IMongoFrameworkQueryable, IOrderedQueryable<TOutput>
 	{
-		EntityProcessorCollection<TEntity> EntityProcessors { get; }
 	}
 }

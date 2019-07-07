@@ -179,8 +179,9 @@ namespace MongoFramework
 
 		private IQueryable<TEntity> GetQueryable()
 		{
-			var queryable = EntityReader.AsQueryable() as IMongoFrameworkQueryable<TEntity, TEntity>;
-			queryable.EntityProcessors.Add(new EntityTrackingProcessor<TEntity>(ChangeTracker));
+			var queryable = EntityReader.AsQueryable();
+			var provider = queryable.Provider as IMongoFrameworkQueryProvider<TEntity>;
+			provider.EntityProcessors.Add(new EntityTrackingProcessor<TEntity>(ChangeTracker));
 			return queryable;
 		}
 

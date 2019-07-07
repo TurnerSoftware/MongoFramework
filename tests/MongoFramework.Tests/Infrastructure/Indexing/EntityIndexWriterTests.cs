@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Driver;
+using MongoDB.Driver.GeoJsonObjectModel;
 using MongoFramework.Attributes;
 using MongoFramework.Infrastructure.Indexing;
 using System;
@@ -17,6 +18,18 @@ namespace MongoFramework.Tests.Infrastructure.Indexing
 			public string IndexedPropertyOne { get; set; }
 			[Index("MyIndexedProperty", IndexSortOrder.Descending)]
 			public string IndexedPropertyTwo { get; set; }
+			[Index(IndexType.Text)]
+			public string IndexedText { get; set; }
+			[Index(IndexType.Geo2dSphere)]
+			public GeoJsonPoint<GeoJson2DGeographicCoordinates> IndexedGeo { get; set; }
+		}
+
+		public class MultipleTextIndexModel
+		{
+			[Index(IndexType.Text)]
+			public string IndexedTextOne { get; set; }
+			[Index(IndexType.Text)]
+			public string IndexedTextTwo { get; set; }
 		}
 
 		public class NoIndexModel
@@ -34,7 +47,7 @@ namespace MongoFramework.Tests.Infrastructure.Indexing
 
 			var collection = connection.GetDatabase().GetCollection<IndexModel>("IndexModel");
 			var dbIndexes = collection.Indexes.List().ToList();
-			Assert.AreEqual(3, dbIndexes.Count);
+			Assert.AreEqual(5, dbIndexes.Count);
 		}
 
 		[TestMethod]
@@ -47,7 +60,7 @@ namespace MongoFramework.Tests.Infrastructure.Indexing
 
 			var collection = connection.GetDatabase().GetCollection<IndexModel>("IndexModel");
 			var dbIndexes = await collection.Indexes.List().ToListAsync().ConfigureAwait(false);
-			Assert.AreEqual(3, dbIndexes.Count);
+			Assert.AreEqual(5, dbIndexes.Count);
 		}
 
 		[TestMethod]
@@ -66,6 +79,16 @@ namespace MongoFramework.Tests.Infrastructure.Indexing
 			var indexWriter = new EntityIndexWriter<NoIndexModel>(connection);
 
 			await AssertExtensions.DoesNotThrowAsync<Exception>(async () => await indexWriter.ApplyIndexingAsync().ConfigureAwait(false)).ConfigureAwait(false);
+		}
+
+
+		[TestMethod, ExpectedException(typeof(Exception), AllowDerivedTypes = true)]
+		public void FailureFromMultipleTextIndexes()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var indexWriter = new EntityIndexWriter<MultipleTextIndexModel>(connection);
+
+			indexWriter.ApplyIndexing();
 		}
 	}
 }
