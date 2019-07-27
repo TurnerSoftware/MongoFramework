@@ -39,17 +39,12 @@ namespace MongoFramework.Infrastructure.Mapping
 		public static IEnumerable<IEntityProperty> GetInheritedProperties(this IEntityDefinition definition)
 		{
 			var currentType = definition.EntityType.BaseType;
-			var seenProperties = new HashSet<string>();
 			while (currentType != typeof(object) && currentType != null)
 			{
 				var currentDefinition = EntityMapping.GetOrCreateDefinition(currentType);
 				foreach (var property in currentDefinition.Properties)
 				{
-					if (!seenProperties.Contains(property.PropertyInfo.Name))
-					{
-						seenProperties.Add(property.PropertyInfo.Name);
-						yield return property;
-					}
+					yield return property;
 				}
 
 				currentType = currentType.BaseType;
@@ -58,19 +53,9 @@ namespace MongoFramework.Infrastructure.Mapping
 
 		public static IEnumerable<IEntityProperty> GetAllProperties(this IEntityDefinition definition)
 		{
-			var result = new Dictionary<string, IEntityProperty>();
-			foreach (var property in definition.Properties)
-			{
-				result.Add(property.PropertyInfo.Name, property);
-			}
-			foreach (var property in definition.GetInheritedProperties())
-			{
-				if (!result.ContainsKey(property.PropertyInfo.Name))
-				{
-					result.Add(property.PropertyInfo.Name, property);
-				}
-			}
-			return result.Values;
+			var localProperties = definition.Properties;
+			var inheritedProperties = definition.GetInheritedProperties();
+			return localProperties.Concat(inheritedProperties);
 		}
 
 		public static IEntityProperty GetProperty(this IEntityDefinition definition, string name)
