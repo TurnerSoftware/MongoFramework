@@ -11,15 +11,17 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 	{
 		public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
 		{
-			definition.Properties = classMap.DeclaredMemberMaps.Select(m => new EntityProperty
-			{
-				EntityType = definition.EntityType,
-				IsKey = m == classMap.IdMemberMap,
-				ElementName = m.ElementName,
-				FullPath = m.ElementName,
-				PropertyType = (m.MemberInfo as PropertyInfo).PropertyType,
-				PropertyInfo = m.MemberInfo as PropertyInfo
-			});
+			definition.Properties = classMap.DeclaredMemberMaps
+				.Where(m => m.MemberInfo.MemberType == MemberTypes.Property)
+				.Select(m => new EntityProperty
+				{
+					EntityType = definition.EntityType,
+					IsKey = m == classMap.IdMemberMap,
+					ElementName = m.ElementName,
+					FullPath = m.ElementName,
+					PropertyType = (m.MemberInfo as PropertyInfo).PropertyType,
+					PropertyInfo = m.MemberInfo as PropertyInfo
+				});
 		}
 	}
 }
