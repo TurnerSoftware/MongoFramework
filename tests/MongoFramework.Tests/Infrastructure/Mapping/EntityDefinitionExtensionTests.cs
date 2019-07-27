@@ -45,6 +45,21 @@ namespace MongoFramework.Tests.Infrastructure.Mapping
 			public TraverseMappingModel NestedRecursionType { get; set; }
 		}
 
+		public class OverridePropertyBaseModel
+		{
+			public virtual string TargetProperty { get; set; }
+		}
+
+		public class OverridePropertyChildModel : OverridePropertyBaseModel
+		{
+			public override string TargetProperty { get; set; }
+		}
+
+		public class OverridePropertyGrandChildModel : OverridePropertyChildModel
+		{
+
+		}
+
 		[TestMethod]
 		public void GetIdNameChecksInheritence()
 		{
@@ -91,6 +106,23 @@ namespace MongoFramework.Tests.Infrastructure.Mapping
 			Assert.IsTrue(result.Any(m => m.FullPath == "ListModel.InnerModel"));
 			Assert.IsTrue(result.Any(m => m.FullPath == "ListModel.InnerModel.InnerMostProperty"));
 			Assert.IsTrue(result.Any(m => m.FullPath == "ListModel.InnerModel.NestedRecursionType"));
+		}
+
+		[TestMethod]
+		public void GetInheritedPropertiesTakesBaseProperties()
+		{
+			var definition = EntityMapping.RegisterType(typeof(OverridePropertyGrandChildModel));
+			var inheritedProperties = definition.GetInheritedProperties().ToArray();
+			Assert.AreEqual(1, inheritedProperties.Length);
+			Assert.AreEqual(typeof(OverridePropertyBaseModel), inheritedProperties[0].EntityType);
+		}
+		[TestMethod]
+		public void GetAllPropertiesTakesBaseProperties()
+		{
+			var definition = EntityMapping.RegisterType(typeof(OverridePropertyChildModel));
+			var allProperties = definition.GetAllProperties().ToArray();
+			Assert.AreEqual(1, allProperties.Length);
+			Assert.AreEqual(typeof(OverridePropertyBaseModel), allProperties[0].EntityType);
 		}
 	}
 }
