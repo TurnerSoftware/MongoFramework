@@ -6,6 +6,7 @@ using MongoFramework.Attributes;
 using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mapping.Processors;
 using MongoFramework.Infrastructure.Serialization;
+using System;
 using System.Collections.Generic;
 
 namespace MongoFramework.Tests.Infrastructure.Serialization
@@ -38,6 +39,11 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 
 		public class UnknownPropertyTypeChildSerializationModel
 		{
+		}
+
+		public class UnknownDictionaryValueModel
+		{
+			public IDictionary<string, object> Dictionary { get; set; }
 		}
 
 		[TestMethod]
@@ -246,6 +252,39 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 
 			var deserializedResult = BsonSerializer.Deserialize<UnknownPropertyTypeSerializationModel>(document);
 			Assert.IsInstanceOfType(deserializedResult.UnknownPropertyType, typeof(UnknownPropertyTypeChildSerializationModel));
+		}
+
+		[TestMethod]
+		public void DeserializeUnknownTypesInDictionary()
+		{
+			EntityMapping.AddMappingProcessor(new TypeDiscoveryProcessor());
+			EntityMapping.RegisterType(typeof(UnknownDictionaryValueModel));
+
+			var document = new BsonDocument
+			{
+				{ "_t", "UnknownDictionaryValueModel" },
+				{
+					"Dictionary",
+					new BsonDocument
+					{
+						{ "String", "ObjectValueAsString" },
+						{ "Number", 1 },
+						{ "Date", new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+						{ "Boolean", true },
+						{ "Array", new BsonArray(new int[] { 10, 20, 30 }) },
+						{ "ObjectId", ObjectId.Parse("507f1f77bcf86cd799439011") }
+					}
+				}
+			};
+
+			var result = BsonSerializer.Deserialize<UnknownDictionaryValueModel>(document);
+			Assert.IsNotNull(result.Dictionary);
+			Assert.AreEqual("ObjectValueAsString", result.Dictionary["String"]);
+			Assert.AreEqual(1, result.Dictionary["Number"]);
+			Assert.AreEqual(new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc), result.Dictionary["Date"]);
+			Assert.AreEqual(true, result.Dictionary["Boolean"]);
+			Assert.AreEqual(20, ((object[])result.Dictionary["Array"])[1]);
+			Assert.AreEqual(ObjectId.Parse("507f1f77bcf86cd799439011"), result.Dictionary["ObjectId"]);
 		}
 	}
 }

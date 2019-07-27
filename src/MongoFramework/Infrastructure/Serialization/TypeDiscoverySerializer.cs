@@ -108,6 +108,38 @@ namespace MongoFramework.Infrastructure.Serialization
 				context.Reader.ReadNull();
 				return default(TEntity);
 			}
+			else if (type == BsonType.Array)
+			{
+				return new ArraySerializer<object>().Deserialize(context);
+			}
+			else if (type == BsonType.Boolean)
+			{
+				return context.Reader.ReadBoolean();
+			}
+			else if (type == BsonType.DateTime)
+			{
+				return new BsonDateTime(context.Reader.ReadDateTime()).ToUniversalTime();
+			}
+			else if (type == BsonType.Double)
+			{
+				return context.Reader.ReadDouble();
+			}
+			else if (type == BsonType.Int32)
+			{
+				return context.Reader.ReadInt32();
+			}
+			else if (type == BsonType.Int64)
+			{
+				return context.Reader.ReadInt64();
+			}
+			else if (type == BsonType.ObjectId)
+			{
+				return context.Reader.ReadObjectId();
+			}
+			else if (type == BsonType.String)
+			{
+				return context.Reader.ReadString();
+			}
 			else
 			{
 				throw new NotSupportedException($"Unsupported BsonType {type} for TypeDiscoverySerializer");
