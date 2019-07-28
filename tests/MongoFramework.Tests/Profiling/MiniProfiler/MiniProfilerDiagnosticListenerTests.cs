@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Attributes;
 using MongoFramework.Profiling.MiniProfiler;
@@ -131,6 +132,36 @@ namespace MongoFramework.Tests.Profiling.MiniProfiler
 				var timings = profiler.Root.CustomTimings["mongodb"];
 				Assert.IsTrue(timings[0].CommandString.Contains("$skip"));
 				Assert.IsTrue(timings[0].CommandString.Contains("78"));
+			}
+		}
+
+		[TestMethod]
+		public void ProfilingReadWithEnforcedSleep()
+		{
+			using (var context = new TestContext(GetConnection()))
+			{
+				for (int i = 0, l = 10; i < l; i++)
+				{
+					context.GeneralProfiling.Add(new GeneralProfileModel
+					{
+						Number = i,
+						Name = "ProfilingRead"
+					});
+				}
+
+				context.GeneralProfiling.SaveChanges();
+
+				var profiler = SEProfiling.MiniProfiler.StartNew();
+
+				var queryable = context.GeneralProfiling;
+				foreach (var entity in queryable)
+				{
+					Thread.Sleep(100);
+				}
+
+				Assert.IsTrue(profiler.Root.CustomTimings.ContainsKey("mongodb"));
+				var timings = profiler.Root.CustomTimings["mongodb"];
+				Assert.IsTrue(timings[0].DurationMilliseconds > 1000);
 			}
 		}
 
