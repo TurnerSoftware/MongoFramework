@@ -42,7 +42,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 			EntityMapping.RegisterType(typeof(NoTypeDiscoveryAttributeModel));
 
 			var serializer = BsonSerializer.LookupSerializer<NoTypeDiscoveryAttributeModel>();
-			Assert.AreNotEqual(typeof(TypeDiscoverySerializer<>), serializer.GetType().GetGenericTypeDefinition());;
+			Assert.AreNotEqual(typeof(TypeDiscoverySerializer<>), serializer.GetType().GetGenericTypeDefinition());
 		}
 	}
 }
