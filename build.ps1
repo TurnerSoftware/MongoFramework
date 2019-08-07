@@ -16,6 +16,9 @@ Write-Host "Environment:" -ForegroundColor Cyan
 Write-Host "  .NET Version:" (dotnet --version)
 Write-Host "  Artifact Path: $packageOutputFolder"
 
+# Initialise Path
+$env:PATH += ";$env:LOCALAPPDATA\Apps\OpenCover\"
+
 Write-Host "Building solution..." -ForegroundColor "Magenta"
 dotnet build -c Release
 if ($LastExitCode -ne 0) {
@@ -35,7 +38,7 @@ if ($RunTests -And -Not $CheckCoverage) {
 }
 elseif ($RunTests -And $CheckCoverage) {
 	Write-Host "Running tests with coverage..." -ForegroundColor "Magenta"
-	Invoke-Expression ("$env:LOCALAPPDATA\Apps\OpenCover\" + 'OpenCover.Console.exe -register:user -target:"%LocalAppData%\Microsoft\dotnet\dotnet.exe" -targetargs:"test tests/MongoFramework.Tests/MongoFramework.Tests.csproj /p:DebugType=Full" -filter:"+[MongoFramework]* -[MongoFramework.Tests]*" -output:"' + $packageOutputFolder + '\coverage.xml" -oldstyle')
+	OpenCover.Console.exe -register:user -target:"%LocalAppData%\Microsoft\dotnet\dotnet.exe" -targetargs:"test tests/MongoFramework.Tests/MongoFramework.Tests.csproj /p:DebugType=Full" -filter:"+[MongoFramework]* -[MongoFramework.Tests]*" -output:"$packageOutputFolder\coverage.xml" -oldstyle
     if ($LastExitCode -ne 0 -Or -Not $?) {
         Write-Host "Failure performing tests with coverage, aborting!" -Foreground "Red"
 		Exit 1
