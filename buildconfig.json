@@ -1,0 +1,4 @@
+{
+  "TestProject": "tests/MongoFramework.Tests/MongoFramework.Tests.csproj",
+  "TestCoverageFilter": "+[MongoFramework]* -[MongoFramework.Tests]*"
+}

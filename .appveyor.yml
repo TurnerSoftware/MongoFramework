@@ -1,16 +1,17 @@
-version: '{build}'
+version: 'Build {build}'
 image: Visual Studio 2017
 skip_branch_with_pr: true
 
 services:
   - mongodb
 install:
-  - choco install opencover codecov
+  - choco install opencover.portable codecov
   - ps: .\build\dotnet-install.ps1 -Version 3.0.100-preview5-011568
 
+  
 build_script:
-  - ps: .\build.appveyor.ps1 -IsTagBuild ([System.Convert]::ToBoolean($env:APPVEYOR_REPO_TAG))
-
+  - ps: .\build.appveyor.ps1
+  
 test: false
 artifacts:
   - path: '.\build-artifacts\*'

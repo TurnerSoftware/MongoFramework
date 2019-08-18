@@ -1,13 +1,6 @@
 <Project>
 
   <PropertyGroup>
-    <BuildNumber Condition="'$(APPVEYOR_BUILD_NUMBER)' != ''">$(APPVEYOR_BUILD_NUMBER)</BuildNumber>
-    <BuildNumber Condition="'$(APPVEYOR_BUILD_NUMBER)' == ''">0</BuildNumber>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <Version>0.16.0+$(BuildNumber)</Version>
-
     <RootNamespace>MongoFramework</RootNamespace>
 
     <Company>Turner Software</Company>
