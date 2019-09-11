@@ -30,7 +30,7 @@ namespace MongoFramework.Tests.Infrastructure.DefinitionHelpers
 		{
 			var serializerRegistry = BsonSerializer.SerializerRegistry;
 			var documentSerializer = serializerRegistry.GetSerializer<TEntity>();
-			return definition.Render(documentSerializer, serializerRegistry);
+			return definition.Render(documentSerializer, serializerRegistry).AsBsonDocument;
 		}
 
 		[TestMethod]
