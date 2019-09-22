@@ -3,11 +3,11 @@
   <PropertyGroup>
     <AssemblyName>MongoFramework.Tests</AssemblyName>
     <RootNamespace>MongoFramework.Tests</RootNamespace>
-    <TargetFrameworks>net461;netcoreapp2.0;netcoreapp3.0</TargetFrameworks>
+    <TargetFrameworks>net461;netcoreapp2.1;netcoreapp3.0</TargetFrameworks>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)'=='netcoreapp2.0'">
+  <PropertyGroup Condition="'$(TargetFramework)'=='netcoreapp2.1'">
     <DefineConstants>NETCOREAPP2_0</DefineConstants>
   </PropertyGroup>
   
