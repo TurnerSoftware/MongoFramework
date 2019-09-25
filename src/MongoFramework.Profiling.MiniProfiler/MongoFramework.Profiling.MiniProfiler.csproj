@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MiniProfiler.Shared" Version="4.0.180" />
+    <PackageReference Include="MiniProfiler.Shared" Version="4.1.0" />
   </ItemGroup>
 
   <ItemGroup>
