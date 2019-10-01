@@ -20,7 +20,7 @@
   <ItemGroup>
     <PackageReference Include="MongoDB.Driver" Version="2.9.2" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.6.0" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.6.0" />
   </ItemGroup>
 
 </Project>
