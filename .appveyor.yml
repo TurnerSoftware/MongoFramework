@@ -6,7 +6,7 @@ services:
   - mongodb
 install:
   - choco install opencover.portable codecov
-  - ps: .\build\dotnet-install.ps1 -Version 3.0.100-preview5-011568
+  - ps: .\build\dotnet-install.ps1 -Version 3.0.100
 
   
 build_script:
