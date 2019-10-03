@@ -23,6 +23,16 @@ deploy:
       secure: eCdbkZMnfQfn//yoFtvyHHVUkoIX1yUfs6qRtOGsRxQq95pDPNMUMD0+XN9itbKp
     on:
       APPVEYOR_REPO_TAG: true
+  
+  - provider: NuGet
+    server: https://nuget.pkg.github.com/TurnerSoftware/index.json
+    artifact: /.nupkg/
+    username: TurnerSoftware
+    api_key:
+      secure: XnTMWCpraeRGwQ/HGCQIneJDAIIsF7MypVnaShycKC95P3+IA0MF+qXV16c8/5jg
+    on:
+      APPVEYOR_REPO_TAG: true
+
   - provider: GitHub
     artifact: /.*nupkg/
     draft: true
