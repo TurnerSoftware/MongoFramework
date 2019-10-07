@@ -26,7 +26,8 @@ deploy:
   
   - provider: NuGet
     server: https://nuget.pkg.github.com/TurnerSoftware/index.json
-    artifact: /.nupkg/
+    artifact: /.*nupkg/
+    skip_symbols: true
     username: TurnerSoftware
     api_key:
       secure: XnTMWCpraeRGwQ/HGCQIneJDAIIsF7MypVnaShycKC95P3+IA0MF+qXV16c8/5jg
