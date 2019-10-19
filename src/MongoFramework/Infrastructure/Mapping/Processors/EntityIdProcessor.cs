@@ -21,6 +21,17 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 			{
 				classMap.MapIdMember(idProperty);
 			}
+			else
+			{
+				idProperty = properties
+					.Where(p => p.Name.Equals("id", StringComparison.InvariantCultureIgnoreCase))
+					.FirstOrDefault();
+
+				if (idProperty != null)
+				{
+					classMap.MapIdMember(idProperty);
+				}
+			}
 
 			//If there is no Id generator, set a default based on the member type
 			if (classMap.IdMemberMap != null && classMap.IdMemberMap.IdGenerator == null)
