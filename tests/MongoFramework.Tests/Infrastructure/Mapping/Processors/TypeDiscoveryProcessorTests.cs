@@ -25,7 +25,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		public void TypeDiscoverySerializerWhenAttributeIsDefined()
 		{
 			EntityMapping.AddMappingProcessor(new TypeDiscoveryProcessor());
-			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 
 			EntityMapping.RegisterType(typeof(TypeDiscoveryAttributeModel));
 
@@ -37,7 +37,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		public void NotTypeDiscoverySerializerWhenAttributeNotDefined()
 		{
 			EntityMapping.AddMappingProcessor(new TypeDiscoveryProcessor());
-			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 
 			EntityMapping.RegisterType(typeof(NoTypeDiscoveryAttributeModel));
 

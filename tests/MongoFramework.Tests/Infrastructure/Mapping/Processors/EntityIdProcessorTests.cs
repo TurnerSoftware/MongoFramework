@@ -48,7 +48,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		public void IdMapsOnAttribute()
 		{
 			EntityMapping.AddMappingProcessor(new EntityIdProcessor());
-			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			var definition = EntityMapping.RegisterType(typeof(IdByAttributeTestModel));
 			Assert.AreEqual("MyCustomId", definition.GetIdName());
 		}

@@ -37,7 +37,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		public void AccessToInherittedProperty()
 		{
 			EntityMapping.AddMappingProcessor(new HierarchyProcessor());
-			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 
 			var definition = EntityMapping.RegisterType(typeof(ChildTestModel));
 
@@ -52,7 +52,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		public void AccessToDeclaredProperty()
 		{
 			EntityMapping.AddMappingProcessor(new HierarchyProcessor());
-			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			var definition = EntityMapping.RegisterType(typeof(ChildTestModel));
 
 			var mappedProperties = definition.GetAllProperties();
