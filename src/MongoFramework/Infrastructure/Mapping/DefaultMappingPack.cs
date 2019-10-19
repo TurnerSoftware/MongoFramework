@@ -13,13 +13,12 @@ namespace MongoFramework.Infrastructure.Mapping
 			{
 				new CollectionNameProcessor(),
 				new HierarchyProcessor(),
+				new PropertyMappingProcessor(),
 				new EntityIdProcessor(),
-				new MappedPropertiesProcessor(),
 				new NestedTypeProcessor(),
 				new ExtraElementsProcessor(),
 				new TypeDiscoveryProcessor(),
 				new BsonKnownTypesProcessor(),
-				new ClassMapPropertiesProcessor(),
 				new IndexProcessor(),
 				new EntityRelationshipProcessor()
 			};
