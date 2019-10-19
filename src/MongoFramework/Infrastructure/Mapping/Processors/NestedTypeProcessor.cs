@@ -20,7 +20,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 				propertyType = propertyType.GetEnumerableItemTypeOrDefault();
 
 				//Maps the property type for handling property nesting
-				if (propertyType.IsClass && propertyType != entityType)
+				if (propertyType.IsClass && propertyType != entityType && propertyType != typeof(string))
 				{
 					if (!EntityMapping.IsRegistered(propertyType))
 					{
