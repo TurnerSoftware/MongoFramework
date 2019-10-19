@@ -36,32 +36,38 @@ namespace MongoFramework.Infrastructure.Serialization
 
 			try
 			{
-				var cachedType = AssignableTypes
-					.Where(t => t.Name == name && expectedAssignableType.IsAssignableFrom(t))
-					.FirstOrDefault();
-
-				if (cachedType == null)
+				foreach (var type in AssignableTypes)
 				{
-					TypeCacheLock.EnterWriteLock();
-					try
+					if (type.Name == name && expectedAssignableType.IsAssignableFrom(type))
 					{
-						var assignableType = AppDomain.CurrentDomain.GetAssemblies()
-							.Where(a => !a.IsDynamic)
-							.SelectMany(a => a.GetTypes())
-							.Where(t => t.Name == name && expectedAssignableType.IsAssignableFrom(t))
-							.FirstOrDefault();
-
-						AssignableTypes.Add(assignableType);
-
-						return assignableType;
-					}
-					finally
-					{
-						TypeCacheLock.ExitWriteLock();
+						return type;
 					}
 				}
 
-				return cachedType;
+				TypeCacheLock.EnterWriteLock();
+				try
+				{
+					foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+					{
+						if (!assembly.IsDynamic)
+						{
+							foreach (var type in assembly.GetTypes())
+							{
+								if (type.Name == name && expectedAssignableType.IsAssignableFrom(type))
+								{
+									AssignableTypes.Add(type);
+									return type;
+								}
+							}
+						}
+					}
+				}
+				finally
+				{
+					TypeCacheLock.ExitWriteLock();
+				}
+
+				return default;
 			}
 			finally
 			{
