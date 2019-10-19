@@ -22,6 +22,8 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 			}
 			else
 			{
+				classMap.SetIgnoreExtraElements(false);
+
 				//If any of the Entity's properties have the "ExtraElementsAttribute", assign that against the BsonClassMap
 				var extraElementsProperty = definition.Properties
 					.Select(p => new
