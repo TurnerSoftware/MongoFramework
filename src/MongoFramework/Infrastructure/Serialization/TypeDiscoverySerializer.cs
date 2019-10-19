@@ -13,7 +13,7 @@ namespace MongoFramework.Infrastructure.Serialization
 {
 	public static class TypeDiscovery
 	{
-		private static ReaderWriterLockSlim TypeCacheLock { get; } = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+		private static ReaderWriterLockSlim TypeCacheLock { get; } = new ReaderWriterLockSlim();
 		private static ConcurrentBag<Type> AssignableTypes { get; set; } = new ConcurrentBag<Type>();
 
 		public static void ClearCache()
