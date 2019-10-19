@@ -53,6 +53,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void ObeysExtraElementsAttribute()
 		{
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			EntityMapping.AddMappingProcessor(new ExtraElementsProcessor());
 			EntityMapping.RegisterType(typeof(ExtraElementsAttrModel));
 
@@ -70,6 +71,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		public void ExtraElementsSerializationIntegrationTest()
 		{
 			EntityMapping.AddMappingProcessor(new CollectionNameProcessor());
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			EntityMapping.AddMappingProcessor(new ExtraElementsProcessor());
 			EntityMapping.RegisterType(typeof(ExtraElementsAttrModel));
 			EntityMapping.RegisterType(typeof(ModelWithExtraElements));

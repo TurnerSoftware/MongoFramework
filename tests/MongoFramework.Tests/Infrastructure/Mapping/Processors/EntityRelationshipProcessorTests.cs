@@ -181,6 +181,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		public void IdentifyCollectionRelationships()
 		{
 			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
+			EntityMapping.AddMappingProcessor(new EntityIdProcessor());
 			EntityMapping.AddMappingProcessor(new EntityRelationshipProcessor());
 
 			var definition = EntityMapping.RegisterType(typeof(CollectionMappingModel));
