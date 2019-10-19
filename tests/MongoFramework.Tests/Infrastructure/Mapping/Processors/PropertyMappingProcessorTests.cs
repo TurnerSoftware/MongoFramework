@@ -1,19 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mapping.Processors;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 {
 	[TestClass]
-	public class ClassMapPropertiesProcessorTests : MappingTestBase
+	public class PropertyMappingProcessorTests : MappingTestBase
 	{
+		public class ColumnAttributePropertyModel
+		{
+			public string Id { get; set; }
+			[Column("CustomPropertyName")]
+			public string MyProperty { get; set; }
+		}
+
+		public class NotMappedPropertiesModel
+		{
+			public string Id { get; set; }
+			[NotMapped]
+			public string NotMapped { get; set; }
+		}
 		public class BaseModel
 		{
 			public virtual string TestProperty { get => BaseProperty; set => BaseProperty = value; }
@@ -27,9 +37,25 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		}
 
 		[TestMethod]
+		public void ObeysNotMappedAttribute()
+		{
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
+			var definition = EntityMapping.RegisterType(typeof(NotMappedPropertiesModel));
+			Assert.IsFalse(definition.Properties.Any(p => p.ElementName == "NotMapped"));
+		}
+
+		[TestMethod]
+		public void ObeysColumnAttributeRemap()
+		{
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
+			var definition = EntityMapping.RegisterType(typeof(ColumnAttributePropertyModel));
+			Assert.IsTrue(definition.Properties.Any(p => p.ElementName == "CustomPropertyName"));
+		}
+
+		[TestMethod]
 		public void OverriddenPropertyDeserializationAppliesToChild()
 		{
-			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			EntityMapping.RegisterType(typeof(ChildModel));
 
 			var document = new BsonDocument
@@ -46,7 +72,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void OverriddenPropertyDeserializationAppliesToBase()
 		{
-			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			EntityMapping.RegisterType(typeof(ChildModel));
 
 			var document = new BsonDocument
@@ -62,7 +88,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void DerivedTypeDeserializationAppliesToDiscriminatorType()
 		{
-			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			EntityMapping.RegisterType(typeof(ChildModel));
 
 			var document = new BsonDocument

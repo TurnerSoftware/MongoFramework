@@ -107,7 +107,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void ForeignKeyAttributeOnId()
 		{
-			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			EntityMapping.AddMappingProcessor(new EntityRelationshipProcessor());
 
 			var definition = EntityMapping.RegisterType(typeof(BaseEntityModel));
@@ -123,7 +123,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void ForeignKeyAttributeOnNavigationProperty()
 		{
-			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			EntityMapping.AddMappingProcessor(new EntityRelationshipProcessor());
 
 			var definition = EntityMapping.RegisterType(typeof(BaseEntityModel));
@@ -139,7 +139,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void IdentifyRelationshipsWithOtherIdTypes()
 		{
-			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			EntityMapping.AddMappingProcessor(new EntityRelationshipProcessor());
 
 			var relationships = EntityMapping.RegisterType(typeof(BaseVariedIdModel)).Relationships;
@@ -150,7 +150,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[ExpectedExceptionPattern(typeof(InvalidOperationException), @"Unable to determine the Id property between .+ and .+\. Check the types for these properties are valid\.")]
 		public void UnsupportedIdTypeOnRelationship()
 		{
-			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			EntityMapping.AddMappingProcessor(new EntityRelationshipProcessor());
 
 			EntityMapping.RegisterType(typeof(UnsupportedIdModel));
@@ -160,7 +160,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[ExpectedExceptionPattern(typeof(InvalidOperationException), @"Can't find property .+ in .+ as indicated by the ForeignKeyAttribute.")]
 		public void InvalidForeignKeyOnRelationship()
 		{
-			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			EntityMapping.AddMappingProcessor(new EntityRelationshipProcessor());
 
 			EntityMapping.RegisterType(typeof(InvalidForeignKeyModel));
@@ -169,7 +169,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void NavigationPropertiesUnmap()
 		{
-			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			EntityMapping.AddMappingProcessor(new EntityRelationshipProcessor());
 
 			var definition = EntityMapping.RegisterType(typeof(BaseEntityModel));
@@ -180,7 +180,8 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void IdentifyCollectionRelationships()
 		{
-			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
+			EntityMapping.AddMappingProcessor(new EntityIdProcessor());
 			EntityMapping.AddMappingProcessor(new EntityRelationshipProcessor());
 
 			var definition = EntityMapping.RegisterType(typeof(CollectionMappingModel));
@@ -200,7 +201,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void ValidInversePropertyMapping()
 		{
-			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			EntityMapping.AddMappingProcessor(new EntityRelationshipProcessor());
 
 			var relationships = EntityMapping.RegisterType(typeof(ValidInversePropertyModel)).Relationships;
@@ -212,7 +213,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[ExpectedExceptionPattern(typeof(InvalidOperationException), "Can't find property .+ in .+ as indicated by the InversePropertyAttribute on .+")]
 		public void InversePropertyMappingNonExistantProperty()
 		{
-			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			EntityMapping.AddMappingProcessor(new EntityRelationshipProcessor());
 
 			EntityMapping.RegisterType(typeof(InversePropertyNonExistantPropertyModel));
@@ -222,7 +223,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[ExpectedExceptionPattern(typeof(InvalidOperationException), "Can't find property .+ in .+ as indicated by the InversePropertyAttribute on .+")]
 		public void InversePropertyMappingInvalidPropertyType()
 		{
-			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			EntityMapping.AddMappingProcessor(new EntityRelationshipProcessor());
 
 			EntityMapping.RegisterType(typeof(InversePropertyMappingInvalidPropertyTypeModel));

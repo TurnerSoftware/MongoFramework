@@ -67,9 +67,7 @@ namespace MongoFramework.Infrastructure.Mapping
 					try
 					{
 						var classMap = new BsonClassMap(entityType);
-
 						BsonClassMap.RegisterClassMap(classMap);
-						classMap.AutoMap();
 
 						foreach (var processor in MappingProcessors)
 						{
