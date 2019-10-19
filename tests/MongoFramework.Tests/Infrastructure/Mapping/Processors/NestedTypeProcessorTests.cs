@@ -33,6 +33,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void MapsNestedStandardPropertyModel()
 		{
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			EntityMapping.AddMappingProcessor(new NestedTypeProcessor());
 			Assert.IsFalse(BsonClassMap.IsClassMapRegistered(typeof(PropertyNestedModel)));
 			EntityMapping.RegisterType(typeof(PropertyBaseModel));
@@ -42,6 +43,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void MapsNestedCollectionPropertyModel()
 		{
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			EntityMapping.AddMappingProcessor(new NestedTypeProcessor());
 			Assert.IsFalse(BsonClassMap.IsClassMapRegistered(typeof(CollectionNestedModel)));
 			EntityMapping.RegisterType(typeof(CollectionBaseModel));

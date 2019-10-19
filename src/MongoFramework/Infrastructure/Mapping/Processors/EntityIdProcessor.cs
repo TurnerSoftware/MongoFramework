@@ -15,29 +15,37 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 			var entityType = definition.EntityType;
 
 			//Find the first property with the "Key" attribute to use as the Id
-			var properties = entityType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-			var idProperty = properties.Where(p => p.GetCustomAttribute<KeyAttribute>() != null).FirstOrDefault();
-			if (idProperty != null)
+			var properties = definition.Properties;
+			var idProperty = properties.Where(p => p.PropertyInfo.GetCustomAttribute<KeyAttribute>() != null).FirstOrDefault();
+			if (idProperty == null)
 			{
-				classMap.MapIdMember(idProperty);
+				idProperty = properties
+					.Where(p => p.ElementName.Equals("id", StringComparison.InvariantCultureIgnoreCase))
+					.FirstOrDefault();
 			}
 
-			//If there is no Id generator, set a default based on the member type
-			if (classMap.IdMemberMap != null && classMap.IdMemberMap.IdGenerator == null)
+			if (idProperty is EntityProperty entityProperty)
 			{
-				var idMemberMap = classMap.IdMemberMap;
-				var memberType = BsonClassMap.GetMemberInfoType(idMemberMap.MemberInfo);
-				if (memberType == typeof(string))
+				classMap.MapIdMember(idProperty.PropertyInfo);
+				entityProperty.IsKey = true;
+
+				//If there is no Id generator, set a default based on the member type
+				if (classMap.IdMemberMap.IdGenerator == null)
 				{
-					idMemberMap.SetIdGenerator(StringObjectIdGenerator.Instance);
-				}
-				else if (memberType == typeof(Guid))
-				{
-					idMemberMap.SetIdGenerator(CombGuidGenerator.Instance);
-				}
-				else if (memberType == typeof(ObjectId))
-				{
-					idMemberMap.SetIdGenerator(ObjectIdGenerator.Instance);
+					var idMemberMap = classMap.IdMemberMap;
+					var memberType = BsonClassMap.GetMemberInfoType(idMemberMap.MemberInfo);
+					if (memberType == typeof(string))
+					{
+						idMemberMap.SetIdGenerator(StringObjectIdGenerator.Instance);
+					}
+					else if (memberType == typeof(Guid))
+					{
+						idMemberMap.SetIdGenerator(CombGuidGenerator.Instance);
+					}
+					else if (memberType == typeof(ObjectId))
+					{
+						idMemberMap.SetIdGenerator(ObjectIdGenerator.Instance);
+					}
 				}
 			}
 		}

@@ -47,8 +47,8 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void IdMapsOnAttribute()
 		{
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			EntityMapping.AddMappingProcessor(new EntityIdProcessor());
-			EntityMapping.AddMappingProcessor(new ClassMapPropertiesProcessor());
 			var definition = EntityMapping.RegisterType(typeof(IdByAttributeTestModel));
 			Assert.AreEqual("MyCustomId", definition.GetIdName());
 		}
@@ -56,6 +56,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void StringIdGeneratorOnStringProperty()
 		{
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			EntityMapping.AddMappingProcessor(new EntityIdProcessor());
 			EntityMapping.RegisterType(typeof(StringIdGeneratorTestModel));
 
@@ -68,6 +69,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void GuidIdGeneratorOnGuidProperty()
 		{
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			EntityMapping.AddMappingProcessor(new EntityIdProcessor());
 			EntityMapping.RegisterType(typeof(GuidIdGeneratorTestModel));
 
@@ -80,6 +82,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void ObjectIdGeneratorOnObjectIdProperty()
 		{
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			EntityMapping.AddMappingProcessor(new EntityIdProcessor());
 			EntityMapping.RegisterType(typeof(ObjectIdGeneratorTestModel));
 
@@ -92,6 +95,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void ExplicitKeyOverridesImplicitId()
 		{
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			EntityMapping.AddMappingProcessor(new EntityIdProcessor());
 			EntityMapping.RegisterType(typeof(ExplicitKeyOverridesImplicitIdModel));
 

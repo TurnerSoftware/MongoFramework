@@ -12,7 +12,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 		public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
 		{
 			var entityType = definition.EntityType;
-			var properties = entityType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+			var properties = definition.Properties;
 
 			foreach (var property in properties)
 			{
