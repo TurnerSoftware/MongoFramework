@@ -27,6 +27,12 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 					continue;
 				}
 
+				//Skip indexer properties (eg. "this[int index]")
+				if (property.GetIndexParameters().Length > 0)
+				{
+					continue;
+				}
+
 				//Skip properties with the "NotMappedAttribute"
 				var notMappedAttribute = property.GetCustomAttribute<NotMappedAttribute>();
 				if (notMappedAttribute != null)
