@@ -60,18 +60,13 @@ namespace MongoFramework.Infrastructure.Mapping
 			MappingLock.EnterUpgradeableReadLock();
 			try
 			{
-				//For reasons unknown to me, you can't just call "BsonClassMap.LookupClassMap" as that "freezes" the class map
-				//Instead, you must do the lookup and initial creation yourself.
-				var classMap = BsonClassMap.GetRegisteredClassMaps()
-					.Where(cm => cm.ClassType == entityType).FirstOrDefault();
-
-				if (classMap == null)
+				if (!BsonClassMap.IsClassMapRegistered(entityType))
 				{
 					MappingLock.EnterWriteLock();
 
 					try
 					{
-						classMap = new BsonClassMap(entityType);
+						var classMap = new BsonClassMap(entityType);
 
 						BsonClassMap.RegisterClassMap(classMap);
 						classMap.AutoMap();
