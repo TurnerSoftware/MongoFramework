@@ -87,7 +87,7 @@ namespace MongoFramework.Infrastructure.Mapping
 					var propertyType = property.PropertyType;
 					propertyType = propertyType.GetEnumerableItemTypeOrDefault();
 
-					if (propertyType.IsClass && !state.SeenTypes.Contains(propertyType))
+					if (propertyType.IsClass && propertyType != typeof(string) && !state.SeenTypes.Contains(propertyType))
 					{
 						var nestedProperties = EntityMapping.GetOrCreateDefinition(propertyType)
 							.GetAllProperties()
