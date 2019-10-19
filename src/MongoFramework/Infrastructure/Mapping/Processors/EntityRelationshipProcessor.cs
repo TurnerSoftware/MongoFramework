@@ -16,6 +16,8 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 		{
 			definition.Relationships = GetEntityRelationships(definition).ToArray();
 
+			var removeProperties = new HashSet<string>();
+
 			foreach (var relationship in definition.Relationships)
 			{
 				if (relationship.IsCollection)
@@ -27,9 +29,13 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 				}
 				else
 				{
+					removeProperties.Add(relationship.NavigationProperty.FullPath);
 					classMap.UnmapMember(relationship.NavigationProperty.PropertyInfo);
 				}
 			}
+
+			//Remove navigation properties
+			definition.Properties = definition.Properties.Where(p => !removeProperties.Contains(p.FullPath)).ToArray();
 		}
 		private IEnumerable<IEntityRelationship> GetEntityRelationships(IEntityDefinition definition)
 		{
