@@ -13,6 +13,13 @@ namespace MongoFramework.Profiling.MiniProfiler
 {
 	public class MiniProfilerDiagnosticListener : IDiagnosticListener
 	{
+		private static MethodInfo OnNextWriteCommandMethod { get; } = typeof(MiniProfilerDiagnosticListener)
+			.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
+			.Where(m => m.IsGenericMethod && m.Name == nameof(OnNextWriteCommand)).FirstOrDefault();
+		private static MethodInfo OnNextIndexCommandMethod { get; } = typeof(MiniProfilerDiagnosticListener)
+			.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
+			.Where(m => m.IsGenericMethod && m.Name == nameof(OnNextIndexCommand)).FirstOrDefault();
+
 		private ConcurrentDictionary<Guid, CustomTiming> Commands { get; } = new ConcurrentDictionary<Guid, CustomTiming>();
 
 		public void OnCompleted() { /* OnCompleted is never called in MongoFramework as commands have a state */ }
@@ -63,9 +70,7 @@ namespace MongoFramework.Profiling.MiniProfiler
 
 		private void OnNextWriteCommand(WriteDiagnosticCommandBase commandBase)
 		{
-			var onNextWriteCommand = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
-				.Where(m => m.IsGenericMethod && m.Name == nameof(OnNextWriteCommand)).FirstOrDefault();
-			onNextWriteCommand.MakeGenericMethod(commandBase.EntityType).Invoke(this, new[] { commandBase });
+			OnNextWriteCommandMethod.MakeGenericMethod(commandBase.EntityType).Invoke(this, new[] { commandBase });
 		}
 #pragma warning disable CRR0026 // Unused member
 		private void OnNextWriteCommand<TEntity>(WriteDiagnosticCommand<TEntity> command)
@@ -110,9 +115,7 @@ namespace MongoFramework.Profiling.MiniProfiler
 
 		private void OnNextIndexCommand(IndexDiagnosticCommandBase commandBase)
 		{
-			var onNextIndexCommand = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
-				.Where(m => m.IsGenericMethod && m.Name == nameof(OnNextIndexCommand)).FirstOrDefault();
-			onNextIndexCommand.MakeGenericMethod(commandBase.EntityType).Invoke(this, new[] { commandBase });
+			OnNextIndexCommandMethod.MakeGenericMethod(commandBase.EntityType).Invoke(this, new[] { commandBase });
 		}
 #pragma warning disable CRR0026 // Unused member
 		private void OnNextIndexCommand<TEntity>(IndexDiagnosticCommand<TEntity> command)
