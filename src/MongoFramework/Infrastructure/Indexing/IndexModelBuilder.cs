@@ -13,31 +13,33 @@ namespace MongoFramework.Infrastructure.Indexing
 		{
 			var indexBuilder = Builders<TEntity>.IndexKeys;
 			var indexes = EntityMapping.GetOrCreateDefinition(typeof(TEntity)).Indexes;
+			var groupedIndexes = indexes.OrderBy(i => i.IndexPriority).GroupBy(i => i.IndexName);
 
-			var groupedIndexModels = indexes
-				.Select(d => new
-				{
-					d.IndexName,
-					d.IndexPriority,
-					IndexModel = CreateIndexModel(d)
-				})
-				.OrderBy(m => m.IndexPriority)
-				.GroupBy(m => m.IndexName)
-				.ToArray();
-
-			foreach (var groupedModel in groupedIndexModels)
+			foreach (var indexGroup in groupedIndexes)
 			{
-				if (groupedModel.Key != null)
+				if (indexGroup.Key != null)
 				{
-					var keys = indexBuilder.Combine(groupedModel.Select(m => m.IndexModel.Keys));
-					var options = groupedModel.FirstOrDefault().IndexModel.Options;
-					yield return new CreateIndexModel<TEntity>(keys, options);
+					var indexKeys = new List<IndexKeysDefinition<TEntity>>();
+					CreateIndexOptions<TEntity> indexOptions = default;
+					foreach (var index in indexGroup)
+					{
+						var indexModel = CreateIndexModel(index);
+						indexKeys.Add(indexModel.Keys);
+
+						if (indexOptions == null)
+						{
+							indexOptions = indexModel.Options;
+						}
+					}
+
+					var combinedKeyDefinition = indexBuilder.Combine(indexKeys);
+					yield return new CreateIndexModel<TEntity>(combinedKeyDefinition, indexOptions);
 				}
 				else
 				{
-					foreach (var model in groupedModel)
+					foreach (var index in indexGroup)
 					{
-						yield return model.IndexModel;
+						yield return CreateIndexModel(index);
 					}
 				}
 			}
