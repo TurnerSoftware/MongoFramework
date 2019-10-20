@@ -143,6 +143,14 @@ namespace MongoFramework
 			}
 		}
 		/// <summary>
+		/// Stages a deletion for a range of entities that match the predicate
+		/// </summary>
+		/// <param name="targetField"></param>
+		public virtual void RemoveRange(Expression<Func<TEntity, bool>> predicate)
+		{
+			EntityWriterPipeline.StageCommand(new RemoveEntityRangeCommand<TEntity>(predicate));
+		}
+		/// <summary>
 		/// Stages a deletion for the entity that matches the specified ID
 		/// </summary>
 		/// <param name="entityId"></param>
