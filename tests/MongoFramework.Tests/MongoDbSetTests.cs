@@ -14,6 +14,7 @@ namespace MongoFramework.Tests
 
 			[Required]
 			public string RequiredField { get; set; }
+			public bool BooleanField { get; set; }
 		}
 
 		[TestMethod, ExpectedException(typeof(ValidationException))]
@@ -189,6 +190,38 @@ namespace MongoFramework.Tests
 			Assert.IsTrue(dbSet.Any(m => m.RequiredField == "SuccessfullyRemoveEntityById"));
 			dbSet.SaveChanges();
 			Assert.IsFalse(dbSet.Any(m => m.RequiredField == "SuccessfullyRemoveEntityById"));
+		}
+
+		[TestMethod]
+		public void SuccessfullyRemoveRangeByPredicate()
+		{
+			var dbSet = new MongoDbSet<MongoDbSetValidationModel>();
+			dbSet.SetConnection(TestConfiguration.GetConnection());
+
+			var entities = new[]
+			{
+				new MongoDbSetValidationModel
+				{
+					RequiredField = "SuccessfullyRemoveRangeByPredicate"
+				},
+				new MongoDbSetValidationModel
+				{
+					RequiredField = "SuccessfullyRemoveRangeByPredicate",
+					BooleanField = true
+				}
+			};
+
+			dbSet.AddRange(entities);
+			dbSet.SaveChanges();
+
+			dbSet.SetConnection(TestConfiguration.GetConnection());
+
+			dbSet.RemoveRange(e => e.BooleanField);
+
+			Assert.AreEqual(2, dbSet.Count(m => m.RequiredField == "SuccessfullyRemoveRangeByPredicate"));
+			dbSet.SaveChanges();
+			Assert.AreEqual(1, dbSet.Count(m => m.RequiredField == "SuccessfullyRemoveRangeByPredicate"));
+			Assert.IsNotNull(dbSet.FirstOrDefault(m => m.Id == entities[0].Id));
 		}
 	}
 }
