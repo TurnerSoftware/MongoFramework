@@ -81,9 +81,13 @@ namespace MongoFramework.Infrastructure.Serialization
 		}
 	}
 
-	public class TypeDiscoverySerializer<TEntity> : IBsonSerializer<TEntity>, IBsonDocumentSerializer, IBsonIdProvider where TEntity : class
+	public abstract class TypeDiscoverySerializer
 	{
-		private static Type[] DictionaryTypes { get; } = new[] { typeof(IDictionary<,>), typeof(Dictionary<,>) };
+		protected static Type[] DictionaryTypes { get; } = new[] { typeof(IDictionary<,>), typeof(Dictionary<,>) };
+	}
+
+	public class TypeDiscoverySerializer<TEntity> : TypeDiscoverySerializer, IBsonSerializer<TEntity>, IBsonDocumentSerializer, IBsonIdProvider where TEntity : class
+	{
 
 		public Type ValueType => typeof(TEntity);
 
