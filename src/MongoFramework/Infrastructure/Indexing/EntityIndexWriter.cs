@@ -27,8 +27,8 @@ namespace MongoFramework.Infrastructure.Indexing
 		
 		public void ApplyIndexing()
 		{
-			var indexModel = IndexModelBuilder<TEntity>.BuildModel();
-			if (indexModel.Any())
+			var indexModel = IndexModelBuilder<TEntity>.BuildModel().ToArray();
+			if (indexModel.Length > 0)
 			{
 				using (var diagnostics = DiagnosticRunner.Start(Connection, indexModel))
 				{
@@ -47,8 +47,8 @@ namespace MongoFramework.Infrastructure.Indexing
 
 		public async Task ApplyIndexingAsync(CancellationToken cancellationToken = default)
 		{
-			var indexModel = IndexModelBuilder<TEntity>.BuildModel();
-			if (indexModel.Any())
+			var indexModel = IndexModelBuilder<TEntity>.BuildModel().ToArray();
+			if (indexModel.Length > 0)
 			{
 				using (var diagnostics = DiagnosticRunner.Start(Connection, indexModel))
 				{
