@@ -15,7 +15,7 @@ namespace MongoFramework.Infrastructure.Mutation.Mutators
 			{
 				if (mutationType == MutatorType.Select && !relationship.IsCollection)
 				{
-					var initialiseSingleEntityMethod = GetType().GetMethod("InitialiseSingleEntityRelationship", BindingFlags.NonPublic | BindingFlags.Static).MakeGenericMethod(relationship.EntityType);
+					var initialiseSingleEntityMethod = GetType().GetMethod(nameof(InitialiseSingleEntityRelationship), BindingFlags.NonPublic | BindingFlags.Static).MakeGenericMethod(relationship.EntityType);
 					initialiseSingleEntityMethod.Invoke(entity, new object[] { entity, relationship, connection });
 				}
 				else if (mutationType == MutatorType.Create && relationship.IsCollection)

@@ -64,7 +64,7 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 
 			foreach (var method in typeof(UpdateDefinitionExtensions).GetMethods(BindingFlags.NonPublic | BindingFlags.Static))
 			{
-				if (method.Name == "InternalSet")
+				if (method.Name == nameof(InternalSet))
 				{
 					var internalSetMethod = method.MakeGenericMethod(typeArgs);
 					var result = internalSetMethod.Invoke(null, new[] { definition, specificDefinition, dotNetValue });
