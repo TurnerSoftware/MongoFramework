@@ -14,7 +14,7 @@ namespace MongoFramework.Infrastructure.Serialization
 	public static class TypeDiscovery
 	{
 		private static ReaderWriterLockSlim TypeCacheLock { get; } = new ReaderWriterLockSlim();
-		private static ConcurrentBag<Type> AssignableTypes { get; set; } = new ConcurrentBag<Type>();
+		private static HashSet<Type> AssignableTypes { get; set; } = new HashSet<Type>();
 
 		public static void ClearCache()
 		{
@@ -22,7 +22,7 @@ namespace MongoFramework.Infrastructure.Serialization
 
 			try
 			{
-				AssignableTypes = new ConcurrentBag<Type>();
+				AssignableTypes.Clear();
 			}
 			finally
 			{
