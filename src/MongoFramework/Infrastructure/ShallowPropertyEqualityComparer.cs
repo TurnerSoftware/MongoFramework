@@ -39,7 +39,7 @@ namespace MongoFramework.Infrastructure
 				var xValue = property.GetValue(x);
 				var yValue = property.GetValue(y);
 
-				if (!object.Equals(xValue, yValue))
+				if (!Equals(xValue, yValue))
 				{
 					return false;
 				}
@@ -50,7 +50,7 @@ namespace MongoFramework.Infrastructure
 
 		public int GetHashCode(TObject obj)
 		{
-			if (obj == null)
+			if (obj is null)
 			{
 				throw new ArgumentNullException(nameof(obj));
 			}

@@ -8,6 +8,6 @@ namespace MongoFramework.Infrastructure
 	public interface ICommandWriter<TEntity> where TEntity : class
 	{
 		void Write(IEnumerable<IWriteCommand<TEntity>> writeCommands);
-		Task WriteAsync(IEnumerable<IWriteCommand<TEntity>> writeCommands, CancellationToken cancellationToken = default(CancellationToken));
+		Task WriteAsync(IEnumerable<IWriteCommand<TEntity>> writeCommands, CancellationToken cancellationToken = default);
 	}
 }

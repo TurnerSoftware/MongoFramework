@@ -64,7 +64,7 @@ namespace MongoFramework.Profiling.MiniProfiler
 		private void OnNextWriteCommand(WriteDiagnosticCommandBase commandBase)
 		{
 			var onNextWriteCommand = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
-				.Where(m => m.IsGenericMethod && m.Name == "OnNextWriteCommand").FirstOrDefault();
+				.Where(m => m.IsGenericMethod && m.Name == nameof(OnNextWriteCommand)).FirstOrDefault();
 			onNextWriteCommand.MakeGenericMethod(commandBase.EntityType).Invoke(this, new[] { commandBase });
 		}
 #pragma warning disable CRR0026 // Unused member
@@ -111,7 +111,7 @@ namespace MongoFramework.Profiling.MiniProfiler
 		private void OnNextIndexCommand(IndexDiagnosticCommandBase commandBase)
 		{
 			var onNextIndexCommand = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
-				.Where(m => m.IsGenericMethod && m.Name == "OnNextIndexCommand").FirstOrDefault();
+				.Where(m => m.IsGenericMethod && m.Name == nameof(OnNextIndexCommand)).FirstOrDefault();
 			onNextIndexCommand.MakeGenericMethod(commandBase.EntityType).Invoke(this, new[] { commandBase });
 		}
 #pragma warning disable CRR0026 // Unused member

@@ -61,7 +61,7 @@ namespace MongoFramework
 		{
 			if (entity == null)
 			{
-				throw new ArgumentNullException("entity");
+				throw new ArgumentNullException(nameof(entity));
 			}
 
 			ChangeTracker.Update(entity, EntityEntryState.Added);
@@ -74,7 +74,7 @@ namespace MongoFramework
 		{
 			if (entities == null)
 			{
-				throw new ArgumentNullException("entities");
+				throw new ArgumentNullException(nameof(entities));
 			}
 
 			foreach (var entity in entities)
@@ -91,7 +91,7 @@ namespace MongoFramework
 		{
 			if (entity == null)
 			{
-				throw new ArgumentNullException("entity");
+				throw new ArgumentNullException(nameof(entity));
 			}
 
 			ChangeTracker.Update(entity, EntityEntryState.Updated);
@@ -104,7 +104,7 @@ namespace MongoFramework
 		{
 			if (entities == null)
 			{
-				throw new ArgumentNullException("entities");
+				throw new ArgumentNullException(nameof(entities));
 			}
 
 			foreach (var entity in entities)
@@ -121,7 +121,7 @@ namespace MongoFramework
 		{
 			if (entity == null)
 			{
-				throw new ArgumentNullException("entity");
+				throw new ArgumentNullException(nameof(entity));
 			}
 
 			ChangeTracker.Update(entity, EntityEntryState.Deleted);
@@ -134,7 +134,7 @@ namespace MongoFramework
 		{
 			if (entities == null)
 			{
-				throw new ArgumentNullException("entities");
+				throw new ArgumentNullException(nameof(entities));
 			}
 
 			foreach (var entity in entities)
@@ -174,7 +174,7 @@ namespace MongoFramework
 		/// Writes all of the items in the changeset to the database.
 		/// </summary>
 		/// <returns></returns>
-		public virtual async Task SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
+		public virtual async Task SaveChangesAsync(CancellationToken cancellationToken = default)
 		{
 			await EntityIndexWriter.ApplyIndexingAsync(cancellationToken).ConfigureAwait(false);
 			cancellationToken.ThrowIfCancellationRequested();
