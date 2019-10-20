@@ -25,19 +25,21 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 				classMap.SetIgnoreExtraElements(false);
 
 				//If any of the Entity's properties have the "ExtraElementsAttribute", assign that against the BsonClassMap
-				var extraElementsProperty = definition.Properties
-					.Select(p => new
-					{
-						Property = p,
-						ExtraElementsAttribute = p.PropertyInfo.GetCustomAttribute<ExtraElementsAttribute>()
-					}).Where(p => p.ExtraElementsAttribute != null).FirstOrDefault();
 
-				if (extraElementsProperty != null && typeof(IDictionary<string, object>).IsAssignableFrom(extraElementsProperty.Property.PropertyType))
+				foreach (var property in definition.Properties)
 				{
-					var memberMap = classMap.DeclaredMemberMaps
-						.Where(m => m.ElementName == extraElementsProperty.Property.ElementName)
-						.FirstOrDefault();
-					classMap.SetExtraElementsMember(memberMap);
+					var extraElementsAttribute = property.PropertyInfo.GetCustomAttribute<ExtraElementsAttribute>();
+					if (extraElementsAttribute != null && typeof(IDictionary<string, object>).IsAssignableFrom(property.PropertyType))
+					{
+						foreach (var memberMap in classMap.DeclaredMemberMaps)
+						{
+							if (memberMap.ElementName == property.ElementName)
+							{
+								classMap.SetExtraElementsMember(memberMap);
+								return;
+							}
+						}
+					}
 				}
 			}
 		}
