@@ -12,17 +12,24 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 	{
 		public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
 		{
-			definition.Indexes = definition.TraverseProperties().SelectMany(p =>
-				p.PropertyInfo.GetCustomAttributes<IndexAttribute>().Select(a => new EntityIndex
+			var definitionIndexes = new List<EntityIndex>();
+			foreach (var property in definition.TraverseProperties())
+			{
+				foreach (var indexAttribute in property.PropertyInfo.GetCustomAttributes<IndexAttribute>())
 				{
-					Property = p,
-					IndexName = a.Name,
-					IsUnique = a.IsUnique,
-					SortOrder = a.SortOrder,
-					IndexPriority = a.IndexPriority,
-					IndexType = a.IndexType
-				})
-			).ToArray();
+					definitionIndexes.Add(new EntityIndex
+					{
+						Property = property,
+						IndexName = indexAttribute.Name,
+						IsUnique = indexAttribute.IsUnique,
+						SortOrder = indexAttribute.SortOrder,
+						IndexPriority = indexAttribute.IndexPriority,
+						IndexType = indexAttribute.IndexType
+					});
+				}
+			}
+
+			definition.Indexes = definitionIndexes;
 		}
 	}
 }
