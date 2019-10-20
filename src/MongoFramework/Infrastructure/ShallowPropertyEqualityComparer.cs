@@ -8,15 +8,11 @@ namespace MongoFramework.Infrastructure
 	public class ShallowPropertyEqualityComparer<TObject> : IEqualityComparer<TObject>
 	{
 		private PropertyInfo[] Properties { get; }
-		private bool ImplementsIEquatable { get; }
+		private static bool ImplementsIEquatable { get; } = typeof(TObject).GetInterfaces().Any(i => i == typeof(IEquatable<TObject>));
 
 		public ShallowPropertyEqualityComparer()
 		{
-			if (typeof(TObject).GetInterfaces().Any(i => i == typeof(IEquatable<TObject>)))
-			{
-				ImplementsIEquatable = true;
-			}
-			else
+			if (!ImplementsIEquatable)
 			{
 				Properties = typeof(TObject).GetProperties(BindingFlags.Public | BindingFlags.Instance);
 			}
