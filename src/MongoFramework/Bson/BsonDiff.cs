@@ -114,7 +114,7 @@ namespace MongoFramework.Bson
 				return new DiffResult(result);
 			}
 
-			return new DiffResult();
+			return DiffResult.NoDifferences;
 		}
 		public static DiffResult GetDifferences(BsonValue valueA, BsonValue valueB)
 		{
@@ -137,7 +137,7 @@ namespace MongoFramework.Bson
 				return new DiffResult(valueB);
 			}
 
-			return new DiffResult();
+			return DiffResult.NoDifferences;
 		}
 		public static DiffResult GetDifferences(BsonArray arrayA, BsonArray arrayB)
 		{
@@ -171,7 +171,7 @@ namespace MongoFramework.Bson
 				return new DiffResult(result);
 			}
 
-			return new DiffResult();
+			return DiffResult.NoDifferences;
 		}
 	}
 }
