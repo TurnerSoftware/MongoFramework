@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson.Serialization;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
@@ -12,6 +13,8 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 		{
 			var entityType = definition.EntityType;
 			var properties = entityType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
+			var definitionProperties = new List<IEntityProperty>();
 
 			foreach (var property in properties)
 			{
@@ -50,18 +53,18 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 					var mappedName = columnAttribute.Name;
 					memberMap.SetElementName(mappedName);
 				}
-			}
 
-			definition.Properties = classMap.DeclaredMemberMaps
-				.Select(m => new EntityProperty
+				definitionProperties.Add(new EntityProperty
 				{
 					EntityType = definition.EntityType,
-					IsKey = m == classMap.IdMemberMap,
-					ElementName = m.ElementName,
-					FullPath = m.ElementName,
-					PropertyType = (m.MemberInfo as PropertyInfo).PropertyType,
-					PropertyInfo = (m.MemberInfo as PropertyInfo)
-				}).ToArray();
+					ElementName = memberMap.ElementName,
+					FullPath = memberMap.ElementName,
+					PropertyType = property.PropertyType,
+					PropertyInfo = property
+				});
+			}
+
+			definition.Properties = definitionProperties;
 		}
 	}
 }
