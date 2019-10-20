@@ -53,14 +53,28 @@ namespace MongoFramework.Infrastructure.Mapping
 
 		public static IEnumerable<IEntityProperty> GetAllProperties(this IEntityDefinition definition)
 		{
-			var localProperties = definition.Properties;
-			var inheritedProperties = definition.GetInheritedProperties();
-			return localProperties.Concat(inheritedProperties);
+			foreach (var property in definition.Properties)
+			{
+				yield return property;
+			}
+
+			foreach (var property in definition.GetInheritedProperties())
+			{
+				yield return property;
+			}
 		}
 
 		public static IEntityProperty GetProperty(this IEntityDefinition definition, string name)
 		{
-			return definition.GetAllProperties().Where(p => p.PropertyInfo.Name == name).FirstOrDefault();
+			foreach (var property in definition.GetAllProperties())
+			{
+				if (property.PropertyInfo.Name == name)
+				{
+					return property;
+				}
+			}
+
+			return default;
 		}
 
 		private class TraversalState
