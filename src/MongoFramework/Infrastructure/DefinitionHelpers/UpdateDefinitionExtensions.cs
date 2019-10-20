@@ -62,14 +62,17 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 			var specificDefinitionType = typeof(StringFieldDefinition<,>).MakeGenericType(typeArgs);
 			var specificDefinition = Activator.CreateInstance(specificDefinitionType, fieldName, null); //ie. StringFieldDefintion<TEntity, valueType>
 
-			var internalSetMethod = typeof(UpdateDefinitionExtensions)
-				.GetMethods(BindingFlags.NonPublic | BindingFlags.Static)
-				.Where(m => m.Name == "InternalSet")
-				.FirstOrDefault()
-				.MakeGenericMethod(typeArgs);
+			foreach (var method in typeof(UpdateDefinitionExtensions).GetMethods(BindingFlags.NonPublic | BindingFlags.Static))
+			{
+				if (method.Name == "InternalSet")
+				{
+					var internalSetMethod = method.MakeGenericMethod(typeArgs);
+					var result = internalSetMethod.Invoke(null, new[] { definition, specificDefinition, dotNetValue });
+					return result as UpdateDefinition<TEntity>;
+				}
+			}
 
-			var result = internalSetMethod.Invoke(null, new[] { definition, specificDefinition, dotNetValue });
-			return result as UpdateDefinition<TEntity>;
+			return default;
 		}
 
 #pragma warning disable CRR0026 // Unused member - used via reflection
