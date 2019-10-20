@@ -12,16 +12,21 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 	{
 		public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
 		{
-			var entityType = definition.EntityType;
-
-			//Find the first property with the "Key" attribute to use as the Id
-			var properties = definition.Properties;
-			var idProperty = properties.Where(p => p.PropertyInfo.GetCustomAttribute<KeyAttribute>() != null).FirstOrDefault();
-			if (idProperty == null)
+			IEntityProperty idProperty = default;
+			foreach (var property in definition.Properties)
 			{
-				idProperty = properties
-					.Where(p => p.ElementName.Equals("id", StringComparison.InvariantCultureIgnoreCase))
-					.FirstOrDefault();
+				if (property.PropertyInfo.GetCustomAttribute<KeyAttribute>() != null)
+				{
+					idProperty = property;
+					break;
+				}
+				
+				if (property.ElementName.Equals("id", StringComparison.InvariantCultureIgnoreCase))
+				{
+					//We don't break here just in case another property has the KeyAttribute
+					//We preference the attribute over the name match
+					idProperty = property;
+				}
 			}
 
 			if (idProperty is EntityProperty entityProperty)
