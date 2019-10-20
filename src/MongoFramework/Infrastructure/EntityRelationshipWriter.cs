@@ -21,7 +21,7 @@ namespace MongoFramework.Infrastructure
 
 		public void CommitEntityRelationships(IEnumerable<TEntity> entities)
 		{
-			var writeMethod = GetType().GetMethod("CommitRelationship", BindingFlags.NonPublic | BindingFlags.Instance);
+			var writeMethod = GetType().GetMethod(nameof(CommitRelationship), BindingFlags.NonPublic | BindingFlags.Instance);
 			foreach (var relationship in Relationships)
 			{
 				writeMethod.MakeGenericMethod(relationship.EntityType)
@@ -31,7 +31,7 @@ namespace MongoFramework.Infrastructure
 
 		public async Task CommitEntityRelationshipsAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default(CancellationToken))
 		{
-			var writeMethod = GetType().GetMethod("CommitRelationshipAsync", BindingFlags.NonPublic | BindingFlags.Instance);
+			var writeMethod = GetType().GetMethod(nameof(CommitRelationshipAsync), BindingFlags.NonPublic | BindingFlags.Instance);
 			foreach (var relationship in Relationships)
 			{
 				await ((Task)writeMethod.MakeGenericMethod(relationship.EntityType)
