@@ -255,6 +255,44 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 		}
 
 		[TestMethod]
+		public void DeserializeStringForUnknownPropertyType()
+		{
+			EntityMapping.AddMappingProcessor(new TypeDiscoveryProcessor());
+			EntityMapping.RegisterType(typeof(UnknownPropertyTypeSerializationModel));
+
+			var document = new BsonDocument
+			{
+				{ "_t", "UnknownPropertyTypeSerializationModel" },
+				{
+					"UnknownPropertyType",
+					new BsonString("SerializedString")
+				}
+			};
+
+			var deserializedResult = BsonSerializer.Deserialize<UnknownPropertyTypeSerializationModel>(document);
+			Assert.IsInstanceOfType(deserializedResult.UnknownPropertyType, typeof(string));
+		}
+
+		[TestMethod]
+		public void DeserializeBooleanForUnknownPropertyType()
+		{
+			EntityMapping.AddMappingProcessor(new TypeDiscoveryProcessor());
+			EntityMapping.RegisterType(typeof(UnknownPropertyTypeSerializationModel));
+
+			var document = new BsonDocument
+			{
+				{ "_t", "UnknownPropertyTypeSerializationModel" },
+				{
+					"UnknownPropertyType",
+					new BsonBoolean(true)
+				}
+			};
+
+			var deserializedResult = BsonSerializer.Deserialize<UnknownPropertyTypeSerializationModel>(document);
+			Assert.IsInstanceOfType(deserializedResult.UnknownPropertyType, typeof(bool));
+		}
+
+		[TestMethod]
 		public void DeserializeUnknownTypesInDictionary()
 		{
 			EntityMapping.AddMappingProcessor(new TypeDiscoveryProcessor());
