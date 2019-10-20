@@ -63,12 +63,14 @@ namespace MongoFramework.Infrastructure
 		{
 			foreach (var collection in ManagedCollections)
 			{
-				var entries = collection.GetEntries()
-					.Where(e => e.State == EntityEntryState.NoChanges || e.State == EntityEntryState.Updated);
+				var entries = collection.GetEntries();
 
 				foreach (var entry in entries)
 				{
-					entry.State = entry.HasChanges() ? EntityEntryState.Updated : EntityEntryState.NoChanges;
+					if (entry.State == EntityEntryState.NoChanges || entry.State == EntityEntryState.Updated)
+					{
+						entry.State = entry.HasChanges() ? EntityEntryState.Updated : EntityEntryState.NoChanges;
+					}
 				}
 			}
 		}
