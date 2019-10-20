@@ -126,13 +126,9 @@ namespace MongoFramework.Infrastructure
 
 		public IEnumerator<TEntity> GetEnumerator()
 		{
-			var result = GetEntries().Select(e => e.Entity);
-			using (var enumerator = result.GetEnumerator())
+			foreach (var entry in GetEntries())
 			{
-				while (enumerator.MoveNext())
-				{
-					yield return enumerator.Current;
-				}
+				yield return entry.Entity;
 			}
 		}
 
