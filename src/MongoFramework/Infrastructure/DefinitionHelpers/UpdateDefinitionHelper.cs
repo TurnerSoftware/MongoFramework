@@ -18,7 +18,7 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 			var propertyNames = documentAProperties.Union(documentBProperties);
 			
 			var baseName = name;
-			if (baseName != string.Empty)
+			if (!string.IsNullOrEmpty(baseName))
 			{
 				baseName += ".";
 			}
