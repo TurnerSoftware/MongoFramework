@@ -22,7 +22,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 					IndexPriority = a.IndexPriority,
 					IndexType = a.IndexType
 				})
-			);
+			).ToArray();
 		}
 	}
 }
