@@ -49,6 +49,11 @@ namespace MongoFramework.Infrastructure.Serialization
 				{
 					foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
 					{
+						if (assembly.FullName.StartsWith("System.") || assembly.FullName.StartsWith("Microsoft."))
+						{
+							continue;
+						}
+
 						if (!assembly.IsDynamic)
 						{
 							foreach (var type in assembly.GetTypes())
