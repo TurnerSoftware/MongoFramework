@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Jobs;
 using MongoFramework.Infrastructure.Serialization;
 
 namespace MongoFramework.Benchmarks.Infrastructure.Serialization
 {
-	[CoreJob, MemoryDiagnoser]
+	[SimpleJob(RuntimeMoniker.NetCoreApp30), MemoryDiagnoser]
 	public class TypeDiscovery_FindTypeBenchmark
 	{
 		private class LocalClass { }
