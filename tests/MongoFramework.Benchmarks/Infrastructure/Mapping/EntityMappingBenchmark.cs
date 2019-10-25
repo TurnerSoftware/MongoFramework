@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Jobs;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoFramework.Infrastructure.Mapping;
 
 namespace MongoFramework.Benchmarks.Infrastructure.Mapping
 {
-	[CoreJob, MemoryDiagnoser]
+	[SimpleJob(RuntimeMoniker.NetCoreApp30), MemoryDiagnoser]
 	public class EntityMappingBenchmark
 	{
 		public class PersonModel

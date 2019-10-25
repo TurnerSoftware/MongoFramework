@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Jobs;
 using MongoFramework.Attributes;
 using MongoFramework.Infrastructure.Indexing;
 using MongoFramework.Infrastructure.Mapping;
 
 namespace MongoFramework.Benchmarks.Infrastructure.Indexing
 {
-	[CoreJob, MemoryDiagnoser]
+	[SimpleJob(RuntimeMoniker.NetCoreApp30), MemoryDiagnoser]
 	public class IndexModelBuilderBenchmark
 	{
 		public class FlatIndexModel
