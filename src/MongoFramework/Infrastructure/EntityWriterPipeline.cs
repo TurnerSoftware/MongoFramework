@@ -14,8 +14,8 @@ namespace MongoFramework.Infrastructure
 	{
 		public IMongoDbConnection Connection { get; }
 		private ICommandWriter<TEntity> CommandWriter { get; }
-		private List<IEntityCollectionBase<TEntity>> ManagedCollections { get; } = new List<IEntityCollectionBase<TEntity>>();
-		private List<IWriteCommand<TEntity>> StagedCommands { get; } = new List<IWriteCommand<TEntity>>();
+		private HashSet<IEntityCollectionBase<TEntity>> ManagedCollections { get; } = new HashSet<IEntityCollectionBase<TEntity>>();
+		private HashSet<IWriteCommand<TEntity>> StagedCommands { get; } = new HashSet<IWriteCommand<TEntity>>();
 
 		public EntityWriterPipeline(IMongoDbConnection connection)
 		{
