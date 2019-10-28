@@ -21,19 +21,19 @@ namespace MongoFramework
 	/// <typeparam name="TEntity"></typeparam>
 	public class MongoDbSet<TEntity> : IMongoDbSet<TEntity> where TEntity : class
 	{
-		public IEntityCollection<TEntity> ChangeTracker { get; private set; }
+		public IEntityCollection<TEntity> ChangeTracker { get; protected set; }
 
-		private IMongoDbConnection Connection { get; set; }
-		private IEntityWriterPipeline<TEntity> EntityWriterPipeline { get; set; }
-		private IEntityReader<TEntity> EntityReader { get; set; }
-		private IEntityIndexWriter<TEntity> EntityIndexWriter { get; set; }
-		private IEntityRelationshipWriter<TEntity> EntityRelationshipWriter { get; set; }
+		protected IMongoDbConnection Connection { get; private set; }
+		protected IEntityWriterPipeline<TEntity> EntityWriterPipeline { get; private set; }
+		protected IEntityReader<TEntity> EntityReader { get; private set; }
+		protected IEntityIndexWriter<TEntity> EntityIndexWriter { get; private set; }
+		protected IEntityRelationshipWriter<TEntity> EntityRelationshipWriter { get; private set; }
 
 		/// <summary>
 		/// Initialise a new entity reader and writer to the specified database.
 		/// </summary>
 		/// <param name="connection"></param>
-		public void SetConnection(IMongoDbConnection connection)
+		public virtual void SetConnection(IMongoDbConnection connection)
 		{
 			Connection = connection;
 			EntityWriterPipeline = new EntityWriterPipeline<TEntity>(connection);
