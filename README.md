@@ -88,7 +88,7 @@ public class MyContext : MongoDbContext
 While it mostly feels the same as creating contexts in Entity Framework, there are a number of differences still with the biggest being in the creation of contexts.
 The `IMongoDbConnection` is the core infrastructure that allows connection to MongoDB and is required to instantiate a context.
 
-You can create an instance of a connection in many ways:
+You can create an instance of a connection in two ways:
 ```csharp
 IMongoDbConnection connection;
 
@@ -97,9 +97,6 @@ connection = MongoDbConnection.FromUrl(new MongoUrl("mongodb://localhost:27017/M
 
 //FromConnectionString
 connection = MongoDbConnection.FromConnectionString("mongodb://localhost:27017/MyDatabase");
-
-//FromConfig (Note: .NET Framework only)
-connection = MongoDbConnection.FromConfig("MyConnectionStringName");
 ```
 
 ### Special Queries

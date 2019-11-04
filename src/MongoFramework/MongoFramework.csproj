@@ -8,14 +8,6 @@
     <PackageTags>$(PackageBaseTags)</PackageTags>
     <Authors>James Turner</Authors>
   </PropertyGroup>
-  
-  <PropertyGroup Condition="'$(TargetFramework)'=='NETCOREAPP2_0'">
-    <DefineConstants>NETCOREAPP2_0</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(TargetFramework)'=='netcoreapp3.0'">
-    <DefineConstants>NETCOREAPP3_0</DefineConstants>
-  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="MongoDB.Driver" Version="2.9.2" />

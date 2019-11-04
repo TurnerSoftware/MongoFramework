@@ -50,21 +50,6 @@ namespace MongoFramework
 			return FromUrl(new MongoUrl(connectionString));
 		}
 
-#if (!NETCOREAPP2_0 && !NETCOREAPP3_0)
-		public static MongoDbConnection FromConfig(string connectionName)
-		{
-			var connectionStringConfig = System.Configuration.ConfigurationManager.ConnectionStrings[connectionName];
-
-			if (connectionStringConfig != null)
-			{
-				var mongoUrl = MongoUrl.Create(connectionStringConfig.ConnectionString);
-				return FromUrl(mongoUrl);
-			}
-
-			return null;
-		}
-#endif
-
 		public IMongoDatabase GetDatabase()
 		{
 			if (IsDisposed)
