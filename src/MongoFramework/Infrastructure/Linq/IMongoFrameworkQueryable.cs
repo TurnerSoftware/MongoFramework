@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 
 namespace MongoFramework.Infrastructure.Linq
 {
@@ -9,5 +11,6 @@ namespace MongoFramework.Infrastructure.Linq
 
 	public interface IMongoFrameworkQueryable<TOutput> : IMongoFrameworkQueryable, IOrderedQueryable<TOutput>
 	{
+		IAsyncEnumerable<TOutput> AsAsyncEnumerable(CancellationToken cancellationToken = default);
 	}
 }

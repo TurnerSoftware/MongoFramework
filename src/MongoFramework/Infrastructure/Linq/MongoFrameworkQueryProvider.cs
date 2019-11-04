@@ -9,6 +9,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MongoFramework.Infrastructure.Linq
 {
@@ -80,6 +83,28 @@ namespace MongoFramework.Infrastructure.Linq
 		public TResult Execute<TResult>(Expression expression)
 		{
 			return (TResult)Execute(expression);
+		}
+		public object ExecuteAsync(Expression expression, CancellationToken cancellationToken = default)
+		{
+			var model = GetExecutionModel(expression);
+			var outputType = model.Serializer.ValueType;
+
+			//aka. ExecuteModelAsync<outputType>(model, cancellationToken)
+
+			Expression executor = Expression.Call(
+				Expression.Constant(this),
+				nameof(ExecuteModelAsync),
+				new[] { outputType },
+				Expression.Constant(model, typeof(AggregateExecutionModel)),
+				Expression.Constant(cancellationToken));
+
+			var lambda = Expression.Lambda(executor);
+			return lambda.Compile().DynamicInvoke(null);
+		}
+
+		public IAsyncEnumerable<TResult> ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken = default)
+		{
+			return (IAsyncEnumerable<TResult>)ExecuteAsync(expression, cancellationToken);
 		}
 
 		private IMongoCollection<TEntity> GetCollection()
@@ -166,6 +191,48 @@ namespace MongoFramework.Infrastructure.Linq
 						{
 							EntityProcessors.ProcessEntity(entityItem, Connection);
 						}
+						yield return item;
+					}
+				}
+			}
+		}
+
+		private async IAsyncEnumerable<TResult> ExecuteModelAsync<TResult>(AggregateExecutionModel model, [EnumeratorCancellation] CancellationToken cancellationToken)
+		{
+			var serializer = model.Serializer as IBsonSerializer<TResult>;
+			var pipeline = PipelineDefinition<TEntity, TResult>.Create(model.Stages, serializer);
+
+			using (var diagnostics = DiagnosticRunner.Start<TEntity>(Connection, model))
+			{
+				IAsyncCursor<TResult> underlyingCursor;
+
+				try
+				{
+					underlyingCursor = await GetCollection().AggregateAsync(pipeline, cancellationToken: cancellationToken);
+				}
+				catch (Exception exception)
+				{
+					diagnostics.Error(exception);
+					throw;
+				}
+
+				var hasFirstResult = false;
+				while (await underlyingCursor.MoveNextAsync(cancellationToken))
+				{
+					if (!hasFirstResult)
+					{
+						hasFirstResult = true;
+						diagnostics.FirstReadResult<TResult>();
+					}
+
+					var resultBatch = underlyingCursor.Current;
+					foreach (var item in resultBatch)
+					{
+						if (item is TEntity entityItem)
+						{
+							EntityProcessors.ProcessEntity(entityItem, Connection);
+						}
+
 						yield return item;
 					}
 				}

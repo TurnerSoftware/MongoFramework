@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 
 namespace MongoFramework.Infrastructure.Linq
 {
@@ -43,6 +44,11 @@ namespace MongoFramework.Infrastructure.Linq
 		public string ToQuery()
 		{
 			return InternalProvider.ToQuery(Expression);
+		}
+
+		public IAsyncEnumerable<TOutput> AsAsyncEnumerable(CancellationToken cancellationToken = default)
+		{
+			return (IAsyncEnumerable<TOutput>)InternalProvider.ExecuteAsync(Expression, cancellationToken);
 		}
 	}
 }
