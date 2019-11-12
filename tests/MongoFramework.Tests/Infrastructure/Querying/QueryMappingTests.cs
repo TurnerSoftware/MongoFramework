@@ -32,7 +32,7 @@ namespace MongoFramework.Tests.Infrastructure.Querying
 				new QueryTestModel()
 			});
 
-			var stages = QueryMapping.FromExpression(queryable.Expression);
+			var stages = StageBuilder.BuildFromExpression(queryable.Expression);
 			Assert.AreEqual(0, stages.Count());
 		}
 
@@ -43,7 +43,7 @@ namespace MongoFramework.Tests.Infrastructure.Querying
 				new QueryTestModel()
 			}).Where(q => q.Id == "");
 
-			var stages = QueryMapping.FromExpression(queryable.Expression);
+			var stages = StageBuilder.BuildFromExpression(queryable.Expression);
 			Assert.AreEqual(1, stages.Count());
 		}
 
@@ -54,7 +54,18 @@ namespace MongoFramework.Tests.Infrastructure.Querying
 				new QueryTestModel()
 			}).Where(q => q.Id == "").OrderBy(q => q.Id);
 
-			var stages = QueryMapping.FromExpression(queryable.Expression);
+			var stages = StageBuilder.BuildFromExpression(queryable.Expression);
+			Assert.AreEqual(2, stages.Count());
+		}
+
+		[TestMethod]
+		public void Queryable_Where_OrderByDescending()
+		{
+			var queryable = Queryable.AsQueryable(new[] {
+				new QueryTestModel()
+			}).Where(q => q.Id == "").OrderByDescending(q => q.Id);
+
+			var stages = StageBuilder.BuildFromExpression(queryable.Expression);
 			Assert.AreEqual(2, stages.Count());
 		}
 
@@ -65,7 +76,7 @@ namespace MongoFramework.Tests.Infrastructure.Querying
 				new QueryTestModel()
 			}).Where(q => q.Id == "").OrderBy(q => q.Id).Select(q => q.SomeNumberField);
 
-			var stages = QueryMapping.FromExpression(queryable.Expression);
+			var stages = StageBuilder.BuildFromExpression(queryable.Expression);
 			Assert.AreEqual(3, stages.Count());
 		}
 	}

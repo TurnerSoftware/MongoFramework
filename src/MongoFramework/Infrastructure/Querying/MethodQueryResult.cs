@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Text;
 using MongoDB.Bson;
 
 namespace MongoFramework.Infrastructure.Querying
 {
-	public interface ICallConverter
+	public class MethodQueryResult
 	{
-		BsonDocument Convert(MethodCallExpression expression);
+		public BsonValue Value { get; set; }
 	}
 }
