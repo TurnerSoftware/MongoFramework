@@ -70,11 +70,26 @@ namespace MongoFramework.Tests.Infrastructure.Querying
 		}
 
 		[TestMethod]
-		public void Queryable_Where_OrderBy_Select()
+		public void Queryable_Where_OrderBy_Select_Property()
 		{
 			var queryable = Queryable.AsQueryable(new[] {
 				new QueryTestModel()
 			}).Where(q => q.Id == "").OrderBy(q => q.Id).Select(q => q.SomeNumberField);
+
+			var stages = StageBuilder.BuildFromExpression(queryable.Expression);
+			Assert.AreEqual(3, stages.Count());
+		}
+
+		[TestMethod]
+		public void Queryable_Where_OrderBy_Select_New()
+		{
+			var queryable = Queryable.AsQueryable(new[] {
+				new QueryTestModel()
+			}).Where(q => q.Id == "").OrderBy(q => q.Id).Select(q => new
+			{
+				MyOwnCustomId = q.Id,
+				MyNestedProperty = q.NestedModel.Name
+			});
 
 			var stages = StageBuilder.BuildFromExpression(queryable.Expression);
 			Assert.AreEqual(3, stages.Count());

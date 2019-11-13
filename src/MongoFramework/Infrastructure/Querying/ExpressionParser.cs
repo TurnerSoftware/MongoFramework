@@ -100,6 +100,10 @@ namespace MongoFramework.Infrastructure.Querying
 			{
 				return BuildMemberAccessQuery(memberExpression);
 			}
+			else if (expression is NewExpression newExpression)
+			{
+				return BuildInstantiationQuery(newExpression);
+			}
 			else if (expression is ParameterExpression)
 			{
 				return null;
@@ -131,6 +135,27 @@ namespace MongoFramework.Infrastructure.Querying
 			}
 
 			throw new ArgumentException($"Unexpected expression type {expression}");
+		}
+
+		private static BsonValue BuildInstantiationQuery(NewExpression newExpression)
+		{
+			var projectionDocument = new BsonDocument
+			{
+				{ "_id", 0 }
+			};
+
+			for (var i = 0; i < newExpression.Members.Count; i++)
+			{
+				var fromExpression = BuildPartialQuery(newExpression.Arguments[i]);
+
+				var member = newExpression.Members[i];
+				var entityDefinition = EntityMapping.GetOrCreateDefinition(member.DeclaringType);
+				var entityProperty = entityDefinition.GetProperty(member.Name);
+
+				projectionDocument.Add(entityProperty.ElementName, fromExpression);
+			}
+
+			return projectionDocument;
 		}
 
 		private static BsonValue BuildMemberAccessQuery(Expression expression)

@@ -20,14 +20,8 @@ namespace MongoFramework.Infrastructure.Querying.MethodParsers
 			return new BsonDocument
 			{
 				{
-					"$project", 
-					new BsonDocument
-					{
-						{ 
-							ExpressionParser.BuildPartialQuery(expression.Arguments[1]).AsString,
-							""
-						}
-					} 
+					"$project",
+					ExpressionParser.BuildPartialQuery(expression.Arguments[1])
 				}
 			};
 		}
