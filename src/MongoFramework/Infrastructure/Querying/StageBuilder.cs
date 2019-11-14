@@ -15,7 +15,7 @@ namespace MongoFramework.Infrastructure.Querying
 
 			while (currentExpression is MethodCallExpression methodCallExpression)
 			{
-				var stage = ExpressionParser.BuildPartialQuery(currentExpression).AsBsonDocument;
+				var stage = ExpressionTranslation.TranslateMethod(methodCallExpression).AsBsonDocument;
 				stages.Push(stage);
 
 				currentExpression = methodCallExpression.Arguments[0];

@@ -8,7 +8,7 @@ using MongoFramework.Infrastructure.Mapping;
 
 namespace MongoFramework.Infrastructure.Querying
 {
-	public static class ExpressionHelper
+	public static class TranslationHelper
 	{
 		public static MethodInfo GetMethodDefinition(Expression<Action> expression)
 		{
