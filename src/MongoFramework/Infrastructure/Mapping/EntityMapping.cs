@@ -1,10 +1,12 @@
-﻿using MongoDB.Bson.Serialization;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace MongoFramework.Infrastructure.Mapping
@@ -40,6 +42,15 @@ namespace MongoFramework.Infrastructure.Mapping
 			EntityDefinitions.Clear();
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsValidTypeToMap(Type entityType)
+		{
+			return entityType.IsClass &&
+				entityType != typeof(object) &&
+				entityType != typeof(string) &&
+				!typeof(BsonValue).IsAssignableFrom(entityType);
+		}
+
 		public static bool IsRegistered(Type entityType)
 		{
 			return EntityDefinitions.ContainsKey(entityType);
@@ -47,6 +58,11 @@ namespace MongoFramework.Infrastructure.Mapping
 
 		public static IEntityDefinition RegisterType(Type entityType)
 		{
+			if (!IsValidTypeToMap(entityType))
+			{
+				throw new ArgumentException("Type is not a valid type to map", nameof(entityType));
+			}
+
 			if (IsRegistered(entityType))
 			{
 				throw new ArgumentException("Type is already registered", nameof(entityType));

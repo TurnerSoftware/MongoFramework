@@ -8,7 +8,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 		public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
 		{
 			var entityType = definition.EntityType;
-			if (entityType != typeof(object) && entityType.BaseType != typeof(object) && !EntityMapping.IsRegistered(entityType.BaseType))
+			if (EntityMapping.IsValidTypeToMap(entityType.BaseType) && !EntityMapping.IsRegistered(entityType.BaseType))
 			{
 				EntityMapping.RegisterType(entityType.BaseType);
 			}

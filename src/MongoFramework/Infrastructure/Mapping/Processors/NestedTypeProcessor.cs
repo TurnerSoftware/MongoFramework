@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson.Serialization;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoFramework.Infrastructure.Internal;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 				propertyType = propertyType.GetEnumerableItemTypeOrDefault();
 
 				//Maps the property type for handling property nesting
-				if (propertyType.IsClass && propertyType != entityType && propertyType != typeof(string))
+				if (propertyType != entityType && EntityMapping.IsValidTypeToMap(propertyType))
 				{
 					if (!EntityMapping.IsRegistered(propertyType))
 					{

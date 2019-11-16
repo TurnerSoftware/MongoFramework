@@ -16,8 +16,15 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 			var dotNetValue = BsonTypeMapper.MapToDotNetValue(value);
 			var valueType = dotNetValue?.GetType();
 
-			var propertyDefinition = EntityMapping.GetOrCreateDefinition(typeof(TEntity)).TraverseProperties()
-				.Where(p => p.FullPath == fieldName).FirstOrDefault();
+			IEntityProperty propertyDefinition = null;
+			if (EntityMapping.IsValidTypeToMap(typeof(TEntity)))
+			{
+				propertyDefinition = EntityMapping.GetOrCreateDefinition(typeof(TEntity))
+					.TraverseProperties()
+					.Where(p => p.FullPath == fieldName)
+					.FirstOrDefault();
+			}
+
 			var propertyType = propertyDefinition?.PropertyType;
 
 			if (valueType == null && propertyType == null)

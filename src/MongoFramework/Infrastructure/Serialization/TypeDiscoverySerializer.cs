@@ -175,7 +175,7 @@ namespace MongoFramework.Infrastructure.Serialization
 			}
 			else
 			{
-				if (type.IsClass && type != typeof(string))
+				if (EntityMapping.IsValidTypeToMap(type))
 				{
 					//Force the type to be processed by the Entity Mapper
 					if (!EntityMapping.IsRegistered(type))
