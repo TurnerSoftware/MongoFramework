@@ -85,5 +85,69 @@ namespace MongoFramework.Tests.Infrastructure.Querying
 			};
 			Assert.AreEqual(expected, result);
 		}
+
+		[TestMethod]
+		public void TranslateConditional_AndAlso()
+		{
+			var expression = GetConditional(e => e.Id == "" && e.SingleNumber >= 5);
+			var result = ExpressionTranslation.TranslateConditional(expression);
+			var expected = new BsonDocument
+			{
+				{ "Id", new BsonDocument { { "$eq", "" } } },
+				{ "SingleNumber", new BsonDocument { { "$gte", 5 } } }
+			};
+			Assert.AreEqual(expected, result);
+		}
+
+		[TestMethod]
+		public void TranslateConditional_OrElse()
+		{
+			var expression = GetConditional(e => e.Id == "" || e.SingleNumber >= 5);
+			var result = ExpressionTranslation.TranslateConditional(expression);
+			var expected = new BsonDocument
+			{
+				{ 
+					"$or",
+					new BsonArray
+					{
+						new BsonDocument { { "Id", new BsonDocument { { "$eq", "" } } } },
+						new BsonDocument { { "SingleNumber", new BsonDocument { { "$gte", 5 } } } }
+					}
+				}
+			};
+			Assert.AreEqual(expected, result);
+		}
+
+		[TestMethod]
+		public void TranslateConditional_Not_AndAlso()
+		{
+			var expression = GetConditional(e => !(e.Id == "" && e.SingleNumber >= 5));
+			var result = ExpressionTranslation.TranslateConditional(expression);
+			var expected = new BsonDocument
+			{
+				{ "Id", new BsonDocument { { "$not", new BsonDocument { { "$eq", "" } } } } },
+				{ "SingleNumber", new BsonDocument { { "$not", new BsonDocument { { "$gte", 5 } } } } }
+			};
+			Assert.AreEqual(expected, result);
+		}
+
+		[TestMethod]
+		public void TranslateConditional_Not_OrElse()
+		{
+			var expression = GetConditional(e => !(e.Id == "" || e.SingleNumber >= 5));
+			var result = ExpressionTranslation.TranslateConditional(expression);
+			var expected = new BsonDocument
+			{
+				{
+					"$nor",
+					new BsonArray
+					{
+						new BsonDocument { { "Id", new BsonDocument { { "$eq", "" } } } },
+						new BsonDocument { { "SingleNumber", new BsonDocument { { "$gte", 5 } } } }
+					}
+				}
+			};
+			Assert.AreEqual(expected, result);
+		}
 	}
 }

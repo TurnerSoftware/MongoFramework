@@ -215,22 +215,22 @@ namespace MongoFramework.Infrastructure.Querying
 			return currentExpression;
 		}
 
-		public static BsonDocument TranslateConditional(Expression expression)
+		public static BsonDocument TranslateConditional(Expression expression, bool negated = false)
 		{
 			var localExpression = UnwrapLambda(expression);
 
-			static void UnwrapBinaryQuery(BsonArray target, ExpressionType expressionType, BinaryExpression expression)
+			static void UnwrapBinaryQuery(BsonArray target, ExpressionType expressionType, BinaryExpression expression, bool negated)
 			{
 				if (expression.Left.NodeType == expressionType)
 				{
-					UnwrapBinaryQuery(target, expressionType, expression.Left as BinaryExpression);
+					UnwrapBinaryQuery(target, expressionType, expression.Left as BinaryExpression, negated);
 				}
 				else
 				{
-					target.Add(TranslateSubExpression(expression.Left));
+					target.Add(TranslateConditional(expression.Left, negated));
 				}
 
-				target.Add(TranslateSubExpression(expression.Right));
+				target.Add(TranslateConditional(expression.Right, negated));
 			}
 
 			if (localExpression is BinaryExpression binaryExpression)
@@ -238,7 +238,7 @@ namespace MongoFramework.Infrastructure.Querying
 				if (localExpression.NodeType == ExpressionType.AndAlso)
 				{
 					var unwrappedQuery = new BsonArray();
-					UnwrapBinaryQuery(unwrappedQuery, ExpressionType.AndAlso, binaryExpression);
+					UnwrapBinaryQuery(unwrappedQuery, ExpressionType.AndAlso, binaryExpression, negated);
 
 					var elements = new BsonElement[unwrappedQuery.Count];
 
@@ -252,7 +252,7 @@ namespace MongoFramework.Infrastructure.Querying
 				else if (localExpression.NodeType == ExpressionType.OrElse)
 				{
 					var unwrappedQuery = new BsonArray();
-					UnwrapBinaryQuery(unwrappedQuery, ExpressionType.OrElse, binaryExpression);
+					UnwrapBinaryQuery(unwrappedQuery, ExpressionType.OrElse, binaryExpression, negated);
 					return new BsonDocument
 					{
 						{ "$or", unwrappedQuery }
@@ -289,25 +289,34 @@ namespace MongoFramework.Infrastructure.Querying
 
 					var expressionOperator = ComparatorToStringMap[expressionType];
 					var valueComparison = new BsonDocument { { expressionOperator, value } };
+
+					if (negated)
+					{
+						valueComparison = new BsonDocument
+						{
+							{ "$not", valueComparison }
+						};
+					}
+
 					return new BsonDocument { { fieldName, valueComparison } };
 				}
 			}
 			else if (localExpression is UnaryExpression unaryExpression && unaryExpression.NodeType == ExpressionType.Not)
 			{
-				string operatorName;
 				if (unaryExpression.Operand.NodeType == ExpressionType.OrElse)
 				{
-					operatorName = "$nor";
+					var translatedInnerExpression = TranslateConditional(unaryExpression.Operand, false);
+					var valueItems = translatedInnerExpression.GetElement("$or").Value;
+
+					return new BsonDocument
+					{
+						{ "$nor", valueItems }
+					};
 				}
 				else
 				{
-					operatorName = "$not";
+					return TranslateConditional(unaryExpression.Operand, !negated);
 				}
-
-				return new BsonDocument
-				{
-					{ operatorName, TranslateConditional(unaryExpression.Operand) }
-				};
 			}
 
 			throw new ArgumentException($"Unexpected node type {expression.NodeType} for a conditional statement");
