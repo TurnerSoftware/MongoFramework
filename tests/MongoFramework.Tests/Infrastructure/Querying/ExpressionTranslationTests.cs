@@ -149,5 +149,19 @@ namespace MongoFramework.Tests.Infrastructure.Querying
 			};
 			Assert.AreEqual(expected, result);
 		}
+
+		[TestMethod]
+		public void TranslateConditional_ExternalConstants()
+		{
+			var externalData = new BsonDocument { { "Data", "Hello World" } };
+
+			var expression = GetConditional(e => e.Id == externalData["Data"].AsString);
+			var result = ExpressionTranslation.TranslateConditional(expression);
+			var expected = new BsonDocument
+			{
+				{ "Id", new BsonDocument { { "$eq", "Hello World" } } }
+			};
+			Assert.AreEqual(expected, result);
+		}
 	}
 }
