@@ -39,5 +39,10 @@ namespace MongoFramework.Tests.Infrastructure.Querying
 		{
 			return ExpressionTranslation.UnwrapLambda(expression);
 		}
+
+		protected static Expression GetTransform<TResult>(Expression<Func<QueryTestModel, TResult>> expression)
+		{
+			return ExpressionTranslation.UnwrapLambda(expression);
+		}
 	}
 }
