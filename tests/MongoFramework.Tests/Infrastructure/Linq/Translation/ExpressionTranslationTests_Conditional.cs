@@ -11,7 +11,7 @@ using MongoFramework.Infrastructure.Linq.Translation;
 namespace MongoFramework.Tests.Infrastructure.Linq.Translation
 {
 	[TestClass]
-	public class ExpressionTranslationTests : QueryTestBase
+	public class ExpressionTranslationTests_Conditional : QueryTestBase
 	{
 		[TestMethod]
 		public void TranslateConditional_Equals()
@@ -237,82 +237,6 @@ namespace MongoFramework.Tests.Infrastructure.Linq.Translation
 			{
 				{ "Id", new BsonDocument { { "$eq", "Hello World" } } }
 			};
-			Assert.AreEqual(expected, result);
-		}
-
-		[TestMethod]
-		public void TranslateInstantiation_Anonymous()
-		{
-			var expression = GetTransform(e => new
-			{
-				e.Id,
-				MyNumber = e.SingleNumber
-			});
-			var result = ExpressionTranslation.TranslateInstantiation(expression);
-			var expected = new BsonDocument
-			{
-				{ "Id", "Id" },
-				{ "MyNumber", "SingleNumber" }
-			};
-			Assert.AreEqual(expected, result);
-		}
-
-		[TestMethod]
-		public void TranslateInstantiation_RealType()
-		{
-			var expression = GetTransform(e => new QueryTestModel
-			{
-				Id = e.Id,
-				SingleNumber = e.SingleNumber
-			});
-			var result = ExpressionTranslation.TranslateInstantiation(expression);
-			var expected = new BsonDocument
-			{
-				{ "Id", "Id" },
-				{ "SingleNumber", "SingleNumber" }
-			};
-			Assert.AreEqual(expected, result);
-		}
-
-		[TestMethod, ExpectedException(typeof(ArgumentException))]
-		public void TranslateInstantiation_InvalidExpression()
-		{
-			var expression = GetTransform(e => e.SingleNumber);
-			ExpressionTranslation.TranslateInstantiation(expression);
-		}
-
-		[TestMethod]
-		public void TranslateMember_SingleLevelMember()
-		{
-			var expression = GetTransform(e => e.SingleString);
-			var result = ExpressionTranslation.TranslateMember(expression);
-			var expected = new BsonString("SingleString");
-			Assert.AreEqual(expected, result);
-		}
-
-		[TestMethod]
-		public void TranslateMember_MultiLevelMember()
-		{
-			var expression = GetTransform(e => e.SingleModel.SingleNumber);
-			var result = ExpressionTranslation.TranslateMember(expression);
-			var expected = new BsonString("SingleModel.SingleNumber");
-			Assert.AreEqual(expected, result);
-		}
-
-		[TestMethod]
-		public void TranslateMember_MemberWithArrayIndex_AtStart()
-		{
-			var expression = GetTransform(e => e.ArrayOfModels[3].SingleNumber);
-			var result = ExpressionTranslation.TranslateMember(expression);
-			var expected = new BsonString("ArrayOfModels.3.SingleNumber");
-			Assert.AreEqual(expected, result);
-		}
-		[TestMethod]
-		public void TranslateMember_MemberWithArrayIndex_AtEnd()
-		{
-			var expression = GetTransform(e => e.SingleModel.ArrayOfModels[2]);
-			var result = ExpressionTranslation.TranslateMember(expression);
-			var expected = new BsonString("SingleModel.ArrayOfModels.2");
 			Assert.AreEqual(expected, result);
 		}
 	}
