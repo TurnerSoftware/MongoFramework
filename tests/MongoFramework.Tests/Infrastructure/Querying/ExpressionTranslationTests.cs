@@ -100,18 +100,95 @@ namespace MongoFramework.Tests.Infrastructure.Querying
 		}
 
 		[TestMethod]
+		public void TranslateConditional_AndAlso_AndAlso()
+		{
+			var expression = GetConditional(e => e.Id == "" && e.SingleNumber >= 5 && e.SingleString == "ABC");
+			var result = ExpressionTranslation.TranslateConditional(expression);
+			var expected = new BsonDocument
+			{
+				{ "Id", new BsonDocument { { "$eq", "" } } },
+				{ "SingleNumber", new BsonDocument { { "$gte", 5 } } },
+				{ "SingleString", new BsonDocument { { "$eq", "ABC" } } }
+			};
+			Assert.AreEqual(expected, result);
+		}
+
+		[TestMethod]
 		public void TranslateConditional_OrElse()
 		{
 			var expression = GetConditional(e => e.Id == "" || e.SingleNumber >= 5);
 			var result = ExpressionTranslation.TranslateConditional(expression);
 			var expected = new BsonDocument
 			{
-				{ 
+				{
 					"$or",
 					new BsonArray
 					{
 						new BsonDocument { { "Id", new BsonDocument { { "$eq", "" } } } },
 						new BsonDocument { { "SingleNumber", new BsonDocument { { "$gte", 5 } } } }
+					}
+				}
+			};
+			Assert.AreEqual(expected, result);
+		}
+
+		[TestMethod]
+		public void TranslateConditional_OrElse_OrElse()
+		{
+			var expression = GetConditional(e => e.Id == "" || e.SingleNumber >= 5 || e.SingleString == "ABC");
+			var result = ExpressionTranslation.TranslateConditional(expression);
+			var expected = new BsonDocument
+			{
+				{
+					"$or",
+					new BsonArray
+					{
+						new BsonDocument { { "Id", new BsonDocument { { "$eq", "" } } } },
+						new BsonDocument { { "SingleNumber", new BsonDocument { { "$gte", 5 } } } },
+						new BsonDocument { { "SingleString", new BsonDocument { { "$eq", "ABC" } } } }
+					}
+				}
+			};
+			Assert.AreEqual(expected, result);
+		}
+		
+		[TestMethod]
+		public void TranslateConditional_AndAlso_OrElse()
+		{
+			var expression = GetConditional(e => e.Id == "" && (e.SingleNumber >= 5 || e.SingleString == "ABC"));
+			var result = ExpressionTranslation.TranslateConditional(expression);
+			var expected = new BsonDocument
+			{
+				{ "Id", new BsonDocument { { "$eq", "" } } },
+				{
+					"$or",
+					new BsonArray
+					{
+						new BsonDocument { { "SingleNumber", new BsonDocument { { "$gte", 5 } } } },
+						new BsonDocument { { "SingleString", new BsonDocument { { "$eq", "ABC" } } } }
+					}
+				}
+			};
+			Assert.AreEqual(expected, result);
+		}
+
+		[TestMethod]
+		public void TranslateConditional_OrElse_AndAlso()
+		{
+			var expression = GetConditional(e => e.Id == "" || (e.SingleNumber >= 5 && e.SingleString == "ABC"));
+			var result = ExpressionTranslation.TranslateConditional(expression);
+			var expected = new BsonDocument
+			{
+				{
+					"$or",
+					new BsonArray
+					{
+						new BsonDocument { { "Id", new BsonDocument { { "$eq", "" } } } },
+						new BsonDocument
+						{
+							{ "SingleNumber", new BsonDocument { { "$gte", 5 } } },
+							{ "SingleString", new BsonDocument { { "$eq", "ABC" } } }
+						}
 					}
 				}
 			};
