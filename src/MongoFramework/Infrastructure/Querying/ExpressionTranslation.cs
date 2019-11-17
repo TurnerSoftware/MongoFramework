@@ -49,47 +49,67 @@ namespace MongoFramework.Infrastructure.Querying
 
 		static ExpressionTranslation()
 		{
-			AddTranslator(new WhereTranslator(), WhereTranslator.GetSupportedMethods());
-			AddTranslator(new OrderByTranslator(), OrderByTranslator.GetSupportedMethods());
-			AddTranslator(new SelectTranslator(), SelectTranslator.GetSupportedMethods());
+			DefaultTranslators.AddTranslators();
 		}
 
-		public static void AddTranslator(IMethodTranslator translator, IEnumerable<MethodInfo> methods)
+		public static void AddTranslator(IQueryTranslator translator)
+		{
+			if (translator is IMethodTranslator methodTranslator)
+			{
+				lock (MethodTranslatorMap)
+				{
+					foreach (var method in methodTranslator.GetSupportedMethods())
+					{
+						MethodTranslatorMap.Add(method, methodTranslator);
+					}
+				}
+			}
+			else if (translator is IMemberTranslator memberTranslator)
+			{
+				lock (MemberTranslatorMap)
+				{
+					foreach (var member in memberTranslator.GetSupportedMembers())
+					{
+						MemberTranslatorMap.Add(member, memberTranslator);
+					}
+				}
+			}
+			else if (translator is IBinaryExpressionTranslator binaryExpressionTranslator)
+			{
+				lock (BinaryTranslatorMap)
+				{
+					foreach (var expressionType in binaryExpressionTranslator.GetSupportedExpressionTypes())
+					{
+						if (DefaultSupportedTypes.Contains(expressionType))
+						{
+							throw new ArgumentException($"{expressionType} is a default expression type and can not have a custom translator");
+						}
+
+						BinaryTranslatorMap.Add(expressionType, binaryExpressionTranslator);
+					}
+				}
+			}
+			else
+			{
+				throw new ArgumentException($"Invalid type of translator. It must implement {nameof(IMethodTranslator)}, {nameof(IMemberTranslator)} or {nameof(IBinaryExpressionTranslator)}.", nameof(translator));
+			}
+		}
+
+		public static void ClearTranslators()
 		{
 			lock (MethodTranslatorMap)
 			{
-				foreach (var method in methods)
-				{
-					MethodTranslatorMap.Add(method, translator);
-				}
+				MethodTranslatorMap.Clear();
 			}
-		}
 
-		public static void AddTranslator(IMemberTranslator translator, IEnumerable<MemberInfo> members)
-		{
 			lock (MemberTranslatorMap)
 			{
-				foreach (var member in members)
-				{
-					MemberTranslatorMap.Add(member, translator);
-				}
+				MemberTranslatorMap.Clear();
 			}
-		}
-
-		public static void AddTranslator(IBinaryExpressionTranslator translator, IEnumerable<ExpressionType> expressionTypes)
-		{
 
 			lock (BinaryTranslatorMap)
 			{
-				foreach (var expressionType in expressionTypes)
-				{
-					if (DefaultSupportedTypes.Contains(expressionType))
-					{
-						throw new ArgumentException($"{expressionType} is a default expression type and can not have a custom translator");
-					}
-
-					BinaryTranslatorMap.Add(expressionType, translator);
-				}
+				BinaryTranslatorMap.Clear();
 			}
 		}
 

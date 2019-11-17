@@ -10,7 +10,7 @@ namespace MongoFramework.Infrastructure.Querying.Translators
 {
 	public class WhereTranslator : IMethodTranslator
 	{
-		public static IEnumerable<MethodInfo> GetSupportedMethods()
+		public IEnumerable<MethodInfo> GetSupportedMethods()
 		{
 			yield return TranslationHelper.GetMethodDefinition(() => Queryable.Where(null, (Expression<Func<object, bool>>)null));
 		}

@@ -10,7 +10,7 @@ namespace MongoFramework.Infrastructure.Querying.Translators
 {
 	public class OrderByTranslator : IMethodTranslator
 	{
-		public static IEnumerable<MethodInfo> GetSupportedMethods()
+		public IEnumerable<MethodInfo> GetSupportedMethods()
 		{
 			yield return TranslationHelper.GetMethodDefinition(() => Queryable.OrderBy(null, (Expression<Func<object, bool>>)null));
 			yield return TranslationHelper.GetMethodDefinition(() => Queryable.OrderByDescending(null, (Expression<Func<object, bool>>)null));
