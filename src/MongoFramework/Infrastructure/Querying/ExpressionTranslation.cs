@@ -147,11 +147,11 @@ namespace MongoFramework.Infrastructure.Querying
 
 			while (true)
 			{
-				if (currentExpression is BinaryExpression binaryExpression && expression.NodeType == ExpressionType.ArrayIndex)
+				if (currentExpression is BinaryExpression binaryExpression && currentExpression.NodeType == ExpressionType.ArrayIndex)
 				{
 					//The index is on the right
 					var arrayIndex = TranslateSubExpression(binaryExpression.Right);
-					partialNamePieces.Push(arrayIndex.AsString);
+					partialNamePieces.Push(arrayIndex.ToString());
 
 					//The parent expression is on the left
 					currentExpression = binaryExpression.Left;
@@ -169,7 +169,7 @@ namespace MongoFramework.Infrastructure.Querying
 				}
 				else
 				{
-					throw new ArgumentException($"Unexpected node type {expression.NodeType}.");
+					throw new ArgumentException($"Unexpected node type {currentExpression.NodeType}.");
 				}
 			}
 		}
