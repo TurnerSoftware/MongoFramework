@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MongoFramework.Infrastructure.Querying;
+using MongoFramework.Infrastructure.Linq.Translation;
 
-namespace MongoFramework.Tests.Infrastructure.Querying
+namespace MongoFramework.Tests.Infrastructure.Linq.Translation
 {
 	[TestClass]
 	public class StageBuilderTests : QueryTestBase

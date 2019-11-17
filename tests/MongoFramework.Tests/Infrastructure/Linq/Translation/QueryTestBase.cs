@@ -1,12 +1,12 @@
-﻿using System;
+﻿using MongoFramework.Infrastructure.Linq.Translation;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
-using MongoFramework.Infrastructure.Querying;
 
-namespace MongoFramework.Tests.Infrastructure.Querying
+namespace MongoFramework.Tests.Infrastructure.Linq.Translation
 {
 	public abstract class QueryTestBase : TestBase
 	{

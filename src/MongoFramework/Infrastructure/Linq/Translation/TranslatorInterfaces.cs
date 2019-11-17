@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using MongoDB.Bson;
 
-namespace MongoFramework.Infrastructure.Querying
+namespace MongoFramework.Infrastructure.Linq.Translation
 {
 	public interface IQueryTranslator { }
 	public interface IMethodTranslator : IQueryTranslator

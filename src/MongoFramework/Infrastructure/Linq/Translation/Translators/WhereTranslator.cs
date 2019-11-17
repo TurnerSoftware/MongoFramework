@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using MongoDB.Bson;
 
-namespace MongoFramework.Infrastructure.Querying.Translators
+namespace MongoFramework.Infrastructure.Linq.Translation.Translators
 {
 	public class WhereTranslator : IMethodTranslator
 	{

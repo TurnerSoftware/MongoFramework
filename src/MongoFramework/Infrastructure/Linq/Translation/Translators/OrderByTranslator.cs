@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using MongoDB.Bson;
 
-namespace MongoFramework.Infrastructure.Querying.Translators
+namespace MongoFramework.Infrastructure.Linq.Translation.Translators
 {
 	public class OrderByTranslator : IMethodTranslator
 	{
@@ -30,7 +30,7 @@ namespace MongoFramework.Infrastructure.Querying.Translators
 					"$sort", 
 					new BsonDocument
 					{
-						{ 
+						{
 							ExpressionTranslation.TranslateSubExpression(expression.Arguments[1]).AsString,
 							direction
 						}

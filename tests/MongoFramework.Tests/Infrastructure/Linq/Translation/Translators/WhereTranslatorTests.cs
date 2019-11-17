@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson;
-using MongoFramework.Infrastructure.Querying.Translators;
+using MongoFramework.Infrastructure.Linq.Translation.Translators;
 
-namespace MongoFramework.Tests.Infrastructure.Querying.Translators
+namespace MongoFramework.Tests.Infrastructure.Linq.Translation.Translators
 {
 	[TestClass]
 	public class WhereTranslatorTests : QueryTestBase

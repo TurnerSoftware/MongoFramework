@@ -6,7 +6,7 @@ using System.Text;
 using MongoDB.Bson;
 using MongoFramework.Infrastructure.Mapping;
 
-namespace MongoFramework.Infrastructure.Querying
+namespace MongoFramework.Infrastructure.Linq.Translation
 {
 	public static class TranslationHelper
 	{

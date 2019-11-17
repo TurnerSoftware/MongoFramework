@@ -1,9 +1,9 @@
-﻿using System;
+﻿using MongoFramework.Infrastructure.Linq.Translation.Translators;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using MongoFramework.Infrastructure.Querying.Translators;
 
-namespace MongoFramework.Infrastructure.Querying
+namespace MongoFramework.Infrastructure.Linq.Translation
 {
 	public static class DefaultTranslators
 	{

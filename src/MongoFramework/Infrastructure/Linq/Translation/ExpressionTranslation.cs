@@ -6,9 +6,8 @@ using System.Reflection;
 using System.Text;
 using MongoDB.Bson;
 using MongoFramework.Infrastructure.Mapping;
-using MongoFramework.Infrastructure.Querying.Translators;
 
-namespace MongoFramework.Infrastructure.Querying
+namespace MongoFramework.Infrastructure.Linq.Translation
 {
 	public static class ExpressionTranslation
 	{
