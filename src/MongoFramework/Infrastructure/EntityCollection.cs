@@ -28,7 +28,7 @@ namespace MongoFramework.Infrastructure
 
 			foreach (var entry in Entries)
 			{
-				if (Equals(entityId, defaultIdValue) && entry.Entity.Equals(entity))
+				if (Equals(entityId, defaultIdValue) && ReferenceEquals(entry.Entity, entity))
 				{
 					return entry;
 				}
@@ -55,7 +55,7 @@ namespace MongoFramework.Infrastructure
 			var entry = GetEntry(entity);
 			if (entry != null)
 			{
-				if (entry.Entity.Equals(entity))
+				if (ReferenceEquals(entry.Entity, entity))
 				{
 					entry.State = state;
 				}

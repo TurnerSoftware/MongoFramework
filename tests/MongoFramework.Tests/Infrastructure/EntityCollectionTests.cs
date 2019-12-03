@@ -14,6 +14,28 @@ namespace MongoFramework.Tests.Infrastructure
 			public string Title { get; set; }
 		}
 
+		public class EntityCollectionOverriddenEqualsModel
+		{
+			public string Id { get; set; }
+
+			public string EqualsProperty { get; set; }
+
+			public override bool Equals(object obj)
+			{
+				if (obj is EntityCollectionOverriddenEqualsModel model)
+				{
+					return EqualsProperty == model.EqualsProperty;
+				}
+
+				return false;
+			}
+
+			public override int GetHashCode()
+			{
+				return EqualsProperty?.GetHashCode() ?? base.GetHashCode();
+			}
+		}
+
 		[TestMethod]
 		public void AddNewEntry()
 		{
@@ -63,6 +85,24 @@ namespace MongoFramework.Tests.Infrastructure
 
 			entityCollection.Update(entity, EntityEntryState.NoChanges);
 			Assert.IsTrue(entityCollection.GetEntries().All(e => e.Entity == entity && e.State == EntityEntryState.NoChanges));
+		}
+
+		[TestMethod]
+		public void EntryDoesntMatchOnEqualityOverride()
+		{
+			var entityCollection = new EntityCollection<EntityCollectionOverriddenEqualsModel>();
+			var entityA = new EntityCollectionOverriddenEqualsModel
+			{
+				EqualsProperty = "DbEntityCollectionTests.EntityCollectionOverriddenEqualsModel"
+			};
+			entityCollection.Update(entityA, EntityEntryState.Added);
+
+			var entityB = new EntityCollectionOverriddenEqualsModel
+			{
+				EqualsProperty = "DbEntityCollectionTests.EntityCollectionOverriddenEqualsModel"
+			};
+			entityCollection.Update(entityB, EntityEntryState.Added);
+			Assert.AreEqual(2, entityCollection.GetEntries().Count());
 		}
 
 		[TestMethod]
