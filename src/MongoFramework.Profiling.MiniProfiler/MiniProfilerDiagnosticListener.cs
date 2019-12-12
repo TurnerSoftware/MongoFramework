@@ -129,10 +129,11 @@ namespace MongoFramework.Profiling.MiniProfiler
 		private string GetIndexModelAsString<TEntity>(CreateIndexModel<TEntity> indexModel)
 		{
 			var serializer = BsonSerializer.LookupSerializer<TEntity>();
+			var indexOptions = indexModel.Options;
 			return new BsonDocument
 			{
 				{ "Keys", indexModel.Keys.Render(serializer, BsonSerializer.SerializerRegistry) },
-				{ "Options", indexModel.Options.ToBsonDocument() }
+				{ "Options", new { indexOptions.Name, indexOptions.Unique, indexOptions.Background }.ToBsonDocument() }
 			}.ToString();
 		}
 	}
