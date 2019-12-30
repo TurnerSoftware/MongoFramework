@@ -27,10 +27,18 @@ namespace MongoFramework.Infrastructure.Mapping
 
 		public static IEntityDefinition SetEntityDefinition(IEntityDefinition definition)
 		{
-			return EntityDefinitions.AddOrUpdate(definition.EntityType, definition, (entityType, existingValue) =>
+			MappingLock.EnterWriteLock();
+			try
 			{
-				return definition;
-			});
+				return EntityDefinitions.AddOrUpdate(definition.EntityType, definition, (entityType, existingValue) =>
+				{
+					return definition;
+				});
+			}
+			finally
+			{
+				MappingLock.ExitWriteLock();
+			}
 		}
 
 		public static void RemoveEntityDefinition(IEntityDefinition definition)
@@ -87,12 +95,21 @@ namespace MongoFramework.Infrastructure.Mapping
 						return definition;
 					}
 
-					var (entityDefinition, classMap) = BuildMapping(entityType);
+					var classMap = new BsonClassMap(entityType);
+					definition = new EntityDefinition
+					{
+						EntityType = entityType
+					};
 
+					EntityDefinitions.TryAdd(entityType, definition);
 					BsonClassMap.RegisterClassMap(classMap);
-					EntityDefinitions.TryAdd(entityType, entityDefinition);
 
-					return entityDefinition;
+					foreach (var processor in MappingProcessors)
+					{
+						processor.ApplyMapping(definition, classMap);
+					}
+
+					return definition;
 				}
 				finally
 				{
@@ -150,12 +167,20 @@ namespace MongoFramework.Infrastructure.Mapping
 						return true;
 					}
 
-					var (entityDefinition, classMap) = BuildMapping(entityType);
+					var classMap = new BsonClassMap(entityType);
+					definition = new EntityDefinition
+					{
+						EntityType = entityType
+					};
 
+					EntityDefinitions.TryAdd(entityType, definition);
 					BsonClassMap.RegisterClassMap(classMap);
-					EntityDefinitions.TryAdd(entityType, entityDefinition);
 
-					definition = entityDefinition;
+					foreach (var processor in MappingProcessors)
+					{
+						processor.ApplyMapping(definition, classMap);
+					}
+
 					return true;
 				}
 				finally
@@ -167,22 +192,6 @@ namespace MongoFramework.Infrastructure.Mapping
 			{
 				MappingLock.ExitUpgradeableReadLock();
 			}
-		}
-
-		private static (IEntityDefinition definition, BsonClassMap classMap) BuildMapping(Type entityType)
-		{
-			var classMap = new BsonClassMap(entityType);
-			var definition = new EntityDefinition
-			{
-				EntityType = entityType
-			};
-
-			foreach (var processor in MappingProcessors)
-			{
-				processor.ApplyMapping(definition, classMap);
-			}
-
-			return (definition, classMap);
 		}
 
 		public static void AddMappingProcessors(IEnumerable<IMappingProcessor> mappingProcessors)
