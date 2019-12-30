@@ -178,10 +178,7 @@ namespace MongoFramework.Infrastructure.Serialization
 				if (EntityMapping.IsValidTypeToMap(type))
 				{
 					//Force the type to be processed by the Entity Mapper
-					if (!EntityMapping.IsRegistered(type))
-					{
-						EntityMapping.RegisterType(type);
-					}
+					EntityMapping.TryRegisterType(type, out _);
 
 					var classMap = BsonClassMap.LookupClassMap(type);
 					var serializerType = typeof(BsonClassMapSerializer<>).MakeGenericType(type);

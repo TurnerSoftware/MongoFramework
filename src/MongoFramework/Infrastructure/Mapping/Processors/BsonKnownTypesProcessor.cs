@@ -15,10 +15,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 			{
 				foreach (var type in bsonKnownTypesAttribute.KnownTypes)
 				{
-					if (!EntityMapping.IsRegistered(type))
-					{
-						EntityMapping.RegisterType(type);
-					}
+					EntityMapping.TryRegisterType(type, out _);
 				}
 			}
 		}

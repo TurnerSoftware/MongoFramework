@@ -24,6 +24,7 @@ namespace MongoFramework.Infrastructure.Mapping
 
 			AddMappingProcessors(DefaultMappingPack.Instance.Processors);
 		}
+
 		public static IEntityDefinition SetEntityDefinition(IEntityDefinition definition)
 		{
 			return EntityDefinitions.AddOrUpdate(definition.EntityType, definition, (entityType, existingValue) =>
@@ -63,53 +64,125 @@ namespace MongoFramework.Infrastructure.Mapping
 				throw new ArgumentException("Type is not a valid type to map", nameof(entityType));
 			}
 
-			if (IsRegistered(entityType))
-			{
-				throw new ArgumentException("Type is already registered", nameof(entityType));
-			}
-
-			var definition = new EntityDefinition
-			{
-				EntityType = entityType
-			};
-
 			MappingLock.EnterUpgradeableReadLock();
 			try
 			{
-				if (!BsonClassMap.IsClassMapRegistered(entityType))
+				if (EntityDefinitions.ContainsKey(entityType))
 				{
-					MappingLock.EnterWriteLock();
+					throw new ArgumentException("Type is already registered", nameof(entityType));
+				}
 
-					try
-					{
-						var classMap = new BsonClassMap(entityType);
-						BsonClassMap.RegisterClassMap(classMap);
+				if (BsonClassMap.IsClassMapRegistered(entityType))
+				{
+					throw new ArgumentException($"Type is already registered as a {nameof(BsonClassMap)}");
+				}
 
-						foreach (var processor in MappingProcessors)
-						{
-							processor.ApplyMapping(definition, classMap);
-						}
-					}
-					finally
+				MappingLock.EnterWriteLock();
+				try
+				{
+					//Now we have the write lock, do one super last minute check
+					if (EntityDefinitions.TryGetValue(entityType, out var definition))
 					{
-						MappingLock.ExitWriteLock();
+						//We will treat success of this check as if we have registered it just now
+						return definition;
 					}
+
+					var (entityDefinition, classMap) = BuildMapping(entityType);
+
+					BsonClassMap.RegisterClassMap(classMap);
+					EntityDefinitions.TryAdd(entityType, entityDefinition);
+
+					return entityDefinition;
+				}
+				finally
+				{
+					MappingLock.ExitWriteLock();
 				}
 			}
 			finally
 			{
 				MappingLock.ExitUpgradeableReadLock();
 			}
-
-			return SetEntityDefinition(definition);
 		}
 
 		public static IEntityDefinition GetOrCreateDefinition(Type entityType)
 		{
-			return EntityDefinitions.GetOrAdd(entityType, t =>
+			MappingLock.EnterUpgradeableReadLock();
+			try
 			{
+				if (EntityDefinitions.TryGetValue(entityType, out var definition))
+				{
+					return definition;
+				}
+
 				return RegisterType(entityType);
-			});
+			}
+			finally
+			{
+				MappingLock.ExitUpgradeableReadLock();
+			}
+		}
+
+		public static bool TryRegisterType(Type entityType, out IEntityDefinition definition)
+		{
+			if (!IsValidTypeToMap(entityType))
+			{
+				definition = null;
+				return false;
+			}
+
+			MappingLock.EnterUpgradeableReadLock();
+			try
+			{
+				if (EntityDefinitions.ContainsKey(entityType) || BsonClassMap.IsClassMapRegistered(entityType))
+				{
+					definition = null;
+					return false;
+				}
+
+				MappingLock.EnterWriteLock();
+				try
+				{
+					//Now we have the write lock, do one super last minute check
+					if (EntityDefinitions.TryGetValue(entityType, out definition))
+					{
+						//We will treat success of this check as if we have registered it just now
+						return true;
+					}
+
+					var (entityDefinition, classMap) = BuildMapping(entityType);
+
+					BsonClassMap.RegisterClassMap(classMap);
+					EntityDefinitions.TryAdd(entityType, entityDefinition);
+
+					definition = entityDefinition;
+					return true;
+				}
+				finally
+				{
+					MappingLock.ExitWriteLock();
+				}
+			}
+			finally
+			{
+				MappingLock.ExitUpgradeableReadLock();
+			}
+		}
+
+		private static (IEntityDefinition definition, BsonClassMap classMap) BuildMapping(Type entityType)
+		{
+			var classMap = new BsonClassMap(entityType);
+			var definition = new EntityDefinition
+			{
+				EntityType = entityType
+			};
+
+			foreach (var processor in MappingProcessors)
+			{
+				processor.ApplyMapping(definition, classMap);
+			}
+
+			return (definition, classMap);
 		}
 
 		public static void AddMappingProcessors(IEnumerable<IMappingProcessor> mappingProcessors)
