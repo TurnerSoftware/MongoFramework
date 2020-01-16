@@ -12,7 +12,7 @@
 		public void ProcessEntity(TEntity entity, IMongoDbConnection connection)
 		{
 			var entry = EntityCollection.GetEntry(entity);
-			if (entry == null || entry.State != EntityEntryState.Deleted)
+			if (entry == null || entry.State == EntityEntryState.NoChanges)
 			{
 				EntityCollection.Update(entity, EntityEntryState.NoChanges);
 			}
