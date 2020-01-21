@@ -2,7 +2,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MongoFramework.Infrastructure
 {
@@ -12,10 +11,7 @@ namespace MongoFramework.Infrastructure
 
 		private IEntityDefinition EntityDefinition { get; }
 
-		public EntityCollection()
-		{
-			EntityDefinition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
-		}
+		public EntityCollection() => EntityDefinition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
 
 		public int Count => Entries.Count;
 
@@ -45,10 +41,7 @@ namespace MongoFramework.Infrastructure
 			return null;
 		}
 
-		public IEnumerable<EntityEntry<TEntity>> GetEntries()
-		{
-			return Entries;
-		}
+		public IEnumerable<EntityEntry<TEntity>> GetEntries() => Entries;
 
 		public void Update(TEntity entity, EntityEntryState state)
 		{
@@ -82,10 +75,7 @@ namespace MongoFramework.Infrastructure
 			return false;
 		}
 
-		public void Clear()
-		{
-			Entries.Clear();
-		}
+		public void Clear() => Entries.Clear();
 
 		public void Add(TEntity item)
 		{
@@ -101,10 +91,7 @@ namespace MongoFramework.Infrastructure
 			}
 		}
 
-		public bool Contains(TEntity item)
-		{
-			return GetEntry(item) != null;
-		}
+		public bool Contains(TEntity item) => GetEntry(item) != null;
 
 		public void CopyTo(TEntity[] array, int arrayIndex)
 		{
@@ -132,9 +119,6 @@ namespace MongoFramework.Infrastructure
 			}
 		}
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 	}
 }

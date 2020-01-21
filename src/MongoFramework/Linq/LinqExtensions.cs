@@ -60,17 +60,9 @@ namespace MongoFramework.Linq
 			return queryable.Where(e => definition.Inject());
 		}
 
-		public static IQueryable<TEntity> SearchText<TEntity>(this IMongoDbSet<TEntity> dbSet, string search) where TEntity : class
-		{
-			return dbSet.WhereFilter(b => b.Text(search));
-		}
-
+		public static IQueryable<TEntity> SearchText<TEntity>(this IMongoDbSet<TEntity> dbSet, string search) where TEntity : class => dbSet.WhereFilter(b => b.Text(search));
 		public static IQueryable<TEntity> SearchGeoIntersecting<TEntity, TCoordinates>(this IQueryable<TEntity> queryable, Expression<Func<TEntity, object>> field, GeoJsonGeometry<TCoordinates> geometry) where TCoordinates : GeoJsonCoordinates
-		{
-			return queryable.WhereFilter(b => b.GeoIntersects(field, geometry));
-		}
-
-
+		 => queryable.WhereFilter(b => b.GeoIntersects(field, geometry));
 		public static IQueryable<TEntity> SearchGeoNear<TEntity, TCoordinates>(this IMongoDbSet<TEntity> dbSet, Expression<Func<TEntity, object>> targetField, GeoJsonPoint<TCoordinates> point, Expression<Func<TEntity, object>> distanceResultField = null, double? maxDistance = null, double? minDistance = null) where TEntity : class where TCoordinates : GeoJsonCoordinates
 		{
 			var entitySerializer = BsonSerializer.LookupSerializer<TEntity>();

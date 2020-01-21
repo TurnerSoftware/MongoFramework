@@ -81,7 +81,6 @@ namespace MongoFramework.Bson
 
 			return false;
 		}
-
 		public static DiffResult GetDifferences(BsonDocument documentA, BsonDocument documentB)
 		{
 			var result = new BsonDocument();

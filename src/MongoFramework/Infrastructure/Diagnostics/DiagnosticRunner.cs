@@ -13,11 +13,7 @@ namespace MongoFramework.Infrastructure.Diagnostics
 		public Guid CommandId { get; } = Guid.NewGuid();
 		public IMongoDbConnection Connection { get; }
 		public bool HasErrored { get; private set; }
-
-		private DiagnosticRunner(IMongoDbConnection connection)
-		{
-			Connection = connection;
-		}
+		private DiagnosticRunner(IMongoDbConnection connection) => Connection = connection;
 		public static DiagnosticRunner Start<TEntity>(IMongoDbConnection connection, AggregateExecutionModel model) where TEntity : class
 		{
 			var runner = new DiagnosticRunner(connection);
@@ -54,7 +50,6 @@ namespace MongoFramework.Infrastructure.Diagnostics
 			});
 			return runner;
 		}
-
 		public void FirstReadResult<TOutput>()
 		{
 			Connection.DiagnosticListener.OnNext(new ReadDiagnosticCommand
@@ -64,7 +59,6 @@ namespace MongoFramework.Infrastructure.Diagnostics
 				EntityType = typeof(TOutput)
 			});
 		}
-
 		public void Error(Exception exception = null)
 		{
 			HasErrored = true;
@@ -79,7 +73,6 @@ namespace MongoFramework.Infrastructure.Diagnostics
 				Connection.DiagnosticListener.OnError(exception);
 			}
 		}
-
 		public void Dispose()
 		{
 			if (!HasErrored)

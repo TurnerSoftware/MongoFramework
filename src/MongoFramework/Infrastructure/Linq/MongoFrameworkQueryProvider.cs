@@ -16,11 +16,8 @@ namespace MongoFramework.Infrastructure.Linq
 	{
 		public IMongoDbConnection Connection { get; }
 		private IEntityDefinition EntityDefinition { get; }
-
 		private BsonDocument PreStage { get; }
-
 		public EntityProcessorCollection<TEntity> EntityProcessors { get; } = new EntityProcessorCollection<TEntity>();
-
 		public MongoFrameworkQueryProvider(IMongoDbConnection connection) : this(connection, null) { }
 		public MongoFrameworkQueryProvider(IMongoDbConnection connection, BsonDocument preStage)
 		{
@@ -29,9 +26,7 @@ namespace MongoFramework.Infrastructure.Linq
 			PreStage = preStage;
 		}
 		public MongoFrameworkQueryProvider(IMongoFrameworkQueryProvider<TEntity> provider, BsonDocument preStage) : this(provider.Connection, preStage)
-		{
-			EntityProcessors.AddRange(provider.EntityProcessors);
-		}
+		 => EntityProcessors.AddRange(provider.EntityProcessors);
 
 		public Expression GetBaseExpression()
 		{
@@ -39,16 +34,8 @@ namespace MongoFramework.Infrastructure.Linq
 			return Expression.Constant(collection.AsQueryable(), typeof(IMongoQueryable<TEntity>));
 		}
 
-		public IQueryable CreateQuery(Expression expression)
-		{
-			throw new NotImplementedException();
-		}
-
-		public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
-		{
-			return new MongoFrameworkQueryable<TElement>(this, expression);
-		}
-
+		public IQueryable CreateQuery(Expression expression) => throw new NotImplementedException();
+		public IQueryable<TElement> CreateQuery<TElement>(Expression expression) => new MongoFrameworkQueryable<TElement>(this, expression);
 		public object Execute(Expression expression)
 		{
 			var model = GetExecutionModel(expression);
@@ -76,17 +63,8 @@ namespace MongoFramework.Infrastructure.Linq
 				throw ex.InnerException;
 			}
 		}
-
-		public TResult Execute<TResult>(Expression expression)
-		{
-			return (TResult)Execute(expression);
-		}
-
-		private IMongoCollection<TEntity> GetCollection()
-		{
-			return Connection.GetDatabase().GetCollection<TEntity>(EntityDefinition.CollectionName);
-		}
-
+		public TResult Execute<TResult>(Expression expression) => (TResult)Execute(expression);
+		private IMongoCollection<TEntity> GetCollection() => Connection.GetDatabase().GetCollection<TEntity>(EntityDefinition.CollectionName);
 		private AggregateExecutionModel GetExecutionModel(Expression expression)
 		{
 			var underlyingProvider = GetCollection().AsQueryable().Provider;
@@ -126,7 +104,6 @@ namespace MongoFramework.Infrastructure.Linq
 
 			return result;
 		}
-
 		private IEnumerable<TResult> ExecuteModel<TResult>(AggregateExecutionModel model)
 		{
 			var serializer = model.Serializer as IBsonSerializer<TResult>;
@@ -166,7 +143,6 @@ namespace MongoFramework.Infrastructure.Linq
 				}
 			}
 		}
-
 		public string ToQuery(Expression expression)
 		{
 			var model = GetExecutionModel(expression);

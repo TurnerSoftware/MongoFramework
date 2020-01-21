@@ -38,10 +38,7 @@ namespace MongoFramework.Attributes
 		/// Applies the specified type of index to the property.
 		/// </summary>
 		/// <param name="indexType"></param>
-		public IndexAttribute(IndexType indexType)
-		{
-			IndexType = indexType;
-		}
+		public IndexAttribute(IndexType indexType) => IndexType = indexType;
 
 		/// <summary>
 		/// Applies a standard index to the property with the specified name and sort order.

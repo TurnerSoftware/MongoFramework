@@ -17,7 +17,6 @@ namespace MongoFramework.Infrastructure
 				Properties = typeof(TObject).GetProperties(BindingFlags.Public | BindingFlags.Instance);
 			}
 		}
-
 		public bool Equals(TObject x, TObject y)
 		{
 			if (object.Equals(x, default(TObject)) && object.Equals(y, default(TObject)))

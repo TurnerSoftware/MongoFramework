@@ -4,10 +4,7 @@
 	{
 		public IEntityCollection<TEntity> EntityCollection { get; private set; }
 
-		public EntityTrackingProcessor(IEntityCollection<TEntity> collection)
-		{
-			EntityCollection = collection;
-		}
+		public EntityTrackingProcessor(IEntityCollection<TEntity> collection) => EntityCollection = collection;
 
 		public void ProcessEntity(TEntity entity, IMongoDbConnection connection)
 		{

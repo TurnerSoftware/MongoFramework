@@ -103,18 +103,8 @@ namespace MongoFramework.Infrastructure
 			}
 		}
 
-		public EntityEntry<EntityBucket<TGroup, TSubEntity>> GetEntry(EntityBucket<TGroup, TSubEntity> entity)
-		{
-			throw new NotImplementedException();
-		}
-
-		public void Update(EntityBucket<TGroup, TSubEntity> entity, EntityEntryState state)
-		{
-			throw new NotImplementedException();
-		}
-		public bool Remove(EntityBucket<TGroup, TSubEntity> entity)
-		{
-			throw new NotImplementedException();
-		}
+		public EntityEntry<EntityBucket<TGroup, TSubEntity>> GetEntry(EntityBucket<TGroup, TSubEntity> entity) => throw new NotImplementedException();
+		public void Update(EntityBucket<TGroup, TSubEntity> entity, EntityEntryState state)  => throw new NotImplementedException();
+		public bool Remove(EntityBucket<TGroup, TSubEntity> entity)  => throw new NotImplementedException();
 	}
 }

@@ -3,7 +3,6 @@ using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using System;
-using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using MongoFramework.Infrastructure.Mapping;
@@ -195,10 +194,7 @@ namespace MongoFramework.Infrastructure.Serialization
 			}
 		}
 
-		public void Serialize(BsonSerializationContext context, BsonSerializationArgs args, object value)
-		{
-			Serialize(context, args, (TEntity)value);
-		}
+		public void Serialize(BsonSerializationContext context, BsonSerializationArgs args, object value) => Serialize(context, args, (TEntity)value);
 
 		public void Serialize(BsonSerializationContext context, BsonSerializationArgs args, TEntity value)
 		{
@@ -212,10 +208,7 @@ namespace MongoFramework.Infrastructure.Serialization
 			return new BsonClassMapSerializer<TEntity>(classMap).TryGetMemberSerializationInfo(memberName, out serializationInfo);
 		}
 
-		TEntity IBsonSerializer<TEntity>.Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
-		{
-			return (TEntity)Deserialize(context, args);
-		}
+		TEntity IBsonSerializer<TEntity>.Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args) => (TEntity)Deserialize(context, args);
 
 		public bool GetDocumentId(object document, out object id, out Type idNominalType, out IIdGenerator idGenerator)
 		{

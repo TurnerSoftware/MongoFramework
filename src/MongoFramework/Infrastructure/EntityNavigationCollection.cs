@@ -19,15 +19,9 @@ namespace MongoFramework.Infrastructure
 		public int LoadedCount => Entries.Count;
 		public int UnloadedCount => UnloadedIds.Count;
 		
-		public EntityNavigationCollection(IEntityProperty foreignProperty)
-		{
-			ForeignProperty = foreignProperty ?? throw new ArgumentNullException(nameof(foreignProperty));
-		}
+		public EntityNavigationCollection(IEntityProperty foreignProperty) => ForeignProperty = foreignProperty ?? throw new ArgumentNullException(nameof(foreignProperty));
 
-		public void SetConnection(IMongoDbConnection connection)
-		{
-			Connection = connection;
-		}
+		public void SetConnection(IMongoDbConnection connection) => Connection = connection;
 		
 		public void AddForeignId(object foreignId)
 		{
@@ -118,9 +112,6 @@ namespace MongoFramework.Infrastructure
 			}
 		}
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 	}
 }

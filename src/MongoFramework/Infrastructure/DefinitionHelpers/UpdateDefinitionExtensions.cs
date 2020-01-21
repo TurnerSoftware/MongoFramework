@@ -93,9 +93,8 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 		/// <param name="value"></param>
 		/// <returns></returns>
 		private static UpdateDefinition<TEntity> InternalSet<TEntity, TField>(UpdateDefinition<TEntity> definition, FieldDefinition<TEntity, TField> field, TField value) where TEntity : class
-		{
-			return definition.Set(field, value);
-		}
+			=> definition.Set(field, value);
+		
 #pragma warning restore CRR0026 // Unused member - used via reflection
 
 		public static bool HasChanges<TEntity>(this UpdateDefinition<TEntity> definition)

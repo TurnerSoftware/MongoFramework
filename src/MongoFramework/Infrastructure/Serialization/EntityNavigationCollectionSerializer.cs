@@ -12,11 +12,7 @@ namespace MongoFramework.Infrastructure.Serialization
 		public IEntityProperty ForeignProperty { get; }
 		public Type ValueType => typeof(ICollection<TEntity>);
 		
-		public EntityNavigationCollectionSerializer(IEntityProperty foreignProperty)
-		{
-			ForeignProperty = foreignProperty;
-		}
-
+		public EntityNavigationCollectionSerializer(IEntityProperty foreignProperty) => ForeignProperty = foreignProperty;
 		public object Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
 		{
 			var type = context.Reader.GetCurrentBsonType();
@@ -101,10 +97,7 @@ namespace MongoFramework.Infrastructure.Serialization
 			context.Writer.WriteEndArray();
 		}
 
-		public void Serialize(BsonSerializationContext context, BsonSerializationArgs args, ICollection<TEntity> value)
-		{
-			Serialize(context, args, (object)value);
-		}
+		public void Serialize(BsonSerializationContext context, BsonSerializationArgs args, ICollection<TEntity> value) => Serialize(context, args, (object)value);
 
 		public bool TryGetItemSerializationInfo(out BsonSerializationInfo serializationInfo)
 		{
@@ -113,9 +106,6 @@ namespace MongoFramework.Infrastructure.Serialization
 			return true;
 		}
 
-		ICollection<TEntity> IBsonSerializer<ICollection<TEntity>>.Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
-		{
-			return Deserialize(context, args) as ICollection<TEntity>;
-		}
+		ICollection<TEntity> IBsonSerializer<ICollection<TEntity>>.Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args) => Deserialize(context, args) as ICollection<TEntity>;
 	}
 }

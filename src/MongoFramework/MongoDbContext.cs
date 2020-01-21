@@ -10,9 +10,7 @@ namespace MongoFramework
 	public class MongoDbContext : IMongoDbContext, IDisposable
 	{
 		protected IMongoDbConnection Connection { get; private set; }
-
 		private IList<IMongoDbSet> DbSets { get; set; }
-
 		public MongoDbContext(IMongoDbConnection connection)
 		{
 			Connection = connection;
@@ -91,9 +89,6 @@ namespace MongoFramework
 			}
 		}
 
-		~MongoDbContext()
-		{
-			Dispose(false);
-		}
+		~MongoDbContext() => Dispose(false);
 	}
 }

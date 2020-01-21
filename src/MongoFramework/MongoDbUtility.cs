@@ -9,9 +9,6 @@ namespace MongoFramework
 		/// </summary>
 		/// <param name="id"></param>
 		/// <returns></returns>
-		public static bool IsValidObjectId(string id)
-		{
-			return ObjectId.TryParse(id, out ObjectId result);
-		}
+		public static bool IsValidObjectId(string id) => ObjectId.TryParse(id, out ObjectId result);
 	}
 }

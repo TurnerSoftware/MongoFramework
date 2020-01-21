@@ -22,7 +22,6 @@ namespace MongoFramework
 	public class MongoDbSet<TEntity> : IMongoDbSet<TEntity> where TEntity : class
 	{
 		public IEntityCollection<TEntity> ChangeTracker { get; protected set; }
-
 		protected IMongoDbConnection Connection { get; private set; }
 		protected IEntityWriterPipeline<TEntity> EntityWriterPipeline { get; private set; }
 		protected IEntityReader<TEntity> EntityReader { get; private set; }
@@ -147,17 +146,13 @@ namespace MongoFramework
 		/// </summary>
 		/// <param name="targetField"></param>
 		public virtual void RemoveRange(Expression<Func<TEntity, bool>> predicate)
-		{
-			EntityWriterPipeline.StageCommand(new RemoveEntityRangeCommand<TEntity>(predicate));
-		}
+		 => EntityWriterPipeline.StageCommand(new RemoveEntityRangeCommand<TEntity>(predicate));
 		/// <summary>
 		/// Stages a deletion for the entity that matches the specified ID
 		/// </summary>
 		/// <param name="entityId"></param>
 		public virtual void RemoveById(object entityId)
-		{
-			EntityWriterPipeline.StageCommand(new RemoveEntityByIdCommand<TEntity>(entityId));
-		}
+		 => EntityWriterPipeline.StageCommand(new RemoveEntityByIdCommand<TEntity>(entityId));
 
 		/// <summary>
 		/// Writes all of the items in the changeset to the database.
@@ -199,15 +194,9 @@ namespace MongoFramework
 
 		public IQueryProvider Provider => GetQueryable().Provider;
 
-		public IEnumerator<TEntity> GetEnumerator()
-		{
-			return GetQueryable().GetEnumerator();
-		}
+		public IEnumerator<TEntity> GetEnumerator() => GetQueryable().GetEnumerator();
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 		#endregion
 	}

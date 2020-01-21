@@ -11,10 +11,7 @@ namespace MongoFramework.Infrastructure.Commands
 	{
 		private EntityEntry<TEntity> EntityEntry { get; }
 
-		public UpdateEntityCommand(EntityEntry<TEntity> entityEntry)
-		{
-			EntityEntry = entityEntry;
-		}
+		public UpdateEntityCommand(EntityEntry<TEntity> entityEntry) => EntityEntry = entityEntry;
 
 		public IEnumerable<WriteModel<TEntity>> GetModel()
 		{

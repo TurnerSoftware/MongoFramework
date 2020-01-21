@@ -1,6 +1,5 @@
 ﻿using System;
 using MongoDB.Driver;
-using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Diagnostics;
 
 namespace MongoFramework

@@ -12,6 +12,5 @@ namespace MongoFramework.Infrastructure
 
 	public interface IEntityCollection<TEntity> : IEntityCollectionBase<TEntity>, ICollection<TEntity> where TEntity : class
 	{
-
 	}
 }

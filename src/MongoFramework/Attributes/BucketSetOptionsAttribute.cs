@@ -7,17 +7,12 @@ namespace MongoFramework.Attributes
 	{
 		public int BucketSize { get; private set; }
 
-		public BucketSetOptionsAttribute(int bucketSize)
-		{
-			BucketSize = bucketSize;
-		}
+		public BucketSetOptionsAttribute(int bucketSize) => BucketSize = bucketSize;
 
-		public override IDbSetOptions GetOptions()
+		public override IDbSetOptions GetOptions() => new BucketSetOptions
 		{
-			return new BucketSetOptions
-			{
-				BucketSize = BucketSize
-			};
-		}
+			BucketSize = BucketSize
+		};
+
 	}
 }

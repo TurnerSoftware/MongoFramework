@@ -38,10 +38,7 @@ namespace MongoFramework.Infrastructure
 		/// <summary>
 		/// Update the original values to reflect the current state of the entity.
 		/// </summary>
-		public void Refresh()
-		{
-			Refresh(Entity);
-		}
+		public void Refresh() => Refresh(Entity);
 
 		/// <summary>
 		/// Update the original values to reflect the state of the provided entity.

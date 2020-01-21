@@ -16,10 +16,7 @@ namespace MongoFramework.Infrastructure.Mutation
 			};
 		}
 
-		public static void MutateEntity(TEntity entity, MutatorType mutationType, IMongoDbConnection connection)
-		{
-			MutateEntities(new[] { entity }, mutationType, connection);
-		}
+		public static void MutateEntity(TEntity entity, MutatorType mutationType, IMongoDbConnection connection) => MutateEntities(new[] { entity }, mutationType, connection);
 
 		public static void MutateEntities(IEnumerable<TEntity> entities, MutatorType mutationType, IMongoDbConnection connection)
 		{

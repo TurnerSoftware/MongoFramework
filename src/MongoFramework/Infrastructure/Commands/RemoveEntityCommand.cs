@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using MongoDB.Driver;
-using MongoFramework.Infrastructure.DefinitionHelpers;
 using MongoFramework.Infrastructure.Mapping;
 
 namespace MongoFramework.Infrastructure.Commands
@@ -10,11 +7,7 @@ namespace MongoFramework.Infrastructure.Commands
 	public class RemoveEntityCommand<TEntity> : IWriteCommand<TEntity> where TEntity : class
 	{
 		private EntityEntry<TEntity> EntityEntry { get; }
-
-		public RemoveEntityCommand(EntityEntry<TEntity> entityEntry)
-		{
-			EntityEntry = entityEntry;
-		}
+		public RemoveEntityCommand(EntityEntry<TEntity> entityEntry) => EntityEntry = entityEntry;
 
 		public IEnumerable<WriteModel<TEntity>> GetModel()
 		{

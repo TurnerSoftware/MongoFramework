@@ -6,9 +6,7 @@ namespace MongoFramework.Bson
 	{
 		public bool HasDifference { get; private set; }
 		public BsonValue Difference { get; private set; }
-
 		public static DiffResult NoDifferences { get; } = new DiffResult();
-
 		/// <summary>
 		/// Creates a DiffResult with no differences.
 		/// </summary>

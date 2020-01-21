@@ -1,31 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using MongoDB.Bson;
 using MongoFramework.Infrastructure.Internal;
 
 namespace MongoFramework.Infrastructure.Mapping
 {
 	public static class EntityDefinitionExtensions
 	{
-		public static IEntityProperty GetIdProperty(this IEntityDefinition definition)
-		{
-			return definition.GetAllProperties().Where(m => m.IsKey).FirstOrDefault();
-		}
-
-		public static string GetIdName(this IEntityDefinition definition)
-		{
-			return definition.GetIdProperty()?.ElementName;
-		}
-
-		public static object GetIdValue(this IEntityDefinition definition, object entity)
-		{
-			return definition.GetIdProperty()?.GetValue(entity);
-		}
-
+		public static IEntityProperty GetIdProperty(this IEntityDefinition definition) => definition.GetAllProperties().Where(m => m.IsKey).FirstOrDefault();
+		public static string GetIdName(this IEntityDefinition definition) => definition.GetIdProperty()?.ElementName;
+		public static object GetIdValue(this IEntityDefinition definition, object entity) => definition.GetIdProperty()?.GetValue(entity);
 		public static object GetDefaultId(this IEntityDefinition definition)
 		{
 			var idPropertyType = definition.GetIdProperty()?.PropertyType;
@@ -35,7 +19,6 @@ namespace MongoFramework.Infrastructure.Mapping
 			}
 			return null;
 		}
-
 		public static IEnumerable<IEntityProperty> GetInheritedProperties(this IEntityDefinition definition)
 		{
 			var currentType = definition.EntityType.BaseType;
@@ -50,7 +33,6 @@ namespace MongoFramework.Infrastructure.Mapping
 				currentType = currentType.BaseType;
 			}
 		}
-
 		public static IEnumerable<IEntityProperty> GetAllProperties(this IEntityDefinition definition)
 		{
 			foreach (var property in definition.Properties)
@@ -63,7 +45,6 @@ namespace MongoFramework.Infrastructure.Mapping
 				yield return property;
 			}
 		}
-
 		public static IEntityProperty GetProperty(this IEntityDefinition definition, string name)
 		{
 			foreach (var property in definition.GetAllProperties())
@@ -76,7 +57,6 @@ namespace MongoFramework.Infrastructure.Mapping
 
 			return default;
 		}
-
 		private class TraversalState
 		{
 			public HashSet<Type> SeenTypes { get; set; }

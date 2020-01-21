@@ -10,12 +10,10 @@ namespace MongoFramework.Infrastructure.Commands
 	public class RemoveEntityByIdCommand<TEntity> : IWriteCommand<TEntity> where TEntity : class
 	{
 		private object EntityId { get; }
-
 		public RemoveEntityByIdCommand(object entityId)
 		{
 			EntityId = entityId;
 		}
-
 		public IEnumerable<WriteModel<TEntity>> GetModel()
 		{
 			var definition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));

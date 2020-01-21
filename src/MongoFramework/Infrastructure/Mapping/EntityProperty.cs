@@ -11,7 +11,6 @@ namespace MongoFramework.Infrastructure.Mapping
 		public string FullPath { get; set; }
 		public Type PropertyType { get; set; }
 		public PropertyInfo PropertyInfo { get; set; }
-
 		public bool Equals(IEntityProperty other)
 		{
 			if (other == null)
@@ -26,20 +25,8 @@ namespace MongoFramework.Infrastructure.Mapping
 				PropertyType == other.PropertyType &&
 				PropertyInfo == other.PropertyInfo;
 		}
-
-		public object GetValue(object entity)
-		{
-			return PropertyInfo.GetValue(entity);
-		}
-
-		public void SetValue(object entity, object value)
-		{
-			PropertyInfo.SetValue(entity, value);
-		}
-
-		public override string ToString()
-		{
-			return $"{EntityType.Name}.{PropertyInfo.Name}";
-		}
+		public object GetValue(object entity) => PropertyInfo.GetValue(entity);
+		public void SetValue(object entity, object value) => PropertyInfo.SetValue(entity, value);
+		public override string ToString() => return $"{EntityType.Name}.{PropertyInfo.Name}";
 	}
 }

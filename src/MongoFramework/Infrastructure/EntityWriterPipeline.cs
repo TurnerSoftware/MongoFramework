@@ -54,10 +54,7 @@ namespace MongoFramework.Infrastructure
 
 			StagedCommands.Add(command);
 		}
-		public void ClearStaging()
-		{
-			StagedCommands.Clear();
-		}
+		public void ClearStaging() => StagedCommands.Clear();
 
 		private void DetectChanges()
 		{

@@ -45,10 +45,7 @@ namespace MongoFramework
 			};
 		}
 
-		public static MongoDbConnection FromConnectionString(string connectionString)
-		{
-			return FromUrl(new MongoUrl(connectionString));
-		}
+		public static MongoDbConnection FromConnectionString(string connectionString) => FromUrl(new MongoUrl(connectionString));
 
 		public IMongoDatabase GetDatabase()
 		{
@@ -80,9 +77,6 @@ namespace MongoFramework
 			}
 		}
 
-		~MongoDbConnection()
-		{
-			Dispose(false);
-		}
+		~MongoDbConnection() => Dispose(false);
 	}
 }

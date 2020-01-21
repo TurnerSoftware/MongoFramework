@@ -6,7 +6,6 @@ namespace MongoFramework.Infrastructure.Mapping
 	public class DefaultMappingPack : IMappingProcessorPack
 	{
 		public IEnumerable<IMappingProcessor> Processors { get; }
-
 		private DefaultMappingPack()
 		{
 			Processors = new List<IMappingProcessor>
@@ -23,7 +22,6 @@ namespace MongoFramework.Infrastructure.Mapping
 				new EntityRelationshipProcessor()
 			};
 		}
-
 		public static IMappingProcessorPack Instance { get; } = new DefaultMappingPack();
 	}
 }

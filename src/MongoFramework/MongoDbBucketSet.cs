@@ -85,10 +85,7 @@ namespace MongoFramework
 			return EntityReader.AsQueryable().Where(e => e.Group == group).OrderBy(e => e.Index).SelectMany(e => e.Items).Take(totalItemCount);
 		}
 
-		public virtual IQueryable<TGroup> Groups()
-		{
-			return EntityReader.AsQueryable().Select(e => e.Group).Distinct();
-		}
+		public virtual IQueryable<TGroup> Groups() => EntityReader.AsQueryable().Select(e => e.Group).Distinct();
 
 		public virtual void SaveChanges()
 		{
@@ -121,15 +118,9 @@ namespace MongoFramework
 
 		public IQueryProvider Provider => GetQueryable().Provider;
 
-		public IEnumerator<EntityBucket<TGroup, TSubEntity>> GetEnumerator()
-		{
-			return GetQueryable().GetEnumerator();
-		}
+		public IEnumerator<EntityBucket<TGroup, TSubEntity>> GetEnumerator() => GetQueryable().GetEnumerator();
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 		#endregion
 	}

@@ -1,7 +1,5 @@
-﻿using MongoDB.Driver;
-using MongoFramework.Infrastructure.Linq;
+﻿using MongoFramework.Infrastructure.Linq;
 using MongoFramework.Infrastructure.Linq.Processors;
-using MongoFramework.Infrastructure.Mapping;
 using System;
 using System.Linq;
 
@@ -11,10 +9,7 @@ namespace MongoFramework.Infrastructure
 	{
 		public IMongoDbConnection Connection { get; }
 		
-		public EntityReader(IMongoDbConnection connection)
-		{
-			Connection = connection ?? throw new ArgumentNullException(nameof(connection));
-		}
+		public EntityReader(IMongoDbConnection connection) => Connection = connection ?? throw new ArgumentNullException(nameof(connection));
 
 		public IQueryable<TEntity> AsQueryable()
 		{

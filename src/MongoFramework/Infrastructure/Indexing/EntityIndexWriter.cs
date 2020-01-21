@@ -13,7 +13,6 @@ namespace MongoFramework.Infrastructure.Indexing
 	{
 		private IMongoDbConnection Connection { get; }
 		private IEntityDefinition EntityDefinition { get; set; }
-
 		public EntityIndexWriter(IMongoDbConnection connection)
 		{
 			Connection = connection;
@@ -21,9 +20,8 @@ namespace MongoFramework.Infrastructure.Indexing
 		}
 
 		private IMongoCollection<TEntity> GetCollection()
-		{
-			return Connection.GetDatabase().GetCollection<TEntity>(EntityDefinition.CollectionName);
-		}
+			=> Connection.GetDatabase().GetCollection<TEntity>(EntityDefinition.CollectionName);
+		
 		
 		public void ApplyIndexing()
 		{

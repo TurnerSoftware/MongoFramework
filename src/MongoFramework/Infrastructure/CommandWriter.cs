@@ -1,9 +1,7 @@
 ﻿using MongoDB.Driver;
 using MongoFramework.Infrastructure.Commands;
-using MongoFramework.Infrastructure.DefinitionHelpers;
 using MongoFramework.Infrastructure.Diagnostics;
 using MongoFramework.Infrastructure.Mapping;
-using MongoFramework.Infrastructure.Mutation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,17 +14,14 @@ namespace MongoFramework.Infrastructure
 	{
 		public IMongoDbConnection Connection { get; }
 		private IEntityDefinition EntityDefinition { get; }
-		
+
 		public CommandWriter(IMongoDbConnection connection)
 		{
 			Connection = connection ?? throw new ArgumentNullException(nameof(connection));
 			EntityDefinition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
 		}
 
-		private IMongoCollection<TEntity> GetCollection()
-		{
-			return Connection.GetDatabase().GetCollection<TEntity>(EntityDefinition.CollectionName);
-		}
+		private IMongoCollection<TEntity> GetCollection() => Connection.GetDatabase().GetCollection<TEntity>(EntityDefinition.CollectionName);
 
 		public void Write(IEnumerable<IWriteCommand<TEntity>> writeCommands)
 		{

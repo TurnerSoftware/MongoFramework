@@ -51,12 +51,12 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 			{
 				return definition.Set(name, BsonNull.Value);
 			}
-			else if (valueA?.BsonType != valueB?.BsonType)
+			else if (valueA?.BsonType != valueB.BsonType)
 			{
 				return definition.Set(name, valueB);
 			}
 
-			var bsonType = valueA?.BsonType;
+			var bsonType = valueA.BsonType;
 			if (bsonType == BsonType.Array)
 			{
 				return CreateFromDiff(definition, name, valueA.AsBsonArray, valueB.AsBsonArray);
