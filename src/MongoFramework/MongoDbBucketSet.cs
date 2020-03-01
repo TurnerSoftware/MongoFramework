@@ -81,8 +81,7 @@ namespace MongoFramework
 
 		public virtual IQueryable<TSubEntity> WithGroup(TGroup group)
 		{
-			var totalItemCount = EntityReader.AsQueryable().Where(e => e.Group == group).Sum(e => e.ItemCount);
-			return EntityReader.AsQueryable().Where(e => e.Group == group).OrderBy(e => e.Index).SelectMany(e => e.Items).Take(totalItemCount);
+			return EntityReader.AsQueryable().Where(e => e.Group == group).OrderBy(e => e.Index).SelectMany(e => e.Items);
 		}
 
 		public virtual IQueryable<TGroup> Groups()

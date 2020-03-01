@@ -350,5 +350,23 @@ namespace MongoFramework.Tests
 			Assert.AreEqual(8, results[3]);
 			Assert.AreEqual(10, results[4]);
 		}
+
+		[TestMethod]
+		public void WithGroupOnEmptyBucket()
+		{
+			var dbSet = new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
+			{
+				BucketSize = 2
+			});
+			dbSet.SetConnection(TestConfiguration.GetConnection());
+
+			var result = dbSet.WithGroup(new EntityGroup
+			{
+				Name = "Group1",
+				Reference = 123
+			}).Count();
+
+			Assert.AreEqual(0, result);
+		}
 	}
 }
