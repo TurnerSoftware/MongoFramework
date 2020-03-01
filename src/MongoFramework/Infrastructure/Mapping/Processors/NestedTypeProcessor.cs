@@ -23,10 +23,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 				//Maps the property type for handling property nesting
 				if (propertyType != entityType && EntityMapping.IsValidTypeToMap(propertyType))
 				{
-					if (!EntityMapping.IsRegistered(propertyType))
-					{
-						EntityMapping.RegisterType(propertyType);
-					}
+					EntityMapping.TryRegisterType(propertyType, out _);
 				}
 			}
 		}
