@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace MongoFramework.Infrastructure.Mapping
 {
-	public interface IEntityProperty : IEquatable<IEntityProperty>
+	public interface IEntityProperty
 	{
 		Type EntityType { get; }
 		bool IsKey { get; }
