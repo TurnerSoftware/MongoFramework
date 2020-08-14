@@ -34,23 +34,23 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 				classMap.MapIdMember(idProperty.PropertyInfo);
 				entityProperty.IsKey = true;
 
-				//If there is no Id generator, set a default based on the member type
-				if (classMap.IdMemberMap.IdGenerator == null)
+				//Set an Id Generator based on the member type
+				var idMemberMap = classMap.IdMemberMap;
+				var memberType = BsonClassMap.GetMemberInfoType(idMemberMap.MemberInfo);
+				if (memberType == typeof(string))
 				{
-					var idMemberMap = classMap.IdMemberMap;
-					var memberType = BsonClassMap.GetMemberInfoType(idMemberMap.MemberInfo);
-					if (memberType == typeof(string))
-					{
-						idMemberMap.SetIdGenerator(StringObjectIdGenerator.Instance);
-					}
-					else if (memberType == typeof(Guid))
-					{
-						idMemberMap.SetIdGenerator(CombGuidGenerator.Instance);
-					}
-					else if (memberType == typeof(ObjectId))
-					{
-						idMemberMap.SetIdGenerator(ObjectIdGenerator.Instance);
-					}
+					idMemberMap.SetIdGenerator(StringObjectIdGenerator.Instance);
+					definition.KeyGenerator = new EntityKeyGenerator(StringObjectIdGenerator.Instance);
+				}
+				else if (memberType == typeof(Guid))
+				{
+					idMemberMap.SetIdGenerator(CombGuidGenerator.Instance);
+					definition.KeyGenerator = new EntityKeyGenerator(CombGuidGenerator.Instance);
+				}
+				else if (memberType == typeof(ObjectId))
+				{
+					idMemberMap.SetIdGenerator(ObjectIdGenerator.Instance);
+					definition.KeyGenerator = new EntityKeyGenerator(ObjectIdGenerator.Instance);
 				}
 			}
 		}
