@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Attributes;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,13 +20,14 @@ namespace MongoFramework.Tests
 		class BucketSubEntity
 		{
 			public string Label { get; set; }
+			public DateTime Date { get; set; }
 		}
 
 		class MongoDbContextTestContext : MongoDbContext
 		{
 			public MongoDbContextTestContext(IMongoDbConnection connection) : base(connection) { }
 			public MongoDbSet<DbSetModel> DbSet { get; set; }
-			[BucketSetOptions(5)]
+			[BucketSetOptions(5, nameof(BucketSubEntity.Date))]
 			public MongoDbBucketSet<BucketGroupModel, BucketSubEntity> DbBucketSet { get; set; }
 		}
 

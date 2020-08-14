@@ -17,6 +17,7 @@ namespace MongoFramework.Tests
 		public class SubEntityClass
 		{
 			public string Label { get; set; }
+			public DateTime Date { get; set; }
 		}
 
 		[TestMethod]
@@ -24,7 +25,8 @@ namespace MongoFramework.Tests
 		{
 			AssertExtensions.DoesNotThrow<Exception>(() => new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
 			{
-				BucketSize = 100
+				BucketSize = 100,
+				EntityTimeProperty = "Date"
 			}));
 		}
 
@@ -39,7 +41,8 @@ namespace MongoFramework.Tests
 		{
 			var dbSet = new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
 			{
-				BucketSize = 100
+				BucketSize = 100,
+				EntityTimeProperty = "Date"
 			});
 			dbSet.SetConnection(TestConfiguration.GetConnection());
 
@@ -48,12 +51,13 @@ namespace MongoFramework.Tests
 				Name = "Group1"
 			}, new SubEntityClass
 			{
-				Label = "Entry1"
+				Label = "Entry1",
+				Date = new DateTime(2020, 1, 1)
 			});
 
 			Assert.IsFalse(dbSet.Any(b => b.Group.Name == "Group1"));
 			dbSet.SaveChanges();
-			Assert.IsTrue(dbSet.Any(b => b.Group.Name == "Group1" && b.Items.Any(i => i.Label == "Entry1")));
+			Assert.IsTrue(dbSet.Any(b => b.Group.Name == "Group1" && b.Items.Any(i => i.Label == "Entry1" && i.Date == new DateTime(2020, 1, 1))));
 		}
 
 		[TestMethod]
@@ -61,7 +65,8 @@ namespace MongoFramework.Tests
 		{
 			var dbSet = new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
 			{
-				BucketSize = 100
+				BucketSize = 100,
+				EntityTimeProperty = "Date"
 			});
 			dbSet.SetConnection(TestConfiguration.GetConnection());
 
@@ -70,12 +75,13 @@ namespace MongoFramework.Tests
 				Name = "Group1"
 			}, new SubEntityClass
 			{
-				Label = "Entry1"
+				Label = "Entry1",
+				Date = new DateTime(2020, 1, 1)
 			});
 
 			Assert.IsFalse(dbSet.Any(b => b.Group.Name == "Group1"));
 			await dbSet.SaveChangesAsync();
-			Assert.IsTrue(dbSet.Any(b => b.Group.Name == "Group1" && b.Items.Any(i => i.Label == "Entry1")));
+			Assert.IsTrue(dbSet.Any(b => b.Group.Name == "Group1" && b.Items.Any(i => i.Label == "Entry1" && i.Date == new DateTime(2020, 1, 1))));
 		}
 
 		[TestMethod, ExpectedException(typeof(ArgumentException))]
@@ -83,16 +89,38 @@ namespace MongoFramework.Tests
 		{
 			new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
 			{
-				BucketSize = 0
+				BucketSize = 0,
+				EntityTimeProperty = "Date"
+			});
+		}
+
+		[TestMethod, ExpectedException(typeof(ArgumentException))]
+		public void InvalidSubEntityTimeProperty_Missing()
+		{
+			new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
+			{
+				BucketSize = 100,
+				EntityTimeProperty = "MissingField"
+			});
+		}
+
+		[TestMethod, ExpectedException(typeof(ArgumentException))]
+		public void InvalidSubEntityTimeProperty_WrongType()
+		{
+			new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
+			{
+				BucketSize = 100,
+				EntityTimeProperty = "Label"
 			});
 		}
 
 		[TestMethod]
-		public void FillIntoAdditionalBuckets()
+		public void RemoveBucket()
 		{
 			var dbSet = new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
 			{
-				BucketSize = 2
+				BucketSize = 2,
+				EntityTimeProperty = "Date"
 			});
 			dbSet.SetConnection(TestConfiguration.GetConnection());
 
@@ -102,18 +130,68 @@ namespace MongoFramework.Tests
 			}, new[] {
 				new SubEntityClass
 				{
-					Label = "Entry1"
+					Label = "Entry1",
+					Date = new DateTime(2020, 1, 1)
 				},
 				new SubEntityClass
 				{
-					Label = "Entry2"
+					Label = "Entry2",
+					Date = new DateTime(2020, 1, 2)
 				},
 				new SubEntityClass
 				{
-					Label = "Entry2"
+					Label = "Entry2",
+					Date = new DateTime(2020, 1, 3)
 				}
 			});
 
+			Assert.IsFalse(dbSet.Any(b => b.Group.Name == "Group1"));
+			dbSet.SaveChanges();
+			Assert.IsTrue(dbSet.Any(b => b.Group.Name == "Group1" && b.ItemCount == 2));
+			Assert.IsTrue(dbSet.Any(b => b.Group.Name == "Group1" && b.ItemCount == 1));
+
+			dbSet.Remove(new EntityGroup
+			{
+				Name = "Group1"
+			});
+			dbSet.SaveChanges();
+
+			Assert.IsFalse(dbSet.Any(b => b.Group.Name == "Group1"));
+		}
+
+		[TestMethod]
+		public void FillIntoAdditionalBuckets()
+		{
+			var dbSet = new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
+			{
+				BucketSize = 2,
+				EntityTimeProperty = "Date"
+			});
+			dbSet.SetConnection(TestConfiguration.GetConnection());
+
+			dbSet.AddRange(new EntityGroup
+			{
+				Name = "Group1"
+			}, new[] {
+				new SubEntityClass
+				{
+					Label = "Entry1",
+					Date = new DateTime(2020, 1, 1)
+				},
+				new SubEntityClass
+				{
+					Label = "Entry2",
+					Date = new DateTime(2020, 1, 2)
+				},
+				new SubEntityClass
+				{
+					Label = "Entry3",
+					Date = new DateTime(2020, 1, 3)
+				}
+			});
+
+			var a = MongoFramework.Infrastructure.Mapping.EntityMapping.GetOrCreateDefinition(typeof(EntityBucket<EntityGroup, SubEntityClass>));
+			var cb = MongoDB.Bson.Serialization.BsonClassMap.LookupClassMap(typeof(EntityBucket<EntityGroup, SubEntityClass>));
 			Assert.IsFalse(dbSet.Any(b => b.Group.Name == "Group1"));
 			dbSet.SaveChanges();
 			Assert.IsTrue(dbSet.Any(b => b.Group.Name == "Group1" && b.ItemCount == 2));
@@ -125,7 +203,8 @@ namespace MongoFramework.Tests
 		{
 			var dbSet = new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
 			{
-				BucketSize = 2
+				BucketSize = 2,
+				EntityTimeProperty = "Date"
 			});
 			dbSet.SetConnection(TestConfiguration.GetConnection());
 
@@ -134,7 +213,8 @@ namespace MongoFramework.Tests
 				Name = "Group1"
 			}, new SubEntityClass
 			{
-				Label = "Entry1"
+				Label = "Entry1",
+				Date = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc)
 			});
 			dbSet.SaveChanges();
 			Assert.IsTrue(dbSet.Any(b => b.Group.Name == "Group1" && b.ItemCount == 1));
@@ -145,23 +225,30 @@ namespace MongoFramework.Tests
 			}, new[] {
 				new SubEntityClass
 				{
-					Label = "Entry2"
+					Label = "Entry2",
+					Date = new DateTime(2020, 1, 2, 0, 0, 0, DateTimeKind.Utc)
 				},
 				new SubEntityClass
 				{
-					Label = "Entry3"
+					Label = "Entry3",
+					Date = new DateTime(2020, 1, 3, 0, 0, 0, DateTimeKind.Utc)
 				}
 			});
 			dbSet.SaveChanges();
 
 			var buckets = dbSet.Where(b => b.Group.Name == "Group1").ToArray();
 			Assert.AreEqual(2, buckets.Count());
-			var backfilledBucket = buckets.FirstOrDefault();
+
+			var backfilledBucket = buckets[0];
+			Assert.AreEqual(new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc), backfilledBucket.Min);
+			Assert.AreEqual(new DateTime(2020, 1, 2, 0, 0, 0, DateTimeKind.Utc), backfilledBucket.Max);
 			Assert.AreEqual(2, backfilledBucket.ItemCount);
 			Assert.AreEqual("Entry1", backfilledBucket.Items[0].Label);
 			Assert.AreEqual("Entry2", backfilledBucket.Items[1].Label);
 
-			var additionalBucket = buckets.LastOrDefault();
+			var additionalBucket = buckets[1];
+			Assert.AreEqual(new DateTime(2020, 1, 3, 0, 0, 0, DateTimeKind.Utc), additionalBucket.Min);
+			Assert.AreEqual(new DateTime(2020, 1, 3, 0, 0, 0, DateTimeKind.Utc), additionalBucket.Max);
 			Assert.AreEqual(1, additionalBucket.ItemCount);
 			Assert.AreEqual("Entry3", additionalBucket.Items[0].Label);
 		}
@@ -171,7 +258,8 @@ namespace MongoFramework.Tests
 		{
 			var dbSet = new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
 			{
-				BucketSize = 2
+				BucketSize = 2,
+				EntityTimeProperty = "Date"
 			});
 			dbSet.SetConnection(TestConfiguration.GetConnection());
 			
@@ -181,23 +269,28 @@ namespace MongoFramework.Tests
 			}, new[] {
 				new SubEntityClass
 				{
-					Label = "Entry1"
+					Label = "Entry1",
+					Date = new DateTime(2020, 1, 1)
 				},
 				new SubEntityClass
 				{
-					Label = "Entry2"
+					Label = "Entry2",
+					Date = new DateTime(2020, 1, 2)
 				},
 				new SubEntityClass
 				{
-					Label = "Entry3"
+					Label = "Entry3",
+					Date = new DateTime(2020, 1, 3)
 				},
 				new SubEntityClass
 				{
-					Label = "Entry4"
+					Label = "Entry4",
+					Date = new DateTime(2020, 1, 4)
 				},
 				new SubEntityClass
 				{
-					Label = "Entry5"
+					Label = "Entry5",
+					Date = new DateTime(2020, 1, 5)
 				}
 			});
 			dbSet.SaveChanges();
@@ -222,7 +315,8 @@ namespace MongoFramework.Tests
 		{
 			var dbSet = new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
 			{
-				BucketSize = 2
+				BucketSize = 2,
+				EntityTimeProperty = "Date"
 			});
 			dbSet.SetConnection(TestConfiguration.GetConnection());
 
@@ -232,15 +326,18 @@ namespace MongoFramework.Tests
 			}, new[] {
 				new SubEntityClass
 				{
-					Label = "Entry1"
+					Label = "Entry1",
+					Date = new DateTime(2020, 1, 1)
 				},
 				new SubEntityClass
 				{
-					Label = "Entry2"
+					Label = "Entry2",
+					Date = new DateTime(2020, 1, 2)
 				},
 				new SubEntityClass
 				{
-					Label = "Entry3"
+					Label = "Entry3",
+					Date = new DateTime(2020, 1, 3)
 				}
 			});
 			dbSet.AddRange(new EntityGroup
@@ -249,15 +346,18 @@ namespace MongoFramework.Tests
 			}, new[] {
 				new SubEntityClass
 				{
-					Label = "Entry1"
+					Label = "Entry1",
+					Date = new DateTime(2020, 1, 1)
 				},
 				new SubEntityClass
 				{
-					Label = "Entry2"
+					Label = "Entry2",
+					Date = new DateTime(2020, 1, 2)
 				},
 				new SubEntityClass
 				{
-					Label = "Entry3"
+					Label = "Entry3",
+					Date = new DateTime(2020, 1, 3)
 				}
 			});
 			dbSet.SaveChanges();
@@ -276,7 +376,8 @@ namespace MongoFramework.Tests
 		{
 			var dbSet = new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
 			{
-				BucketSize = 2
+				BucketSize = 2,
+				EntityTimeProperty = "Date"
 			});
 			dbSet.SetConnection(TestConfiguration.GetConnection());
 
@@ -313,7 +414,8 @@ namespace MongoFramework.Tests
 		{
 			var dbSet = new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
 			{
-				BucketSize = 2
+				BucketSize = 2,
+				EntityTimeProperty = "Date"
 			});
 
 			Assert.ThrowsException<ArgumentNullException>(() => dbSet.Add(null, new SubEntityClass()));
@@ -322,33 +424,15 @@ namespace MongoFramework.Tests
 		}
 
 		[TestMethod]
-		public void ValueTypeSubEntity()
+		public void InvalidRemoveArguments()
 		{
-			var dbSet = new MongoDbBucketSet<EntityGroup, int>(new BucketSetOptions
+			var dbSet = new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
 			{
-				BucketSize = 2
+				BucketSize = 2,
+				EntityTimeProperty = "Date"
 			});
-			dbSet.SetConnection(TestConfiguration.GetConnection());
 
-			dbSet.AddRange(new EntityGroup
-			{
-				Name = "Group1"
-			}, new[] { 2, 4, 6, 8, 10 });
-			dbSet.SaveChanges();
-
-			Assert.AreEqual(3, dbSet.Count());
-
-			var results = dbSet.WithGroup(new EntityGroup
-			{
-				Name = "Group1"
-			}).ToArray();
-
-			Assert.AreEqual(5, results.Length);
-			Assert.AreEqual(2, results[0]);
-			Assert.AreEqual(4, results[1]);
-			Assert.AreEqual(6, results[2]);
-			Assert.AreEqual(8, results[3]);
-			Assert.AreEqual(10, results[4]);
+			Assert.ThrowsException<ArgumentNullException>(() => dbSet.Remove(null));
 		}
 
 		[TestMethod]
@@ -356,7 +440,8 @@ namespace MongoFramework.Tests
 		{
 			var dbSet = new MongoDbBucketSet<EntityGroup, SubEntityClass>(new BucketSetOptions
 			{
-				BucketSize = 2
+				BucketSize = 2,
+				EntityTimeProperty = "Date"
 			});
 			dbSet.SetConnection(TestConfiguration.GetConnection());
 
