@@ -11,7 +11,6 @@ namespace MongoFramework.Infrastructure.Mapping
 		public string CollectionName { get; set; }
 		public IEntityKeyGenerator KeyGenerator { get; set; }
 		public IEnumerable<IEntityProperty> Properties { get; set; } = Enumerable.Empty<IEntityProperty>();
-		public IEnumerable<IEntityRelationship> Relationships { get; set; } = Enumerable.Empty<IEntityRelationship>();
 		public IEnumerable<IEntityIndex> Indexes { get; set; } = Enumerable.Empty<IEntityIndex>();
 	}
 }

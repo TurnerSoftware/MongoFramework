@@ -19,8 +19,7 @@ namespace MongoFramework.Infrastructure.Mapping
 				new ExtraElementsProcessor(),
 				new TypeDiscoveryProcessor(),
 				new BsonKnownTypesProcessor(),
-				new IndexProcessor(),
-				new EntityRelationshipProcessor()
+				new IndexProcessor()
 			};
 		}
 
