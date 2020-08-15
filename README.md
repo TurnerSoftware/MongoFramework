@@ -16,7 +16,6 @@ Some of the major features include:
 - Changeset support (allowing for queuing multiple DB updates to run at once)
 - Diff-updates (only _changes_ to an entity to be written)
 - Entity mutation (allowing automatic changes on properties during select/insert/update calls)
-- Navigation properties for related entities (both single-entity relationships and collections)
 - Entity Buckets (clustering of small documents together, optimised for write performance)
 - Runtime type discovery (serialize and deserialize without needing to specify every "known" type)
 
@@ -200,34 +199,6 @@ public class MyCustomMutatorAttribute : MutatePropertyAttribute
   }
 }
 ```
-
-### Entity Relationships
-With MongoFramework's support for relationships between entities, there are specific attributes for linking an ID property to its navigation property.
-
-`[ForeignKey("NameOfIdProperty")]` / `[ForeignKey("NameOfNavigationProperty")]`
-
-Allows connecting two properties, an ID property and a navigation property, together in a relationship.
-The ID property will be saved and updated based on the navigation property.
-The navigation property won't be mapped to the entity.
-
-`[InverseProperty("NameOfIdProperty)]`
-
-Allows connecting an `ICollection` navigation property to a specific identifier on the related entity.
-Without this attribute on a collection, the ID property of the related entity will be used.
-
-The IDs of a one-to-many relationship are saved on the "one" as an array of IDs.
-```json
-{
-  "_id": "5c4e495bd8ab921bf84fad1b",
-  "RelatedIds": [
-    "5c4e576f39530530fc4d632c",
-    "5c4e576f39530530fc4d632d"
-  ]
-}
-```
-
-Entity relationships and navigation properties are still very new features with various limitations and quirks.
-These features aren't designed to make MongoDB turn into a perfect relational database, just to make some different data access scenarios easier.
 
 ### Runtime Type Discovery
 MongoFramework provides runtime type discovery in two methods: automatically for any properties of type `object` and for any entities that specify the `RuntimeTypeDiscovery` attribute on their class definition.

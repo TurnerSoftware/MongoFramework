@@ -9,7 +9,6 @@ namespace MongoFramework.Infrastructure.Mapping
 		string CollectionName { get; set; }
 		IEntityKeyGenerator KeyGenerator { get; set; }
 		IEnumerable<IEntityProperty> Properties { get; set; }
-		IEnumerable<IEntityRelationship> Relationships { get; set; }
 		IEnumerable<IEntityIndex> Indexes { get; set; }
 	}
 }

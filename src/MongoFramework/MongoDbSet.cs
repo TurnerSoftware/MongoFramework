@@ -27,7 +27,6 @@ namespace MongoFramework
 		protected IEntityWriterPipeline<TEntity> EntityWriterPipeline { get; private set; }
 		protected IEntityReader<TEntity> EntityReader { get; private set; }
 		protected IEntityIndexWriter<TEntity> EntityIndexWriter { get; private set; }
-		protected IEntityRelationshipWriter<TEntity> EntityRelationshipWriter { get; private set; }
 
 		/// <summary>
 		/// Initialise a new entity reader and writer to the specified database.
@@ -39,7 +38,6 @@ namespace MongoFramework
 			EntityWriterPipeline = new EntityWriterPipeline<TEntity>(connection);
 			EntityReader = new EntityReader<TEntity>(connection);
 			EntityIndexWriter = new EntityIndexWriter<TEntity>(connection);
-			EntityRelationshipWriter = new EntityRelationshipWriter<TEntity>(connection);
 			ChangeTracker = new EntityCollection<TEntity>();
 
 			EntityWriterPipeline.AddCollection(ChangeTracker);
@@ -166,7 +164,6 @@ namespace MongoFramework
 		public virtual void SaveChanges()
 		{
 			EntityIndexWriter.ApplyIndexing();
-			EntityRelationshipWriter.CommitEntityRelationships(ChangeTracker);
 			EntityWriterPipeline.Write();
 		}
 
@@ -177,8 +174,6 @@ namespace MongoFramework
 		public virtual async Task SaveChangesAsync(CancellationToken cancellationToken = default)
 		{
 			await EntityIndexWriter.ApplyIndexingAsync(cancellationToken).ConfigureAwait(false);
-			cancellationToken.ThrowIfCancellationRequested();
-			await EntityRelationshipWriter.CommitEntityRelationshipsAsync(ChangeTracker, cancellationToken).ConfigureAwait(false);
 			cancellationToken.ThrowIfCancellationRequested();
 			await EntityWriterPipeline.WriteAsync(cancellationToken).ConfigureAwait(false);
 		}
