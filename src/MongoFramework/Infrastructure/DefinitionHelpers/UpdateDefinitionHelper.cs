@@ -8,10 +8,11 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 	{
 		public static UpdateDefinition<TEntity> CreateFromDiff<TEntity>(BsonDocument documentA, BsonDocument documentB) where TEntity : class
 		{
-			var definition = Builders<TEntity>.Update.Combine();
-			return CreateFromDiff(definition, string.Empty, documentA, documentB);
+			var definition = new BsonDocument();
+			ApplyDiffUpdate(definition, string.Empty, documentA, documentB);
+			return new BsonDocumentUpdateDefinition<TEntity>(definition);
 		}
-		private static UpdateDefinition<TEntity> CreateFromDiff<TEntity>(UpdateDefinition<TEntity> definition, string name, BsonDocument documentA, BsonDocument documentB) where TEntity : class
+		private static void ApplyDiffUpdate(BsonDocument updateDefinition, string name, BsonDocument documentA, BsonDocument documentB)
 		{
 			var documentAProperties = documentA?.Names ?? Enumerable.Empty<string>();
 			var documentBProperties = documentB?.Names ?? Enumerable.Empty<string>();
@@ -23,61 +24,55 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 				baseName += ".";
 			}
 
-			var resultDefinition = definition;
-
 			foreach (var propertyName in propertyNames)
 			{
 				var fullName = baseName + propertyName;
 
 				if (documentB == null || !documentB.Contains(propertyName))
 				{
-					resultDefinition = resultDefinition.Unset(new StringFieldDefinition<TEntity>(fullName));
+					ApplyPropertyUnset(updateDefinition, fullName);
 				}
 				else if (documentA == null || !documentA.Contains(propertyName))
 				{
-					resultDefinition = resultDefinition.Set(fullName, documentB[propertyName]);
+					ApplyPropertySet(updateDefinition, fullName, documentB[propertyName]);
 				}
 				else
 				{
-					resultDefinition = CreateFromDiff(resultDefinition, fullName, documentA[propertyName], documentB[propertyName]);
+					ApplyDiffUpdate(updateDefinition, fullName, documentA[propertyName], documentB[propertyName]);
 				}
 			}
-
-			return resultDefinition;
 		}
-		private static UpdateDefinition<TEntity> CreateFromDiff<TEntity>(UpdateDefinition<TEntity> definition, string name, BsonValue valueA, BsonValue valueB) where TEntity : class
+		private static void ApplyDiffUpdate(BsonDocument updateDefinition, string name, BsonValue valueA, BsonValue valueB)
 		{
 			if (valueB == null)
 			{
-				return definition.Set(name, BsonNull.Value);
+				ApplyPropertySet(updateDefinition, name, BsonNull.Value);
 			}
 			else if (valueA?.BsonType != valueB?.BsonType)
 			{
-				return definition.Set(name, valueB);
+				ApplyPropertySet(updateDefinition, name, valueB);
 			}
-
-			var bsonType = valueA?.BsonType;
-			if (bsonType == BsonType.Array)
+			else
 			{
-				return CreateFromDiff(definition, name, valueA.AsBsonArray, valueB.AsBsonArray);
+				var bsonType = valueA?.BsonType;
+				if (bsonType == BsonType.Array)
+				{
+					ApplyDiffUpdate(updateDefinition, name, valueA.AsBsonArray, valueB.AsBsonArray);
+				}
+				else if (bsonType == BsonType.Document)
+				{
+					ApplyDiffUpdate(updateDefinition, name, valueA.AsBsonDocument, valueB.AsBsonDocument);
+				}
+				else if (valueA != valueB)
+				{
+					ApplyPropertySet(updateDefinition, name, valueB);
+				}
 			}
-			else if (bsonType == BsonType.Document)
-			{
-				return CreateFromDiff(definition, name, valueA.AsBsonDocument, valueB.AsBsonDocument);
-			}
-			else if (valueA != valueB)
-			{
-				return definition.Set(name, valueB);
-			}
-
-			return definition;
 		}
-		private static UpdateDefinition<TEntity> CreateFromDiff<TEntity>(UpdateDefinition<TEntity> definition, string name, BsonArray arrayA, BsonArray arrayB) where TEntity : class
+		private static void ApplyDiffUpdate(BsonDocument updateDefinition, string name, BsonArray arrayA, BsonArray arrayB)
 		{
 			var arrayACount = arrayA.Count;
 			var arrayBCount = arrayB.Count;
-
-			var resultDefinition = definition;
 
 			//Due to limitations of MongoDB, we can't pull/push at the same time.
 			//As highlighted on task SERVER-1014 (MongoDB Jira), you can't pull at an index, only at a value match.
@@ -91,15 +86,42 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 				for (int i = 0, l = arrayBCount; i < l; i++)
 				{
 					var fullName = name + "." + i;
-					resultDefinition = CreateFromDiff(resultDefinition, fullName, arrayA[i], arrayB[i]);
+					ApplyDiffUpdate(updateDefinition, fullName, arrayA[i], arrayB[i]);
 				}
 			}
 			else
 			{
-				resultDefinition = resultDefinition.Set(name, arrayB);
+				ApplyPropertySet(updateDefinition, name, arrayB);
 			}
+		}
 
-			return resultDefinition;
+		private static void ApplyPropertySet(BsonDocument updateDefinition, string name, BsonValue value)
+		{
+			if (updateDefinition.TryGetElement("$set", out var element))
+			{
+				element.Value.AsBsonDocument.Add(name, value);
+			}
+			else
+			{
+				updateDefinition.Set("$set", new BsonDocument
+				{
+					{ name, value }
+				});
+			}
+		}
+		private static void ApplyPropertyUnset(BsonDocument updateDefinition, string name)
+		{
+			if (updateDefinition.TryGetElement("$unset", out var element))
+			{
+				element.Value.AsBsonDocument.Add(name, 1);
+			}
+			else
+			{
+				updateDefinition.Set("$unset", new BsonDocument
+				{
+					{ name, 1 }
+				});
+			}
 		}
 	}
 }
