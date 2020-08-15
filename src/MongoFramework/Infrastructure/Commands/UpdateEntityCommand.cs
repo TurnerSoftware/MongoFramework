@@ -8,9 +8,9 @@ namespace MongoFramework.Infrastructure.Commands
 {
 	public class UpdateEntityCommand<TEntity> : IWriteCommand<TEntity> where TEntity : class
 	{
-		private EntityEntry<TEntity> EntityEntry { get; }
+		private EntityEntry EntityEntry { get; }
 
-		public UpdateEntityCommand(EntityEntry<TEntity> entityEntry)
+		public UpdateEntityCommand(EntityEntry entityEntry)
 		{
 			EntityEntry = entityEntry;
 		}
@@ -23,7 +23,7 @@ namespace MongoFramework.Infrastructure.Commands
 			{
 				var definition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
 				var updateDefintion = UpdateDefinitionHelper.CreateFromDiff<TEntity>(EntityEntry.OriginalValues, EntityEntry.CurrentValues);
-				yield return new UpdateOneModel<TEntity>(definition.CreateIdFilterFromEntity(EntityEntry.Entity), updateDefintion);
+				yield return new UpdateOneModel<TEntity>(definition.CreateIdFilterFromEntity(EntityEntry.Entity as TEntity), updateDefintion);
 			}
 		}
 	}

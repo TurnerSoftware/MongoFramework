@@ -8,7 +8,7 @@ namespace MongoFramework.Infrastructure
 {
 	public static class EntityCommandBuilder<TEntity> where TEntity : class
 	{
-		public static IWriteCommand<TEntity> CreateCommand(EntityEntry<TEntity> entityEntry)
+		public static IWriteCommand<TEntity> CreateCommand(EntityEntry entityEntry)
 		{
 			if (entityEntry.State == EntityEntryState.Added)
 			{

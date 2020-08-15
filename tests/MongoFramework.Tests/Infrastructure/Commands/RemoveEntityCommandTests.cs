@@ -32,12 +32,12 @@ namespace MongoFramework.Tests.Infrastructure.Commands
 
 			writer.Write(new[]
 			{
-				new AddEntityCommand<TestModel>(new EntityEntry<TestModel>(entity, EntityEntryState.Added))
+				new AddEntityCommand<TestModel>(new EntityEntry(entity, EntityEntryState.Added))
 			});
 
 			writer.Write(new[]
 			{
-				new RemoveEntityCommand<TestModel>(new EntityEntry<TestModel>(entity, EntityEntryState.Deleted))
+				new RemoveEntityCommand<TestModel>(new EntityEntry(entity, EntityEntryState.Deleted))
 			});
 
 			var dbEntity = reader.AsQueryable().Where(e => e.Id == entity.Id).FirstOrDefault();

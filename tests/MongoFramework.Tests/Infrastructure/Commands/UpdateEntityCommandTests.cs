@@ -32,7 +32,7 @@ namespace MongoFramework.Tests.Infrastructure.Commands
 
 			writer.Write(new[]
 			{
-				new AddEntityCommand<TestModel>(new EntityEntry<TestModel>(entity, EntityEntryState.Added))
+				new AddEntityCommand<TestModel>(new EntityEntry(entity, EntityEntryState.Added))
 			});
 
 			var updatedEntity = new TestModel
@@ -43,7 +43,7 @@ namespace MongoFramework.Tests.Infrastructure.Commands
 
 			writer.Write(new[]
 			{
-				new UpdateEntityCommand<TestModel>(new EntityEntry<TestModel>(updatedEntity, EntityEntryState.Updated))
+				new UpdateEntityCommand<TestModel>(new EntityEntry(updatedEntity, EntityEntryState.Updated))
 			});
 
 			var dbEntity = reader.AsQueryable().Where(e => e.Id == entity.Id).FirstOrDefault();

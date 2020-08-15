@@ -42,8 +42,8 @@ namespace MongoFramework.Tests.Infrastructure.Commands
 
 			writer.Write(new[]
 			{
-				new AddEntityCommand<TestModel>(new EntityEntry<TestModel>(entities[0], EntityEntryState.Added)),
-				new AddEntityCommand<TestModel>(new EntityEntry<TestModel>(entities[1], EntityEntryState.Added))
+				new AddEntityCommand<TestModel>(new EntityEntry(entities[0], EntityEntryState.Added)),
+				new AddEntityCommand<TestModel>(new EntityEntry(entities[1], EntityEntryState.Added))
 			});
 
 			writer.Write(new[]
