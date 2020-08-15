@@ -79,7 +79,7 @@ namespace MongoFramework.Tests.Infrastructure
 				Title = "EntityWriterPipelineTests.WriteFromCollection"
 			};
 			var command = EntityCommandBuilder<TestModel>.CreateCommand(
-				new EntityEntry<TestModel>(entity, EntityEntryState.Added)
+				new EntityEntry(entity, EntityEntryState.Added)
 			);
 
 			pipeline.StageCommand(command);

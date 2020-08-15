@@ -26,7 +26,7 @@ namespace MongoFramework.Tests.Infrastructure.Linq.Processors
 
 			processor.ProcessEntity(new TestEntity { Id = "123", Description = "Database" }, null);
 
-			var collectionEntity = collection.GetEntry(new TestEntity { Id = "123" }).Entity;
+			var collectionEntity = collection.GetEntry(new TestEntity { Id = "123" }).Entity as TestEntity;
 			Assert.AreEqual("Database", collectionEntity.Description);
 		}
 
@@ -44,7 +44,7 @@ namespace MongoFramework.Tests.Infrastructure.Linq.Processors
 
 			processor.ProcessEntity(new TestEntity { Id = "123", Description = "2" }, null);
 
-			var collectionEntity = collection.GetEntry(new TestEntity { Id = "123" }).Entity;
+			var collectionEntity = collection.GetEntry(new TestEntity { Id = "123" }).Entity as TestEntity;
 			Assert.AreEqual("2", collectionEntity.Description);
 		}
 
@@ -62,7 +62,7 @@ namespace MongoFramework.Tests.Infrastructure.Linq.Processors
 
 			processor.ProcessEntity(new TestEntity { Id = "123", Description = "Database" }, null);
 
-			var collectionEntity = collection.GetEntry(new TestEntity { Id = "123" }).Entity;
+			var collectionEntity = collection.GetEntry(new TestEntity { Id = "123" }).Entity as TestEntity;
 			Assert.AreEqual("Deleted", collectionEntity.Description);
 		}
 
@@ -80,7 +80,7 @@ namespace MongoFramework.Tests.Infrastructure.Linq.Processors
 
 			processor.ProcessEntity(new TestEntity { Id = "123", Description = "Database" }, null);
 
-			var collectionEntity = collection.GetEntry(new TestEntity { Id = "123" }).Entity;
+			var collectionEntity = collection.GetEntry(new TestEntity { Id = "123" }).Entity as TestEntity;
 			Assert.AreEqual("Updated", collectionEntity.Description);
 		}
 
@@ -98,7 +98,7 @@ namespace MongoFramework.Tests.Infrastructure.Linq.Processors
 
 			processor.ProcessEntity(new TestEntity { Id = "123", Description = "Database" }, null);
 
-			var collectionEntity = collection.GetEntry(new TestEntity { Id = "123" }).Entity;
+			var collectionEntity = collection.GetEntry(new TestEntity { Id = "123" }).Entity as TestEntity;
 			Assert.AreEqual("Added", collectionEntity.Description);
 		}
 	}

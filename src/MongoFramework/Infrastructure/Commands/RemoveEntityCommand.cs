@@ -9,9 +9,9 @@ namespace MongoFramework.Infrastructure.Commands
 {
 	public class RemoveEntityCommand<TEntity> : IWriteCommand<TEntity> where TEntity : class
 	{
-		private EntityEntry<TEntity> EntityEntry { get; }
+		private EntityEntry EntityEntry { get; }
 
-		public RemoveEntityCommand(EntityEntry<TEntity> entityEntry)
+		public RemoveEntityCommand(EntityEntry entityEntry)
 		{
 			EntityEntry = entityEntry;
 		}
@@ -19,7 +19,7 @@ namespace MongoFramework.Infrastructure.Commands
 		public IEnumerable<WriteModel<TEntity>> GetModel()
 		{
 			var definition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
-			yield return new DeleteOneModel<TEntity>(definition.CreateIdFilterFromEntity(EntityEntry.Entity));
+			yield return new DeleteOneModel<TEntity>(definition.CreateIdFilterFromEntity(EntityEntry.Entity as TEntity));
 		}
 	}
 }

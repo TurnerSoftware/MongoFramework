@@ -90,7 +90,7 @@ namespace MongoFramework.Infrastructure
 					}
 					else if (entry.State == EntityEntryState.Deleted)
 					{
-						collection.Remove(entry.Entity);
+						collection.Remove(entry.Entity as TEntity);
 					}
 				}
 			}
@@ -106,11 +106,11 @@ namespace MongoFramework.Infrastructure
 				{
 					if (entry.State == EntityEntryState.Added)
 					{
-						EntityMutation<TEntity>.MutateEntity(entry.Entity, MutatorType.Insert, Connection);
+						EntityMutation<TEntity>.MutateEntity(entry.Entity as TEntity, MutatorType.Insert, Connection);
 					}
 					else if (entry.State == EntityEntryState.Updated)
 					{
-						EntityMutation<TEntity>.MutateEntity(entry.Entity, MutatorType.Update, Connection);
+						EntityMutation<TEntity>.MutateEntity(entry.Entity as TEntity, MutatorType.Update, Connection);
 					}
 
 					var validationContext = new ValidationContext(entry.Entity);
