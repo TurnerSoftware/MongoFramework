@@ -7,7 +7,6 @@ using MongoFramework.Infrastructure.Mutation;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -16,17 +15,19 @@ using System.Threading.Tasks;
 namespace MongoFramework
 {
 	/// <summary>
-	/// Basic Mongo "DbSet", providing changeset support and attribute validation
+	/// Basic Mongo "DbSet", providing changeset support
 	/// </summary>
 	/// <typeparam name="TEntity"></typeparam>
 	public class MongoDbSet<TEntity> : IMongoDbSet<TEntity> where TEntity : class
 	{
-		public IEntityCollection<TEntity> ChangeTracker { get; protected set; }
-
 		protected IMongoDbConnection Connection { get; private set; }
-		protected IEntityWriterPipeline<TEntity> EntityWriterPipeline { get; private set; }
+		protected ICommandWriter<TEntity> CommandWriter { get; private set; }
 		protected IEntityReader<TEntity> EntityReader { get; private set; }
 		protected IEntityIndexWriter<TEntity> EntityIndexWriter { get; private set; }
+
+
+		protected IEntityCollection<TEntity> ChangeTracker { get; } = new EntityCollection<TEntity>();
+		protected HashSet<IWriteCommand<TEntity>> StagedCommands { get; } = new HashSet<IWriteCommand<TEntity>>();
 
 		/// <summary>
 		/// Initialise a new entity reader and writer to the specified database.
@@ -35,18 +36,18 @@ namespace MongoFramework
 		public virtual void SetConnection(IMongoDbConnection connection)
 		{
 			Connection = connection;
-			EntityWriterPipeline = new EntityWriterPipeline<TEntity>(connection);
+			CommandWriter = new CommandWriter<TEntity>(connection);
 			EntityReader = new EntityReader<TEntity>(connection);
 			EntityIndexWriter = new EntityIndexWriter<TEntity>(connection);
-			ChangeTracker = new EntityCollection<TEntity>();
 
-			EntityWriterPipeline.AddCollection(ChangeTracker);
+			ChangeTracker.Clear();
+			StagedCommands.Clear();
 		}
 
 		public virtual TEntity Create()
 		{
 			var entity = Activator.CreateInstance<TEntity>();
-			EntityMutation<TEntity>.MutateEntity(entity, MutatorType.Create, Connection);
+			EntityMutation<TEntity>.MutateEntity(entity, MutatorType.Create);
 			Add(entity);
 			return entity;
 		}
@@ -146,7 +147,7 @@ namespace MongoFramework
 		/// <param name="targetField"></param>
 		public virtual void RemoveRange(Expression<Func<TEntity, bool>> predicate)
 		{
-			EntityWriterPipeline.StageCommand(new RemoveEntityRangeCommand<TEntity>(predicate));
+			StagedCommands.Add(new RemoveEntityRangeCommand<TEntity>(predicate));
 		}
 		/// <summary>
 		/// Stages a deletion for the entity that matches the specified ID
@@ -154,7 +155,7 @@ namespace MongoFramework
 		/// <param name="entityId"></param>
 		public virtual void RemoveById(object entityId)
 		{
-			EntityWriterPipeline.StageCommand(new RemoveEntityByIdCommand<TEntity>(entityId));
+			StagedCommands.Add(new RemoveEntityByIdCommand<TEntity>(entityId));
 		}
 
 		/// <summary>
@@ -164,7 +165,8 @@ namespace MongoFramework
 		public virtual void SaveChanges()
 		{
 			EntityIndexWriter.ApplyIndexing();
-			EntityWriterPipeline.Write();
+			CommandWriter.Write(GetAllWriteCommands());
+			CommitChanges();
 		}
 
 		/// <summary>
@@ -175,7 +177,42 @@ namespace MongoFramework
 		{
 			await EntityIndexWriter.ApplyIndexingAsync(cancellationToken).ConfigureAwait(false);
 			cancellationToken.ThrowIfCancellationRequested();
-			await EntityWriterPipeline.WriteAsync(cancellationToken).ConfigureAwait(false);
+			await CommandWriter.WriteAsync(GetAllWriteCommands(), cancellationToken).ConfigureAwait(false);
+			CommitChanges();
+		}
+
+		private IEnumerable<IWriteCommand<TEntity>> GetAllWriteCommands()
+		{
+			foreach (var command in StagedCommands)
+			{
+				yield return command;
+			}
+
+			foreach (var entry in ChangeTracker.GetEntries())
+			{
+				yield return EntityCommandBuilder<TEntity>.CreateCommand(entry);
+			}
+		}
+
+		private void CommitChanges()
+		{
+			StagedCommands.Clear();
+
+			var entries = ChangeTracker.GetEntries()
+				.Where(e => e.State != EntityEntryState.NoChanges)
+				.ToArray();
+
+			foreach (var entry in entries)
+			{
+				if (entry.State == EntityEntryState.Added || entry.State == EntityEntryState.Updated)
+				{
+					entry.Refresh();
+				}
+				else if (entry.State == EntityEntryState.Deleted)
+				{
+					ChangeTracker.Remove(entry.Entity as TEntity);
+				}
+			}
 		}
 
 		#region IQueryable Implementation

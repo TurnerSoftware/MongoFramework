@@ -67,7 +67,7 @@ namespace MongoFramework.Tests.Linq
 		public void WhereIdMatchesGuids()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var writerPipeline = new EntityWriterPipeline<WhereIdMatchesGuidModel>(TestConfiguration.GetConnection());
+			var commandWriter = new CommandWriter<WhereIdMatchesGuidModel>(connection);
 			var entityCollection = new EntityCollection<WhereIdMatchesGuidModel>()
 			{
 				new WhereIdMatchesGuidModel { Description = "1" },
@@ -75,8 +75,7 @@ namespace MongoFramework.Tests.Linq
 				new WhereIdMatchesGuidModel { Description = "3" },
 				new WhereIdMatchesGuidModel { Description = "4" }
 			};
-			writerPipeline.AddCollection(entityCollection);
-			writerPipeline.Write();
+			commandWriter.Write(entityCollection.GetEntries().Select(e => EntityCommandBuilder<WhereIdMatchesGuidModel>.CreateCommand(e)));
 
 			var provider = new MongoFrameworkQueryProvider<WhereIdMatchesGuidModel>(connection);
 			var queryable = new MongoFrameworkQueryable<WhereIdMatchesGuidModel>(provider);
@@ -93,7 +92,7 @@ namespace MongoFramework.Tests.Linq
 		public void WhereIdMatchesObjectIds()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var writerPipeline = new EntityWriterPipeline<WhereIdMatchesObjectIdModel>(connection);
+			var commandWriter = new CommandWriter<WhereIdMatchesObjectIdModel>(connection);
 			var entityCollection = new EntityCollection<WhereIdMatchesObjectIdModel>()
 			{
 				new WhereIdMatchesObjectIdModel { Description = "1" },
@@ -101,8 +100,7 @@ namespace MongoFramework.Tests.Linq
 				new WhereIdMatchesObjectIdModel { Description = "3" },
 				new WhereIdMatchesObjectIdModel { Description = "4" }
 			};
-			writerPipeline.AddCollection(entityCollection);
-			writerPipeline.Write();
+			commandWriter.Write(entityCollection.GetEntries().Select(e => EntityCommandBuilder<WhereIdMatchesObjectIdModel>.CreateCommand(e)));
 
 			var provider = new MongoFrameworkQueryProvider<WhereIdMatchesObjectIdModel>(connection);
 			var queryable = new MongoFrameworkQueryable<WhereIdMatchesObjectIdModel>(provider);
@@ -119,7 +117,7 @@ namespace MongoFramework.Tests.Linq
 		public void WhereIdMatchesStringIds()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var writerPipeline = new EntityWriterPipeline<WhereIdMatchesStringModel>(connection);
+			var commandWriter = new CommandWriter<WhereIdMatchesStringModel>(connection);
 			var entityCollection = new EntityCollection<WhereIdMatchesStringModel>()
 			{
 				new WhereIdMatchesStringModel { Description = "1" },
@@ -127,8 +125,7 @@ namespace MongoFramework.Tests.Linq
 				new WhereIdMatchesStringModel { Description = "3" },
 				new WhereIdMatchesStringModel { Description = "4" }
 			};
-			writerPipeline.AddCollection(entityCollection);
-			writerPipeline.Write();
+			commandWriter.Write(entityCollection.GetEntries().Select(e => EntityCommandBuilder<WhereIdMatchesStringModel>.CreateCommand(e)));
 
 			var provider = new MongoFrameworkQueryProvider<WhereIdMatchesStringModel>(connection);
 			var queryable = new MongoFrameworkQueryable<WhereIdMatchesStringModel>(provider);

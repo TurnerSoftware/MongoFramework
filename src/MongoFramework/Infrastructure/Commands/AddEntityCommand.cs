@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using MongoDB.Driver;
+using MongoFramework.Infrastructure.Mutation;
 
 namespace MongoFramework.Infrastructure.Commands
 {
@@ -16,7 +16,13 @@ namespace MongoFramework.Infrastructure.Commands
 
 		public IEnumerable<WriteModel<TEntity>> GetModel()
 		{
-			yield return new InsertOneModel<TEntity>(EntityEntry.Entity as TEntity);
+			var entity = EntityEntry.Entity as TEntity;
+			EntityMutation<TEntity>.MutateEntity(entity, MutatorType.Insert);
+
+			var validationContext = new ValidationContext(entity);
+			Validator.ValidateObject(entity, validationContext);
+
+			yield return new InsertOneModel<TEntity>(entity);
 		}
 	}
 }

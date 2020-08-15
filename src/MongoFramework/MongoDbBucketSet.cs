@@ -16,9 +16,11 @@ namespace MongoFramework
 		where TGroup : class
 		where TSubEntity : class
 	{
-		private IEntityWriterPipeline<EntityBucket<TGroup, TSubEntity>> EntityWriterPipeline { get; set; }
+		private ICommandWriter<EntityBucket<TGroup, TSubEntity>> CommandWriter { get; set; }
 		private IEntityReader<EntityBucket<TGroup, TSubEntity>> EntityReader { get; set; }
 		private IEntityIndexWriter<EntityBucket<TGroup, TSubEntity>> EntityIndexWriter { get; set; }
+
+		private HashSet<IWriteCommand<EntityBucket<TGroup, TSubEntity>>> StagedCommands { get; } = new HashSet<IWriteCommand<EntityBucket<TGroup, TSubEntity>>>();
 
 		internal int BucketSize { get; }
 
@@ -56,7 +58,7 @@ namespace MongoFramework
 
 		public void SetConnection(IMongoDbConnection connection)
 		{
-			EntityWriterPipeline = new EntityWriterPipeline<EntityBucket<TGroup, TSubEntity>>(connection);
+			CommandWriter = new CommandWriter<EntityBucket<TGroup, TSubEntity>>(connection);
 			EntityReader = new EntityReader<EntityBucket<TGroup, TSubEntity>>(connection);
 			EntityIndexWriter = new EntityIndexWriter<EntityBucket<TGroup, TSubEntity>>(connection);
 		}
@@ -73,7 +75,7 @@ namespace MongoFramework
 				throw new ArgumentNullException(nameof(entity));
 			}
 
-			EntityWriterPipeline.StageCommand(new AddToBucketCommand<TGroup, TSubEntity>(group, entity, EntityTimeProperty, BucketSize));
+			StagedCommands.Add(new AddToBucketCommand<TGroup, TSubEntity>(group, entity, EntityTimeProperty, BucketSize));
 		}
 
 		public virtual void AddRange(TGroup group, IEnumerable<TSubEntity> entities)
@@ -90,7 +92,7 @@ namespace MongoFramework
 
 			foreach (var entity in entities)
 			{
-				EntityWriterPipeline.StageCommand(new AddToBucketCommand<TGroup, TSubEntity>(group, entity, EntityTimeProperty, BucketSize));
+				StagedCommands.Add(new AddToBucketCommand<TGroup, TSubEntity>(group, entity, EntityTimeProperty, BucketSize));
 			}
 		}
 
@@ -101,7 +103,7 @@ namespace MongoFramework
 				throw new ArgumentNullException(nameof(group));
 			}
 
-			EntityWriterPipeline.StageCommand(new RemoveBucketCommand<TGroup, TSubEntity>(group));
+			StagedCommands.Add(new RemoveBucketCommand<TGroup, TSubEntity>(group));
 		}
 
 		public virtual IQueryable<TSubEntity> WithGroup(TGroup group)
@@ -117,14 +119,16 @@ namespace MongoFramework
 		public virtual void SaveChanges()
 		{
 			EntityIndexWriter.ApplyIndexing();
-			EntityWriterPipeline.Write();
+			CommandWriter.Write(StagedCommands);
+			StagedCommands.Clear();
 		}
 
 		public virtual async Task SaveChangesAsync(CancellationToken cancellationToken = default)
 		{
 			await EntityIndexWriter.ApplyIndexingAsync(cancellationToken).ConfigureAwait(false);
 			cancellationToken.ThrowIfCancellationRequested();
-			await EntityWriterPipeline.WriteAsync(cancellationToken).ConfigureAwait(false);
+			await CommandWriter.WriteAsync(StagedCommands, cancellationToken).ConfigureAwait(false);
+			StagedCommands.Clear();
 		}
 
 		#region IQueryable Implementation

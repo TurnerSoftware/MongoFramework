@@ -30,7 +30,7 @@ namespace MongoFramework.Infrastructure
 
 		public void Write(IEnumerable<IWriteCommand<TEntity>> writeCommands)
 		{
-			var writeModel = writeCommands.SelectMany(c => c.GetModel());
+			var writeModel = writeCommands.SelectMany(c => c.GetModel()).ToArray();
 
 			if (writeModel.Any())
 			{
@@ -51,7 +51,7 @@ namespace MongoFramework.Infrastructure
 
 		public async Task WriteAsync(IEnumerable<IWriteCommand<TEntity>> writeCommands, CancellationToken cancellationToken = default(CancellationToken))
 		{
-			var writeModel = writeCommands.SelectMany(c => c.GetModel());
+			var writeModel = writeCommands.SelectMany(c => c.GetModel()).ToArray();
 
 			cancellationToken.ThrowIfCancellationRequested();
 

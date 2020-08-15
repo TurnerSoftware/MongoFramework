@@ -15,18 +15,18 @@ namespace MongoFramework.Infrastructure.Mutation
 			};
 		}
 
-		public static void MutateEntity(TEntity entity, MutatorType mutationType, IMongoDbConnection connection)
+		public static void MutateEntity(TEntity entity, MutatorType mutationType)
 		{
-			MutateEntities(new[] { entity }, mutationType, connection);
+			MutateEntities(new[] { entity }, mutationType);
 		}
 
-		public static void MutateEntities(IEnumerable<TEntity> entities, MutatorType mutationType, IMongoDbConnection connection)
+		public static void MutateEntities(IEnumerable<TEntity> entities, MutatorType mutationType)
 		{
 			foreach (var entity in entities)
 			{
 				foreach (var driver in MutationDrivers)
 				{
-					driver.MutateEntity(entity, mutationType, connection);
+					driver.MutateEntity(entity, mutationType);
 				}
 			}
 		}

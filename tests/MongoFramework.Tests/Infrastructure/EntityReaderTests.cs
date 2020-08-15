@@ -23,8 +23,7 @@ namespace MongoFramework.Tests.Infrastructure
 			var connection = TestConfiguration.GetConnection();
 			var entityCollection = new EntityCollection<A>();
 			var reader = new EntityReader<A>(connection);
-			var writerPipeline = new EntityWriterPipeline<A>(connection);
-			writerPipeline.AddCollection(entityCollection);
+			var commandWriter = new CommandWriter<A>(connection);
 
 			entityCollection.Update(new A
 			{
@@ -37,8 +36,7 @@ namespace MongoFramework.Tests.Infrastructure
 				Description = "DbEntityReaderTests.ReadMixedEntities"
 			}, EntityEntryState.Added);
 
-
-			writerPipeline.Write();
+			commandWriter.Write(entityCollection.GetEntries().Select(e => EntityCommandBuilder<A>.CreateCommand(e)));
 
 			var readMixedEntitiesQuery =
 				reader.AsQueryable().Where(e => e.Description == "DbEntityReaderTests.ReadMixedEntities");

@@ -35,15 +35,14 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
 			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
 
-			var entityCollection = new EntityCollection<MongoFrameworkQueryableModel>();
-			var writerPipeline = new EntityWriterPipeline<MongoFrameworkQueryableModel>(connection);
-			writerPipeline.AddCollection(entityCollection);
-			entityCollection.Update(new MongoFrameworkQueryableModel { Title = "EnumerateQueryable" }, EntityEntryState.Added);
-			writerPipeline.Write();
+			var commandWriter = new CommandWriter<MongoFrameworkQueryableModel>(connection);
+			var entity = new MongoFrameworkQueryableModel { Title = "EnumerateQueryable" };
+			var entry = new EntityEntry(entity, EntityEntryState.Added);
+			commandWriter.Write(new[] { EntityCommandBuilder<MongoFrameworkQueryableModel>.CreateCommand(entry) });
 
-			foreach (var entity in queryable)
+			foreach (var dbEntity in queryable)
 			{
-				Assert.AreEqual("EnumerateQueryable", entity.Title);
+				Assert.AreEqual("EnumerateQueryable", dbEntity.Title);
 			}
 		}
 
@@ -59,13 +58,12 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 			var processor = new TestProcessor<MongoFrameworkQueryableModel>();
 			provider.EntityProcessors.Add(processor);
 
-			var entityCollection = new EntityCollection<MongoFrameworkQueryableModel>();
-			var writerPipeline = new EntityWriterPipeline<MongoFrameworkQueryableModel>(connection);
-			writerPipeline.AddCollection(entityCollection);
-			entityCollection.Update(new MongoFrameworkQueryableModel { Title = "EntityProcessorFireTest" }, EntityEntryState.Added);
-			writerPipeline.Write();
+			var commandWriter = new CommandWriter<MongoFrameworkQueryableModel>(connection);
+			var entity = new MongoFrameworkQueryableModel { Title = "EntityProcessorFireTest" };
+			var entry = new EntityEntry(entity, EntityEntryState.Added);
+			commandWriter.Write(new[] { EntityCommandBuilder<MongoFrameworkQueryableModel>.CreateCommand(entry) });
 
-			foreach (var entity in queryable)
+			foreach (var dbEntity in queryable)
 			{
 				//Do nothing
 			}
@@ -85,11 +83,10 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 			var processor = new TestProcessor<MongoFrameworkQueryableModel>();
 			provider.EntityProcessors.Add(processor);
 
-			var entityCollection = new EntityCollection<MongoFrameworkQueryableModel>();
-			var writerPipeline = new EntityWriterPipeline<MongoFrameworkQueryableModel>(connection);
-			writerPipeline.AddCollection(entityCollection);
-			entityCollection.Update(new MongoFrameworkQueryableModel { Title = "EntityProcessorNoFireTest" }, EntityEntryState.Added);
-			writerPipeline.Write();
+			var commandWriter = new CommandWriter<MongoFrameworkQueryableModel>(connection);
+			var entity = new MongoFrameworkQueryableModel { Title = "EntityProcessorNoFireTest" };
+			var entry = new EntityEntry(entity, EntityEntryState.Added);
+			commandWriter.Write(new[] { EntityCommandBuilder<MongoFrameworkQueryableModel>.CreateCommand(entry) });
 
 			foreach (var titles in queryable.Select(e => e.Title))
 			{
@@ -111,11 +108,10 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 			var processor = new TestProcessor<MongoFrameworkQueryableModel>();
 			provider.EntityProcessors.Add(processor);
 
-			var entityCollection = new EntityCollection<MongoFrameworkQueryableModel>();
-			var writerPipeline = new EntityWriterPipeline<MongoFrameworkQueryableModel>(connection);
-			writerPipeline.AddCollection(entityCollection);
-			entityCollection.Update(new MongoFrameworkQueryableModel { Title = "EntityProcessorsRunWithToDictionaryTest" }, EntityEntryState.Added);
-			writerPipeline.Write();
+			var commandWriter = new CommandWriter<MongoFrameworkQueryableModel>(connection);
+			var entity = new MongoFrameworkQueryableModel { Title = "EntityProcessorsRunWithToDictionaryTest" };
+			var entry = new EntityEntry(entity, EntityEntryState.Added);
+			commandWriter.Write(new[] { EntityCommandBuilder<MongoFrameworkQueryableModel>.CreateCommand(entry) });
 
 			var result = queryable.ToDictionary(m => m.Id);
 			Assert.AreEqual("EntityProcessorsRunWithToDictionaryTest", result.FirstOrDefault().Value.Title);

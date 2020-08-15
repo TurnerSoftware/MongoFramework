@@ -29,10 +29,9 @@ namespace MongoFramework.Tests.Infrastructure.Mutation.Mutators
 		public void OnInsert()
 		{
 			var entity = new ValidAttributeUseModel();
-			var connection = TestConfiguration.GetConnection();
 			var mutator = new EntityAttributeMutator<ValidAttributeUseModel>();
 
-			mutator.MutateEntity(entity, MutatorType.Insert, connection);
+			mutator.MutateEntity(entity, MutatorType.Insert);
 
 			Assert.IsTrue(DateTime.MinValue < entity.UpdatedDate);
 		}
@@ -41,10 +40,9 @@ namespace MongoFramework.Tests.Infrastructure.Mutation.Mutators
 		public void OnUpdate()
 		{
 			var entity = new ValidAttributeUseModel();
-			var connection = TestConfiguration.GetConnection();
 			var mutator = new EntityAttributeMutator<ValidAttributeUseModel>();
 
-			mutator.MutateEntity(entity, MutatorType.Update, connection);
+			mutator.MutateEntity(entity, MutatorType.Update);
 
 			Assert.IsTrue(DateTime.MinValue < entity.UpdatedDate);
 		}
@@ -53,10 +51,9 @@ namespace MongoFramework.Tests.Infrastructure.Mutation.Mutators
 		public void InvalidUseProperty()
 		{
 			var entity = new InvalidAttributeUseModel();
-			var connection = TestConfiguration.GetConnection();
 			var mutator = new EntityAttributeMutator<InvalidAttributeUseModel>();
 
-			mutator.MutateEntity(entity, MutatorType.Insert, connection);
+			mutator.MutateEntity(entity, MutatorType.Insert);
 		}
 	}
 }

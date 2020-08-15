@@ -15,13 +15,11 @@ namespace MongoFramework.Tests.Infrastructure
 		public void ValidObjectId()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var writerPipeline = new EntityWriterPipeline<MongoDbUtilityModel>(connection);
-			var entityCollection = new EntityCollection<MongoDbUtilityModel>();
-			writerPipeline.AddCollection(entityCollection);
+			var commandWriter = new CommandWriter<MongoDbUtilityModel>(connection);
 
 			var entity = new MongoDbUtilityModel();
-			entityCollection.Update(entity, EntityEntryState.Added);
-			writerPipeline.Write();
+			var entry = new EntityEntry(entity, EntityEntryState.Added);
+			commandWriter.Write(new[] { EntityCommandBuilder<MongoDbUtilityModel>.CreateCommand(entry) });
 
 			Assert.IsTrue(MongoDbUtility.IsValidObjectId(entity.Id));
 		}

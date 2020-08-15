@@ -14,7 +14,7 @@ namespace MongoFramework.Infrastructure
 			{
 				return new AddEntityCommand<TEntity>(entityEntry);
 			}
-			else if (entityEntry.State == EntityEntryState.Updated)
+			else if (entityEntry.State == EntityEntryState.Updated || entityEntry.State == EntityEntryState.NoChanges)
 			{
 				return new UpdateEntityCommand<TEntity>(entityEntry);
 			}

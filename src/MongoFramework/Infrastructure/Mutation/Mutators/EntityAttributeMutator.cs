@@ -7,7 +7,7 @@ namespace MongoFramework.Infrastructure.Mutation.Mutators
 {
 	public class EntityAttributeMutator<TEntity> : IEntityMutator<TEntity> where TEntity : class
 	{
-		public void MutateEntity(TEntity entity, MutatorType mutationType, IMongoDbConnection connection)
+		public void MutateEntity(TEntity entity, MutatorType mutationType)
 		{
 			var definition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
 			var mutatePropertiesMap = definition.GetAllProperties().Select(p => new
