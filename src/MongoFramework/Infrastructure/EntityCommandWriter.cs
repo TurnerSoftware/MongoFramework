@@ -33,7 +33,7 @@ namespace MongoFramework.Infrastructure
 				}
 			}
 		}
-		public static async Task WriteAsync<TEntity>(IMongoDbConnection connection, IEnumerable<IWriteCommand> commands, CancellationToken cancellationToken) where TEntity : class
+		public static async Task WriteAsync<TEntity>(IMongoDbConnection connection, IEnumerable<IWriteCommand> commands, CancellationToken cancellationToken = default) where TEntity : class
 		{
 			var writeModels = commands.OfType<IWriteCommand<TEntity>>().SelectMany(c => c.GetModel()).ToArray();
 			if (writeModels.Any())
