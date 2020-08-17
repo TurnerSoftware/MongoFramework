@@ -15,8 +15,7 @@ Some of the major features include:
 - Entity change tracking
 - Changeset support (allowing for queuing multiple DB updates to run at once)
 - Diff-updates (only _changes_ to an entity to be written)
-- Entity mutation (allowing automatic changes on properties during select/insert/update calls)
-- Entity Buckets (clustering of small documents together, optimised for write performance)
+- Entity Buckets (clustering of small documents together, [improving index performance](https://www.mongodb.com/blog/post/building-with-patterns-the-bucket-pattern))
 - Runtime type discovery (serialize and deserialize without needing to specify every "known" type)
 
 MongoFramework is currently built on-top of the official MongoDB C# driver.
@@ -117,25 +116,29 @@ A typical setup for using an entity bucket might look like:
 ```csharp
 public class MyBucketGrouping
 {
-  public string ClientId { get; set; }
-  public DateTime FiledDate { get; set; }
+  public string SensorId { get; set; }
+  public DateTime Date { get; set; }
 }
 
 public class MyBucketItem
 {
-  public string Name { get; set; }
-  public decimal Amount { get; set; }
+  public DateTime EntryTime { get; set; }
+  public int Value { get; set; }
 }
 
 public class MyContext : MongoDbContext
 {
   public MyContext(IMongoDbConnection connection) : base(connection) { }
-  [BucketSetOptions(BucketSize = 100)]
+  [BucketSetOptions(bucketSize: 1000, entityTimeProperty: nameof(MyBucketItem.EntryTime))]
   public MongoDbBucketSet<MyBucketGrouping, MyBucketItem> MyBuckets { get; set; }
 }
 ```
 
-The attribute `BucketSetOptions` is required and `BucketSize` is the number of items in a single bucket. Keep in mind the limitations of MongoDB (size of document) when determining the number of items in a bucket.
+The attribute `BucketSetOptions` is required. 
+The `bucketSize` is the maximum number of items in a single bucket.
+The `entityTimeProperty` identifies the property name in the sub-entity where a timestamp is stored.
+
+Keep in mind the limitations of MongoDB (size of document) when determining the number of items in a bucket.
 
 Managing buckets is very similar to managing normal entities though are currently limited to add data only.
 
@@ -144,23 +147,23 @@ using (var context = new MyContext(MongoDbConnection.FromConnectionString("mongo
 {
   context.MyBuckets.AddRange(new MyBucketGrouping
   {
-    ClientId = "ABC123",
-    FiledDate = DateTime.Today
+    SensorId = "ABC123",
+    Date = DateTime.Parse("2020-04-04")
   }, new []
   {
     new MyBucketItem
     {
-      Name = "Foo",
+      EntryTime = DateTime.Parse("2020-04-04T01:00"),
       Amount = 123
     },
     new MyBucketItem
     {
-      Name = "Bar",
+      EntryTime = DateTime.Parse("2020-04-04T02:00"),
       Amount = 456
     },
     new MyBucketItem
     {
-      Name = "Baz",
+      EntryTime = DateTime.Parse("2020-04-04T03:00"),
       Amount = 789
     }
   });
@@ -174,31 +177,6 @@ Sometimes your model in the database will have more fields than the model you ar
 
 To ignore the fields, you need to specify the `IgnoreExtraElements` attribute on the entity's class definition.
 To map the fields, you need to specify the `ExtraElements` attribute on an `IDictionary<string, object>` property.
-
-### Property Mutation through Attribute
-MongoFramework has a built-in mutation system used during reads and writes that allow you to do interesting things.
-
-#### Built-in Attribute Mutators
-
-|Attribute|Description|
-|---------|-----------|
-|`[CreatedDate]`|Populates the property with the current date/time on insert. _Note: The property must be of type `DateTime`_|
-|`[UpdatedDate]`|Populates the property with the current date/time on insert. _Note: The property must be of type `DateTime`_|
-
-#### Create Your Own
-
-Simply extend `MongoFramework.Attributes.MutatePropertyAttribute` and overwrite the specific method when you want your mutation to fire.
-
-```csharp
-[AttributeUsage(AttributeTargets.Property)]
-public class MyCustomMutatorAttribute : MutatePropertyAttribute
-{
-  public override void OnInsert(object target, IEntityProperty property)
-  {
-    //Do your mutation here! The "target" is the entity in question.
-  }
-}
-```
 
 ### Runtime Type Discovery
 MongoFramework provides runtime type discovery in two methods: automatically for any properties of type `object` and for any entities that specify the `RuntimeTypeDiscovery` attribute on their class definition.
