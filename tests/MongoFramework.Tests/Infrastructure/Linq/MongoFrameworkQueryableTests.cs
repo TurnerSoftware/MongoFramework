@@ -25,6 +25,15 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 			public string Id { get; set; }
 			public string Title { get; set; }
 		}
+		public class MixedReadA
+		{
+			public string Id { get; set; }
+			public string Description { get; set; }
+		}
+		public class MixedReadB : MixedReadA
+		{
+			public bool BIsForBoolean { get; set; }
+		}
 
 		[TestMethod]
 		public void EnumerateQueryable()
@@ -32,13 +41,12 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
 
 			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
 			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
 			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
 
-			var commandWriter = new CommandWriter<MongoFrameworkQueryableModel>(connection);
-			var entity = new MongoFrameworkQueryableModel { Title = "EnumerateQueryable" };
-			var entry = new EntityEntry(entity, EntityEntryState.Added);
-			commandWriter.Write(new[] { EntityCommandBuilder<MongoFrameworkQueryableModel>.CreateCommand(entry) });
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "EnumerateQueryable" }, EntityEntryState.Added);
+			context.SaveChanges();
 
 			foreach (var dbEntity in queryable)
 			{
@@ -52,16 +60,15 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
 
 			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
 			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
 			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
 
 			var processor = new TestProcessor<MongoFrameworkQueryableModel>();
 			provider.EntityProcessors.Add(processor);
 
-			var commandWriter = new CommandWriter<MongoFrameworkQueryableModel>(connection);
-			var entity = new MongoFrameworkQueryableModel { Title = "EntityProcessorFireTest" };
-			var entry = new EntityEntry(entity, EntityEntryState.Added);
-			commandWriter.Write(new[] { EntityCommandBuilder<MongoFrameworkQueryableModel>.CreateCommand(entry) });
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "EntityProcessorFireTest" }, EntityEntryState.Added);
+			context.SaveChanges();
 
 			foreach (var dbEntity in queryable)
 			{
@@ -77,16 +84,15 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
 
 			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
 			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
 			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
 
 			var processor = new TestProcessor<MongoFrameworkQueryableModel>();
 			provider.EntityProcessors.Add(processor);
 
-			var commandWriter = new CommandWriter<MongoFrameworkQueryableModel>(connection);
-			var entity = new MongoFrameworkQueryableModel { Title = "EntityProcessorNoFireTest" };
-			var entry = new EntityEntry(entity, EntityEntryState.Added);
-			commandWriter.Write(new[] { EntityCommandBuilder<MongoFrameworkQueryableModel>.CreateCommand(entry) });
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "EntityProcessorNoFireTest" }, EntityEntryState.Added);
+			context.SaveChanges();
 
 			foreach (var titles in queryable.Select(e => e.Title))
 			{
@@ -102,20 +108,47 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
 
 			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
 			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
 			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
 
 			var processor = new TestProcessor<MongoFrameworkQueryableModel>();
 			provider.EntityProcessors.Add(processor);
 
-			var commandWriter = new CommandWriter<MongoFrameworkQueryableModel>(connection);
-			var entity = new MongoFrameworkQueryableModel { Title = "EntityProcessorsRunWithToDictionaryTest" };
-			var entry = new EntityEntry(entity, EntityEntryState.Added);
-			commandWriter.Write(new[] { EntityCommandBuilder<MongoFrameworkQueryableModel>.CreateCommand(entry) });
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "EntityProcessorsRunWithToDictionaryTest" }, EntityEntryState.Added);
+			context.SaveChanges();
 
 			var result = queryable.ToDictionary(m => m.Id);
 			Assert.AreEqual("EntityProcessorsRunWithToDictionaryTest", result.FirstOrDefault().Value.Title);
 			Assert.IsTrue(processor.EntityProcessed);
+		}
+
+		[TestMethod]
+		public void ReadMixedEntities()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var provider = new MongoFrameworkQueryProvider<MixedReadA>(connection);
+			var queryable = new MongoFrameworkQueryable<MixedReadA>(provider);
+
+			context.ChangeTracker.SetEntityState(new MixedReadA
+			{
+				Description = "MongoFrameworkQueryableTests.ReadMixedEntities"
+			}, EntityEntryState.Added);
+
+			context.ChangeTracker.SetEntityState<MixedReadA>(new MixedReadB
+			{
+				BIsForBoolean = true,
+				Description = "MongoFrameworkQueryableTests.ReadMixedEntities"
+			}, EntityEntryState.Added);
+
+			context.SaveChanges();
+
+			var readMixedEntitiesQuery = queryable.Where(e => e.Description == "MongoFrameworkQueryableTests.ReadMixedEntities");
+
+			Assert.AreEqual(2, readMixedEntitiesQuery.Count());
+			Assert.AreEqual(2, readMixedEntitiesQuery.OfType<MixedReadA>().Count());
+			Assert.AreEqual(1, readMixedEntitiesQuery.OfType<MixedReadB>().Count());
 		}
 	}
 }

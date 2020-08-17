@@ -22,25 +22,20 @@ namespace MongoFramework.Tests.Infrastructure.Commands
 		public void RemoveEntity()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var writer = new CommandWriter<TestModel>(connection);
-			var reader = new EntityReader<TestModel>(connection);
+			var context = new MongoDbContext(connection);
 
 			var entity = new TestModel
 			{
 				Title = "RemoveEntityCommandTests.RemoveEntity"
 			};
 
-			writer.Write(new[]
-			{
-				new AddEntityCommand<TestModel>(new EntityEntry(entity, EntityEntryState.Added))
-			});
+			context.CommandStaging.Add(new AddEntityCommand<TestModel>(new EntityEntry(entity, EntityEntryState.Added)));
+			context.SaveChanges();
 
-			writer.Write(new[]
-			{
-				new RemoveEntityCommand<TestModel>(new EntityEntry(entity, EntityEntryState.Deleted))
-			});
+			context.CommandStaging.Add(new RemoveEntityCommand<TestModel>(new EntityEntry(entity, EntityEntryState.Deleted)));
+			context.SaveChanges();
 
-			var dbEntity = reader.AsQueryable().Where(e => e.Id == entity.Id).FirstOrDefault();
+			var dbEntity = context.Query<TestModel>().Where(e => e.Id == entity.Id).FirstOrDefault();
 			Assert.IsNull(dbEntity);
 		}
 	}

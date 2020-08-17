@@ -11,6 +11,8 @@ namespace MongoFramework.Infrastructure.Commands
 	{
 		private EntityEntry EntityEntry { get; }
 
+		public Type EntityType => typeof(TEntity);
+
 		public RemoveEntityCommand(EntityEntry entityEntry)
 		{
 			EntityEntry = entityEntry;

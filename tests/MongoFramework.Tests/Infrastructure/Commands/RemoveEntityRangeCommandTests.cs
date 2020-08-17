@@ -23,8 +23,7 @@ namespace MongoFramework.Tests.Infrastructure.Commands
 		public void RemoveEntities()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var writer = new CommandWriter<TestModel>(connection);
-			var reader = new EntityReader<TestModel>(connection);
+			var context = new MongoDbContext(connection);
 
 			var entities = new[]
 			{
@@ -40,21 +39,17 @@ namespace MongoFramework.Tests.Infrastructure.Commands
 				}
 			};
 
-			writer.Write(new[]
-			{
-				new AddEntityCommand<TestModel>(new EntityEntry(entities[0], EntityEntryState.Added)),
-				new AddEntityCommand<TestModel>(new EntityEntry(entities[1], EntityEntryState.Added))
-			});
+			context.CommandStaging.Add(new AddEntityCommand<TestModel>(new EntityEntry(entities[0], EntityEntryState.Added)));
+			context.CommandStaging.Add(new AddEntityCommand<TestModel>(new EntityEntry(entities[1], EntityEntryState.Added)));
+			context.SaveChanges();
 
-			writer.Write(new[]
-			{
-				new RemoveEntityRangeCommand<TestModel>(e => e.DateTime < DateTime.UtcNow)
-			});
+			context.CommandStaging.Add(new RemoveEntityRangeCommand<TestModel>(e => e.DateTime < DateTime.UtcNow));
+			context.SaveChanges();
 
-			var removedEntity = reader.AsQueryable().Where(e => e.Id == entities[0].Id).FirstOrDefault();
+			var removedEntity = context.Query<TestModel>().Where(e => e.Id == entities[0].Id).FirstOrDefault();
 			Assert.IsNull(removedEntity);
 
-			var nonRemovedEntity = reader.AsQueryable().Where(e => e.Id == entities[1].Id).FirstOrDefault();
+			var nonRemovedEntity = context.Query<TestModel>().Where(e => e.Id == entities[1].Id).FirstOrDefault();
 			Assert.IsNotNull(nonRemovedEntity);
 		}
 	}

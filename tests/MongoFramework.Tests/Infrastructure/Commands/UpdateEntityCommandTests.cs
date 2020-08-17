@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,22 +19,28 @@ namespace MongoFramework.Tests.Infrastructure.Commands
 			public string Title { get; set; }
 		}
 
+		public class TestValidationModel
+		{
+			public string Id { get; set; }
+
+			[Required]
+			public string RequiredField { get; set; }
+			public bool BooleanField { get; set; }
+		}
+
 		[TestMethod]
 		public void UpdateEntity()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var writer = new CommandWriter<TestModel>(connection);
-			var reader = new EntityReader<TestModel>(connection);
+			var context = new MongoDbContext(connection);
 
 			var entity = new TestModel
 			{
 				Title = "UpdateEntityCommandTests.UpdateEntity"
 			};
 
-			writer.Write(new[]
-			{
-				new AddEntityCommand<TestModel>(new EntityEntry(entity, EntityEntryState.Added))
-			});
+			context.CommandStaging.Add(new AddEntityCommand<TestModel>(new EntityEntry(entity, EntityEntryState.Added)));
+			context.SaveChanges();
 
 			var updatedEntity = new TestModel
 			{
@@ -41,13 +48,19 @@ namespace MongoFramework.Tests.Infrastructure.Commands
 				Title = "UpdateEntityCommandTests.UpdateEntity-Updated"
 			};
 
-			writer.Write(new[]
-			{
-				new UpdateEntityCommand<TestModel>(new EntityEntry(updatedEntity, EntityEntryState.Updated))
-			});
+			context.CommandStaging.Add(new UpdateEntityCommand<TestModel>(new EntityEntry(updatedEntity, EntityEntryState.Updated)));
+			context.SaveChanges();
 
-			var dbEntity = reader.AsQueryable().Where(e => e.Id == entity.Id).FirstOrDefault();
+			var dbEntity = context.Query<TestModel>().Where(e => e.Id == entity.Id).FirstOrDefault();
 			Assert.AreEqual("UpdateEntityCommandTests.UpdateEntity-Updated", dbEntity.Title);
+		}
+
+		[TestMethod, ExpectedException(typeof(ValidationException))]
+		public void ValidationExceptionOnInvalidModel()
+		{
+			var entity = new TestValidationModel { };
+			var command = new UpdateEntityCommand<TestValidationModel>(new EntityEntry(entity, EntityEntryState.Updated));
+			command.GetModel().FirstOrDefault();
 		}
 	}
 }

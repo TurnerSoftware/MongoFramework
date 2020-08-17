@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson.Serialization;
 using MongoFramework.Attributes;
+using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mapping.Processors;
 using System.Collections.Generic;
@@ -77,21 +78,17 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 			EntityMapping.RegisterType(typeof(ModelWithExtraElements));
 
 			var connection = TestConfiguration.GetConnection();
-			var modelWithExtraPropertiesDbSet = new MongoDbSet<ModelWithExtraElements>();
-			modelWithExtraPropertiesDbSet.SetConnection(connection);
+			var context = new MongoDbContext(connection);
 
 			var entity = new ModelWithExtraElements
 			{
 				PropertyOne = "ModelWithExtraElements",
 				PropertyTwo = 123
 			};
-			modelWithExtraPropertiesDbSet.Add(entity);
-			modelWithExtraPropertiesDbSet.SaveChanges();
-			
-			var extraElementsAttrModelDbSet = new MongoDbSet<ExtraElementsAttrModel>();
-			extraElementsAttrModelDbSet.SetConnection(connection);
+			context.ChangeTracker.SetEntityState(entity, EntityEntryState.Added);
+			context.SaveChanges();
 
-			var dbEntity = extraElementsAttrModelDbSet.Where(e => e.Id == entity.Id).FirstOrDefault();
+			var dbEntity = context.Query<ExtraElementsAttrModel>().Where(e => e.Id == entity.Id).FirstOrDefault();
 			Assert.AreEqual("ModelWithExtraElements", dbEntity.AdditionalElements[nameof(ModelWithExtraElements.PropertyOne)]);
 			Assert.AreEqual(123, dbEntity.AdditionalElements[nameof(ModelWithExtraElements.PropertyTwo)]);
 		}

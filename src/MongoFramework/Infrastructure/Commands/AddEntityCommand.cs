@@ -1,13 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using MongoDB.Driver;
-using MongoFramework.Infrastructure.Mutation;
 
 namespace MongoFramework.Infrastructure.Commands
 {
 	public class AddEntityCommand<TEntity> : IWriteCommand<TEntity> where TEntity : class
 	{
 		private EntityEntry EntityEntry { get; }
+
+		public Type EntityType => typeof(TEntity);
 
 		public AddEntityCommand(EntityEntry entityEntry)
 		{
@@ -17,7 +19,6 @@ namespace MongoFramework.Infrastructure.Commands
 		public IEnumerable<WriteModel<TEntity>> GetModel()
 		{
 			var entity = EntityEntry.Entity as TEntity;
-			EntityMutation<TEntity>.MutateEntity(entity, MutatorType.Insert);
 
 			var validationContext = new ValidationContext(entity);
 			Validator.ValidateObject(entity, validationContext);

@@ -17,6 +17,10 @@
 		/// <summary>
 		/// The entity is known to be deleted during the next save
 		/// </summary>
-		Deleted
+		Deleted,
+		/// <summary>
+		/// The entity is not attached for tracking
+		/// </summary>
+		Detached
 	}
 }
