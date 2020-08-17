@@ -12,7 +12,7 @@ namespace MongoFramework.Infrastructure.Indexing
 	{
 		private static readonly ConcurrentDictionary<Type, bool> HasAppliedIndexes = new ConcurrentDictionary<Type, bool>();
 
-		internal static void ClearCache()
+		public static void ClearCache()
 		{
 			HasAppliedIndexes.Clear();
 		}
