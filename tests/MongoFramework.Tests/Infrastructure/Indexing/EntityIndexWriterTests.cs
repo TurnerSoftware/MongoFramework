@@ -41,9 +41,8 @@ namespace MongoFramework.Tests.Infrastructure.Indexing
 		public void WriteIndexSync()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var indexWriter = new EntityIndexWriter<IndexModel>(connection);
 
-			indexWriter.ApplyIndexing();
+			EntityIndexWriter.ApplyIndexing<IndexModel>(connection);
 
 			var collection = connection.GetDatabase().GetCollection<IndexModel>("IndexModel");
 			var dbIndexes = collection.Indexes.List().ToList();
@@ -54,9 +53,9 @@ namespace MongoFramework.Tests.Infrastructure.Indexing
 		public async Task WriteIndexAsync()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var indexWriter = new EntityIndexWriter<IndexModel>(connection);
 
-			await indexWriter.ApplyIndexingAsync().ConfigureAwait(false);
+
+			await EntityIndexWriter.ApplyIndexingAsync<IndexModel>(connection);
 
 			var collection = connection.GetDatabase().GetCollection<IndexModel>("IndexModel");
 			var dbIndexes = await collection.Indexes.List().ToListAsync().ConfigureAwait(false);
@@ -67,18 +66,14 @@ namespace MongoFramework.Tests.Infrastructure.Indexing
 		public void NoIndexSync()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var indexWriter = new EntityIndexWriter<NoIndexModel>(connection);
-
-			AssertExtensions.DoesNotThrow<Exception>(() => indexWriter.ApplyIndexing());
+			AssertExtensions.DoesNotThrow<Exception>(() => EntityIndexWriter.ApplyIndexing<NoIndexModel>(connection));
 		}
 
 		[TestMethod]
 		public async Task NoIndexAsync()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var indexWriter = new EntityIndexWriter<NoIndexModel>(connection);
-
-			await AssertExtensions.DoesNotThrowAsync<Exception>(async () => await indexWriter.ApplyIndexingAsync().ConfigureAwait(false)).ConfigureAwait(false);
+			await AssertExtensions.DoesNotThrowAsync<Exception>(async () => await EntityIndexWriter.ApplyIndexingAsync<NoIndexModel>(connection)).ConfigureAwait(false);
 		}
 
 
@@ -86,9 +81,7 @@ namespace MongoFramework.Tests.Infrastructure.Indexing
 		public void FailureFromMultipleTextIndexes()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var indexWriter = new EntityIndexWriter<MultipleTextIndexModel>(connection);
-
-			indexWriter.ApplyIndexing();
+			EntityIndexWriter.ApplyIndexing<MultipleTextIndexModel>(connection);
 		}
 	}
 }

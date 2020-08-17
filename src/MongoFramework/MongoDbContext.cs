@@ -1,6 +1,11 @@
-﻿using MongoFramework.Attributes;
+﻿using MongoFramework.Infrastructure;
+using MongoFramework.Infrastructure.Commands;
+using MongoFramework.Infrastructure.Indexing;
+using MongoFramework.Infrastructure.Internal;
+using MongoFramework.Infrastructure.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,9 +14,10 @@ namespace MongoFramework
 {
 	public class MongoDbContext : IMongoDbContext, IDisposable
 	{
-		protected IMongoDbConnection Connection { get; private set; }
+		public IMongoDbConnection Connection { get; }
 
-		private IList<IMongoDbSet> DbSets { get; set; }
+		public EntityEntryContainer ChangeTracker { get; } = new EntityEntryContainer();
+		public EntityCommandStaging CommandStaging { get; } = new EntityCommandStaging();
 
 		public MongoDbContext(IMongoDbConnection connection)
 		{
@@ -21,58 +27,93 @@ namespace MongoFramework
 
 		private void InitialiseDbSets()
 		{
-			DbSets = new List<IMongoDbSet>();
-
-			//Construct the MongoDbSet properties
-			var properties = GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
-			var mongoDbSetType = typeof(IMongoDbSet);
+			var properties = DbSetInitializer.GetDbSetProperties(this);
 			foreach (var property in properties)
 			{
-				var propertyType = property.PropertyType;
-				if (propertyType.IsGenericType && mongoDbSetType.IsAssignableFrom(propertyType))
-				{
-					var dbSet = OnDbSetCreation(property);
-					DbSets.Add(dbSet);
-					property.SetValue(this, dbSet);
-				}
+				var dbSetOptions = DbSetInitializer.GetDefaultDbSetOptions(property);
+				var dbSet = OnDbSetCreation(property, dbSetOptions);
+				property.SetValue(this, dbSet);
 			}
 		}
 
-		protected virtual IMongoDbSet OnDbSetCreation(PropertyInfo property)
+		protected virtual IMongoDbSet OnDbSetCreation(PropertyInfo property, IDbSetOptions dbSetOptions)
 		{
-			IMongoDbSet dbSet;
+			return DbSetInitializer.CreateDbSet(property.PropertyType, this, dbSetOptions);
+		}
 
-			var propertyType = property.PropertyType;
-			var dbSetWithOptionsConstructor = propertyType.GetConstructor(new[] { typeof(IDbSetOptions) });
-			if (dbSetWithOptionsConstructor != null)
+		private IEnumerable<IWriteCommand> GenerateWriteCommands()
+		{
+			var entries = ChangeTracker.Entries();
+			foreach (var entry in entries)
 			{
-				var dbSetOptionsAttribute = property.GetCustomAttribute<DbSetOptionsAttribute>();
-				var dbSetOptions = dbSetOptionsAttribute?.GetOptions();
-				dbSet = dbSetWithOptionsConstructor.Invoke(new[] { dbSetOptions }) as IMongoDbSet;
-			}
-			else
-			{
-				dbSet = Activator.CreateInstance(propertyType) as IMongoDbSet;
+				if (entry.State != EntityEntryState.NoChanges)
+				{
+					yield return EntityCommandBuilder.CreateCommand(entry);
+				}
 			}
 
-			dbSet.SetConnection(Connection);
-			return dbSet;
+			foreach (var command in CommandStaging.GetCommands())
+			{
+				yield return command;
+			}
 		}
 
 		public virtual void SaveChanges()
 		{
-			foreach (var dbSet in DbSets)
+			ChangeTracker.DetectChanges();
+			var commands = GenerateWriteCommands();
+
+			var commandsByEntityType = commands.GroupBy(c => c.EntityType);
+			foreach (var entityTypeCommands in commandsByEntityType)
 			{
-				dbSet.SaveChanges();
+				var method = GenericsHelper.GetMethodDelegate<Action<IMongoDbConnection, IEnumerable<IWriteCommand>>>(
+					typeof(MongoDbContext), nameof(InternalSaveChanges), entityTypeCommands.Key
+				);
+				method(Connection, entityTypeCommands);
 			}
+
+			ChangeTracker.CommitChanges();
+			CommandStaging.CommitChanges();
 		}
 
-		public virtual async Task SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
+		private static void InternalSaveChanges<TEntity>(IMongoDbConnection connection, IEnumerable<IWriteCommand> commands) where TEntity : class
 		{
-			foreach (var dbSet in DbSets)
+			EntityIndexWriter.ApplyIndexing<TEntity>(connection);
+			EntityCommandWriter.Write<TEntity>(connection, commands);
+		}
+
+		public virtual async Task SaveChangesAsync(CancellationToken cancellationToken = default)
+		{
+			ChangeTracker.DetectChanges();
+			var commands = GenerateWriteCommands();
+
+			var commandsByEntityType = commands.GroupBy(c => c.EntityType);
+			foreach (var entityTypeCommands in commandsByEntityType)
 			{
-				await dbSet.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+				var methodAsync = GenericsHelper.GetMethodDelegate<Func<IMongoDbConnection, IEnumerable<IWriteCommand>, CancellationToken, Task>>(
+					typeof(MongoDbContext), nameof(InternalSaveChangesAsync), entityTypeCommands.Key
+				);
+				await methodAsync(Connection, entityTypeCommands, cancellationToken);
 			}
+
+			ChangeTracker.CommitChanges();
+			CommandStaging.CommitChanges();
+		}
+		private static async Task InternalSaveChangesAsync<TEntity>(IMongoDbConnection connection, IEnumerable<IWriteCommand> commands, CancellationToken cancellationToken) where TEntity : class
+		{
+			await EntityIndexWriter.ApplyIndexingAsync<TEntity>(connection);
+			await EntityCommandWriter.WriteAsync<TEntity>(connection, commands, cancellationToken);
+		}
+
+		public IMongoDbSet<TEntity> Set<TEntity>() where TEntity : class
+		{
+			return new MongoDbSet<TEntity>(this);
+		}
+
+		public IQueryable<TEntity> Query<TEntity>() where TEntity : class
+		{
+			var provider = new MongoFrameworkQueryProvider<TEntity>(Connection);
+			return new MongoFrameworkQueryable<TEntity>(provider);
 		}
 
 		public void Dispose()
@@ -86,8 +127,6 @@ namespace MongoFramework
 			if (disposing)
 			{
 				Connection?.Dispose();
-				Connection = null;
-				DbSets = null;
 			}
 		}
 

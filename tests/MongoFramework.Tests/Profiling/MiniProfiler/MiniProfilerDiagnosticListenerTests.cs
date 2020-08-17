@@ -49,7 +49,7 @@ namespace MongoFramework.Tests.Profiling.MiniProfiler
 				{
 					Name = "ProfilingInsert",
 				});
-				context.GeneralProfiling.SaveChanges();
+				context.SaveChanges();
 
 				Assert.IsTrue(profiler.Root.CustomTimings.ContainsKey("mongodb"));
 				var timings = profiler.Root.CustomTimings["mongodb"];
@@ -68,12 +68,12 @@ namespace MongoFramework.Tests.Profiling.MiniProfiler
 					Name = "ProfilingUpdate",
 				};
 				context.GeneralProfiling.Add(entity);
-				context.GeneralProfiling.SaveChanges();
+				context.SaveChanges();
 
 				var profiler = SEProfiling.MiniProfiler.StartNew();
 
 				entity.Name = "ProfilingUpdate-Updated";
-				context.GeneralProfiling.SaveChanges();
+				context.SaveChanges();
 
 				Assert.IsTrue(profiler.Root.CustomTimings.ContainsKey("mongodb"));
 				var timings = profiler.Root.CustomTimings["mongodb"];
@@ -92,12 +92,12 @@ namespace MongoFramework.Tests.Profiling.MiniProfiler
 					Name = "ProfilingDelete",
 				};
 				context.GeneralProfiling.Add(entity);
-				context.GeneralProfiling.SaveChanges();
+				context.SaveChanges();
 
 				var profiler = SEProfiling.MiniProfiler.StartNew();
 
 				context.GeneralProfiling.Remove(entity);
-				context.GeneralProfiling.SaveChanges();
+				context.SaveChanges();
 
 				Assert.IsTrue(profiler.Root.CustomTimings.ContainsKey("mongodb"));
 				var timings = profiler.Root.CustomTimings["mongodb"];
@@ -120,7 +120,7 @@ namespace MongoFramework.Tests.Profiling.MiniProfiler
 					});
 				}
 				
-				context.GeneralProfiling.SaveChanges();
+				context.SaveChanges();
 
 				var profiler = SEProfiling.MiniProfiler.StartNew();
 
@@ -149,7 +149,7 @@ namespace MongoFramework.Tests.Profiling.MiniProfiler
 					});
 				}
 
-				context.GeneralProfiling.SaveChanges();
+				context.SaveChanges();
 
 				var profiler = SEProfiling.MiniProfiler.StartNew();
 
@@ -170,9 +170,11 @@ namespace MongoFramework.Tests.Profiling.MiniProfiler
 		{
 			using (var context = new TestContext(GetConnection()))
 			{
+				context.IndexProfiling.Add(new ProfileIndexModel());
+
 				var profiler = SEProfiling.MiniProfiler.StartNew();
 
-				context.IndexProfiling.SaveChanges();
+				context.SaveChanges();
 
 				Assert.IsTrue(profiler.Root.CustomTimings.ContainsKey("mongodb"));
 				var timings = profiler.Root.CustomTimings["mongodb"];

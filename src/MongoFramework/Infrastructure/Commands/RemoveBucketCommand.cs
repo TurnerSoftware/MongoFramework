@@ -11,6 +11,8 @@ namespace MongoFramework.Infrastructure.Commands
 	{
 		private TGroup Group { get; }
 
+		public Type EntityType => typeof(EntityBucket<TGroup, TSubEntity>);
+
 		public RemoveBucketCommand(TGroup group)
 		{
 			Group = group;

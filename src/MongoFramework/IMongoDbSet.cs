@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,9 +8,10 @@ namespace MongoFramework
 {
 	public interface IMongoDbSet
 	{
-		void SetConnection(IMongoDbConnection connection);
+		[Obsolete("Use SaveChanges on the IMongoDbContext")]
 		void SaveChanges();
-		Task SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
+		[Obsolete("Use SaveChangesAsync on the IMongoDbContext")]
+		Task SaveChangesAsync(CancellationToken cancellationToken = default);
 	}
 
 	public interface IMongoDbSet<TEntity> : IMongoDbSet, IQueryable<TEntity> where TEntity : class

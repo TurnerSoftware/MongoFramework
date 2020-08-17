@@ -1,6 +1,5 @@
 ﻿using System;
 using MongoDB.Driver;
-using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Diagnostics;
 
 namespace MongoFramework
@@ -9,6 +8,6 @@ namespace MongoFramework
 	{
 		IMongoClient Client { get; }
 		IMongoDatabase GetDatabase();
-		IDiagnosticListener DiagnosticListener { set; get; }
+		IDiagnosticListener DiagnosticListener { get; set; }
 	}
 }

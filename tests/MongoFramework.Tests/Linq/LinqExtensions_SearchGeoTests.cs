@@ -31,8 +31,8 @@ namespace MongoFramework.Tests.Linq
 		public void SearchGeoNear()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var dbSet = new MongoDbSet<SearchGeoModel>();
-			dbSet.SetConnection(connection);
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<SearchGeoModel>(context);
 
 			dbSet.AddRange(new SearchGeoModel[]
 			{
@@ -49,7 +49,7 @@ namespace MongoFramework.Tests.Linq
 					new GeoJson2DGeographicCoordinates(147.327194, -42.882137)
 				) }
 			});
-			dbSet.SaveChanges();
+			context.SaveChanges();
 
 			var results = dbSet.SearchGeoNear(e => e.PrimaryCoordinates, new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
 				new GeoJson2DGeographicCoordinates(138, -30)
@@ -66,8 +66,8 @@ namespace MongoFramework.Tests.Linq
 		public void SearchGeoNearWithCustomDistanceField()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var dbSet = new MongoDbSet<SearchGeoModel>();
-			dbSet.SetConnection(connection);
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<SearchGeoModel>(context);
 
 			dbSet.AddRange(new SearchGeoModel[]
 			{
@@ -78,7 +78,7 @@ namespace MongoFramework.Tests.Linq
 					new GeoJson2DGeographicCoordinates(138.600739, -34.928497)
 				) }
 			});
-			dbSet.SaveChanges();
+			context.SaveChanges();
 
 			var results = dbSet.SearchGeoNear(e => e.PrimaryCoordinates, new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
 				new GeoJson2DGeographicCoordinates(138, -30)
@@ -95,8 +95,8 @@ namespace MongoFramework.Tests.Linq
 		public void SearchGeoNearWithMinMaxDistances()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var dbSet = new MongoDbSet<SearchGeoModel>();
-			dbSet.SetConnection(connection);
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<SearchGeoModel>(context);
 
 			dbSet.AddRange(new SearchGeoModel[]
 			{
@@ -113,7 +113,7 @@ namespace MongoFramework.Tests.Linq
 					new GeoJson2DGeographicCoordinates(147.327194, -42.882137)
 				) }
 			});
-			dbSet.SaveChanges();
+			context.SaveChanges();
 			
 			SearchGeoModel[] GetResults(double? maxDistance = null, double? minDistance = null)
 			{
@@ -148,8 +148,8 @@ namespace MongoFramework.Tests.Linq
 		public void SearchGeoNearRecordLimits()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var dbSet = new MongoDbSet<SearchGeoModel>();
-			dbSet.SetConnection(connection);
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<SearchGeoModel>(context);
 
 			for (var i = 0; i < 100; i++)
 			{
@@ -174,7 +174,7 @@ namespace MongoFramework.Tests.Linq
 					new GeoJson2DGeographicCoordinates(147.327194, -42.882137)
 				) }
 			});
-			dbSet.SaveChanges();
+			context.SaveChanges();
 
 			IQueryable<SearchGeoModel> WithGeoQuery()
 			{
@@ -198,8 +198,8 @@ namespace MongoFramework.Tests.Linq
 		public void SearchGeoIntersects()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var dbSet = new MongoDbSet<SearchGeoModel>();
-			dbSet.SetConnection(connection);
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<SearchGeoModel>(context);
 
 			dbSet.AddRange(new SearchGeoModel[]
 			{
@@ -222,7 +222,7 @@ namespace MongoFramework.Tests.Linq
 					new GeoJson2DGeographicCoordinates(153.025131, -27.469770)
 				) }
 			});
-			dbSet.SaveChanges();
+			context.SaveChanges();
 
 			var results = dbSet.SearchGeoIntersecting(e => e.PrimaryCoordinates, new GeoJsonPolygon<GeoJson2DGeographicCoordinates>(
 				new GeoJsonPolygonCoordinates<GeoJson2DGeographicCoordinates>(

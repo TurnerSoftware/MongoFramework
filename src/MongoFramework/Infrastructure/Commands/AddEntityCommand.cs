@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.ComponentModel.DataAnnotations;
 using MongoDB.Driver;
 
 namespace MongoFramework.Infrastructure.Commands
@@ -9,6 +9,8 @@ namespace MongoFramework.Infrastructure.Commands
 	{
 		private EntityEntry EntityEntry { get; }
 
+		public Type EntityType => typeof(TEntity);
+
 		public AddEntityCommand(EntityEntry entityEntry)
 		{
 			EntityEntry = entityEntry;
@@ -16,7 +18,12 @@ namespace MongoFramework.Infrastructure.Commands
 
 		public IEnumerable<WriteModel<TEntity>> GetModel()
 		{
-			yield return new InsertOneModel<TEntity>(EntityEntry.Entity as TEntity);
+			var entity = EntityEntry.Entity as TEntity;
+
+			var validationContext = new ValidationContext(entity);
+			Validator.ValidateObject(entity, validationContext);
+
+			yield return new InsertOneModel<TEntity>(entity);
 		}
 	}
 }

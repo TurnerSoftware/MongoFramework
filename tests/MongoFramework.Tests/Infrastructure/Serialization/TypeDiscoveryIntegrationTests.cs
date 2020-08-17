@@ -40,8 +40,8 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 		public void ReadAndWriteRootEntity()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var dbSet = new MongoDbSet<RootKnownBaseModel>();
-			dbSet.SetConnection(connection);
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<RootKnownBaseModel>(context);
 
 			var rootEntity = new RootKnownBaseModel
 			{
@@ -55,11 +55,10 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 			};
 			dbSet.Add(childEntity);
 
-			dbSet.SaveChanges();
+			context.SaveChanges();
 
 			ResetMongoDb();
-			dbSet = new MongoDbSet<RootKnownBaseModel>();
-			dbSet.SetConnection(connection);
+			dbSet = new MongoDbSet<RootKnownBaseModel>(context);
 
 			var dbRootEntity = dbSet.Where(e => e.Id == rootEntity.Id).FirstOrDefault();
 			Assert.IsNotNull(dbRootEntity);
@@ -74,8 +73,8 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 		public void ReadAndWriteUnknownPropertyTypeEntity()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var dbSet = new MongoDbSet<UnknownPropertyTypeModel>();
-			dbSet.SetConnection(connection);
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<UnknownPropertyTypeModel>(context);
 
 			var entities = new[]
 			{
@@ -97,11 +96,10 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 			};
 
 			dbSet.AddRange(entities);
-			dbSet.SaveChanges();
+			context.SaveChanges();
 
 			ResetMongoDb();
-			dbSet = new MongoDbSet<UnknownPropertyTypeModel>();
-			dbSet.SetConnection(connection);
+			dbSet = new MongoDbSet<UnknownPropertyTypeModel>(context);
 
 			var dbEntities = dbSet.ToArray();
 			Assert.IsNull(dbEntities[0].UnknownItem);

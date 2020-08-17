@@ -2,19 +2,19 @@
 {
 	public class EntityTrackingProcessor<TEntity> : ILinqProcessor<TEntity> where TEntity : class
 	{
-		public IEntityCollection<TEntity> EntityCollection { get; private set; }
+		public IMongoDbContext Context { get; }
 
-		public EntityTrackingProcessor(IEntityCollection<TEntity> collection)
+		public EntityTrackingProcessor(IMongoDbContext context)
 		{
-			EntityCollection = collection;
+			Context = context;
 		}
 
 		public void ProcessEntity(TEntity entity, IMongoDbConnection connection)
 		{
-			var entry = EntityCollection.GetEntry(entity);
+			var entry = Context.ChangeTracker.GetEntry(entity);
 			if (entry == null || entry.State == EntityEntryState.NoChanges)
 			{
-				EntityCollection.Update(entity, EntityEntryState.NoChanges);
+				Context.ChangeTracker.SetEntityState<TEntity>(entity, EntityEntryState.NoChanges);
 			}
 		}
 	}

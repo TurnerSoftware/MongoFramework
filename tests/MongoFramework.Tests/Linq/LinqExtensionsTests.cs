@@ -67,16 +67,18 @@ namespace MongoFramework.Tests.Linq
 		public void WhereIdMatchesGuids()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var writerPipeline = new EntityWriterPipeline<WhereIdMatchesGuidModel>(TestConfiguration.GetConnection());
-			var entityCollection = new EntityCollection<WhereIdMatchesGuidModel>()
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<WhereIdMatchesGuidModel>(context);
+
+			var entityCollection = new[]
 			{
 				new WhereIdMatchesGuidModel { Description = "1" },
 				new WhereIdMatchesGuidModel { Description = "2" },
 				new WhereIdMatchesGuidModel { Description = "3" },
 				new WhereIdMatchesGuidModel { Description = "4" }
 			};
-			writerPipeline.AddCollection(entityCollection);
-			writerPipeline.Write();
+			dbSet.AddRange(entityCollection);
+			context.SaveChanges();
 
 			var provider = new MongoFrameworkQueryProvider<WhereIdMatchesGuidModel>(connection);
 			var queryable = new MongoFrameworkQueryable<WhereIdMatchesGuidModel>(provider);
@@ -93,16 +95,18 @@ namespace MongoFramework.Tests.Linq
 		public void WhereIdMatchesObjectIds()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var writerPipeline = new EntityWriterPipeline<WhereIdMatchesObjectIdModel>(connection);
-			var entityCollection = new EntityCollection<WhereIdMatchesObjectIdModel>()
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<WhereIdMatchesObjectIdModel>(context);
+
+			var entityCollection = new[]
 			{
 				new WhereIdMatchesObjectIdModel { Description = "1" },
 				new WhereIdMatchesObjectIdModel { Description = "2" },
 				new WhereIdMatchesObjectIdModel { Description = "3" },
 				new WhereIdMatchesObjectIdModel { Description = "4" }
 			};
-			writerPipeline.AddCollection(entityCollection);
-			writerPipeline.Write();
+			dbSet.AddRange(entityCollection);
+			context.SaveChanges();
 
 			var provider = new MongoFrameworkQueryProvider<WhereIdMatchesObjectIdModel>(connection);
 			var queryable = new MongoFrameworkQueryable<WhereIdMatchesObjectIdModel>(provider);
@@ -119,16 +123,18 @@ namespace MongoFramework.Tests.Linq
 		public void WhereIdMatchesStringIds()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var writerPipeline = new EntityWriterPipeline<WhereIdMatchesStringModel>(connection);
-			var entityCollection = new EntityCollection<WhereIdMatchesStringModel>()
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<WhereIdMatchesStringModel>(context);
+
+			var entityCollection = new[]
 			{
 				new WhereIdMatchesStringModel { Description = "1" },
 				new WhereIdMatchesStringModel { Description = "2" },
 				new WhereIdMatchesStringModel { Description = "3" },
 				new WhereIdMatchesStringModel { Description = "4" }
 			};
-			writerPipeline.AddCollection(entityCollection);
-			writerPipeline.Write();
+			dbSet.AddRange(entityCollection);
+			context.SaveChanges();
 
 			var provider = new MongoFrameworkQueryProvider<WhereIdMatchesStringModel>(connection);
 			var queryable = new MongoFrameworkQueryable<WhereIdMatchesStringModel>(provider);
@@ -145,8 +151,8 @@ namespace MongoFramework.Tests.Linq
 		public void SearchText()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var dbSet = new MongoDbSet<SearchTextModel>();
-			dbSet.SetConnection(connection);
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<SearchTextModel>(context);
 
 			dbSet.AddRange(new SearchTextModel[]
 			{
@@ -155,7 +161,7 @@ namespace MongoFramework.Tests.Linq
 				new SearchTextModel { MiscField = 3, Text = "The quick brown fox jumps over the lazy dog." },
 				new SearchTextModel { MiscField = 4, Text = "Jived fox nymph grabs quick waltz." },
 			});
-			dbSet.SaveChanges();
+			context.SaveChanges();
 
 			Assert.AreEqual(4, dbSet.SearchText("quick").Count());
 			Assert.AreEqual(0, dbSet.SearchText("the").Count()); //Stop words aren't used in text indexes: https://docs.mongodb.com/manual/core/index-text/#supported-languages-and-stop-words

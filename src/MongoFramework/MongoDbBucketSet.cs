@@ -16,17 +16,16 @@ namespace MongoFramework
 		where TGroup : class
 		where TSubEntity : class
 	{
-		private IEntityWriterPipeline<EntityBucket<TGroup, TSubEntity>> EntityWriterPipeline { get; set; }
-		private IEntityReader<EntityBucket<TGroup, TSubEntity>> EntityReader { get; set; }
-		private IEntityIndexWriter<EntityBucket<TGroup, TSubEntity>> EntityIndexWriter { get; set; }
+		private IMongoDbContext Context { get; }
 
 		internal int BucketSize { get; }
 
 		internal IEntityProperty EntityTimeProperty { get; }
 
-
-		public MongoDbBucketSet(IDbSetOptions options)
+		public MongoDbBucketSet(IMongoDbContext context, IDbSetOptions options)
 		{
+			Context = context ?? throw new ArgumentNullException(nameof(context));
+
 			if (options is BucketSetOptions bucketOptions)
 			{
 				if (bucketOptions.BucketSize < 1)
@@ -54,13 +53,6 @@ namespace MongoFramework
 			}
 		}
 
-		public void SetConnection(IMongoDbConnection connection)
-		{
-			EntityWriterPipeline = new EntityWriterPipeline<EntityBucket<TGroup, TSubEntity>>(connection);
-			EntityReader = new EntityReader<EntityBucket<TGroup, TSubEntity>>(connection);
-			EntityIndexWriter = new EntityIndexWriter<EntityBucket<TGroup, TSubEntity>>(connection);
-		}
-
 		public virtual void Add(TGroup group, TSubEntity entity)
 		{
 			if (group == null)
@@ -73,7 +65,7 @@ namespace MongoFramework
 				throw new ArgumentNullException(nameof(entity));
 			}
 
-			EntityWriterPipeline.StageCommand(new AddToBucketCommand<TGroup, TSubEntity>(group, entity, EntityTimeProperty, BucketSize));
+			Context.CommandStaging.Add(new AddToBucketCommand<TGroup, TSubEntity>(group, entity, EntityTimeProperty, BucketSize));
 		}
 
 		public virtual void AddRange(TGroup group, IEnumerable<TSubEntity> entities)
@@ -90,7 +82,7 @@ namespace MongoFramework
 
 			foreach (var entity in entities)
 			{
-				EntityWriterPipeline.StageCommand(new AddToBucketCommand<TGroup, TSubEntity>(group, entity, EntityTimeProperty, BucketSize));
+				Context.CommandStaging.Add(new AddToBucketCommand<TGroup, TSubEntity>(group, entity, EntityTimeProperty, BucketSize));
 			}
 		}
 
@@ -101,37 +93,41 @@ namespace MongoFramework
 				throw new ArgumentNullException(nameof(group));
 			}
 
-			EntityWriterPipeline.StageCommand(new RemoveBucketCommand<TGroup, TSubEntity>(group));
+			Context.CommandStaging.Add(new RemoveBucketCommand<TGroup, TSubEntity>(group));
 		}
 
 		public virtual IQueryable<TSubEntity> WithGroup(TGroup group)
 		{
-			return EntityReader.AsQueryable().Where(e => e.Group == group).OrderBy(e => e.Min).SelectMany(e => e.Items);
+			return GetQueryable()
+				.Where(e => e.Group == group)
+				.OrderBy(e => e.Min)
+				.SelectMany(e => e.Items);
 		}
 
 		public virtual IQueryable<TGroup> Groups()
 		{
-			return EntityReader.AsQueryable().Select(e => e.Group).Distinct();
+			return GetQueryable()
+				.Select(e => e.Group)
+				.Distinct();
 		}
 
-		public virtual void SaveChanges()
+		[Obsolete("Use SaveChanges on the IMongoDbContext")]
+		public void SaveChanges()
 		{
-			EntityIndexWriter.ApplyIndexing();
-			EntityWriterPipeline.Write();
+			Context.SaveChanges();
 		}
 
-		public virtual async Task SaveChangesAsync(CancellationToken cancellationToken = default)
+		[Obsolete("Use SaveChangesAsync on the IMongoDbContext")]
+		public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
 		{
-			await EntityIndexWriter.ApplyIndexingAsync(cancellationToken).ConfigureAwait(false);
-			cancellationToken.ThrowIfCancellationRequested();
-			await EntityWriterPipeline.WriteAsync(cancellationToken).ConfigureAwait(false);
+			await Context.SaveChangesAsync(cancellationToken);
 		}
 
 		#region IQueryable Implementation
 
 		private IQueryable<EntityBucket<TGroup, TSubEntity>> GetQueryable()
 		{
-			return EntityReader.AsQueryable();
+			return Context.Query<EntityBucket<TGroup, TSubEntity>>();
 		}
 	
 		public Type ElementType => GetQueryable().ElementType;

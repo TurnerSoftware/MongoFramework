@@ -21,22 +21,24 @@ namespace MongoFramework.Tests.Infrastructure.Linq.Processors
 		[TestMethod]
 		public void TrackUnseenEntities()
 		{
-			var collection = new EntityCollection<TestEntity>();
-			var processor = new EntityTrackingProcessor<TestEntity>(collection);
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var processor = new EntityTrackingProcessor<TestEntity>(context);
 
 			processor.ProcessEntity(new TestEntity { Id = "123", Description = "Database" }, null);
 
-			var collectionEntity = collection.GetEntry(new TestEntity { Id = "123" }).Entity as TestEntity;
+			var collectionEntity = context.ChangeTracker.GetEntry(new TestEntity { Id = "123" }).Entity as TestEntity;
 			Assert.AreEqual("Database", collectionEntity.Description);
 		}
 
 		[TestMethod]
 		public void RefreshEntityIfMarkedAsNoChanges()
 		{
-			var collection = new EntityCollection<TestEntity>();
-			var processor = new EntityTrackingProcessor<TestEntity>(collection);
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var processor = new EntityTrackingProcessor<TestEntity>(context);
 
-			collection.Update(new TestEntity
+			context.ChangeTracker.SetEntityState(new TestEntity
 			{
 				Id = "123",
 				Description = "1"
@@ -44,17 +46,18 @@ namespace MongoFramework.Tests.Infrastructure.Linq.Processors
 
 			processor.ProcessEntity(new TestEntity { Id = "123", Description = "2" }, null);
 
-			var collectionEntity = collection.GetEntry(new TestEntity { Id = "123" }).Entity as TestEntity;
+			var collectionEntity = context.ChangeTracker.GetEntry(new TestEntity { Id = "123" }).Entity as TestEntity;
 			Assert.AreEqual("2", collectionEntity.Description);
 		}
 
 		[TestMethod]
 		public void DontRefreshEntityIfMarkedForDeletion()
 		{
-			var collection = new EntityCollection<TestEntity>();
-			var processor = new EntityTrackingProcessor<TestEntity>(collection);
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var processor = new EntityTrackingProcessor<TestEntity>(context);
 
-			collection.Update(new TestEntity
+			context.ChangeTracker.SetEntityState(new TestEntity
 			{
 				Id = "123",
 				Description = "Deleted"
@@ -62,17 +65,18 @@ namespace MongoFramework.Tests.Infrastructure.Linq.Processors
 
 			processor.ProcessEntity(new TestEntity { Id = "123", Description = "Database" }, null);
 
-			var collectionEntity = collection.GetEntry(new TestEntity { Id = "123" }).Entity as TestEntity;
+			var collectionEntity = context.ChangeTracker.GetEntry(new TestEntity { Id = "123" }).Entity as TestEntity;
 			Assert.AreEqual("Deleted", collectionEntity.Description);
 		}
 
 		[TestMethod]
 		public void DontRefreshEntityIfMarkedForUpdate()
 		{
-			var collection = new EntityCollection<TestEntity>();
-			var processor = new EntityTrackingProcessor<TestEntity>(collection);
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var processor = new EntityTrackingProcessor<TestEntity>(context);
 
-			collection.Update(new TestEntity
+			context.ChangeTracker.SetEntityState(new TestEntity
 			{
 				Id = "123",
 				Description = "Updated"
@@ -80,17 +84,18 @@ namespace MongoFramework.Tests.Infrastructure.Linq.Processors
 
 			processor.ProcessEntity(new TestEntity { Id = "123", Description = "Database" }, null);
 
-			var collectionEntity = collection.GetEntry(new TestEntity { Id = "123" }).Entity as TestEntity;
+			var collectionEntity = context.ChangeTracker.GetEntry(new TestEntity { Id = "123" }).Entity as TestEntity;
 			Assert.AreEqual("Updated", collectionEntity.Description);
 		}
 
 		[TestMethod]
 		public void DontRefreshEntityIfMarkedForAdded()
 		{
-			var collection = new EntityCollection<TestEntity>();
-			var processor = new EntityTrackingProcessor<TestEntity>(collection);
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var processor = new EntityTrackingProcessor<TestEntity>(context);
 
-			collection.Update(new TestEntity
+			context.ChangeTracker.SetEntityState(new TestEntity
 			{
 				Id = "123",
 				Description = "Added"
@@ -98,7 +103,7 @@ namespace MongoFramework.Tests.Infrastructure.Linq.Processors
 
 			processor.ProcessEntity(new TestEntity { Id = "123", Description = "Database" }, null);
 
-			var collectionEntity = collection.GetEntry(new TestEntity { Id = "123" }).Entity as TestEntity;
+			var collectionEntity = context.ChangeTracker.GetEntry(new TestEntity { Id = "123" }).Entity as TestEntity;
 			Assert.AreEqual("Added", collectionEntity.Description);
 		}
 	}

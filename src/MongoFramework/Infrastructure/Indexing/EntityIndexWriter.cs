@@ -1,40 +1,40 @@
-﻿using MongoDB.Driver;
-using MongoFramework.Infrastructure.Diagnostics;
+﻿using MongoFramework.Infrastructure.Diagnostics;
 using MongoFramework.Infrastructure.Mapping;
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace MongoFramework.Infrastructure.Indexing
 {
-	public class EntityIndexWriter<TEntity> : IEntityIndexWriter<TEntity> where TEntity : class
+	public static class EntityIndexWriter
 	{
-		private IMongoDbConnection Connection { get; }
-		private IEntityDefinition EntityDefinition { get; set; }
+		private static readonly ConcurrentDictionary<Type, bool> HasAppliedIndexes = new ConcurrentDictionary<Type, bool>();
 
-		public EntityIndexWriter(IMongoDbConnection connection)
+		internal static void ClearCache()
 		{
-			Connection = connection;
-			EntityDefinition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
+			HasAppliedIndexes.Clear();
 		}
 
-		private IMongoCollection<TEntity> GetCollection()
+		public static void ApplyIndexing<TEntity>(IMongoDbConnection connection) where TEntity : class
 		{
-			return Connection.GetDatabase().GetCollection<TEntity>(EntityDefinition.CollectionName);
-		}
-		
-		public void ApplyIndexing()
-		{
+			if (HasAppliedIndexes.TryGetValue(typeof(TEntity), out var hasApplied) && hasApplied)
+			{
+				return;
+			}
+
 			var indexModel = IndexModelBuilder<TEntity>.BuildModel().ToArray();
 			if (indexModel.Length > 0)
 			{
-				using (var diagnostics = DiagnosticRunner.Start(Connection, indexModel))
+				var definition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
+				using (var diagnostics = DiagnosticRunner.Start(connection, indexModel))
 				{
 					try
 					{
-						GetCollection().Indexes.CreateMany(indexModel);
+						var collection = connection.GetDatabase().GetCollection<TEntity>(definition.CollectionName);
+						collection.Indexes.CreateMany(indexModel);
+						HasAppliedIndexes.TryAdd(typeof(TEntity), true);
 					}
 					catch (Exception exception)
 					{
@@ -45,16 +45,24 @@ namespace MongoFramework.Infrastructure.Indexing
 			}
 		}
 
-		public async Task ApplyIndexingAsync(CancellationToken cancellationToken = default)
+		public static async Task ApplyIndexingAsync<TEntity>(IMongoDbConnection connection, CancellationToken cancellationToken = default) where TEntity : class
 		{
+			if (HasAppliedIndexes.TryGetValue(typeof(TEntity), out var hasApplied) && hasApplied)
+			{
+				return;
+			}
+
 			var indexModel = IndexModelBuilder<TEntity>.BuildModel().ToArray();
 			if (indexModel.Length > 0)
 			{
-				using (var diagnostics = DiagnosticRunner.Start(Connection, indexModel))
+				var definition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
+				using (var diagnostics = DiagnosticRunner.Start(connection, indexModel))
 				{
 					try
 					{
-						await GetCollection().Indexes.CreateManyAsync(indexModel, cancellationToken).ConfigureAwait(false);
+						var collection = connection.GetDatabase().GetCollection<TEntity>(definition.CollectionName);
+						await collection.Indexes.CreateManyAsync(indexModel, cancellationToken).ConfigureAwait(false);
+						HasAppliedIndexes.TryAdd(typeof(TEntity), true);
 					}
 					catch (Exception exception)
 					{

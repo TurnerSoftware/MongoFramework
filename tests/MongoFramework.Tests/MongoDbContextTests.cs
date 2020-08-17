@@ -77,8 +77,6 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public async Task ContextSavesDbSetsAsync()
 		{
-			var connectionString = TestConfiguration.ConnectionString;
-			var databaseName = TestConfiguration.GetDatabaseName();
 			using (var context = new MongoDbContextTestContext(TestConfiguration.GetConnection()))
 			{
 				context.DbSet.Add(new DbSetModel());

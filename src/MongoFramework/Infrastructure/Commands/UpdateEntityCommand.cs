@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using MongoDB.Driver;
-using MongoFramework.Bson;
 using MongoFramework.Infrastructure.DefinitionHelpers;
 using MongoFramework.Infrastructure.Mapping;
 
@@ -10,6 +11,8 @@ namespace MongoFramework.Infrastructure.Commands
 	{
 		private EntityEntry EntityEntry { get; }
 
+		public Type EntityType => typeof(TEntity);
+
 		public UpdateEntityCommand(EntityEntry entityEntry)
 		{
 			EntityEntry = entityEntry;
@@ -17,14 +20,14 @@ namespace MongoFramework.Infrastructure.Commands
 
 		public IEnumerable<WriteModel<TEntity>> GetModel()
 		{
-			//MongoDB doesn't like it if an UpdateDefinition is empty.
-			//This is primarily to work around a mutation that may set an entity to its default state.
-			if (BsonDiff.HasDifferences(EntityEntry.OriginalValues, EntityEntry.CurrentValues))
-			{
-				var definition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
-				var updateDefintion = UpdateDefinitionHelper.CreateFromDiff<TEntity>(EntityEntry.OriginalValues, EntityEntry.CurrentValues);
-				yield return new UpdateOneModel<TEntity>(definition.CreateIdFilterFromEntity(EntityEntry.Entity as TEntity), updateDefintion);
-			}
+			var entity = EntityEntry.Entity as TEntity;
+
+			var validationContext = new ValidationContext(entity);
+			Validator.ValidateObject(entity, validationContext);
+
+			var definition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
+			var updateDefintion = UpdateDefinitionHelper.CreateFromDiff<TEntity>(EntityEntry.OriginalValues, EntityEntry.CurrentValues);
+			yield return new UpdateOneModel<TEntity>(definition.CreateIdFilterFromEntity(entity), updateDefintion);
 		}
 	}
 }

@@ -10,6 +10,8 @@ namespace MongoFramework.Infrastructure.Commands
 	{
 		private Expression<Func<TEntity, bool>> Predicate { get; }
 
+		public Type EntityType => typeof(TEntity);
+
 		public RemoveEntityRangeCommand(Expression<Func<TEntity, bool>> predicate)
 		{
 			Predicate = predicate;

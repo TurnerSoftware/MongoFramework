@@ -11,6 +11,8 @@ namespace MongoFramework.Infrastructure.Commands
 	{
 		private object EntityId { get; }
 
+		public Type EntityType => typeof(TEntity);
+
 		public RemoveEntityByIdCommand(object entityId)
 		{
 			EntityId = entityId;

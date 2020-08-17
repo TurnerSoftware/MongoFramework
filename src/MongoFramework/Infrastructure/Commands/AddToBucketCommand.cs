@@ -14,6 +14,8 @@ namespace MongoFramework.Infrastructure.Commands
 		private IEntityProperty EntityTimeProperty { get; }
 		private int BucketSize { get; }
 
+		public Type EntityType => typeof(EntityBucket<TGroup, TSubEntity>);
+
 		public AddToBucketCommand(TGroup group, TSubEntity subEntity, IEntityProperty entityTimeProperty, int bucketSize)
 		{
 			Group = group;

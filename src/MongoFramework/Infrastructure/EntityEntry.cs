@@ -1,23 +1,26 @@
-﻿using MongoDB.Bson;
+﻿using System;
+using MongoDB.Bson;
 
 namespace MongoFramework.Infrastructure
 {
 	public class EntityEntry
 	{
 		/// <summary>
+		/// The entity that forms this <see cref="EntityEntry"/> object.
+		/// </summary>
+		public object Entity { get; }
+
+		public Type EntityType { get; }
+
+		/// <summary>
 		/// The state of the entity in this <see cref="EntityEntry"/> object.
 		/// </summary>
-		public EntityEntryState State { get; set; }
+		public EntityEntryState State { get; internal set; }
 
 		/// <summary>
 		/// The original values of the entity.
 		/// </summary>
 		public BsonDocument OriginalValues { get; private set; }
-
-		/// <summary>
-		/// The entity that forms this <see cref="EntityEntry"/> object.
-		/// </summary>
-		public object Entity { get; private set; }
 
 		/// <summary>
 		/// Creates a new <see cref="EntityEntry"/> with the specified entity and state information.
@@ -28,29 +31,32 @@ namespace MongoFramework.Infrastructure
 		{
 			State = state;
 			Entity = entity;
+			EntityType = entity.GetType();
 
 			if (state == EntityEntryState.NoChanges)
 			{
-				Refresh();
+				OriginalValues = Entity.ToBsonDocument();
 			}
 		}
 
 		/// <summary>
-		/// Update the original values to reflect the current state of the entity.
+		/// Creates a new <see cref="EntityEntry"/> with the specified entity, type and state information.
 		/// </summary>
-		public void Refresh()
+		/// <param name="entity"></param>
+		/// <param name="entityType"></param>
+		/// <param name="state"></param>
+		public EntityEntry(object entity, Type entityType, EntityEntryState state) : this(entity, state)
 		{
-			Refresh(Entity);
+			EntityType = entityType;
 		}
 
 		/// <summary>
-		/// Update the original values to reflect the state of the provided entity.
+		/// Resets the state of the entry, ready for tracking new changes.
 		/// </summary>
-		/// <param name="entity"></param>
-		public void Refresh(object entity)
+		public void ResetState()
 		{
-			OriginalValues = entity.ToBsonDocument();
-			State = this.HasChanges() ? EntityEntryState.Updated : EntityEntryState.NoChanges;
+			OriginalValues = Entity.ToBsonDocument();
+			State = EntityEntryState.NoChanges;
 		}
 
 		/// <summary>
