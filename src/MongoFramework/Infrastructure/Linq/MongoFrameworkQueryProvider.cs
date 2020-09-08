@@ -157,7 +157,7 @@ namespace MongoFramework.Infrastructure.Linq
 						}
 
 						var item = enumerator.Current;
-						if (item is TEntity entityItem)
+						if (item is TEntity entityItem && (model.ResultTransformer == null || model.ResultTransformer.ReturnType == typeof(TEntity)))
 						{
 							EntityProcessors.ProcessEntity(entityItem, Connection);
 						}

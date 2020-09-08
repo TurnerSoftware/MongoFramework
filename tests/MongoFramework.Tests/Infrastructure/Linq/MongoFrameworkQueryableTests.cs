@@ -79,7 +79,7 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 		}
 
 		[TestMethod]
-		public void EntityProcessorsNotFiredWhenNotTEntity()
+		public void EntityProcessorsNotFiredWhenNotTEntity_Select()
 		{
 			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
 
@@ -91,7 +91,7 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 			var processor = new TestProcessor<MongoFrameworkQueryableModel>();
 			provider.EntityProcessors.Add(processor);
 
-			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "EntityProcessorNoFireTest" }, EntityEntryState.Added);
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "EntityProcessorsNotFiredWhenNotTEntity_Select" }, EntityEntryState.Added);
 			context.SaveChanges();
 
 			foreach (var titles in queryable.Select(e => e.Title))
@@ -99,6 +99,28 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 				//Do nothing
 			}
 
+			Assert.IsFalse(processor.EntityProcessed);
+		}
+
+		[TestMethod]
+		public void EntityProcessorsNotFiredWhenNotTEntity_Any()
+		{
+			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
+
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
+			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
+
+			var processor = new TestProcessor<MongoFrameworkQueryableModel>();
+			provider.EntityProcessors.Add(processor);
+
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "EntityProcessorsNotFiredWhenNotTEntity_Any" }, EntityEntryState.Added);
+			context.SaveChanges();
+
+			var result = queryable.Any(e => e.Title == "EntityProcessorsNotFiredWhenNotTEntity_Any");
+
+			Assert.IsTrue(result);
 			Assert.IsFalse(processor.EntityProcessed);
 		}
 
