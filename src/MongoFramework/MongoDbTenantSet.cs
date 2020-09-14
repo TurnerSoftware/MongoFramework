@@ -1,0 +1,204 @@
+﻿using MongoFramework.Infrastructure;
+using MongoFramework.Infrastructure.Commands;
+using MongoFramework.Infrastructure.Linq;
+using MongoFramework.Infrastructure.Linq.Processors;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace MongoFramework
+{
+	/// <summary>
+	/// Basic Mongo "DbSet", providing entity tracking support.
+	/// </summary>
+	/// <typeparam name="TEntity"></typeparam>
+	public class MongoDbTenantSet<TEntity> : IMongoDbSet<TEntity> where TEntity : class, ITenant
+	{
+		protected IMongoDbContext Context { get; }
+		public string TenantKey { get; private set; }
+
+		public MongoDbTenantSet(IMongoDbContext context)
+		{
+			Context = context ?? throw new ArgumentNullException(nameof(context));
+			TenantKey = context.TenantKey;
+		}
+
+		public virtual TEntity Create()
+		{
+			var entity = Activator.CreateInstance<TEntity>();
+			entity.TenantKey = TenantKey;			
+			Add(entity);
+			return entity;
+		}
+
+		/// <summary>
+		/// Marks the entity for insertion into the database.
+		/// </summary>
+		/// <param name="entity"></param>
+		public virtual void Add(TEntity entity)
+		{
+			if (entity == null)
+			{
+				throw new ArgumentNullException(nameof(entity));
+			}
+			entity.TenantKey = TenantKey;
+			Context.ChangeTracker.SetEntityState(entity, EntityEntryState.Added);
+		}
+		/// <summary>
+		/// Marks the collection of entities for insertion into the database.
+		/// </summary>
+		/// <param name="entities"></param>
+		public virtual void AddRange(IEnumerable<TEntity> entities)
+		{
+			if (entities == null)
+			{
+				throw new ArgumentNullException(nameof(entities));
+			}
+
+			foreach (var entity in entities)
+			{
+				entity.TenantKey = TenantKey;
+				Context.ChangeTracker.SetEntityState(entity, EntityEntryState.Added);
+			}
+		}
+
+		/// <summary>
+		/// Marks the entity for updating.
+		/// </summary>
+		/// <param name="entity"></param>
+		public virtual void Update(TEntity entity)
+		{
+			if (entity == null)
+			{
+				throw new ArgumentNullException(nameof(entity));
+			}
+
+			if (entity.TenantKey != TenantKey)
+			{
+				throw new ArgumentException("Tenant Key Does Not Match: " + nameof(entity));
+			}
+
+			Context.ChangeTracker.SetEntityState(entity, EntityEntryState.Updated);
+		}
+		/// <summary>
+		/// Marks the collection of entities for updating.
+		/// </summary>
+		/// <param name="entities"></param>
+		public virtual void UpdateRange(IEnumerable<TEntity> entities)
+		{
+			if (entities == null)
+			{
+				throw new ArgumentNullException(nameof(entities));
+			}
+
+			foreach (var entity in entities)
+			{
+				if (entity.TenantKey != TenantKey)
+				{
+					throw new ArgumentException("Tenant Key Does Not Match: " + nameof(entity));
+				}
+				Context.ChangeTracker.SetEntityState(entity, EntityEntryState.Updated);
+			}
+		}
+
+		/// <summary>
+		/// Marks the entity for deletion.
+		/// </summary>
+		/// <param name="entity"></param>
+		public virtual void Remove(TEntity entity)
+		{
+			if (entity == null)
+			{
+				throw new ArgumentNullException(nameof(entity));
+			}
+			if (entity.TenantKey != TenantKey)
+			{
+				throw new ArgumentException("Tenant Key Does Not Match: " + nameof(entity));
+			}
+
+			Context.ChangeTracker.SetEntityState(entity, EntityEntryState.Deleted);
+		}
+		/// <summary>
+		/// Marks the collection of entities for deletion.
+		/// </summary>
+		/// <param name="entities"></param>
+		public virtual void RemoveRange(IEnumerable<TEntity> entities)
+		{
+			if (entities == null)
+			{
+				throw new ArgumentNullException(nameof(entities));
+			}
+
+			foreach (var entity in entities)
+			{
+				if (entity.TenantKey != TenantKey)
+				{
+					throw new ArgumentException("Tenant Key Does Not Match: " + nameof(entity));
+				}
+				Context.ChangeTracker.SetEntityState(entity, EntityEntryState.Deleted);
+			}
+		}
+		/// <summary>
+		/// Stages a deletion for a range of entities that match the predicate
+		/// </summary>
+		/// <param name="targetField"></param>
+		public virtual void RemoveRange(Expression<Func<TEntity, bool>> predicate)
+		{
+			//TODO: TenantCheck here
+			Context.CommandStaging.Add(new RemoveEntityRangeCommand<TEntity>(predicate));
+		}
+		/// <summary>
+		/// Stages a deletion for the entity that matches the specified ID
+		/// </summary>
+		/// <param name="entityId"></param>
+		public virtual void RemoveById(object entityId)
+		{
+			//TODO: TenantCheck here
+			Context.CommandStaging.Add(new RemoveEntityByIdCommand<TEntity>(entityId));
+		}
+
+		[Obsolete("Use SaveChanges on the IMongoDbContext")]
+		public void SaveChanges()
+		{
+			Context.SaveChanges();
+		}
+
+		[Obsolete("Use SaveChangesAsync on the IMongoDbContext")]
+		public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
+		{
+			await Context.SaveChangesAsync(cancellationToken);
+		}
+
+		#region IQueryable Implementation
+
+		private IQueryable<TEntity> GetQueryable()
+		{
+			var queryable = Context.Query<TEntity>().Where(c => c.TenantKey == TenantKey);
+			var provider = queryable.Provider as IMongoFrameworkQueryProvider<TEntity>;
+			provider.EntityProcessors.Add(new EntityTrackingProcessor<TEntity>(Context));
+			return queryable;
+		}
+
+		public Expression Expression => GetQueryable().Expression;
+
+		public Type ElementType => GetQueryable().ElementType;
+
+		public IQueryProvider Provider => GetQueryable().Provider;
+
+		public IEnumerator<TEntity> GetEnumerator()
+		{
+			return GetQueryable().GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
+
+		#endregion
+	}
+}
