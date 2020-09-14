@@ -18,21 +18,21 @@ namespace MongoFramework
 	/// Basic Mongo "DbSet", providing entity tracking support.
 	/// </summary>
 	/// <typeparam name="TEntity"></typeparam>
-	public class MongoDbTenantSet<TEntity> : IMongoDbSet<TEntity> where TEntity : class, ITenant
+	public class MongoDbTenantSet<TEntity> : IMongoDbSet<TEntity> where TEntity : class, IHasTenantId
 	{
 		protected IMongoDbContext Context { get; }
-		public string TenantKey { get; private set; }
+		public string TenantId { get; private set; }
 
 		public MongoDbTenantSet(IMongoDbContext context)
 		{
 			Context = context ?? throw new ArgumentNullException(nameof(context));
-			TenantKey = context.TenantKey;
+			TenantId = context.TenantId;
 		}
 
 		public virtual TEntity Create()
 		{
 			var entity = Activator.CreateInstance<TEntity>();
-			entity.TenantKey = TenantKey;			
+			entity.TenantId = TenantId;			
 			Add(entity);
 			return entity;
 		}
@@ -47,7 +47,7 @@ namespace MongoFramework
 			{
 				throw new ArgumentNullException(nameof(entity));
 			}
-			entity.TenantKey = TenantKey;
+			entity.TenantId = TenantId;
 			Context.ChangeTracker.SetEntityState(entity, EntityEntryState.Added);
 		}
 		/// <summary>
@@ -63,7 +63,7 @@ namespace MongoFramework
 
 			foreach (var entity in entities)
 			{
-				entity.TenantKey = TenantKey;
+				entity.TenantId = TenantId;
 				Context.ChangeTracker.SetEntityState(entity, EntityEntryState.Added);
 			}
 		}
@@ -79,7 +79,7 @@ namespace MongoFramework
 				throw new ArgumentNullException(nameof(entity));
 			}
 
-			if (entity.TenantKey != TenantKey)
+			if (entity.TenantId != TenantId)
 			{
 				throw new ArgumentException("Tenant Key Does Not Match: " + nameof(entity));
 			}
@@ -99,7 +99,7 @@ namespace MongoFramework
 
 			foreach (var entity in entities)
 			{
-				if (entity.TenantKey != TenantKey)
+				if (entity.TenantId != TenantId)
 				{
 					throw new ArgumentException("Tenant Key Does Not Match: " + nameof(entity));
 				}
@@ -117,7 +117,7 @@ namespace MongoFramework
 			{
 				throw new ArgumentNullException(nameof(entity));
 			}
-			if (entity.TenantKey != TenantKey)
+			if (entity.TenantId != TenantId)
 			{
 				throw new ArgumentException("Tenant Key Does Not Match: " + nameof(entity));
 			}
@@ -137,7 +137,7 @@ namespace MongoFramework
 
 			foreach (var entity in entities)
 			{
-				if (entity.TenantKey != TenantKey)
+				if (entity.TenantId != TenantId)
 				{
 					throw new ArgumentException("Tenant Key Does Not Match: " + nameof(entity));
 				}
@@ -150,8 +150,8 @@ namespace MongoFramework
 		/// <param name="targetField"></param>
 		public virtual void RemoveRange(Expression<Func<TEntity, bool>> predicate)
 		{
-			var key = TenantKey;
-			var filter = predicate.AndAlso(o => o.TenantKey == key);
+			var key = TenantId;
+			var filter = predicate.AndAlso(o => o.TenantId == key);
 			Context.CommandStaging.Add(new RemoveEntityRangeCommand<TEntity>(filter));
 		}
 		/// <summary>
@@ -160,7 +160,7 @@ namespace MongoFramework
 		/// <param name="entityId"></param>
 		public virtual void RemoveById(object entityId)
 		{
-			Context.CommandStaging.Add(new RemoveEntityByIdCommand<TEntity>(entityId, TenantKey));
+			Context.CommandStaging.Add(new RemoveEntityByIdCommand<TEntity>(entityId, TenantId));
 		}
 
 		[Obsolete("Use SaveChanges on the IMongoDbContext")]
@@ -179,8 +179,8 @@ namespace MongoFramework
 
 		private IQueryable<TEntity> GetQueryable()
 		{
-			var key = TenantKey;
-			var queryable = Context.Query<TEntity>().Where(c => c.TenantKey == key);
+			var key = TenantId;
+			var queryable = Context.Query<TEntity>().Where(c => c.TenantId == key);
 			var provider = queryable.Provider as IMongoFrameworkQueryProvider<TEntity>;
 			provider.EntityProcessors.Add(new EntityTrackingProcessor<TEntity>(Context));
 			return queryable;

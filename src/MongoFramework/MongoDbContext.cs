@@ -19,11 +19,11 @@ namespace MongoFramework
 		public EntityEntryContainer ChangeTracker { get; } = new EntityEntryContainer();
 		public EntityCommandStaging CommandStaging { get; } = new EntityCommandStaging();
 
-		public string TenantKey { get; private set; }
+		public string TenantId { get; private set; }
 
-		public MongoDbContext(IMongoDbConnection connection, string tenantKey = null)
+		public MongoDbContext(IMongoDbConnection connection, string tenantId = null)
 		{
-			TenantKey = tenantKey;
+			TenantId = tenantId;
 			Connection = connection;
 			InitialiseDbSets();
 		}

@@ -9,10 +9,10 @@ namespace MongoFramework.Tests
 	[TestClass]
 	public class MongoDbContextTenantTests : TestBase
 	{
-		class DbSetModel : ITenant
+		class DbSetModel : IHasTenantId
 		{
 			public string Id { get; set; }
-			public string TenantKey { get; set; }
+			public string TenantId { get; set; }
 		}
 		class BucketGroupModel
 		{
@@ -26,7 +26,7 @@ namespace MongoFramework.Tests
 
 		class MongoDbContextTestContext : MongoDbContext
 		{
-			public MongoDbContextTestContext(IMongoDbConnection connection, string tenantKey) : base(connection, tenantKey) { }
+			public MongoDbContextTestContext(IMongoDbConnection connection, string tenantId) : base(connection, tenantId) { }
 			public MongoDbTenantSet<DbSetModel> DbSet { get; set; }
 			[BucketSetOptions(5, nameof(BucketSubEntity.Date))]
 			public MongoDbBucketSet<BucketGroupModel, BucketSubEntity> DbBucketSet { get; set; }
@@ -35,7 +35,7 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public void ContextCreatedWithOptions()
 		{
-			using (var context = new MongoDbContextTestContext(TestConfiguration.GetConnection(), TestConfiguration.GetTenantKey()))
+			using (var context = new MongoDbContextTestContext(TestConfiguration.GetConnection(), TestConfiguration.GetTenantId()))
 			{
 				context.DbSet.Add(new DbSetModel());
 				Assert.IsFalse(context.DbSet.Any());
@@ -47,7 +47,7 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public void ContextCreatesDbSets()
 		{
-			using (var context = new MongoDbContextTestContext(TestConfiguration.GetConnection(), TestConfiguration.GetTenantKey()))
+			using (var context = new MongoDbContextTestContext(TestConfiguration.GetConnection(), TestConfiguration.GetTenantId()))
 			{
 				Assert.IsNotNull(context.DbSet);
 				Assert.IsNotNull(context.DbBucketSet);
@@ -57,7 +57,7 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public void DbSetsHaveOptionsApplied()
 		{
-			using (var context = new MongoDbContextTestContext(TestConfiguration.GetConnection(), TestConfiguration.GetTenantKey()))
+			using (var context = new MongoDbContextTestContext(TestConfiguration.GetConnection(), TestConfiguration.GetTenantId()))
 			{
 				Assert.AreEqual(5, context.DbBucketSet.BucketSize);
 			}
@@ -66,26 +66,26 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public void ContextSavesDbSets()
 		{
-			using (var context = new MongoDbContextTestContext(TestConfiguration.GetConnection(), TestConfiguration.GetTenantKey()))
+			using (var context = new MongoDbContextTestContext(TestConfiguration.GetConnection(), TestConfiguration.GetTenantId()))
 			{
 				context.DbSet.Add(new DbSetModel());
 				Assert.IsFalse(context.DbSet.Any());
 				context.SaveChanges();
 				Assert.IsTrue(context.DbSet.Any());
-				Assert.IsTrue(context.DbSet.First().TenantKey == TestConfiguration.GetTenantKey());
+				Assert.IsTrue(context.DbSet.First().TenantId == TestConfiguration.GetTenantId());
 			}
 		}
 
 		[TestMethod]
 		public async Task ContextSavesDbSetsAsync()
 		{
-			using (var context = new MongoDbContextTestContext(TestConfiguration.GetConnection(), TestConfiguration.GetTenantKey()))
+			using (var context = new MongoDbContextTestContext(TestConfiguration.GetConnection(), TestConfiguration.GetTenantId()))
 			{
 				context.DbSet.Add(new DbSetModel());
 				Assert.IsFalse(context.DbSet.Any());
 				await context.SaveChangesAsync().ConfigureAwait(false);
 				Assert.IsTrue(context.DbSet.Any());
-				Assert.IsTrue(context.DbSet.First().TenantKey == TestConfiguration.GetTenantKey());
+				Assert.IsTrue(context.DbSet.First().TenantId == TestConfiguration.GetTenantId());
 			}
 		}
 	}
