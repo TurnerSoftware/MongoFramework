@@ -12,14 +12,14 @@ namespace MongoFramework.Infrastructure.Commands
 		{
 			return Builders<TEntity>.Filter.Eq(definition.GetIdName(), definition.GetIdValue(entity));
 		}
-		public static FilterDefinition<TEntity> CreateIdFilter<TEntity>(this IEntityDefinition definition, object entityId, string tenantKey = null)
+		public static FilterDefinition<TEntity> CreateIdFilter<TEntity>(this IEntityDefinition definition, object entityId, string tenantId = null)
 		{
-			if (tenantKey == null)
+			if (tenantId == null)
 			    return Builders<TEntity>.Filter.Eq(definition.GetIdName(), entityId);
 			else
 				return Builders<TEntity>.Filter.And(
 					Builders<TEntity>.Filter.Eq(definition.GetIdName(), entityId),
-					Builders<TEntity>.Filter.Eq("TenantKey", tenantKey)
+					Builders<TEntity>.Filter.Eq("TenantId", tenantId)
 					);
 		}
 	}

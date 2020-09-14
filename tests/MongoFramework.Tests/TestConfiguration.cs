@@ -7,7 +7,7 @@ namespace MongoFramework.Tests
 	{
 		public static string ConnectionString => Environment.GetEnvironmentVariable("MONGODB_URI") ?? "mongodb://localhost";
 
-		public static string GetTenantKey()
+		public static string GetTenantId()
 		{
 			return "testkey1";
 		}

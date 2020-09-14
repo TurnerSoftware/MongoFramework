@@ -9,10 +9,10 @@ namespace MongoFramework.Tests
 	[TestClass]
 	public class MongoDbTenantSetTests : TestBase
 	{
-		public class TestModel : ITenant
+		public class TestModel : IHasTenantId
 		{
 			public string Id { get; set; }
-			public string TenantKey { get; set; }
+			public string TenantId { get; set; }
 
 			public string Description { get; set; }
 			public bool BooleanField { get; set; }
@@ -22,11 +22,11 @@ namespace MongoFramework.Tests
 		public void SuccessfulLimitsQueryToTenant()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var tenantKey = TestConfiguration.GetTenantKey();
-			var context = new MongoDbContext(connection, tenantKey);
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
-			var context2 = new MongoDbContext(connection, tenantKey + "-alt");
+			var context2 = new MongoDbContext(connection, tenantId + "-alt");
 			var dbSet2 = new MongoDbTenantSet<TestModel>(context2);
 
 
@@ -72,8 +72,8 @@ namespace MongoFramework.Tests
 		public void SuccessfulInsertAndQueryBack()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var tenantKey = TestConfiguration.GetTenantKey();
-			var context = new MongoDbContext(connection, tenantKey);
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
 			dbSet.Add(new TestModel
@@ -84,15 +84,15 @@ namespace MongoFramework.Tests
 			Assert.IsFalse(dbSet.Any(m => m.Description == "ValueSync"));
 			context.SaveChanges();
 			Assert.IsTrue(dbSet.Any(m => m.Description == "ValueSync"));
-			Assert.IsTrue(dbSet.Any(m => m.TenantKey == tenantKey));
+			Assert.IsTrue(dbSet.Any(m => m.TenantId == tenantId));
 		}
 
 		[TestMethod]
 		public async Task SuccessfulInsertAndQueryBackAsync()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var tenantKey = TestConfiguration.GetTenantKey();
-			var context = new MongoDbContext(connection, tenantKey);
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
 			dbSet.Add(new TestModel
@@ -103,15 +103,15 @@ namespace MongoFramework.Tests
 			Assert.IsFalse(dbSet.Any(m => m.Description == "ValueAsync"));
 			await context.SaveChangesAsync();
 			Assert.IsTrue(dbSet.Any(m => m.Description == "ValueAsync"));
-			Assert.IsTrue(dbSet.Any(m => m.TenantKey == tenantKey));
+			Assert.IsTrue(dbSet.Any(m => m.TenantId == tenantId));
 		}
 
 		[TestMethod]
 		public void SuccessfullyUpdateEntity()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var tenantKey = TestConfiguration.GetTenantKey();
-			var context = new MongoDbContext(connection, tenantKey);
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
 			var entity = new TestModel
@@ -130,7 +130,7 @@ namespace MongoFramework.Tests
 			Assert.IsFalse(dbSet.Any(m => m.Description == "SuccessfullyUpdateEntity-Updated"));
 			context.SaveChanges();
 			Assert.IsTrue(dbSet.Any(m => m.Description == "SuccessfullyUpdateEntity-Updated"));
-			Assert.IsTrue(dbSet.First(m => m.Description == "SuccessfullyUpdateEntity-Updated").TenantKey == tenantKey);
+			Assert.IsTrue(dbSet.First(m => m.Description == "SuccessfullyUpdateEntity-Updated").TenantId == tenantId);
 		}
 
 
@@ -138,8 +138,8 @@ namespace MongoFramework.Tests
 		public void SuccessfullyBlocksUpdateEntity()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var tenantKey = TestConfiguration.GetTenantKey();
-			var context = new MongoDbContext(connection, tenantKey);
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
 			var entity = new TestModel
@@ -151,7 +151,7 @@ namespace MongoFramework.Tests
 			context.SaveChanges();
 
 			dbSet = new MongoDbTenantSet<TestModel>(context);
-			entity.TenantKey = "qweasd";
+			entity.TenantId = "qweasd";
 			entity.Description = "SuccessfullyUpdateEntity-Updated";
 			Assert.ThrowsException<ArgumentException>(() => dbSet.Update(entity));
 
@@ -161,8 +161,8 @@ namespace MongoFramework.Tests
 		public void SuccessfullyUpdateRange()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var tenantKey = TestConfiguration.GetTenantKey();
-			var context = new MongoDbContext(connection, tenantKey);
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
 			var entities = new[] {
@@ -195,8 +195,8 @@ namespace MongoFramework.Tests
 		public void SuccessfullyBlocksUpdateRange()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var tenantKey = TestConfiguration.GetTenantKey();
-			var context = new MongoDbContext(connection, tenantKey);
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
 			var entities = new[] {
@@ -216,10 +216,10 @@ namespace MongoFramework.Tests
 			dbSet = new MongoDbTenantSet<TestModel>(context);
 
 			entities[0].Description = "SuccessfullyUpdateRange.1-Updated";
-			entities[0].TenantKey = "qweasd";
+			entities[0].TenantId = "qweasd";
 
 			entities[1].Description = "SuccessfullyUpdateRange.2-Updated";
-			entities[1].TenantKey = "qweasd";
+			entities[1].TenantId = "qweasd";
 			Assert.ThrowsException<ArgumentException>(() => dbSet.UpdateRange(entities));
 		}
 
@@ -227,8 +227,8 @@ namespace MongoFramework.Tests
 		public void SuccessfullyRemoveEntity()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var tenantKey = TestConfiguration.GetTenantKey();
-			var context = new MongoDbContext(connection, tenantKey);
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
 			var entity = new TestModel
@@ -252,8 +252,8 @@ namespace MongoFramework.Tests
 		public void SuccessfullyBlocksRemoveEntity()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var tenantKey = TestConfiguration.GetTenantKey();
-			var context = new MongoDbContext(connection, tenantKey);
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
 			var entity = new TestModel
@@ -264,7 +264,7 @@ namespace MongoFramework.Tests
 			dbSet.Add(entity);
 			context.SaveChanges();
 
-			entity.TenantKey = "qweasd";
+			entity.TenantId = "qweasd";
 
 			dbSet = new MongoDbTenantSet<TestModel>(context);
 
@@ -276,8 +276,8 @@ namespace MongoFramework.Tests
 		public void SuccessfullyRemoveRange()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var tenantKey = TestConfiguration.GetTenantKey();
-			var context = new MongoDbContext(connection, tenantKey);
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
 			var entities = new[] {
@@ -309,8 +309,8 @@ namespace MongoFramework.Tests
 		public void SuccessfullyBlocksRemoveRange()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var tenantKey = TestConfiguration.GetTenantKey();
-			var context = new MongoDbContext(connection, tenantKey);
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
 			var entities = new[] {
@@ -329,8 +329,8 @@ namespace MongoFramework.Tests
 
 			dbSet = new MongoDbTenantSet<TestModel>(context);
 
-			entities[0].TenantKey = "qweasd";
-			entities[1].TenantKey = "qweasd";
+			entities[0].TenantId = "qweasd";
+			entities[1].TenantId = "qweasd";
 
 			Assert.ThrowsException<ArgumentException>(() => dbSet.RemoveRange(entities));
 
@@ -340,11 +340,11 @@ namespace MongoFramework.Tests
 		public void SuccessfullyRemoveEntityById()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var tenantKey = TestConfiguration.GetTenantKey();
-			var context = new MongoDbContext(connection, tenantKey);
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
-			var context2 = new MongoDbContext(connection, tenantKey + "-alt");
+			var context2 = new MongoDbContext(connection, tenantId + "-alt");
 			var dbSet2 = new MongoDbTenantSet<TestModel>(context2);
 
 			var entity = new TestModel
@@ -381,11 +381,11 @@ namespace MongoFramework.Tests
 		public void SuccessfullyRemoveRangeByPredicate()
 		{
 			var connection = TestConfiguration.GetConnection();
-			var tenantKey = TestConfiguration.GetTenantKey();
-			var context = new MongoDbContext(connection, tenantKey);
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
-			var context2 = new MongoDbContext(connection, tenantKey + "-alt");
+			var context2 = new MongoDbContext(connection, tenantId + "-alt");
 			var dbSet2 = new MongoDbTenantSet<TestModel>(context2);
 
 
