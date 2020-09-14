@@ -2,6 +2,8 @@
 using MongoFramework.Infrastructure.Commands;
 using MongoFramework.Infrastructure.Linq;
 using MongoFramework.Infrastructure.Linq.Processors;
+using MongoFramework.Infrastructure.Mapping;
+using MongoFramework.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -148,8 +150,9 @@ namespace MongoFramework
 		/// <param name="targetField"></param>
 		public virtual void RemoveRange(Expression<Func<TEntity, bool>> predicate)
 		{
-			//TODO: TenantCheck here
-			Context.CommandStaging.Add(new RemoveEntityRangeCommand<TEntity>(predicate));
+			var key = TenantKey;
+			var filter = predicate.AndAlso(o => o.TenantKey == key);
+			Context.CommandStaging.Add(new RemoveEntityRangeCommand<TEntity>(filter));
 		}
 		/// <summary>
 		/// Stages a deletion for the entity that matches the specified ID
@@ -157,8 +160,7 @@ namespace MongoFramework
 		/// <param name="entityId"></param>
 		public virtual void RemoveById(object entityId)
 		{
-			//TODO: TenantCheck here
-			Context.CommandStaging.Add(new RemoveEntityByIdCommand<TEntity>(entityId));
+			Context.CommandStaging.Add(new RemoveEntityByIdCommand<TEntity>(entityId, TenantKey));
 		}
 
 		[Obsolete("Use SaveChanges on the IMongoDbContext")]
@@ -177,7 +179,8 @@ namespace MongoFramework
 
 		private IQueryable<TEntity> GetQueryable()
 		{
-			var queryable = Context.Query<TEntity>().Where(c => c.TenantKey == TenantKey);
+			var key = TenantKey;
+			var queryable = Context.Query<TEntity>().Where(c => c.TenantKey == key);
 			var provider = queryable.Provider as IMongoFrameworkQueryProvider<TEntity>;
 			provider.EntityProcessors.Add(new EntityTrackingProcessor<TEntity>(Context));
 			return queryable;
