@@ -9,6 +9,8 @@ namespace MongoFramework
 {
 	public interface IMongoDbContext
 	{
+		string TenantKey { get; }
+
 		EntityEntryContainer ChangeTracker { get; }
 		EntityCommandStaging CommandStaging { get; }
 
