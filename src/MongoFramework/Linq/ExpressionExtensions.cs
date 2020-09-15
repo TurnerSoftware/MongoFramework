@@ -20,8 +20,8 @@ namespace MongoFramework.Linq
 
 		private class ReplaceParameterVisitor : ExpressionVisitor
 		{
-			private ParameterExpression _oldParameter;
-			private ParameterExpression _newParameter;
+			private readonly ParameterExpression _oldParameter;
+			private readonly ParameterExpression _newParameter;
 
 			public ReplaceParameterVisitor(ParameterExpression oldParameter, ParameterExpression newParameter)
 			{
@@ -32,7 +32,9 @@ namespace MongoFramework.Linq
 			protected override Expression VisitParameter(ParameterExpression node)
 			{
 				if (ReferenceEquals(node, _oldParameter))
-					return _newParameter;
+				{
+				    return _newParameter;
+				}
 
 				return base.VisitParameter(node);
 			}

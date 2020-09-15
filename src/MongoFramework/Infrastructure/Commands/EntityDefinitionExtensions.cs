@@ -19,12 +19,16 @@ namespace MongoFramework.Infrastructure.Commands
 				throw new ArgumentException("Tenant ID required for Tenant Entity");
 			}
 			if (tenantId == null)
-			    return Builders<TEntity>.Filter.Eq(definition.GetIdName(), entityId);
+			{
+				return Builders<TEntity>.Filter.Eq(definition.GetIdName(), entityId);
+			}
 			else
+			{
 				return Builders<TEntity>.Filter.And(
 					Builders<TEntity>.Filter.Eq(definition.GetIdName(), entityId),
 					Builders<TEntity>.Filter.Eq("TenantId", tenantId)
 					);
+			}
 		}
 	}
 }
