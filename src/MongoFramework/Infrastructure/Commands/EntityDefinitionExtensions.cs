@@ -14,7 +14,7 @@ namespace MongoFramework.Infrastructure.Commands
 		}
 		public static FilterDefinition<TEntity> CreateIdFilter<TEntity>(this IEntityDefinition definition, object entityId, string tenantId = null)
 		{
-			if (typeof(TEntity) is IHasTenantId && tenantId == null)
+			if (typeof(TEntity) is IHaveTenantId && tenantId == null)
 			{
 				throw new ArgumentException("Tenant ID required for Tenant Entity");
 			}

@@ -18,7 +18,7 @@ namespace MongoFramework
 	/// Basic Mongo "DbSet", providing entity tracking support.
 	/// </summary>
 	/// <typeparam name="TEntity"></typeparam>
-	public class MongoDbTenantSet<TEntity> : IMongoDbSet<TEntity> where TEntity : class, IHasTenantId
+	public class MongoDbTenantSet<TEntity> : IMongoDbSet<TEntity> where TEntity : class, IHaveTenantId
 	{
 		protected IMongoDbContext Context { get; }
 

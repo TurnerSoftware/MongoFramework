@@ -9,7 +9,7 @@ namespace MongoFramework.Tests
 	[TestClass]
 	public class MongoDbTenantSetTests : TestBase
 	{
-		public class TestModel : IHasTenantId
+		public class TestModel : IHaveTenantId
 		{
 			public string Id { get; set; }
 			public string TenantId { get; set; }

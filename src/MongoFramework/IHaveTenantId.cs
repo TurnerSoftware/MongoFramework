@@ -1,7 +1,7 @@
 ﻿using System;
 namespace MongoFramework
 {
-	public interface IHasTenantId
+	public interface IHaveTenantId
 	{
 		string TenantId { get; set; }
 	}
