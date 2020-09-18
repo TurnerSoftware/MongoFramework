@@ -79,7 +79,7 @@ namespace MongoFramework
 
 			if (entity.TenantId != Context.TenantId)
 			{
-				throw new MultiTenantException("Tenant Key Does Not Match: " + nameof(entity));
+				throw new MultiTenantException($"Entity type {entity.GetType().Name}, tenant ID does not match. Expected: {Context.TenantId}, entity has: {entity.TenantId}");
 			}
 
 			Context.ChangeTracker.SetEntityState(entity, EntityEntryState.Updated);
@@ -99,7 +99,7 @@ namespace MongoFramework
 			{
 				if (entity.TenantId != Context.TenantId)
 				{
-					throw new MultiTenantException("Tenant Key Does Not Match: " + nameof(entity));
+					throw new MultiTenantException($"Entity type {entity.GetType().Name}, tenant ID does not match. Expected: {Context.TenantId}, entity has: {entity.TenantId}");
 				}
 				Context.ChangeTracker.SetEntityState(entity, EntityEntryState.Updated);
 			}
@@ -117,7 +117,7 @@ namespace MongoFramework
 			}
 			if (entity.TenantId != Context.TenantId)
 			{
-				throw new MultiTenantException("Tenant Key Does Not Match: " + nameof(entity));
+				throw new MultiTenantException($"Entity type {entity.GetType().Name}, tenant ID does not match. Expected: {Context.TenantId}, entity has: {entity.TenantId}");
 			}
 
 			Context.ChangeTracker.SetEntityState(entity, EntityEntryState.Deleted);
@@ -137,7 +137,7 @@ namespace MongoFramework
 			{
 				if (entity.TenantId != Context.TenantId)
 				{
-					throw new MultiTenantException("Tenant Key Does Not Match: " + nameof(entity));
+					throw new MultiTenantException($"Entity type {entity.GetType().Name}, tenant ID does not match. Expected: {Context.TenantId}, entity has: {entity.TenantId}");
 				}
 				Context.ChangeTracker.SetEntityState(entity, EntityEntryState.Deleted);
 			}
