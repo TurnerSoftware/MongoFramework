@@ -64,6 +64,7 @@ namespace MongoFramework
 		public virtual void SaveChanges()
 		{
 			ChangeTracker.DetectChanges();
+			ChangeTracker.EnforceMultiTenant(this.TenantId);
 			var commands = GenerateWriteCommands();
 
 			var commandsByEntityType = commands.GroupBy(c => c.EntityType);
@@ -88,6 +89,7 @@ namespace MongoFramework
 		public virtual async Task SaveChangesAsync(CancellationToken cancellationToken = default)
 		{
 			ChangeTracker.DetectChanges();
+			ChangeTracker.EnforceMultiTenant(this.TenantId);
 			var commands = GenerateWriteCommands();
 
 			var commandsByEntityType = commands.GroupBy(c => c.EntityType);
