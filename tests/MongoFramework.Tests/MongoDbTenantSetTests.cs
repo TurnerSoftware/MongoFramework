@@ -158,6 +158,31 @@ namespace MongoFramework.Tests
 		}
 
 		[TestMethod]
+		public void SuccessfullyBlocksUpdateChangedEntity()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbContext(connection, tenantId);
+			var dbSet = new MongoDbTenantSet<TestModel>(context);
+
+			var entity = new TestModel
+			{
+				Description = "SuccessfullyUpdateEntity"
+			};
+
+			dbSet.Add(entity);
+			context.SaveChanges();
+			entity.Description = "SuccessfullyUpdateEntity-Updated";
+
+			dbSet.Update(entity);
+
+			//changing tenant ID after state is updated
+			entity.TenantId = "qweasd";
+			Assert.ThrowsException<ArgumentException>(() => context.SaveChanges());
+		}
+
+
+		[TestMethod]
 		public void SuccessfullyUpdateRange()
 		{
 			var connection = TestConfiguration.GetConnection();

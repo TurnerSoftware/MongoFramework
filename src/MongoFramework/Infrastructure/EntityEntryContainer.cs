@@ -153,6 +153,35 @@ namespace MongoFramework.Infrastructure
 			}
 		}
 
+		public void EnforceMultiTenant(string tenantId)
+		{
+			if (string.IsNullOrEmpty(tenantId))
+			{
+				return;
+			}
+
+			foreach (var pair in EntryLookupByType)
+			{
+				if (!typeof(IHaveTenantId).IsAssignableFrom(pair.Key))
+				{
+					continue;
+				}
+
+				var typeGroup = pair.Value;
+				for (var i = typeGroup.Count - 1; i >= 0; i--)
+				{
+					var entry = typeGroup[i];
+					var tenantItem = entry.Entity as IHaveTenantId;
+					if (tenantItem.TenantId != tenantId)
+					{
+						throw new ArgumentException("Tenant Key Does Not Match: " + entry.EntityType.Name  + " Expected: " + tenantId + ", entity has: " + tenantItem.TenantId);
+					}
+
+				}
+
+			}
+		}
+
 		public void Clear()
 		{
 			EntryLookupByType.Clear();
