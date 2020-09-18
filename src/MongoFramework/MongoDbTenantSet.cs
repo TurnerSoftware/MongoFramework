@@ -79,7 +79,7 @@ namespace MongoFramework
 
 			if (entity.TenantId != Context.TenantId)
 			{
-				throw new ArgumentException("Tenant Key Does Not Match: " + nameof(entity));
+				throw new MultiTenantException("Tenant Key Does Not Match: " + nameof(entity));
 			}
 
 			Context.ChangeTracker.SetEntityState(entity, EntityEntryState.Updated);
@@ -99,7 +99,7 @@ namespace MongoFramework
 			{
 				if (entity.TenantId != Context.TenantId)
 				{
-					throw new ArgumentException("Tenant Key Does Not Match: " + nameof(entity));
+					throw new MultiTenantException("Tenant Key Does Not Match: " + nameof(entity));
 				}
 				Context.ChangeTracker.SetEntityState(entity, EntityEntryState.Updated);
 			}
@@ -117,7 +117,7 @@ namespace MongoFramework
 			}
 			if (entity.TenantId != Context.TenantId)
 			{
-				throw new ArgumentException("Tenant Key Does Not Match: " + nameof(entity));
+				throw new MultiTenantException("Tenant Key Does Not Match: " + nameof(entity));
 			}
 
 			Context.ChangeTracker.SetEntityState(entity, EntityEntryState.Deleted);
@@ -137,7 +137,7 @@ namespace MongoFramework
 			{
 				if (entity.TenantId != Context.TenantId)
 				{
-					throw new ArgumentException("Tenant Key Does Not Match: " + nameof(entity));
+					throw new MultiTenantException("Tenant Key Does Not Match: " + nameof(entity));
 				}
 				Context.ChangeTracker.SetEntityState(entity, EntityEntryState.Deleted);
 			}

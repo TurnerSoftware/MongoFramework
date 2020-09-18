@@ -174,7 +174,7 @@ namespace MongoFramework.Infrastructure
 					var tenantItem = entry.Entity as IHaveTenantId;
 					if (tenantItem.TenantId != tenantId)
 					{
-						throw new ArgumentException("Tenant Key Does Not Match: " + entry.EntityType.Name  + " Expected: " + tenantId + ", entity has: " + tenantItem.TenantId);
+						throw new MultiTenantException("Tenant Key Does Not Match: " + entry.EntityType.Name  + " Expected: " + tenantId + ", entity has: " + tenantItem.TenantId);
 					}
 
 				}
