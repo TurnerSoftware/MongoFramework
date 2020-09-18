@@ -153,7 +153,7 @@ namespace MongoFramework.Tests
 			dbSet = new MongoDbTenantSet<TestModel>(context);
 			entity.TenantId = "qweasd";
 			entity.Description = "SuccessfullyUpdateEntity-Updated";
-			Assert.ThrowsException<ArgumentException>(() => dbSet.Update(entity));
+			Assert.ThrowsException<MultiTenantException>(() => dbSet.Update(entity));
 
 		}
 
@@ -178,7 +178,7 @@ namespace MongoFramework.Tests
 
 			//changing tenant ID after state is updated
 			entity.TenantId = "qweasd";
-			Assert.ThrowsException<ArgumentException>(() => context.SaveChanges());
+			Assert.ThrowsException<MultiTenantException>(() => context.SaveChanges());
 		}
 
 
@@ -245,7 +245,7 @@ namespace MongoFramework.Tests
 
 			entities[1].Description = "SuccessfullyUpdateRange.2-Updated";
 			entities[1].TenantId = "qweasd";
-			Assert.ThrowsException<ArgumentException>(() => dbSet.UpdateRange(entities));
+			Assert.ThrowsException<MultiTenantException>(() => dbSet.UpdateRange(entities));
 		}
 
 		[TestMethod]
@@ -293,7 +293,7 @@ namespace MongoFramework.Tests
 
 			dbSet = new MongoDbTenantSet<TestModel>(context);
 
-			Assert.ThrowsException<ArgumentException>(() => dbSet.Remove(entity));
+			Assert.ThrowsException<MultiTenantException>(() => dbSet.Remove(entity));
 
 		}
 
@@ -357,7 +357,7 @@ namespace MongoFramework.Tests
 			entities[0].TenantId = "qweasd";
 			entities[1].TenantId = "qweasd";
 
-			Assert.ThrowsException<ArgumentException>(() => dbSet.RemoveRange(entities));
+			Assert.ThrowsException<MultiTenantException>(() => dbSet.RemoveRange(entities));
 
 		}
 
