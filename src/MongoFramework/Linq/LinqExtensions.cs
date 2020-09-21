@@ -83,16 +83,12 @@ namespace MongoFramework.Linq
 				var distanceResultStringField = distanceResultExpressionField.Render(entitySerializer, BsonSerializer.SerializerRegistry);
 				distanceFieldName = distanceResultStringField.FieldName;
 			}
-			
+
 			var geoNearSettings = new BsonDocument
 			{
 				{ "near", point.ToBsonDocument() },
 				{ "key", keyStringField.FieldName },
-				{ "distanceField", distanceFieldName },
-				
-				//Note: Limit here is maxed as an operational courtesy as future versions will eliminate it (see Jira SERVER-22949)
-				//		Additionally, $geoNear operations still have a 16MB document limit in aggregation (see Jira SERVER-18965)
-				{ "limit", int.MaxValue }
+				{ "distanceField", distanceFieldName }
 			};
 
 			if (maxDistance.HasValue)
