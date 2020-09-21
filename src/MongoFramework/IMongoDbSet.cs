@@ -16,6 +16,7 @@ namespace MongoFramework
 
 	public interface IMongoDbSet<TEntity> : IMongoDbSet, IQueryable<TEntity> where TEntity : class
 	{
+		IMongoDbContext Context { get; }
 		TEntity Create();
 		void Add(TEntity entity);
 		void AddRange(IEnumerable<TEntity> entities);

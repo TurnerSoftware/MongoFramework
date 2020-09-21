@@ -89,18 +89,23 @@ namespace MongoFramework.Infrastructure.Linq
 
 		private AggregateExecutionModel GetExecutionModel(Expression expression)
 		{
+			//Use the official driver to do the heavy lifting on the query translation
 			var underlyingProvider = GetCollection().AsQueryable().Provider;
-			var providerType = underlyingProvider.GetType();
-
+			var providerType = underlyingProvider.GetType(); //Type: MongoQueryProviderImpl (internal)
 			var translatedQuery = providerType.GetMethod("Translate", BindingFlags.NonPublic | BindingFlags.Instance)
-				.Invoke(underlyingProvider, new[] { expression });
+				.Invoke(underlyingProvider, new[] { expression }); //Type: QueryableTranslation (internal)
 			var translatedQueryType = translatedQuery.GetType();
 
-			//Get the model stages and processing type
+			//We can't cast to AggregateQueryableExecutionModel<T> directly as we don't have generic parameter T
+			//While it may be TEntity, it could also be something else
 			var underlyingExecutionModel = translatedQueryType.GetProperty("Model").GetValue(translatedQuery) as QueryableExecutionModel;
-			var modelType = underlyingExecutionModel.GetType(); //Assumed type: AggregateQueryableExecutionModel<>
+			var modelType = underlyingExecutionModel.GetType(); //Assumed type: AggregateQueryableExecutionModel<T>
+
+			//Retrieve the stages from reflection
 			var expressionStages = modelType.GetProperty(nameof(AggregateQueryableExecutionModel<object>.Stages))
 					.GetValue(underlyingExecutionModel) as IEnumerable<BsonDocument>;
+
+			//Retreve the serializer from reflection
 			var serializer = modelType.GetProperty(nameof(AggregateQueryableExecutionModel<object>.OutputSerializer))
 					.GetValue(underlyingExecutionModel) as IBsonSerializer;
 
@@ -116,11 +121,11 @@ namespace MongoFramework.Infrastructure.Linq
 			};
 
 			//Get the result transforming lambda (allows things like FirstOrDefault, Count, Average etc to work properly)
-			var resultTransformer = translatedQueryType.GetProperty("ResultTransformer").GetValue(translatedQuery);
+			var resultTransformer = translatedQueryType.GetProperty("ResultTransformer").GetValue(translatedQuery); //Type: Mixed (implements IResultTransformer (internal))
 			if (resultTransformer != null)
 			{
 				var resultTransformerType = resultTransformer.GetType();
-				var lambda = resultTransformerType.GetMethod("CreateAggregator").Invoke(resultTransformer, new[] { serializer.ValueType });
+				var lambda = resultTransformerType.GetMethod("CreateAggregator").Invoke(resultTransformer, new[] { serializer.ValueType }); //Type: LambdaExpression
 				result.ResultTransformer = lambda as LambdaExpression;
 			}
 
