@@ -20,7 +20,7 @@ namespace MongoFramework
 	/// <typeparam name="TEntity"></typeparam>
 	public class MongoDbTenantSet<TEntity> : IMongoDbSet<TEntity> where TEntity : class, IHaveTenantId
 	{
-		protected IMongoDbContext Context { get; }
+		public IMongoDbContext Context { get; }
 
 		public MongoDbTenantSet(IMongoDbContext context)
 		{
