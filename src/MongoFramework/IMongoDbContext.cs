@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,8 +10,9 @@ namespace MongoFramework
 	public interface IMongoDbContext
 	{
 		string TenantId { get; }
+		IMongoDbConnection Connection { get; }
 
-		EntityEntryContainer ChangeTracker { get; }
+    EntityEntryContainer ChangeTracker { get; }
 		EntityCommandStaging CommandStaging { get; }
 
 		IMongoDbSet<TEntity> Set<TEntity>() where TEntity : class;

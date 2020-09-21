@@ -18,7 +18,7 @@ namespace MongoFramework
 	/// <typeparam name="TEntity"></typeparam>
 	public class MongoDbSet<TEntity> : IMongoDbSet<TEntity> where TEntity : class
 	{
-		protected IMongoDbContext Context { get; }
+		public IMongoDbContext Context { get; }
 
 		public MongoDbSet(IMongoDbContext context)
 		{
