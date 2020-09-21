@@ -19,6 +19,19 @@ namespace MongoFramework.Tests
 		}
 
 		[TestMethod]
+		public void SuccessfulCreateTenantId()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbContext(connection, tenantId);
+			var dbSet = new MongoDbTenantSet<TestModel>(context);
+
+			var model = dbSet.Create();
+
+			Assert.IsTrue(model.TenantId == tenantId);
+		}
+
+		[TestMethod]
 		public void SuccessfulLimitsQueryToTenant()
 		{
 			var connection = TestConfiguration.GetConnection();
