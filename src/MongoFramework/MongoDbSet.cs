@@ -1,7 +1,9 @@
-﻿using MongoFramework.Infrastructure;
+﻿using MongoDB.Driver;
+using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Commands;
 using MongoFramework.Infrastructure.Linq;
 using MongoFramework.Infrastructure.Linq.Processors;
+using MongoFramework.Infrastructure.Mapping;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -29,6 +31,42 @@ namespace MongoFramework
 		{
 			var entity = Activator.CreateInstance<TEntity>();
 			Add(entity);
+			return entity;
+		}
+
+		/// <summary>
+		///     Finds an entity with the given primary key values. If an entity with the given primary key values
+		///     is being tracked by the context, then it is returned immediately without making a request to the
+		///     database. Otherwise, a query is made to the database for an entity with the given primary key value
+		///     and this entity, if found, is attached to the context and returned. If no entity is found, then
+		///     null is returned.
+		/// </summary>
+		/// <param name="id">The value of the primary key for the entity to be found.</param>
+		/// <returns>The entity found, or null.</returns>
+		public virtual TEntity Find(object id) 
+		{
+			if (id == null)
+				throw new ArgumentNullException(nameof(id));
+
+			var tracked = Context.ChangeTracker.GetEntryById<TEntity>(id);
+
+			if (tracked != null)
+			{
+				return tracked.Entity as TEntity;
+			}
+
+			var entityDefinition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
+			var filter = entityDefinition.CreateIdFilter<TEntity>(id);
+
+			var collection = Context.Connection.GetDatabase().GetCollection<TEntity>(entityDefinition.CollectionName);
+			var cursor = collection.Find(filter);
+			var entity = cursor.FirstOrDefault();
+
+			if (entity != null)
+			{
+				Context.ChangeTracker.SetEntityState(entity, EntityEntryState.NoChanges);
+			}
+
 			return entity;
 		}
 

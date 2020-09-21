@@ -120,6 +120,28 @@ namespace MongoFramework.Tests.Infrastructure
 		}
 
 		[TestMethod]
+		public void GetExistingEntryIdMatch()
+		{
+			var entryContainer = new EntityEntryContainer();
+			var entity = new EntityEntryContainerModel
+			{
+				Id = "123",
+				Title = "EntityEntryContainerTests.UpdateExistingEntryWithoutId"
+			};
+			entryContainer.SetEntityState(entity, EntityEntryState.Added);
+
+			var entry = entryContainer.GetEntryById<EntityEntryContainerModel>("123");
+			Assert.AreEqual(entity, entry.Entity);
+			Assert.AreEqual(EntityEntryState.Added, entry.State);
+
+			entryContainer.SetEntityState(entity, EntityEntryState.NoChanges);
+
+			entry = entryContainer.GetEntryById<EntityEntryContainerModel>("123");
+			Assert.AreEqual(entity, entry.Entity);
+			Assert.AreEqual(EntityEntryState.NoChanges, entry.State);
+		}
+
+		[TestMethod]
 		public void RemoveRange()
 		{
 			var entryContainer = new EntityEntryContainer();
