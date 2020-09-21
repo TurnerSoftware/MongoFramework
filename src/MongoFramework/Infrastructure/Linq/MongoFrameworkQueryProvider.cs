@@ -84,9 +84,10 @@ namespace MongoFramework.Infrastructure.Linq
 		{
 			return (TResult)Execute(expression);
 		}
+
 		public object ExecuteAsync(Expression expression, CancellationToken cancellationToken = default)
 		{
-			var model = GetExecutionModel(expression);
+			var model = GetExecutionModel(expression, true);
 			var outputType = model.Serializer.ValueType;
 
 			//aka. ExecuteModelAsync<outputType>(model, cancellationToken)
@@ -98,13 +99,17 @@ namespace MongoFramework.Infrastructure.Linq
 				Expression.Constant(model, typeof(AggregateExecutionModel)),
 				Expression.Constant(cancellationToken));
 
+			if (model.ResultTransformer != null)
+			{
+				executor = Expression.Invoke(
+					model.ResultTransformer, 
+					Expression.Convert(executor, model.ResultTransformer.Parameters[0].Type),
+					Expression.Constant(cancellationToken)
+				);
+			}
+
 			var lambda = Expression.Lambda(executor);
 			return lambda.Compile().DynamicInvoke(null);
-		}
-
-		public IAsyncEnumerable<TResult> ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken = default)
-		{
-			return (IAsyncEnumerable<TResult>)ExecuteAsync(expression, cancellationToken);
 		}
 
 		private IMongoCollection<TEntity> GetCollection()
@@ -112,7 +117,7 @@ namespace MongoFramework.Infrastructure.Linq
 			return Connection.GetDatabase().GetCollection<TEntity>(EntityDefinition.CollectionName);
 		}
 
-		private AggregateExecutionModel GetExecutionModel(Expression expression)
+		private AggregateExecutionModel GetExecutionModel(Expression expression, bool isAsync = false)
 		{
 			//Use the official driver to do the heavy lifting on the query translation
 			var underlyingProvider = GetCollection().AsQueryable().Provider;
@@ -149,9 +154,11 @@ namespace MongoFramework.Infrastructure.Linq
 			var resultTransformer = translatedQueryType.GetProperty("ResultTransformer").GetValue(translatedQuery); //Type: Mixed (implements IResultTransformer (internal))
 			if (resultTransformer != null)
 			{
-				var resultTransformerType = resultTransformer.GetType();
-				var lambda = resultTransformerType.GetMethod("CreateAggregator").Invoke(resultTransformer, new[] { serializer.ValueType }); //Type: LambdaExpression
-				result.ResultTransformer = lambda as LambdaExpression;
+				result.ResultTransformer = ResultTransformers.Transform(expression, isAsync) as LambdaExpression;
+				//var resultTransformerType = resultTransformer.GetType();
+				//var methodName = isAsync ? "CreateAsyncAggregator" : "CreateAggregator";
+				//var lambda = resultTransformerType.GetMethod(methodName).Invoke(resultTransformer, new[] { serializer.ValueType }); //Type: LambdaExpression
+				//result.ResultTransformer = lambda as LambdaExpression;
 			}
 
 			return result;
@@ -228,7 +235,7 @@ namespace MongoFramework.Infrastructure.Linq
 					var resultBatch = underlyingCursor.Current;
 					foreach (var item in resultBatch)
 					{
-						if (item is TEntity entityItem)
+						if (item is TEntity entityItem && (model.ResultTransformer == null || model.ResultTransformer.ReturnType == typeof(TEntity)))
 						{
 							EntityProcessors.ProcessEntity(entityItem, Connection);
 						}

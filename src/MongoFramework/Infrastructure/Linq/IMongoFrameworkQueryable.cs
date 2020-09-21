@@ -11,6 +11,5 @@ namespace MongoFramework.Infrastructure.Linq
 
 	public interface IMongoFrameworkQueryable<TOutput> : IMongoFrameworkQueryable, IOrderedQueryable<TOutput>
 	{
-		IAsyncEnumerable<TOutput> AsAsyncEnumerable(CancellationToken cancellationToken = default);
 	}
 }
