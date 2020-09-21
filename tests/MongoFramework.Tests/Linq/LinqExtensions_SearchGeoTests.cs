@@ -114,7 +114,7 @@ namespace MongoFramework.Tests.Linq
 				) }
 			});
 			context.SaveChanges();
-			
+
 			SearchGeoModel[] GetResults(double? maxDistance = null, double? minDistance = null)
 			{
 				return dbSet.SearchGeoNear(e => e.PrimaryCoordinates, new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
@@ -141,57 +141,6 @@ namespace MongoFramework.Tests.Linq
 			Assert.AreEqual(2, results.Count());
 			Assert.IsTrue(results.Max(e => e.CustomDistanceField) < 3000000);
 			Assert.IsTrue(results.Min(e => e.CustomDistanceField) > 600000);
-		}
-
-
-		[TestMethod]
-		public void SearchGeoNearRecordLimits()
-		{
-			var connection = TestConfiguration.GetConnection();
-			var context = new MongoDbContext(connection);
-			var dbSet = new MongoDbSet<SearchGeoModel>(context);
-
-			for (var i = 0; i < 100; i++)
-			{
-				dbSet.Add(new SearchGeoModel
-				{
-					Description = $"Adelaide ({i})",
-					PrimaryCoordinates = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
-						new GeoJson2DGeographicCoordinates(138.600739, -34.928497)
-					)
-				});
-			}
-
-			dbSet.AddRange(new SearchGeoModel[]
-			{
-				new SearchGeoModel { Description = "New York", PrimaryCoordinates = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
-					new GeoJson2DGeographicCoordinates(-74.005974, 40.712776)
-				) },
-				new SearchGeoModel { Description = "Perth", PrimaryCoordinates = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
-					new GeoJson2DGeographicCoordinates(115.860458, -31.950527)
-				) },
-				new SearchGeoModel { Description = "Hobart", PrimaryCoordinates = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
-					new GeoJson2DGeographicCoordinates(147.327194, -42.882137)
-				) }
-			});
-			context.SaveChanges();
-
-			IQueryable<SearchGeoModel> WithGeoQuery()
-			{
-				return dbSet.SearchGeoNear(e => e.PrimaryCoordinates, new GeoJsonPoint<GeoJson2DGeographicCoordinates>(
-					new GeoJson2DGeographicCoordinates(138, -30)
-				));
-			}
-
-			Assert.AreEqual(103, WithGeoQuery().Count());
-			Assert.AreEqual(3, WithGeoQuery().Skip(100).Count());
-
-			var afterSkipResult = WithGeoQuery().Skip(100).FirstOrDefault();
-			Assert.AreEqual("Hobart", afterSkipResult.Description);
-
-			var afterTakeResult = WithGeoQuery().Take(3).ToArray();
-			Assert.AreEqual(3, afterTakeResult.Length);
-			Assert.AreEqual("Adelaide (0)", afterTakeResult[0].Description);
 		}
 
 		[TestMethod]
@@ -232,7 +181,7 @@ namespace MongoFramework.Tests.Linq
 							new GeoJson2DGeographicCoordinates(115.860458, -31.950527), //Perth
 							new GeoJson2DGeographicCoordinates(147.327194, -42.882137), //Hobart
 							new GeoJson2DGeographicCoordinates(153.399994, -28.016666), //Gold Coast
-							
+
 							new GeoJson2DGeographicCoordinates(115.860458, -31.950527) //Wrap back to first point
 						}
 					)
