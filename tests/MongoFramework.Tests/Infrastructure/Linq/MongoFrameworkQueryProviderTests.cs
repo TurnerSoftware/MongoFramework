@@ -20,23 +20,21 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 		}
 
 		[TestMethod]
-		public async Task EnumerateQueryable()
+		public async Task EnumerateQueryableAsync()
 		{
 			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
 
 			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
 			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
 			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
 
-			var entityCollection = new EntityCollection<MongoFrameworkQueryableModel>();
-			var writerPipeline = new EntityWriterPipeline<MongoFrameworkQueryableModel>(connection);
-			writerPipeline.AddCollection(entityCollection);
-			entityCollection.Update(new MongoFrameworkQueryableModel { Title = "EnumerateQueryable" }, EntityEntryState.Added);
-			writerPipeline.Write();
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "EnumerateQueryableAsync" }, EntityEntryState.Added);
+			context.SaveChanges();
 
 			await foreach (var entity in queryable.AsAsyncEnumerable())
 			{
-				Assert.AreEqual("EnumerateQueryable", entity.Title);
+				Assert.AreEqual("EnumerateQueryableAsync", entity.Title);
 			}
 		}
 
@@ -46,14 +44,12 @@ namespace MongoFramework.Tests.Infrastructure.Linq
 			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
 
 			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
 			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
 			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
 
-			var entityCollection = new EntityCollection<MongoFrameworkQueryableModel>();
-			var writerPipeline = new EntityWriterPipeline<MongoFrameworkQueryableModel>(connection);
-			writerPipeline.AddCollection(entityCollection);
-			entityCollection.Update(new MongoFrameworkQueryableModel { Title = "FirstOrDefaultAsyncQuery" }, EntityEntryState.Added);
-			writerPipeline.Write();
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "FirstOrDefaultAsyncQuery" }, EntityEntryState.Added);
+			context.SaveChanges();
 
 			var result = await queryable.AsAsyncEnumerable().FirstOrDefaultAsync();
 			Assert.AreEqual("FirstOrDefaultAsyncQuery", result.Title);
