@@ -7,9 +7,11 @@ using MongoFramework.Infrastructure.Linq;
 using MongoFramework.Infrastructure.Mapping;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading;
 
 namespace MongoFramework.Linq
 {
@@ -17,12 +19,22 @@ namespace MongoFramework.Linq
 	{
 		public static string ToQuery(this IQueryable queryable)
 		{
-			if (!(queryable is IMongoFrameworkQueryable))
+			if (queryable is IMongoFrameworkQueryable mongoFrameworkQueryable)
 			{
-				throw new ArgumentException($"Queryable must implement interface {nameof(IMongoFrameworkQueryable)}", nameof(queryable));
+				return mongoFrameworkQueryable.ToQuery();
+			}
+			
+			throw new ArgumentException($"Queryable must implement interface {nameof(IMongoFrameworkQueryable)}", nameof(queryable));
+		}
+
+		public static IAsyncEnumerable<TOutput> AsAsyncEnumerable<TOutput>(this IQueryable<TOutput> queryable, CancellationToken cancellationToken = default)
+		{
+			if (queryable is IMongoFrameworkQueryable<TOutput> mongoFrameworkQueryable)
+			{
+				return mongoFrameworkQueryable.AsAsyncEnumerable(cancellationToken);
 			}
 
-			return (queryable as IMongoFrameworkQueryable).ToQuery();
+			throw new ArgumentException($"Queryable must implement interface {nameof(IMongoFrameworkQueryable<TOutput>)}", nameof(queryable));
 		}
 
 		public static IQueryable<TEntity> WhereIdMatches<TEntity>(this IQueryable<TEntity> queryable, IEnumerable entityIds) where TEntity : class
