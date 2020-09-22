@@ -51,6 +51,67 @@ namespace MongoFramework.Tests
 		}
 
 		[TestMethod]
+		public void SuccessfulInsertAndFind()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<TestModel>(context);
+
+			var model = new TestModel
+			{
+				Description = "ValueSync"
+			};
+
+			dbSet.Add(model);
+
+			context.SaveChanges();
+
+			context = new MongoDbContext(connection);
+			dbSet = new MongoDbSet<TestModel>(context);
+			Assert.IsTrue(dbSet.Find(model.Id).Description == "ValueSync");
+			Assert.IsTrue(context.ChangeTracker.GetEntry(model).State == MongoFramework.Infrastructure.EntityEntryState.NoChanges);			
+		}
+
+		[TestMethod]
+		public void SuccessfulNullFind()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<TestModel>(context);
+
+			var model = new TestModel
+			{
+				Description = "ValueSync"
+			};
+
+			dbSet.Add(model);
+
+			context.SaveChanges();
+
+			Assert.IsNull(dbSet.Find("abcd"));
+		}
+
+		[TestMethod]
+		public void SuccessfullyFindTracked()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<TestModel>(context);
+
+			var model = new TestModel
+			{
+				Id = "abcd",
+				Description = "ValueSync"
+			};
+
+			dbSet.Add(model);
+
+			//Note: not saving, but still should be found as tracked
+			Assert.IsTrue(dbSet.Find(model.Id).Description == "ValueSync");
+			Assert.IsTrue(context.ChangeTracker.GetEntry(model).State == MongoFramework.Infrastructure.EntityEntryState.Added);
+		}
+
+		[TestMethod]
 		public void SuccessfullyUpdateEntity()
 		{
 			var connection = TestConfiguration.GetConnection();

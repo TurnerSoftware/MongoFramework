@@ -67,7 +67,27 @@ namespace MongoFramework.Infrastructure
 
 			return null;
 		}
+		
+		public EntityEntry GetEntryById<TCollectionBase>(object id)
+		{		
+			var collectionType = typeof(TCollectionBase);
 
+			if (EntryLookupByType.TryGetValue(collectionType, out var entries))
+			{
+				var entityDefinition = EntityMapping.GetOrCreateDefinition(collectionType);
+
+				foreach (var entry in entries)
+				{
+					var entryEntityId = entityDefinition.GetIdValue(entry.Entity);
+					if (entryEntityId.Equals(id))
+					{
+						return entry;
+					}
+				}
+			}
+
+			return null;
+		}
 		public EntityEntry SetEntityState<TCollectionBase>(TCollectionBase entity, EntityEntryState state) where TCollectionBase : class
 		{
 			if (entity is null)
