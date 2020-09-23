@@ -3,9 +3,9 @@ using System;
 
 namespace MongoFramework
 {
-	public class MongoDbTenantContext : MongoDbContext, IMongoDbTenantContext, IDisposable
+	public class MongoDbTenantContext : MongoDbContext, IMongoDbTenantContext
 	{
-		public virtual string TenantId { get; protected set; }
+		public virtual string TenantId { get; }
 
 		public MongoDbTenantContext(IMongoDbConnection connection, string tenantId) : base(connection)
 		{

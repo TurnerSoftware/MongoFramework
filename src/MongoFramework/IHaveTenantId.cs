@@ -1,5 +1,4 @@
-﻿using System;
-namespace MongoFramework
+﻿namespace MongoFramework
 {
 	public interface IHaveTenantId
 	{
