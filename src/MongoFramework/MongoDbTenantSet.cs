@@ -105,12 +105,7 @@ namespace MongoFramework
 			var filter = predicate.AndAlso(o => o.TenantId == key);
 			base.RemoveRange(filter);
 		}
-
-		public override void RemoveById(object entityId)
-		{
-			Context.CommandStaging.Add(new RemoveEntityByIdCommand<TEntity>(entityId, Context.TenantId));
-		}
-
+		
 		#region IQueryable Implementation
 
 		protected override IQueryable<TEntity> GetQueryable()

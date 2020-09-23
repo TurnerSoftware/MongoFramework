@@ -24,7 +24,7 @@ namespace MongoFramework.Infrastructure.Commands
 			EntityTimeProperty = entityTimeProperty;
 		}
 
-		public IEnumerable<WriteModel<EntityBucket<TGroup, TSubEntity>>> GetModel()
+		public IEnumerable<WriteModel<EntityBucket<TGroup, TSubEntity>>> GetModel(WriteModelOptions options = null)
 		{
 			var filterBuilder = Builders<EntityBucket<TGroup, TSubEntity>>.Filter;
 			var filter = filterBuilder.And(

@@ -17,7 +17,7 @@ namespace MongoFramework.Infrastructure.Commands
 			Predicate = predicate;
 		}
 
-		public IEnumerable<WriteModel<TEntity>> GetModel()
+		public IEnumerable<WriteModel<TEntity>> GetModel(WriteModelOptions options = null)
 		{
 			yield return new DeleteManyModel<TEntity>(Predicate);
 		}

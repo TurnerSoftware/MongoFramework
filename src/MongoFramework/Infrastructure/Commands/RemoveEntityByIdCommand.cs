@@ -10,20 +10,18 @@ namespace MongoFramework.Infrastructure.Commands
 	public class RemoveEntityByIdCommand<TEntity> : IWriteCommand<TEntity> where TEntity : class
 	{
 		private object EntityId { get; }
-		private string TenantId { get; }
 
 		public Type EntityType => typeof(TEntity);
 
-		public RemoveEntityByIdCommand(object entityId, string tenantId = null)
+		public RemoveEntityByIdCommand(object entityId)
 		{
 			EntityId = entityId;
-			TenantId = tenantId;
 		}
 
-		public IEnumerable<WriteModel<TEntity>> GetModel()
+		public IEnumerable<WriteModel<TEntity>> GetModel(WriteModelOptions options = null)
 		{
 			var definition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
-			yield return new DeleteOneModel<TEntity>(definition.CreateIdFilter<TEntity>(EntityId, TenantId));
+			yield return new DeleteOneModel<TEntity>(definition.CreateIdFilter<TEntity>(EntityId, options?.TenantId));
 		}
 	}
 }

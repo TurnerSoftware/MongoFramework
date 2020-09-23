@@ -18,7 +18,7 @@ namespace MongoFramework.Infrastructure.Commands
 			Group = group;
 		}
 
-		public IEnumerable<WriteModel<EntityBucket<TGroup, TSubEntity>>> GetModel()
+		public IEnumerable<WriteModel<EntityBucket<TGroup, TSubEntity>>> GetModel(WriteModelOptions options = null)
 		{
 			var filterBuilder = Builders<EntityBucket<TGroup, TSubEntity>>.Filter;
 			var filter = filterBuilder.Eq(b => b.Group, Group);

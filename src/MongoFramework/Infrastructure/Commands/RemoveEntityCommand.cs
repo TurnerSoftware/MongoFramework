@@ -18,7 +18,7 @@ namespace MongoFramework.Infrastructure.Commands
 			EntityEntry = entityEntry;
 		}
 
-		public IEnumerable<WriteModel<TEntity>> GetModel()
+		public IEnumerable<WriteModel<TEntity>> GetModel(WriteModelOptions options = null)
 		{
 			var definition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
 			yield return new DeleteOneModel<TEntity>(definition.CreateIdFilterFromEntity(EntityEntry.Entity as TEntity));

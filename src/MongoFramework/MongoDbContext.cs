@@ -58,31 +58,34 @@ namespace MongoFramework
 			}
 		}
 
-		public virtual void AfterDetectChanges() {}
+		protected virtual void AfterDetectChanges() {}
+
+		protected virtual WriteModelOptions GetWriteModelOptions() => null;		
 
 		public virtual void SaveChanges()
 		{
 			ChangeTracker.DetectChanges();
 			AfterDetectChanges();
 			var commands = GenerateWriteCommands();
+			var writeModelOptions = GetWriteModelOptions();
 
 			var commandsByEntityType = commands.GroupBy(c => c.EntityType);
 			foreach (var entityTypeCommands in commandsByEntityType)
 			{
-				var method = GenericsHelper.GetMethodDelegate<Action<IMongoDbConnection, IEnumerable<IWriteCommand>>>(
+				var method = GenericsHelper.GetMethodDelegate<Action<IMongoDbConnection, IEnumerable<IWriteCommand>, WriteModelOptions>>(
 					typeof(MongoDbContext), nameof(InternalSaveChanges), entityTypeCommands.Key
 				);
-				method(Connection, entityTypeCommands);
+				method(Connection, entityTypeCommands, writeModelOptions);
 			}
 
 			ChangeTracker.CommitChanges();
 			CommandStaging.CommitChanges();
 		}
 
-		private static void InternalSaveChanges<TEntity>(IMongoDbConnection connection, IEnumerable<IWriteCommand> commands) where TEntity : class
+		private static void InternalSaveChanges<TEntity>(IMongoDbConnection connection, IEnumerable<IWriteCommand> commands, WriteModelOptions options) where TEntity : class
 		{
 			EntityIndexWriter.ApplyIndexing<TEntity>(connection);
-			EntityCommandWriter.Write<TEntity>(connection, commands);
+			EntityCommandWriter.Write<TEntity>(connection, commands, options);
 		}
 
 		public virtual async Task SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -90,23 +93,24 @@ namespace MongoFramework
 			ChangeTracker.DetectChanges();
 			AfterDetectChanges();
 			var commands = GenerateWriteCommands();
-
+			var writeModelOptions = GetWriteModelOptions();
+	
 			var commandsByEntityType = commands.GroupBy(c => c.EntityType);
 			foreach (var entityTypeCommands in commandsByEntityType)
 			{
-				var methodAsync = GenericsHelper.GetMethodDelegate<Func<IMongoDbConnection, IEnumerable<IWriteCommand>, CancellationToken, Task>>(
+				var methodAsync = GenericsHelper.GetMethodDelegate<Func<IMongoDbConnection, IEnumerable<IWriteCommand>, WriteModelOptions, CancellationToken, Task>>(
 					typeof(MongoDbContext), nameof(InternalSaveChangesAsync), entityTypeCommands.Key
 				);
-				await methodAsync(Connection, entityTypeCommands, cancellationToken);
+				await methodAsync(Connection, entityTypeCommands, writeModelOptions, cancellationToken);
 			}
 
 			ChangeTracker.CommitChanges();
 			CommandStaging.CommitChanges();
 		}
-		private static async Task InternalSaveChangesAsync<TEntity>(IMongoDbConnection connection, IEnumerable<IWriteCommand> commands, CancellationToken cancellationToken) where TEntity : class
+		private static async Task InternalSaveChangesAsync<TEntity>(IMongoDbConnection connection, IEnumerable<IWriteCommand> commands, WriteModelOptions options, CancellationToken cancellationToken) where TEntity : class
 		{
 			await EntityIndexWriter.ApplyIndexingAsync<TEntity>(connection);
-			await EntityCommandWriter.WriteAsync<TEntity>(connection, commands, cancellationToken);
+			await EntityCommandWriter.WriteAsync<TEntity>(connection, commands, options, cancellationToken);
 		}
 
 		public virtual IMongoDbSet<TEntity> Set<TEntity>() where TEntity : class

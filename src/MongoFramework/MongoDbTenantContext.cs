@@ -1,14 +1,5 @@
-﻿using MongoFramework.Infrastructure;
-using MongoFramework.Infrastructure.Commands;
-using MongoFramework.Infrastructure.Indexing;
-using MongoFramework.Infrastructure.Internal;
-using MongoFramework.Infrastructure.Linq;
+﻿using MongoFramework.Infrastructure.Commands;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace MongoFramework
 {
@@ -21,9 +12,14 @@ namespace MongoFramework
 			TenantId = tenantId ?? throw new ArgumentNullException(nameof(tenantId));
 		}
 
-		public override void AfterDetectChanges()
+		protected override void AfterDetectChanges()
 		{
 			ChangeTracker.EnforceMultiTenant(TenantId);
+		}
+
+		protected override WriteModelOptions GetWriteModelOptions()
+		{
+			return new WriteModelOptions { TenantId = TenantId };
 		}
 	}
 }

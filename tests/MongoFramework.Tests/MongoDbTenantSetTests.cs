@@ -416,6 +416,47 @@ namespace MongoFramework.Tests
 		}
 
 		[TestMethod]
+		public async Task SuccessfullyRemoveEntityByIdAsync()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbTenantContext(connection, tenantId);
+			var dbSet = new MongoDbTenantSet<TestModel>(context);
+
+			var context2 = new MongoDbTenantContext(connection, tenantId + "-alt");
+			var dbSet2 = new MongoDbTenantSet<TestModel>(context2);
+
+			var entity = new TestModel
+			{
+				Description = "SuccessfullyRemoveEntityById"
+			};
+
+			dbSet.Add(entity);
+			await context.SaveChangesAsync();
+
+			var entity2 = new TestModel
+			{
+				Description = "SuccessfullyRemoveEntityById"
+			};
+
+			dbSet2.Add(entity2);
+			await context2.SaveChangesAsync();
+
+			dbSet = new MongoDbTenantSet<TestModel>(context);
+
+			dbSet.RemoveById(entity.Id);
+
+			//mismatched tenant, should not delete anything
+			dbSet.RemoveById(entity2.Id);
+
+			Assert.IsTrue(dbSet.Any(m => m.Description == "SuccessfullyRemoveEntityById"));
+			Assert.IsTrue(dbSet2.Any(m => m.Description == "SuccessfullyRemoveEntityById"));
+			await context.SaveChangesAsync();
+			Assert.IsFalse(dbSet.Any(m => m.Description == "SuccessfullyRemoveEntityById"));
+			Assert.IsTrue(dbSet2.Any(m => m.Description == "SuccessfullyRemoveEntityById"));
+		}
+
+		[TestMethod]
 		public void SuccessfullyRemoveRangeByPredicate()
 		{
 			var connection = TestConfiguration.GetConnection();

@@ -12,9 +12,9 @@ namespace MongoFramework.Infrastructure
 {
 	public static class EntityCommandWriter
 	{
-		public static void Write<TEntity>(IMongoDbConnection connection, IEnumerable<IWriteCommand> commands) where TEntity : class
+		public static void Write<TEntity>(IMongoDbConnection connection, IEnumerable<IWriteCommand> commands, WriteModelOptions options) where TEntity : class
 		{
-			var writeModels = commands.OfType<IWriteCommand<TEntity>>().SelectMany(c => c.GetModel()).ToArray();
+			var writeModels = commands.OfType<IWriteCommand<TEntity>>().SelectMany(c => c.GetModel(options)).ToArray();
 			if (writeModels.Any())
 			{
 				var entityDefinition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
@@ -33,9 +33,9 @@ namespace MongoFramework.Infrastructure
 				}
 			}
 		}
-		public static async Task WriteAsync<TEntity>(IMongoDbConnection connection, IEnumerable<IWriteCommand> commands, CancellationToken cancellationToken = default) where TEntity : class
+		public static async Task WriteAsync<TEntity>(IMongoDbConnection connection, IEnumerable<IWriteCommand> commands, WriteModelOptions options, CancellationToken cancellationToken = default) where TEntity : class
 		{
-			var writeModels = commands.OfType<IWriteCommand<TEntity>>().SelectMany(c => c.GetModel()).ToArray();
+			var writeModels = commands.OfType<IWriteCommand<TEntity>>().SelectMany(c => c.GetModel(options)).ToArray();
 			if (writeModels.Any())
 			{
 				var entityDefinition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
