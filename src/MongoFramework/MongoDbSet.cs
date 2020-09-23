@@ -190,7 +190,7 @@ namespace MongoFramework
 
 		#region IQueryable Implementation
 
-		private IQueryable<TEntity> GetQueryable()
+		protected virtual IQueryable<TEntity> GetQueryable()
 		{
 			var queryable = Context.Query<TEntity>();
 			var provider = queryable.Provider as IMongoFrameworkQueryProvider<TEntity>;
