@@ -23,7 +23,7 @@ namespace MongoFramework.Tests
 		{
 			var connection = TestConfiguration.GetConnection();
 			var tenantId = TestConfiguration.GetTenantId();
-			var context = new MongoDbContext(connection, tenantId);
+			var context = new MongoDbTenantContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
 			var model = dbSet.Create();
@@ -36,10 +36,10 @@ namespace MongoFramework.Tests
 		{
 			var connection = TestConfiguration.GetConnection();
 			var tenantId = TestConfiguration.GetTenantId();
-			var context = new MongoDbContext(connection, tenantId);
+			var context = new MongoDbTenantContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
-			var context2 = new MongoDbContext(connection, tenantId + "-alt");
+			var context2 = new MongoDbTenantContext(connection, tenantId + "-alt");
 			var dbSet2 = new MongoDbTenantSet<TestModel>(context2);
 
 
@@ -86,7 +86,7 @@ namespace MongoFramework.Tests
 		{
 			var connection = TestConfiguration.GetConnection();
 			var tenantId = TestConfiguration.GetTenantId();
-			var context = new MongoDbContext(connection, tenantId);
+			var context = new MongoDbTenantContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
 			dbSet.Add(new TestModel
@@ -105,7 +105,7 @@ namespace MongoFramework.Tests
 		{
 			var connection = TestConfiguration.GetConnection();
 			var tenantId = TestConfiguration.GetTenantId();
-			var context = new MongoDbContext(connection, tenantId);
+			var context = new MongoDbTenantContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
 			dbSet.Add(new TestModel
@@ -124,7 +124,7 @@ namespace MongoFramework.Tests
 		{
 			var connection = TestConfiguration.GetConnection();
 			var tenantId = TestConfiguration.GetTenantId();
-			var context = new MongoDbContext(connection, tenantId);
+			var context = new MongoDbTenantContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
 			var entity = new TestModel
@@ -152,7 +152,7 @@ namespace MongoFramework.Tests
 		{
 			var connection = TestConfiguration.GetConnection();
 			var tenantId = TestConfiguration.GetTenantId();
-			var context = new MongoDbContext(connection, tenantId);
+			var context = new MongoDbTenantContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
 			var entity = new TestModel
@@ -175,7 +175,7 @@ namespace MongoFramework.Tests
 		{
 			var connection = TestConfiguration.GetConnection();
 			var tenantId = TestConfiguration.GetTenantId();
-			var context = new MongoDbContext(connection, tenantId);
+			var context = new MongoDbTenantContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
 			var entity = new TestModel
@@ -200,7 +200,7 @@ namespace MongoFramework.Tests
 		{
 			var connection = TestConfiguration.GetConnection();
 			var tenantId = TestConfiguration.GetTenantId();
-			var context = new MongoDbContext(connection, tenantId);
+			var context = new MongoDbTenantContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
 			var entities = new[] {
@@ -234,7 +234,7 @@ namespace MongoFramework.Tests
 		{
 			var connection = TestConfiguration.GetConnection();
 			var tenantId = TestConfiguration.GetTenantId();
-			var context = new MongoDbContext(connection, tenantId);
+			var context = new MongoDbTenantContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
 			var entities = new[] {
@@ -266,7 +266,7 @@ namespace MongoFramework.Tests
 		{
 			var connection = TestConfiguration.GetConnection();
 			var tenantId = TestConfiguration.GetTenantId();
-			var context = new MongoDbContext(connection, tenantId);
+			var context = new MongoDbTenantContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
 			var entity = new TestModel
@@ -291,7 +291,7 @@ namespace MongoFramework.Tests
 		{
 			var connection = TestConfiguration.GetConnection();
 			var tenantId = TestConfiguration.GetTenantId();
-			var context = new MongoDbContext(connection, tenantId);
+			var context = new MongoDbTenantContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
 			var entity = new TestModel
@@ -315,7 +315,7 @@ namespace MongoFramework.Tests
 		{
 			var connection = TestConfiguration.GetConnection();
 			var tenantId = TestConfiguration.GetTenantId();
-			var context = new MongoDbContext(connection, tenantId);
+			var context = new MongoDbTenantContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
 			var entities = new[] {
@@ -348,7 +348,7 @@ namespace MongoFramework.Tests
 		{
 			var connection = TestConfiguration.GetConnection();
 			var tenantId = TestConfiguration.GetTenantId();
-			var context = new MongoDbContext(connection, tenantId);
+			var context = new MongoDbTenantContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
 			var entities = new[] {
@@ -379,10 +379,10 @@ namespace MongoFramework.Tests
 		{
 			var connection = TestConfiguration.GetConnection();
 			var tenantId = TestConfiguration.GetTenantId();
-			var context = new MongoDbContext(connection, tenantId);
+			var context = new MongoDbTenantContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
-			var context2 = new MongoDbContext(connection, tenantId + "-alt");
+			var context2 = new MongoDbTenantContext(connection, tenantId + "-alt");
 			var dbSet2 = new MongoDbTenantSet<TestModel>(context2);
 
 			var entity = new TestModel
@@ -420,10 +420,10 @@ namespace MongoFramework.Tests
 		{
 			var connection = TestConfiguration.GetConnection();
 			var tenantId = TestConfiguration.GetTenantId();
-			var context = new MongoDbContext(connection, tenantId);
+			var context = new MongoDbTenantContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
-			var context2 = new MongoDbContext(connection, tenantId + "-alt");
+			var context2 = new MongoDbTenantContext(connection, tenantId + "-alt");
 			var dbSet2 = new MongoDbTenantSet<TestModel>(context2);
 
 

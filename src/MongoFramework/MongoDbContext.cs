@@ -19,11 +19,8 @@ namespace MongoFramework
 		public EntityEntryContainer ChangeTracker { get; } = new EntityEntryContainer();
 		public EntityCommandStaging CommandStaging { get; } = new EntityCommandStaging();
 
-		public virtual string TenantId { get; protected set; }
-
-		public MongoDbContext(IMongoDbConnection connection, string tenantId = null)
+		public MongoDbContext(IMongoDbConnection connection)
 		{
-			TenantId = tenantId;
 			Connection = connection;
 			InitialiseDbSets();
 		}
@@ -61,10 +58,12 @@ namespace MongoFramework
 			}
 		}
 
+		public virtual void AfterDetectChanges() {}
+
 		public virtual void SaveChanges()
 		{
 			ChangeTracker.DetectChanges();
-			ChangeTracker.EnforceMultiTenant(this.TenantId);
+			AfterDetectChanges();
 			var commands = GenerateWriteCommands();
 
 			var commandsByEntityType = commands.GroupBy(c => c.EntityType);
@@ -89,7 +88,7 @@ namespace MongoFramework
 		public virtual async Task SaveChangesAsync(CancellationToken cancellationToken = default)
 		{
 			ChangeTracker.DetectChanges();
-			ChangeTracker.EnforceMultiTenant(this.TenantId);
+			AfterDetectChanges();
 			var commands = GenerateWriteCommands();
 
 			var commandsByEntityType = commands.GroupBy(c => c.EntityType);
@@ -110,7 +109,7 @@ namespace MongoFramework
 			await EntityCommandWriter.WriteAsync<TEntity>(connection, commands, cancellationToken);
 		}
 
-		public IMongoDbSet<TEntity> Set<TEntity>() where TEntity : class
+		public virtual IMongoDbSet<TEntity> Set<TEntity>() where TEntity : class
 		{
 			return new MongoDbSet<TEntity>(this);
 		}

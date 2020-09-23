@@ -24,7 +24,7 @@ namespace MongoFramework.Tests
 			public DateTime Date { get; set; }
 		}
 
-		class MongoDbContextTestContext : MongoDbContext
+		class MongoDbContextTestContext : MongoDbTenantContext
 		{
 			public MongoDbContextTestContext(IMongoDbConnection connection, string tenantId) : base(connection, tenantId) { }
 			public MongoDbTenantSet<DbSetModel> DbSet { get; set; }

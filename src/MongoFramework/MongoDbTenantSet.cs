@@ -18,13 +18,18 @@ namespace MongoFramework
 	/// Basic Mongo "DbSet", providing entity tracking support.
 	/// </summary>
 	/// <typeparam name="TEntity"></typeparam>
-	public class MongoDbTenantSet<TEntity> : IMongoDbSet<TEntity> where TEntity : class, IHaveTenantId
+	public class MongoDbTenantSet<TEntity> : IMongoDbTenantSet<TEntity> where TEntity : class, IHaveTenantId
 	{
-		public IMongoDbContext Context { get; }
+		public IMongoDbTenantContext Context { get; }
+		IMongoDbContext IMongoDbSet<TEntity>.Context => Context;
 
 		public MongoDbTenantSet(IMongoDbContext context)
 		{
-			Context = context ?? throw new ArgumentNullException(nameof(context));
+			if (context == null)
+			{
+				throw new ArgumentNullException(nameof(context));
+			}
+			Context = (context as IMongoDbTenantContext) ?? throw new ArgumentException("Context provided to a MongoDbTenantSet must be IMongoDbTenantContext",nameof(context));
 		}
 
 		public virtual TEntity Create()
