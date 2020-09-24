@@ -50,7 +50,7 @@ namespace MongoFramework.Tests.Infrastructure.Commands
 		{
 			var entity = new TestValidationModel { };
 			var command = new AddEntityCommand<TestValidationModel>(new EntityEntry(entity, EntityEntryState.Added));
-			command.GetModel().FirstOrDefault();
+			command.GetModel(WriteModelOptions.Default).FirstOrDefault();
 		}
 	}
 }

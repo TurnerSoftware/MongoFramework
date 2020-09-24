@@ -16,7 +16,7 @@ namespace MongoFramework.Infrastructure.Commands
 			EntityEntry = entityEntry;
 		}
 
-		public IEnumerable<WriteModel<TEntity>> GetModel(WriteModelOptions options = null)
+		public IEnumerable<WriteModel<TEntity>> GetModel(WriteModelOptions options)
 		{
 			var entity = EntityEntry.Entity as TEntity;
 

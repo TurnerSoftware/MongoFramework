@@ -12,6 +12,6 @@ namespace MongoFramework.Infrastructure.Commands
 
 	public interface IWriteCommand<TEntity> : IWriteCommand where TEntity : class
 	{
-		IEnumerable<WriteModel<TEntity>> GetModel(WriteModelOptions options = null);
+		IEnumerable<WriteModel<TEntity>> GetModel(WriteModelOptions options);
 	}
 }

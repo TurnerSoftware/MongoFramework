@@ -6,6 +6,7 @@ namespace MongoFramework.Infrastructure.Commands
 {
 	public class WriteModelOptions
 	{
+		public static WriteModelOptions Default { get; } = new WriteModelOptions();
 		public string TenantId { get; set; }
 	}
 }

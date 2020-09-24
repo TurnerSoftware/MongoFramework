@@ -60,7 +60,7 @@ namespace MongoFramework
 
 		protected virtual void AfterDetectChanges() {}
 
-		protected virtual WriteModelOptions GetWriteModelOptions() => null;		
+		protected virtual WriteModelOptions GetWriteModelOptions() => WriteModelOptions.Default;		
 
 		public virtual void SaveChanges()
 		{
