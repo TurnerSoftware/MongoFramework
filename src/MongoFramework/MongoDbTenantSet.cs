@@ -19,10 +19,6 @@ namespace MongoFramework
 
 		public MongoDbTenantSet(IMongoDbContext context) : base(context)
 		{
-			if (context == null)
-			{
-				throw new ArgumentNullException(nameof(context));
-			}
 			Context = context as IMongoDbTenantContext ?? throw new ArgumentException("Context provided to a MongoDbTenantSet must be IMongoDbTenantContext",nameof(context));
 		}
 

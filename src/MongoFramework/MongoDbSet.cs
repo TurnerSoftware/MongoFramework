@@ -46,7 +46,9 @@ namespace MongoFramework
 		public virtual TEntity Find(object id) 
 		{
 			if (id == null)
+			{
 				throw new ArgumentNullException(nameof(id));
+			}
 
 			var tracked = Context.ChangeTracker.GetEntryById<TEntity>(id);
 

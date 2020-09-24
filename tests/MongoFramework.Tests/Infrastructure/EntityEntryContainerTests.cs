@@ -126,7 +126,7 @@ namespace MongoFramework.Tests.Infrastructure
 			var entity = new EntityEntryContainerModel
 			{
 				Id = "123",
-				Title = "EntityEntryContainerTests.UpdateExistingEntryWithoutId"
+				Title = "EntityEntryContainerTests.GetExistingEntryIdMatch"
 			};
 			entryContainer.SetEntityState(entity, EntityEntryState.Added);
 
