@@ -111,6 +111,15 @@ namespace MongoFramework
 			provider.EntityProcessors.Add(new EntityTrackingProcessor<TEntity>(Context));
 			return queryable;
 		}
+		
+		public IQueryable<TEntity> GetSearchTextQueryable(string search)
+		{			
+			var key = Context.TenantId;
+			var queryable = Context.Query<TEntity>().WhereFilter(b => b.Text(search)).Where(c => c.TenantId == key);
+			var provider = queryable.Provider as IMongoFrameworkQueryProvider<TEntity>;
+			provider.EntityProcessors.Add(new EntityTrackingProcessor<TEntity>(Context));
+			return queryable;
+		}
 
 		#endregion
 	}

@@ -53,7 +53,7 @@ namespace MongoFramework.Linq
 			return queryable.Where(expression);
 		}
 
-		private static IQueryable<TEntity> WhereFilter<TEntity>(this IQueryable<TEntity> queryable, Func<FilterDefinitionBuilder<TEntity>, FilterDefinition<TEntity>> queryFilter)
+		public static IQueryable<TEntity> WhereFilter<TEntity>(this IQueryable<TEntity> queryable, Func<FilterDefinitionBuilder<TEntity>, FilterDefinition<TEntity>> queryFilter)
 		{
 			var definition = queryFilter.Invoke(Builders<TEntity>.Filter);
 			return queryable.Where(e => definition.Inject());
@@ -62,6 +62,11 @@ namespace MongoFramework.Linq
 		public static IQueryable<TEntity> SearchText<TEntity>(this IMongoDbSet<TEntity> dbSet, string search) where TEntity : class
 		{
 			return dbSet.WhereFilter(b => b.Text(search));
+		}
+
+		public static IQueryable<TEntity> SearchText<TEntity>(this IMongoDbTenantSet<TEntity> dbSet, string search) where TEntity : class
+		{
+			return dbSet.GetSearchTextQueryable(search);
 		}
 
 		public static IQueryable<TEntity> SearchGeoIntersecting<TEntity, TCoordinates>(this IQueryable<TEntity> queryable, Expression<Func<TEntity, object>> field, GeoJsonGeometry<TCoordinates> geometry) where TCoordinates : GeoJsonCoordinates

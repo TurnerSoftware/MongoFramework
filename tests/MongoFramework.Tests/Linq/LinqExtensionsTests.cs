@@ -43,6 +43,15 @@ namespace MongoFramework.Tests.Linq
 			public int MiscField { get; set; }
 		}
 
+		public class SearchTextTenantModel : IHaveTenantId
+		{
+			public string TenantId { get; set; }
+			public string Id { get; set; }
+			[Index(IndexType.Text)]
+			public string Text { get; set; }
+			public int MiscField { get; set; }
+		}
+
 		[TestMethod]
 		public void ValidToQuery()
 		{
@@ -162,6 +171,38 @@ namespace MongoFramework.Tests.Linq
 				new SearchTextModel { MiscField = 4, Text = "Jived fox nymph grabs quick waltz." },
 			});
 			context.SaveChanges();
+
+			Assert.AreEqual(4, dbSet.SearchText("quick").Count());
+			Assert.AreEqual(0, dbSet.SearchText("the").Count()); //Stop words aren't used in text indexes: https://docs.mongodb.com/manual/core/index-text/#supported-languages-and-stop-words
+			Assert.AreEqual(2, dbSet.SearchText("dog").Count());
+			Assert.AreEqual(1, dbSet.SearchText("jived").Count());
+
+			Assert.AreEqual(1, dbSet.SearchText("quick").Where(e => e.MiscField == 3).Count());
+		}
+
+		[TestMethod]
+		public void SearchTextTenant()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbTenantContext(connection, TestConfiguration.GetTenantId());
+			var dbSet = new MongoDbTenantSet<SearchTextTenantModel>(context);
+
+			var models = new SearchTextTenantModel[]
+			{
+				new SearchTextTenantModel { MiscField = 1, Text = "The quick brown fox jumps over the lazy dog." },
+				new SearchTextTenantModel { MiscField = 2, Text = "The five boxing wizards jump quickly." },
+				new SearchTextTenantModel { MiscField = 3, Text = "The quick brown fox jumps over the lazy dog." },
+				new SearchTextTenantModel { MiscField = 4, Text = "Jived fox nymph grabs quick waltz." },
+			};
+
+			dbSet.AddRange(models);
+			context.SaveChanges();
+
+			//add some extras to ensure only our tenant's results are coming back.
+			var context2 = new MongoDbTenantContext(connection, "second");
+			var dbSet2 = new MongoDbTenantSet<SearchTextTenantModel>(context);
+			dbSet2.AddRange(models);
+			context2.SaveChanges();
 
 			Assert.AreEqual(4, dbSet.SearchText("quick").Count());
 			Assert.AreEqual(0, dbSet.SearchText("the").Count()); //Stop words aren't used in text indexes: https://docs.mongodb.com/manual/core/index-text/#supported-languages-and-stop-words
