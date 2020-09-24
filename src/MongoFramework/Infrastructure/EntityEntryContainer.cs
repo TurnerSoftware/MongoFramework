@@ -175,16 +175,16 @@ namespace MongoFramework.Infrastructure
 
 		public void EnforceMultiTenant(string tenantId)
 		{
-			if (string.IsNullOrEmpty(tenantId))
-			{
-				return;
-			}
-
 			foreach (var pair in EntryLookupByType)
 			{
 				if (!typeof(IHaveTenantId).IsAssignableFrom(pair.Key))
 				{
 					continue;
+				}
+
+				if (string.IsNullOrEmpty(tenantId))
+				{
+					throw new MultiTenantException($"Entity type {pair.Key.Name} is in the context, but no tenant ID was provided.");
 				}
 
 				var typeGroup = pair.Value;

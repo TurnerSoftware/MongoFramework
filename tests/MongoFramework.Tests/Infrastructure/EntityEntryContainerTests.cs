@@ -36,6 +36,13 @@ namespace MongoFramework.Tests.Infrastructure
 			}
 		}
 
+		public class EntityEntryContainerTenantModel : IHaveTenantId
+		{
+			public string TenantId { get; set; }
+			public string Id { get; set; }
+			public string Title { get; set; }
+		}
+
 		[TestMethod]
 		public void AddNewEntry()
 		{
@@ -192,5 +199,44 @@ namespace MongoFramework.Tests.Infrastructure
 			var entryContainer = new EntityEntryContainer();
 			Assert.IsNull(entryContainer.SetEntityState(new EntityEntryContainerModel { }, EntityEntryState.Detached));
 		}
+
+		[TestMethod]
+		public void EnforceMultiTenantRequiresTenantId()
+		{
+			var entryContainer = new EntityEntryContainer();
+			var entity = new EntityEntryContainerTenantModel
+			{
+				TenantId = TestConfiguration.GetTenantId(),
+				Title = "EntityEntryContainerTests.EnforceMultiTenantRequiresTenantId"
+			};
+			entryContainer.SetEntityState(entity, EntityEntryState.Added);
+
+			Assert.ThrowsException<MultiTenantException>(() => entryContainer.EnforceMultiTenant(null));
+			Assert.ThrowsException<MultiTenantException>(() => entryContainer.EnforceMultiTenant(" "));
+		}
+
+		[TestMethod]
+		public void EnforceMultiTenantsSkipsNonTenantModels()
+		{
+			var entryContainer = new EntityEntryContainer();
+
+			var entity = new EntityEntryContainerModel
+			{
+				Title = "EntityEntryContainerTests.RequireTenantIdForTenantModels"
+			};
+			entryContainer.SetEntityState(entity, EntityEntryState.Added);
+
+			var entity2 = new EntityEntryContainerTenantModel
+			{
+				TenantId = TestConfiguration.GetTenantId(),
+				Title = "EntityEntryContainerTests.RequireTenantIdForTenantModels"
+			};
+			entryContainer.SetEntityState(entity2, EntityEntryState.Added);
+
+			entryContainer.EnforceMultiTenant(TestConfiguration.GetTenantId());
+
+			Assert.AreEqual(entryContainer.Entries().Count(), 2);
+		}
+
 	}
 }

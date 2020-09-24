@@ -509,5 +509,31 @@ namespace MongoFramework.Tests
 			Assert.AreEqual(2, dbSet2.Count(m => m.Description == "SuccessfullyRemoveRangeByPredicate"));
 			Assert.IsNotNull(dbSet.FirstOrDefault(m => m.Id == entities[0].Id));
 		}
+
+		[TestMethod]
+		public void SuccessfullyReturnsBaseContext()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbTenantContext(connection, tenantId);
+			var dbSet = new MongoDbTenantSet<TestModel>(context);
+
+			Assert.IsInstanceOfType((dbSet as IMongoDbSet<TestModel>).Context, typeof(IMongoDbContext));
+		}
+
+		[TestMethod]
+		public void SuccessfullyBlocksNulls()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbTenantContext(connection, tenantId);
+			var dbSet = new MongoDbTenantSet<TestModel>(context);
+
+			Assert.ThrowsException<ArgumentNullException>(() => dbSet.Add(null));
+			Assert.ThrowsException<ArgumentNullException>(() => dbSet.AddRange(null));
+			Assert.ThrowsException<ArgumentNullException>(() => dbSet.Update(null));
+			Assert.ThrowsException<ArgumentNullException>(() => dbSet.UpdateRange(null));
+		}
+
 	}
 }
