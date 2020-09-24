@@ -72,7 +72,7 @@ namespace MongoFramework.Tests
 				Assert.IsFalse(context.DbSet.Any());
 				context.SaveChanges();
 				Assert.IsTrue(context.DbSet.Any());
-				Assert.IsTrue(context.DbSet.First().TenantId == TestConfiguration.GetTenantId());
+				Assert.AreEqual(TestConfiguration.GetTenantId(), context.DbSet.First().TenantId);
 			}
 		}
 
@@ -85,7 +85,7 @@ namespace MongoFramework.Tests
 				Assert.IsFalse(context.DbSet.Any());
 				await context.SaveChangesAsync().ConfigureAwait(false);
 				Assert.IsTrue(context.DbSet.Any());
-				Assert.IsTrue(context.DbSet.First().TenantId == TestConfiguration.GetTenantId());
+				Assert.AreEqual(TestConfiguration.GetTenantId(), context.DbSet.First().TenantId);
 			}
 		}
 	}
