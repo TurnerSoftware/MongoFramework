@@ -23,6 +23,16 @@ namespace MongoFramework.Linq
 			throw new ArgumentException($"Queryable must implement interface {nameof(IMongoFrameworkQueryable)}", nameof(source));
 		}
 
+		public static async Task<TOutput[]> ToArrayAsync<TOutput>(this IQueryable<TOutput> source, CancellationToken cancellationToken = default)
+		{
+			return await source.AsAsyncEnumerable(cancellationToken).ToArrayAsync(cancellationToken);
+		}
+
+		public static async Task<List<TOutput>> ToListAsync<TOutput>(this IQueryable<TOutput> source, CancellationToken cancellationToken = default)
+		{
+			return await source.AsAsyncEnumerable(cancellationToken).ToListAsync(cancellationToken);
+		}
+
 		private static async Task<TResult> ExecuteExpressionAsync<TResult, TSource>(IQueryable<TSource> source, Expression expression, CancellationToken cancellationToken)
 		{
 			if (source is IMongoFrameworkQueryable)
