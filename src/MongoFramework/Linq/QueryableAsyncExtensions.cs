@@ -64,15 +64,6 @@ namespace MongoFramework.Linq
 			), cancellationToken);
 		}
 
-		public static async Task<int> CountAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default)
-		{
-			return await ExecuteMethodAsync<int, TSource>(source, MethodInfoCache.Queryable.Count_1.MakeGenericMethod(typeof(TSource)), cancellationToken);
-		}
-		public static async Task<int> CountAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default)
-		{
-			return await ExecuteMethodAsync<int, TSource>(source, MethodInfoCache.Queryable.Count_2.MakeGenericMethod(typeof(TSource)),	predicate, cancellationToken);
-		}
-
 		public static async Task<TSource> FirstAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default)
 		{
 			return await ExecuteMethodAsync<TSource, TSource>(source, MethodInfoCache.Queryable.First_1.MakeGenericMethod(typeof(TSource)), cancellationToken);
@@ -105,6 +96,42 @@ namespace MongoFramework.Linq
 		public static async Task<TSource> SingleOrDefaultAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default)
 		{
 			return await ExecuteMethodAsync<TSource, TSource>(source, MethodInfoCache.Queryable.SingleOrDefault_2.MakeGenericMethod(typeof(TSource)), predicate, cancellationToken);
+		}
+
+		public static async Task<int> CountAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<int, TSource>(source, MethodInfoCache.Queryable.Count_1.MakeGenericMethod(typeof(TSource)), cancellationToken);
+		}
+		public static async Task<int> CountAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<int, TSource>(source, MethodInfoCache.Queryable.Count_2.MakeGenericMethod(typeof(TSource)), predicate, cancellationToken);
+		}
+
+		public static async Task<TSource> MaxAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<TSource, TSource>(source, MethodInfoCache.Queryable.Max_1.MakeGenericMethod(typeof(TSource)), cancellationToken);
+		}
+		public static async Task<TResult> MaxAsync<TSource, TResult>(this IQueryable<TSource> source, Expression<Func<TSource, TResult>> selector, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<TResult, TSource>(source, MethodInfoCache.Queryable.Max_2.MakeGenericMethod(typeof(TSource), typeof(TResult)), selector, cancellationToken);
+		}
+
+		public static async Task<TSource> MinAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<TSource, TSource>(source, MethodInfoCache.Queryable.Min_1.MakeGenericMethod(typeof(TSource)), cancellationToken);
+		}
+		public static async Task<TResult> MinAsync<TSource, TResult>(this IQueryable<TSource> source, Expression<Func<TSource, TResult>> selector, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<TResult, TSource>(source, MethodInfoCache.Queryable.Min_2.MakeGenericMethod(typeof(TSource), typeof(TResult)), selector, cancellationToken);
+		}
+
+		public static async Task<bool> AnyAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<bool, TSource>(source, MethodInfoCache.Queryable.Any_1.MakeGenericMethod(typeof(TSource)), cancellationToken);
+		}
+		public static async Task<bool> AnyAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<bool, TSource>(source, MethodInfoCache.Queryable.Any_2.MakeGenericMethod(typeof(TSource)), predicate, cancellationToken);
 		}
 	}
 }

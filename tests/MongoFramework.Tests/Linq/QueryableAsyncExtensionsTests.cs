@@ -17,6 +17,17 @@ namespace MongoFramework.Tests.Linq
 		{
 			public string Id { get; set; }
 			public string Title { get; set; }
+			public DateTime Date { get; set; }
+			public int IntNumber { get; set; }
+			public decimal DecimalNumber { get; set; }
+			public double DoubleNumber { get; set; }
+			public float FloatNumber { get; set; }
+			public long LongNumber { get; set; }
+			public int? NullableIntNumber { get; set; }
+			public decimal? NullableDecimalNumber { get; set; }
+			public double? NullableDoubleNumber { get; set; }
+			public float? NullableFloatNumber { get; set; }
+			public long? NullableLongNumber { get; set; }
 		}
 
 		[TestMethod]
@@ -250,6 +261,188 @@ namespace MongoFramework.Tests.Linq
 
 			var result = await queryable.SingleOrDefaultAsync(e => e.Title == "SingleOrDefaultAsync_WithPredicate.2");
 			Assert.AreEqual("SingleOrDefaultAsync_WithPredicate.2", result.Title);
+		}
+
+		[TestMethod]
+		public async Task CountAsync_NoValues()
+		{
+			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
+
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
+			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
+
+			context.SaveChanges();
+
+			var result = await queryable.CountAsync();
+			Assert.AreEqual(0, result);
+		}
+		[TestMethod]
+		public async Task CountAsync_HasValues()
+		{
+			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
+
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
+			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
+
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "CountAsync_HasValues.1" }, EntityEntryState.Added);
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "CountAsync_HasValues.2" }, EntityEntryState.Added);
+			context.SaveChanges();
+
+			var result = await queryable.CountAsync();
+			Assert.AreEqual(2, result);
+		}
+		[TestMethod]
+		public async Task CountAsync_WithPredicate()
+		{
+			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
+
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
+			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
+
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "CountAsync_WithPredicate.1" }, EntityEntryState.Added);
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "CountAsync_WithPredicate.2" }, EntityEntryState.Added);
+			context.SaveChanges();
+
+			var result = await queryable.CountAsync(e => e.Title == "CountAsync_WithPredicate.2");
+			Assert.AreEqual(1, result);
+		}
+
+		[TestMethod]
+		public async Task MaxAsync_NoValues()
+		{
+			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
+
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
+			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
+
+			context.SaveChanges();
+
+			await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await queryable.Select(e => e.IntNumber).MaxAsync());
+		}
+		[TestMethod]
+		public async Task MaxAsync_HasValues_Number()
+		{
+			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
+
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
+			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
+
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "MaxAsync_HasValues_Number.1", IntNumber = 5 }, EntityEntryState.Added);
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "MaxAsync_HasValues_Number.2", IntNumber = 7 }, EntityEntryState.Added);
+			context.SaveChanges();
+
+			var result = await queryable.Select(e => e.IntNumber).MaxAsync();
+			Assert.AreEqual(7, result);
+		}
+		[TestMethod]
+		public async Task MaxAsync_HasValues_Date()
+		{
+			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
+
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
+			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
+
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "MaxAsync_HasValues_Date.1", Date = new DateTime(2020, 1, 10, 0, 0, 0, DateTimeKind.Utc) }, EntityEntryState.Added);
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "MaxAsync_HasValues_Date.2", Date = new DateTime(2020, 3, 10, 0, 0, 0, DateTimeKind.Utc) }, EntityEntryState.Added);
+			context.SaveChanges();
+
+			var result = await queryable.Select(e => e.Date).MaxAsync();
+			Assert.AreEqual(new DateTime(2020, 3, 10, 0, 0, 0, DateTimeKind.Utc), result);
+		}
+		[TestMethod]
+		public async Task MaxAsync_WithSelector()
+		{
+			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
+
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
+			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
+
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "MaxAsync_WithSelector.1", IntNumber = 10 }, EntityEntryState.Added);
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "MaxAsync_WithSelector.2", IntNumber = 20 }, EntityEntryState.Added);
+			context.SaveChanges();
+
+			var result = await queryable.MaxAsync(e => e.IntNumber);
+			Assert.AreEqual(20, result);
+		}
+
+		[TestMethod]
+		public async Task MinAsync_NoValues()
+		{
+			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
+
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
+			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
+
+			context.SaveChanges();
+
+			await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await queryable.Select(e => e.IntNumber).MinAsync());
+		}
+		[TestMethod]
+		public async Task MinAsync_HasValues_Number()
+		{
+			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
+
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
+			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
+
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "MinAsync_HasValues_Number.1", IntNumber = 7 }, EntityEntryState.Added);
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "MinAsync_HasValues_Number.2", IntNumber = 5 }, EntityEntryState.Added);
+			context.SaveChanges();
+
+			var result = await queryable.Select(e => e.IntNumber).MinAsync();
+			Assert.AreEqual(5, result);
+		}
+		[TestMethod]
+		public async Task MinAsync_HasValues_Date()
+		{
+			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
+
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
+			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
+
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "MinAsync_HasValues_Date.1", Date = new DateTime(2020, 3, 10, 0, 0, 0, DateTimeKind.Utc) }, EntityEntryState.Added);
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "MinAsync_HasValues_Date.2", Date = new DateTime(2020, 1, 10, 0, 0, 0, DateTimeKind.Utc) }, EntityEntryState.Added);
+			context.SaveChanges();
+
+			var result = await queryable.Select(e => e.Date).MinAsync();
+			Assert.AreEqual(new DateTime(2020, 1, 10, 0, 0, 0, DateTimeKind.Utc), result);
+		}
+		[TestMethod]
+		public async Task MinAsync_WithSelector()
+		{
+			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
+
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
+			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
+
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "MinAsync_WithSelector.1", IntNumber = 20 }, EntityEntryState.Added);
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "MinAsync_WithSelector.2", IntNumber = 10 }, EntityEntryState.Added);
+			context.SaveChanges();
+
+			var result = await queryable.MinAsync(e => e.IntNumber);
+			Assert.AreEqual(10, result);
 		}
 	}
 }
