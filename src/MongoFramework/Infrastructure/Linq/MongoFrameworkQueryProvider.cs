@@ -155,10 +155,9 @@ namespace MongoFramework.Infrastructure.Linq
 			if (resultTransformer != null)
 			{
 				result.ResultTransformer = ResultTransformers.Transform(expression, serializer.ValueType, isAsync) as LambdaExpression;
-				//var resultTransformerType = resultTransformer.GetType();
-				//var methodName = isAsync ? "CreateAsyncAggregator" : "CreateAggregator";
-				//var lambda = resultTransformerType.GetMethod(methodName).Invoke(resultTransformer, new[] { serializer.ValueType }); //Type: LambdaExpression
-				//result.ResultTransformer = lambda as LambdaExpression;
+
+				//Note: In the future this can change from the initial reflection to a `TryTransform` function where it checks the expression itself
+				//		The reason we are doing this method first is to weed out the bugs and any core missing functionality.					
 			}
 
 			return result;
