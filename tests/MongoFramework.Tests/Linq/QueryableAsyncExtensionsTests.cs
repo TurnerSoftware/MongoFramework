@@ -50,6 +50,42 @@ namespace MongoFramework.Tests.Linq
 		}
 
 		[TestMethod]
+		public async Task ToArrayAsync()
+		{
+			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
+
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
+			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
+
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "ToArrayAsync" }, EntityEntryState.Added);
+			context.SaveChanges();
+
+			var result = await queryable.ToArrayAsync();
+			Assert.AreEqual(1, result.Length);
+			Assert.AreEqual("ToArrayAsync", result[0].Title);
+		}
+
+		[TestMethod]
+		public async Task ToListAsync()
+		{
+			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
+
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
+			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
+
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "ToListAsync" }, EntityEntryState.Added);
+			context.SaveChanges();
+
+			var result = await queryable.ToListAsync();
+			Assert.AreEqual(1, result.Count);
+			Assert.AreEqual("ToListAsync", result[0].Title);
+		}
+
+		[TestMethod]
 		public async Task FirstAsync_NoValue()
 		{
 			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
