@@ -154,7 +154,7 @@ namespace MongoFramework.Infrastructure.Linq
 			var resultTransformer = translatedQueryType.GetProperty("ResultTransformer").GetValue(translatedQuery); //Type: Mixed (implements IResultTransformer (internal))
 			if (resultTransformer != null)
 			{
-				result.ResultTransformer = ResultTransformers.Transform(expression, isAsync) as LambdaExpression;
+				result.ResultTransformer = ResultTransformers.Transform(expression, serializer.ValueType, isAsync) as LambdaExpression;
 				//var resultTransformerType = resultTransformer.GetType();
 				//var methodName = isAsync ? "CreateAsyncAggregator" : "CreateAggregator";
 				//var lambda = resultTransformerType.GetMethod(methodName).Invoke(resultTransformer, new[] { serializer.ValueType }); //Type: LambdaExpression
