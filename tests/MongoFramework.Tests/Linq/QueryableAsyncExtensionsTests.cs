@@ -152,11 +152,26 @@ namespace MongoFramework.Tests.Linq
 			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
 
 			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "SingleAsync_HasValue.1" }, EntityEntryState.Added);
-			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "SingleAsync_HasValue.2" }, EntityEntryState.Added);
 			context.SaveChanges();
 
 			var result = await queryable.SingleAsync();
 			Assert.AreEqual("SingleAsync_HasValue.1", result.Title);
+		}
+		[TestMethod]
+		public async Task SingleAsync_HasMoreThanOneValue()
+		{
+			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
+
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
+			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
+
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "SingleAsync_HasMoreThanOneValue.1" }, EntityEntryState.Added);
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "SingleAsync_HasMoreThanOneValue.2" }, EntityEntryState.Added);
+			context.SaveChanges();
+
+			await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await queryable.SingleOrDefaultAsync());
 		}
 		[TestMethod]
 		public async Task SingleAsync_WithPredicate()
