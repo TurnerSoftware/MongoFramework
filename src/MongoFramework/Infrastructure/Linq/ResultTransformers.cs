@@ -2,12 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
 namespace MongoFramework.Infrastructure.Linq
 {
@@ -30,11 +25,22 @@ namespace MongoFramework.Infrastructure.Linq
 						"cancellationToken"
 					);
 
-					var methodInfo = transformName switch
+					var methodInfo = (transformName switch
 					{
-						nameof(Enumerable.First) => GetMethodInfo(sourceType, () => FirstAsync<object>(default, default)),
+						nameof(Queryable.First) => MethodInfoCache.AsyncEnumerable.First_1,
+						nameof(Queryable.FirstOrDefault) => MethodInfoCache.AsyncEnumerable.FirstOrDefault_1,
+
+						nameof(Queryable.Single) => MethodInfoCache.AsyncEnumerable.Single_1,
+						nameof(Queryable.SingleOrDefault) => MethodInfoCache.AsyncEnumerable.SingleOrDefault_1,
+
+						nameof(Queryable.Max) => MethodInfoCache.AsyncEnumerable.Single_1,
+						nameof(Queryable.Min) => MethodInfoCache.AsyncEnumerable.Single_1,
+						nameof(Queryable.Sum) => MethodInfoCache.AsyncEnumerable.Single_1,
+
+						nameof(Queryable.Any) => MethodInfoCache.AsyncEnumerable.Any_1,
+
 						_ => throw new InvalidOperationException($"No transform available for {transformName}")
-					};
+					}).MakeGenericMethod(sourceType);
 
 					return Expression.Lambda(
 						Expression.Call(
@@ -54,11 +60,22 @@ namespace MongoFramework.Infrastructure.Linq
 						"source"
 					);
 
-					var methodInfo = transformName switch
+					var methodInfo = (transformName switch
 					{
-						nameof(Enumerable.First) => EnumerableMethods.First_TSource_1(sourceType),
+						nameof(Queryable.First) => MethodInfoCache.Enumerable.First_1,
+						nameof(Queryable.FirstOrDefault) => MethodInfoCache.Enumerable.FirstOrDefault_1,
+
+						nameof(Queryable.Single) => MethodInfoCache.Enumerable.Single_1,
+						nameof(Queryable.SingleOrDefault) => MethodInfoCache.Enumerable.SingleOrDefault_1,
+
+						nameof(Queryable.Max) => MethodInfoCache.Enumerable.Single_1,
+						nameof(Queryable.Min) => MethodInfoCache.Enumerable.Single_1,
+						nameof(Queryable.Sum) => MethodInfoCache.Enumerable.Single_1,
+
+						nameof(Queryable.Any) => MethodInfoCache.Enumerable.Any_1,
+
 						_ => throw new InvalidOperationException($"No transform available for {transformName}")
-					};
+					}).MakeGenericMethod(sourceType);
 
 					return Expression.Lambda(
 						Expression.Call(
@@ -71,25 +88,7 @@ namespace MongoFramework.Infrastructure.Linq
 				}
 			}
 
-			throw new InvalidOperationException("Unexpected expression type");
-		}
-
-		private static MethodInfo GetMethodInfo(Type sourceType, Expression<Action> expression)
-		{
-			var method = (expression.Body as MethodCallExpression).Method;
-			return method.GetGenericMethodDefinition().MakeGenericMethod(sourceType);
-		}
-
-		private static async Task<TSource> FirstAsync<TSource>(IAsyncEnumerable<TSource> asyncEnumerable, CancellationToken cancellationToken)
-		{
-			await foreach (var item in asyncEnumerable)
-			{
-				return item;
-			}
-
-			throw new Exception("No elements in sequence");
+			throw new InvalidOperationException($"Result transformation unavailable for expression type {expression.NodeType}");
 		}
 	}
 }
-
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
