@@ -61,12 +61,12 @@ if ($RunTests) {
 			Write-Host "Tests passed!" -ForegroundColor "Green"
 
 			Write-Host "Finalising coverage report..." -ForegroundColor "Magenta"
-			reportgenerator -reports:$packageOutputFolder/coverage/*/coverage.cobertura.xml -targetdir:$packageOutputFolder/coverage.xml -reporttypes:Cobertura
+			reportgenerator -reports:$packageOutputFolder/coverage/*/coverage.cobertura.xml -targetdir:$packageOutputFolder -reporttypes:Cobertura
 			if ($LastExitCode -ne 0) {
 				Write-Host "Failure finalising coverage report, aborting!" -Foreground "Red"
 				Exit 1
 			}
-			Rename-Item $packageOutputFolder/Cobertura.xml $packageOutputFolder/coverage.xml
+			Rename-Item -Path $packageOutputFolder/Cobertura.xml -NewName $packageOutputFolder/coverage.xml
 			Write-Host "Coverage report finalised!" -ForegroundColor "Green"
 
 			Write-Host "Saving code coverage..." -ForegroundColor "Magenta"
