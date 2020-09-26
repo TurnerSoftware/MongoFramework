@@ -5,7 +5,8 @@ skip_branch_with_pr: true
 services:
   - mongodb
 install:
-  - choco install opencover.portable codecov
+  - choco install codecov
+  - choco install OpenCover --source https://www.myget.org/F/opencover/api/v2
   - ps: .\build\dotnet-install.ps1 -Version 3.0.100
 
   
