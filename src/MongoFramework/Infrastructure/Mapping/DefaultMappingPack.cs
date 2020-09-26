@@ -17,6 +17,7 @@ namespace MongoFramework.Infrastructure.Mapping
 				new EntityIdProcessor(),
 				new NestedTypeProcessor(),
 				new ExtraElementsProcessor(),
+				new DecimalSerializationProcessor(),
 				new TypeDiscoveryProcessor(),
 				new BsonKnownTypesProcessor(),
 				new IndexProcessor()
