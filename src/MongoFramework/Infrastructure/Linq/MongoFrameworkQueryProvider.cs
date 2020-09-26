@@ -9,6 +9,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MongoFramework.Infrastructure.Linq
 {
@@ -82,12 +85,39 @@ namespace MongoFramework.Infrastructure.Linq
 			return (TResult)Execute(expression);
 		}
 
+		public object ExecuteAsync(Expression expression, CancellationToken cancellationToken = default)
+		{
+			var model = GetExecutionModel(expression, true);
+			var outputType = model.Serializer.ValueType;
+
+			//aka. ExecuteModelAsync<outputType>(model, cancellationToken)
+
+			Expression executor = Expression.Call(
+				Expression.Constant(this),
+				nameof(ExecuteModelAsync),
+				new[] { outputType },
+				Expression.Constant(model, typeof(AggregateExecutionModel)),
+				Expression.Constant(cancellationToken));
+
+			if (model.ResultTransformer != null)
+			{
+				executor = Expression.Invoke(
+					model.ResultTransformer, 
+					Expression.Convert(executor, model.ResultTransformer.Parameters[0].Type),
+					Expression.Constant(cancellationToken)
+				);
+			}
+
+			var lambda = Expression.Lambda(executor);
+			return lambda.Compile().DynamicInvoke(null);
+		}
+
 		private IMongoCollection<TEntity> GetCollection()
 		{
 			return Connection.GetDatabase().GetCollection<TEntity>(EntityDefinition.CollectionName);
 		}
 
-		private AggregateExecutionModel GetExecutionModel(Expression expression)
+		private AggregateExecutionModel GetExecutionModel(Expression expression, bool isAsync = false)
 		{
 			//Use the official driver to do the heavy lifting on the query translation
 			var underlyingProvider = GetCollection().AsQueryable().Provider;
@@ -124,9 +154,10 @@ namespace MongoFramework.Infrastructure.Linq
 			var resultTransformer = translatedQueryType.GetProperty("ResultTransformer").GetValue(translatedQuery); //Type: Mixed (implements IResultTransformer (internal))
 			if (resultTransformer != null)
 			{
-				var resultTransformerType = resultTransformer.GetType();
-				var lambda = resultTransformerType.GetMethod("CreateAggregator").Invoke(resultTransformer, new[] { serializer.ValueType }); //Type: LambdaExpression
-				result.ResultTransformer = lambda as LambdaExpression;
+				result.ResultTransformer = ResultTransformers.Transform(expression, serializer.ValueType, isAsync) as LambdaExpression;
+
+				//Note: In the future this can change from the initial reflection to a `TryTransform` function where it checks the expression itself
+				//		The reason we are doing this method first is to weed out the bugs and any core missing functionality.					
 			}
 
 			return result;
@@ -166,6 +197,48 @@ namespace MongoFramework.Infrastructure.Linq
 						{
 							EntityProcessors.ProcessEntity(entityItem, Connection);
 						}
+						yield return item;
+					}
+				}
+			}
+		}
+
+		private async IAsyncEnumerable<TResult> ExecuteModelAsync<TResult>(AggregateExecutionModel model, [EnumeratorCancellation] CancellationToken cancellationToken)
+		{
+			var serializer = model.Serializer as IBsonSerializer<TResult>;
+			var pipeline = PipelineDefinition<TEntity, TResult>.Create(model.Stages, serializer);
+
+			using (var diagnostics = DiagnosticRunner.Start<TEntity>(Connection, model))
+			{
+				IAsyncCursor<TResult> underlyingCursor;
+
+				try
+				{
+					underlyingCursor = await GetCollection().AggregateAsync(pipeline, cancellationToken: cancellationToken);
+				}
+				catch (Exception exception)
+				{
+					diagnostics.Error(exception);
+					throw;
+				}
+
+				var hasFirstResult = false;
+				while (await underlyingCursor.MoveNextAsync(cancellationToken))
+				{
+					if (!hasFirstResult)
+					{
+						hasFirstResult = true;
+						diagnostics.FirstReadResult<TResult>();
+					}
+
+					var resultBatch = underlyingCursor.Current;
+					foreach (var item in resultBatch)
+					{
+						if (item is TEntity entityItem && (model.ResultTransformer == null || model.ResultTransformer.ReturnType == typeof(TEntity)))
+						{
+							EntityProcessors.ProcessEntity(entityItem, Connection);
+						}
+
 						yield return item;
 					}
 				}

@@ -3,26 +3,20 @@ using System.Collections.Generic;
 
 namespace MongoFramework.Infrastructure.Mapping
 {
-	public class DefaultMappingPack : IMappingProcessorPack
+	public static class DefaultProcessors
 	{
-		public IEnumerable<IMappingProcessor> Processors { get; }
-
-		private DefaultMappingPack()
+		public static IEnumerable<IMappingProcessor> CreateProcessors() => new IMappingProcessor[]
 		{
-			Processors = new List<IMappingProcessor>
-			{
-				new CollectionNameProcessor(),
-				new HierarchyProcessor(),
-				new PropertyMappingProcessor(),
-				new EntityIdProcessor(),
-				new NestedTypeProcessor(),
-				new ExtraElementsProcessor(),
-				new TypeDiscoveryProcessor(),
-				new BsonKnownTypesProcessor(),
-				new IndexProcessor()
-			};
-		}
-
-		public static IMappingProcessorPack Instance { get; } = new DefaultMappingPack();
+			new CollectionNameProcessor(),
+			new HierarchyProcessor(),
+			new PropertyMappingProcessor(),
+			new EntityIdProcessor(),
+			new NestedTypeProcessor(),
+			new ExtraElementsProcessor(),
+			new DecimalSerializationProcessor(),
+			new TypeDiscoveryProcessor(),
+			new BsonKnownTypesProcessor(),
+			new IndexProcessor()
+		};
 	}
 }
