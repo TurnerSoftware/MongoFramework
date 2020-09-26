@@ -13,14 +13,13 @@ namespace MongoFramework.Linq
 	{
 		public static IAsyncEnumerable<TOutput> AsAsyncEnumerable<TOutput>(this IQueryable<TOutput> source, CancellationToken cancellationToken = default)
 		{
-			if (source is IMongoFrameworkQueryable)
+			if (source.Provider is IMongoFrameworkQueryProvider asyncProvider)
 			{
-				var asyncProvider = source.Provider as IMongoFrameworkQueryProvider;
 				var resultEnumerable = asyncProvider.ExecuteAsync(source.Expression, cancellationToken) as IAsyncEnumerable<TOutput>;
 				return resultEnumerable;
 			}
 
-			throw new ArgumentException($"Queryable must implement interface {nameof(IMongoFrameworkQueryable)}", nameof(source));
+			throw new ArgumentException($"Query provider must implement interface {nameof(IMongoFrameworkQueryProvider)}", nameof(source));
 		}
 
 		public static async Task<TOutput[]> ToArrayAsync<TOutput>(this IQueryable<TOutput> source, CancellationToken cancellationToken = default)
@@ -35,15 +34,15 @@ namespace MongoFramework.Linq
 
 		private static async Task<TResult> ExecuteExpressionAsync<TResult, TSource>(IQueryable<TSource> source, Expression expression, CancellationToken cancellationToken)
 		{
-			if (source is IMongoFrameworkQueryable)
+			if (source.Provider is IMongoFrameworkQueryProvider provider)
 			{
-				var finalisedQueryable = source.Provider.CreateQuery<TResult>(expression) as IMongoFrameworkQueryable;
+				var finalisedQueryable = provider.CreateQuery<TResult>(expression);
 				var asyncProvider = finalisedQueryable.Provider as IMongoFrameworkQueryProvider;
 				var resultTask = (ValueTask<TResult>)asyncProvider.ExecuteAsync(finalisedQueryable.Expression, cancellationToken);
 				return await resultTask;
 			}
 
-			throw new ArgumentException($"Queryable must implement interface {nameof(IMongoFrameworkQueryable)}", nameof(source));
+			throw new ArgumentException($"Query provider must implement interface {nameof(IMongoFrameworkQueryProvider)}", nameof(source));
 		}
 
 		private static async Task<TResult> ExecuteMethodAsync<TResult, TSource>(IQueryable<TSource> source, MethodInfo method, CancellationToken cancellationToken)
