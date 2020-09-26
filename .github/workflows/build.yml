@@ -15,19 +15,19 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-        mongodb: [3.6.0]
+        mongodb: [3.6]
     steps:
     - uses: actions/checkout@v2
 
-    - name: Setup MongoDB
+    - name: Setup MongoDB (Non-Windows)
       if: matrix.os != 'windows-latest'
       run: |
         brew tap mongodb/brew | 
         brew install mongodb-community@${{matrix.mongodb}} |
         brew services start mongodb-community@${{matrix.mongodb}}
-    - name: Setup MongoDB
+    - name: Setup MongoDB (Windows Only)
       if: matrix.os == 'windows-latest'
-      run: choco install mongodb --version=${{matrix.mongodb}}
+      run: choco install mongodb --version=${{matrix.mongodb}}.0
 
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
