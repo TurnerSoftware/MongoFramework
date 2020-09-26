@@ -17,12 +17,12 @@ namespace MongoFramework.Linq
 	{
 		public static string ToQuery(this IQueryable queryable)
 		{
-			if (!(queryable is IMongoFrameworkQueryable))
+			if (queryable is IMongoFrameworkQueryable mongoFrameworkQueryable)
 			{
-				throw new ArgumentException($"Queryable must implement interface {nameof(IMongoFrameworkQueryable)}", nameof(queryable));
+				return mongoFrameworkQueryable.ToQuery();
 			}
-
-			return (queryable as IMongoFrameworkQueryable).ToQuery();
+			
+			throw new ArgumentException($"Queryable must implement interface {nameof(IMongoFrameworkQueryable)}", nameof(queryable));
 		}
 
 		public static IQueryable<TEntity> WhereIdMatches<TEntity>(this IQueryable<TEntity> queryable, IEnumerable entityIds) where TEntity : class

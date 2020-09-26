@@ -1,7 +1,4 @@
-﻿using MongoDB.Driver.Linq;
-using MongoFramework.Infrastructure.Diagnostics;
-using MongoFramework.Infrastructure.Mapping;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
