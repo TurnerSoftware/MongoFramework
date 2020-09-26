@@ -26,7 +26,7 @@ jobs:
         brew install mongodb-community@${{matrix.mongodb}} |
         brew services start mongodb-community@${{matrix.mongodb}}
     - name: Setup MongoDB
-      if: matrix.os == 'windows-latest''
+      if: matrix.os == 'windows-latest'
       run: choco install mongodb --version=${{matrix.mongodb}}
 
     - name: Setup .NET Core
