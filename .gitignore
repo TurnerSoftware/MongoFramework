@@ -255,3 +255,6 @@ paket-files/
 /.cr
 
 /build-artifacts
+
+# MacOS
+.DS_Store
