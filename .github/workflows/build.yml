@@ -20,13 +20,13 @@ jobs:
     - uses: actions/checkout@v2
     
     - name: Setup MongoDB (MacOS)
-      if: matrix.os != 'macOS-latest'
+      if: matrix.os == 'macOS-latest'
       run: |
         brew tap mongodb/brew | 
         brew install mongodb-community@${{matrix.mongodb}} |
         brew services start mongodb-community@${{matrix.mongodb}}
     - name: Setup MongoDB (Ubuntu)
-      if: matrix.os != 'ubuntu-latest'
+      if: matrix.os == 'ubuntu-latest'
       run: apt-get install mongodb=${{matrix.mongodb}}.0
     - name: Setup MongoDB (Windows)
       if: matrix.os == 'windows-latest'
