@@ -10,13 +10,18 @@ env:
 
 jobs:
   build:
-    name: Build-${{matrix.os}}
+    name: Build-${{matrix.os}}-mongodb-${{matrix.mongodb}}
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
+        mongodb: [3.6]
     steps:
     - uses: actions/checkout@v2
+    - name: Setup MongoDB
+      uses: supercharge/mongodb-github-action@1.3.0
+      with:
+        mongodb-version: ${{matrix.mongodb}}
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
