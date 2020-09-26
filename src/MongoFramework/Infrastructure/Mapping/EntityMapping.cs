@@ -3,9 +3,7 @@ using MongoDB.Bson.Serialization;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
@@ -22,7 +20,7 @@ namespace MongoFramework.Infrastructure.Mapping
 			EntityDefinitions = new ConcurrentDictionary<Type, IEntityDefinition>();
 			MappingProcessors = new List<IMappingProcessor>();
 
-			AddMappingProcessors(DefaultMappingPack.Instance.Processors);
+			AddMappingProcessors(DefaultProcessors.CreateProcessors());
 		}
 
 		public static IEntityDefinition SetEntityDefinition(IEntityDefinition definition)

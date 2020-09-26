@@ -8,7 +8,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 {
 	public class TypeDiscoveryProcessor : IMappingProcessor
 	{
-		private static bool ProviderAdded { get; set; }
+		private bool ProviderAdded { get; set; }
 
 		public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
 		{

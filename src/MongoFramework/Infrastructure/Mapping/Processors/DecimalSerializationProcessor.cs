@@ -6,13 +6,13 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 {
 	public class DecimalSerializationProcessor : IMappingProcessor
 	{
-		private static bool ProviderAdded { get; set; }
+		private bool SerializerAdded { get; set; }
 
 		public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
 		{
-			if (!ProviderAdded)
+			if (!SerializerAdded)
 			{
-				ProviderAdded = true;
+				SerializerAdded = true;
 				BsonSerializer.RegisterSerializer(typeof(decimal), new DecimalSerializer(BsonType.Decimal128));
 				BsonSerializer.RegisterSerializer(typeof(decimal?), new NullableSerializer<decimal>(new DecimalSerializer(BsonType.Decimal128)));
 			}
