@@ -1,0 +1,41 @@
+name: Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request: 
+
+env:
+  BuildArtifactDirectory: build-artifacts
+
+jobs:
+  build:
+    name: Build-${{matrix.os}}
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.301
+    - name: Install dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build -c Release /p:Version=$BuildVersion --no-restore
+    - name: Test
+      run: dotnet test $config.TestProject --logger trx --results-directory ${{env.BuildArtifactDirectory}}/coverage --collect "XPlat Code Coverage" --settings CodeCoverage.runsettings --no-restore
+    - name: Prepare coverage report
+      run: reportgenerator -reports:${{env.BuildArtifactDirectory}}/coverage/*/coverage.cobertura.xml -targetdir:${{env.BuildArtifactDirectory}} -reporttypes:Cobertura
+#    - name: Upload coverage
+#      uses: codecov/codecov-action@v1.0.13
+#      with:
+#        file: Cobertura.xml
+#        fail_ci_if_error: false
+    - name: Publish artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{matrix.os}}
+        path: ${{env.BuildArtifactDirectory}}
