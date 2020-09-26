@@ -132,5 +132,87 @@ namespace MongoFramework.Linq
 		{
 			return await ExecuteMethodAsync<bool, TSource>(source, MethodInfoCache.Queryable.Any_2.MakeGenericMethod(typeof(TSource)), predicate, cancellationToken);
 		}
+
+		public static async Task<int> SumAsync(this IQueryable<int> source, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<int, int>(source, MethodInfoCache.Queryable.Sum_Int32_1, cancellationToken);
+		}
+		public static async Task<int?> SumAsync(this IQueryable<int?> source, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<int?, int?>(source, MethodInfoCache.Queryable.Sum_NullableInt32_1, cancellationToken);
+		}
+		public static async Task<decimal> SumAsync(this IQueryable<decimal> source, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<decimal, decimal>(source, MethodInfoCache.Queryable.Sum_Decimal_1, cancellationToken);
+		}
+		public static async Task<decimal?> SumAsync(this IQueryable<decimal?> source, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<decimal?, decimal?>(source, MethodInfoCache.Queryable.Sum_NullableDecimal_1, cancellationToken);
+		}
+		public static async Task<double> SumAsync(this IQueryable<double> source, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<double, double>(source, MethodInfoCache.Queryable.Sum_Double_1, cancellationToken);
+		}
+		public static async Task<double?> SumAsync(this IQueryable<double?> source, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<double?, double?>(source, MethodInfoCache.Queryable.Sum_NullableDouble_1, cancellationToken);
+		}
+		public static async Task<float> SumAsync(this IQueryable<float> source, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<float, float>(source, MethodInfoCache.Queryable.Sum_Float_1, cancellationToken);
+		}
+		public static async Task<float?> SumAsync(this IQueryable<float?> source, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<float?, float?>(source, MethodInfoCache.Queryable.Sum_NullableFloat_1, cancellationToken);
+		}
+		public static async Task<long> SumAsync(this IQueryable<long> source, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<long, long>(source, MethodInfoCache.Queryable.Sum_Long_1, cancellationToken);
+		}
+		public static async Task<long?> SumAsync(this IQueryable<long?> source, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<long?, long?>(source, MethodInfoCache.Queryable.Sum_NullableLong_1, cancellationToken);
+		}
+
+		public static async Task<int> SumAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, int>> selector, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<int, TSource>(source, MethodInfoCache.Queryable.Sum_Int32_2.MakeGenericMethod(typeof(TSource)), selector, cancellationToken);
+		}
+		public static async Task<int?> SumAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, int?>> selector, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<int?, TSource>(source, MethodInfoCache.Queryable.Sum_NullableInt32_2.MakeGenericMethod(typeof(TSource)), selector, cancellationToken);
+		}
+		public static async Task<decimal> SumAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, decimal>> selector, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<decimal, TSource>(source, MethodInfoCache.Queryable.Sum_Decimal_2.MakeGenericMethod(typeof(TSource)), selector, cancellationToken);
+		}
+		public static async Task<decimal?> SumAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, decimal?>> selector, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<decimal?, TSource>(source, MethodInfoCache.Queryable.Sum_NullableDecimal_2.MakeGenericMethod(typeof(TSource)), selector, cancellationToken);
+		}
+		public static async Task<double> SumAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, double>> selector, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<double, TSource>(source, MethodInfoCache.Queryable.Sum_Double_2.MakeGenericMethod(typeof(TSource)), selector, cancellationToken);
+		}
+		public static async Task<double?> SumAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, double?>> selector, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<double?, TSource>(source, MethodInfoCache.Queryable.Sum_NullableDouble_2.MakeGenericMethod(typeof(TSource)), selector, cancellationToken);
+		}
+		public static async Task<float> SumAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, float>> selector, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<float, TSource>(source, MethodInfoCache.Queryable.Sum_Float_2.MakeGenericMethod(typeof(TSource)), selector, cancellationToken);
+		}
+		public static async Task<float?> SumAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, float?>> selector, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<float?, TSource>(source, MethodInfoCache.Queryable.Sum_NullableFloat_2.MakeGenericMethod(typeof(TSource)), selector, cancellationToken);
+		}
+		public static async Task<long> SumAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, long>> selector, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<long, TSource>(source, MethodInfoCache.Queryable.Sum_Long_2.MakeGenericMethod(typeof(TSource)), selector, cancellationToken);
+		}
+		public static async Task<long?> SumAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, long?>> selector, CancellationToken cancellationToken = default)
+		{
+			return await ExecuteMethodAsync<long?, TSource>(source, MethodInfoCache.Queryable.Sum_NullableLong_2.MakeGenericMethod(typeof(TSource)), selector, cancellationToken);
+		}
 	}
 }

@@ -35,7 +35,7 @@ namespace MongoFramework.Infrastructure.Linq
 						nameof(Queryable.Count) => MethodInfoCache.AsyncEnumerable.SingleOrDefault_1,
 						nameof(Queryable.Max) => MethodInfoCache.AsyncEnumerable.Single_1,
 						nameof(Queryable.Min) => MethodInfoCache.AsyncEnumerable.Single_1,
-						nameof(Queryable.Sum) => MethodInfoCache.AsyncEnumerable.Single_1,
+						nameof(Queryable.Sum) => MethodInfoCache.AsyncEnumerable.SingleOrDefault_1,
 
 						nameof(Queryable.Any) => MethodInfoCache.AsyncEnumerable.Any_1,
 
@@ -71,7 +71,7 @@ namespace MongoFramework.Infrastructure.Linq
 						nameof(Queryable.Count) => MethodInfoCache.Enumerable.SingleOrDefault_1,
 						nameof(Queryable.Max) => MethodInfoCache.Enumerable.Single_1,
 						nameof(Queryable.Min) => MethodInfoCache.Enumerable.Single_1,
-						nameof(Queryable.Sum) => MethodInfoCache.Enumerable.Single_1,
+						nameof(Queryable.Sum) => MethodInfoCache.Enumerable.SingleOrDefault_1,
 
 						nameof(Queryable.Any) => MethodInfoCache.Enumerable.Any_1,
 
