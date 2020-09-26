@@ -480,5 +480,55 @@ namespace MongoFramework.Tests.Linq
 			var result = await queryable.MinAsync(e => e.IntNumber);
 			Assert.AreEqual(10, result);
 		}
+
+		[TestMethod]
+		public async Task AnyAsync_NoValues()
+		{
+			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
+
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
+			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
+
+			var result = await queryable.AnyAsync();
+			Assert.IsFalse(result);
+		}
+		[TestMethod]
+		public async Task AnyAsync_HasValues()
+		{
+			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
+
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
+			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
+
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "AnyAsync_HasValues.1" }, EntityEntryState.Added);
+			context.SaveChanges();
+
+			var result = await queryable.AnyAsync();
+			Assert.IsTrue(result);
+		}
+		[TestMethod]
+		public async Task AnyAsync_WithPredicate()
+		{
+			EntityMapping.RegisterType(typeof(MongoFrameworkQueryableModel));
+
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var provider = new MongoFrameworkQueryProvider<MongoFrameworkQueryableModel>(connection);
+			var queryable = new MongoFrameworkQueryable<MongoFrameworkQueryableModel>(provider);
+
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "AnyAsync_WithPredicate.1" }, EntityEntryState.Added);
+			context.ChangeTracker.SetEntityState(new MongoFrameworkQueryableModel { Title = "AnyAsync_WithPredicate.2" }, EntityEntryState.Added);
+			context.SaveChanges();
+
+			var resultOne = await queryable.AnyAsync(e => e.Title == "AnyAsync_WithPredicate.2");
+			Assert.IsTrue(resultOne);
+
+			var resultTwo = await queryable.AnyAsync(e => e.Title == "AnyAsync_WithPredicate.3");
+			Assert.IsFalse(resultTwo);
+		}
 	}
 }
