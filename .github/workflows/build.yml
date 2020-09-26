@@ -18,14 +18,17 @@ jobs:
         mongodb: [3.6]
     steps:
     - uses: actions/checkout@v2
-
-    - name: Setup MongoDB (Non-Windows)
-      if: matrix.os != 'windows-latest'
+    
+    - name: Setup MongoDB (MacOS)
+      if: matrix.os != 'macOS-latest'
       run: |
         brew tap mongodb/brew | 
         brew install mongodb-community@${{matrix.mongodb}} |
         brew services start mongodb-community@${{matrix.mongodb}}
-    - name: Setup MongoDB (Windows Only)
+    - name: Setup MongoDB (Ubuntu)
+      if: matrix.os != 'ubuntu-latest'
+      run: apt-get install mongodb=${{matrix.mongodb}}.0
+    - name: Setup MongoDB (Windows)
       if: matrix.os == 'windows-latest'
       run: choco install mongodb --version=${{matrix.mongodb}}.0
 
