@@ -27,7 +27,7 @@ jobs:
         brew services start mongodb-community@${{matrix.mongodb}}
     - name: Setup MongoDB (Ubuntu)
       if: matrix.os == 'ubuntu-latest'
-      run: apt-get install mongodb=${{matrix.mongodb}}.0
+      run: sudo apt-get install mongodb=${{matrix.mongodb}}.0
     - name: Setup MongoDB (Windows)
       if: matrix.os == 'windows-latest'
       run: choco install mongodb --version=${{matrix.mongodb}}.0
