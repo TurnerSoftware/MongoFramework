@@ -7,30 +7,36 @@ on:
 
 env:
   BuildArtifactDirectory: build-artifacts
+  BuildVersion: -${{GITHUB_RUN_ID}}
 
 jobs:
   build:
-    name: Build-${{matrix.os}}-mongodb-${{matrix.mongodb}}
+    name: ${{matrix.os}}
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-        mongodb: [3.6]
+#        mongodb: [3.6]
     steps:
-    - uses: actions/checkout@v2
+    - name: Identify build version
+      run: ./build-version.ps1
+      shell: pwsh
+
+    - name: Checkout
+      uses: actions/checkout@v2
     
-    - name: Setup MongoDB (MacOS)
-      if: matrix.os == 'macOS-latest'
-      run: |
-        brew tap mongodb/brew | 
-        brew install mongodb-community@${{matrix.mongodb}} |
-        brew services start mongodb-community@${{matrix.mongodb}}
-    - name: Setup MongoDB (Ubuntu)
-      if: matrix.os == 'ubuntu-latest'
-      run: sudo apt-get install mongodb=${{matrix.mongodb}}.0
-    - name: Setup MongoDB (Windows)
-      if: matrix.os == 'windows-latest'
-      run: choco install mongodb --version=${{matrix.mongodb}}.0
+#    - name: Setup MongoDB (MacOS)
+#      if: matrix.os == 'macOS-latest'
+#      run: |
+#        brew tap mongodb/brew | 
+#        brew install mongodb-community@${{matrix.mongodb}} |
+#        brew services start mongodb-community@${{matrix.mongodb}}
+#    - name: Setup MongoDB (Ubuntu)
+#      if: matrix.os == 'ubuntu-latest'
+#      run: sudo apt-get install mongodb=${{matrix.mongodb}}.0
+#    - name: Setup MongoDB (Windows)
+#      if: matrix.os == 'windows-latest'
+#      run: choco install mongodb --version=${{matrix.mongodb}}.0
 
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
@@ -41,16 +47,26 @@ jobs:
     - name: Build
       run: dotnet build -c Release /p:Version=$BuildVersion --no-restore
     - name: Test
-      run: dotnet test $config.TestProject --logger trx --results-directory ${{env.BuildArtifactDirectory}}/coverage --collect "XPlat Code Coverage" --settings CodeCoverage.runsettings --no-restore
-    - name: Prepare coverage report
-      run: reportgenerator -reports:${{env.BuildArtifactDirectory}}/coverage/*/coverage.cobertura.xml -targetdir:${{env.BuildArtifactDirectory}} -reporttypes:Cobertura
-#    - name: Upload coverage
-#      uses: codecov/codecov-action@v1.0.13
-#      with:
-#        file: Cobertura.xml
-#        fail_ci_if_error: false
+      run: dotnet test --logger trx --results-directory ${{env.BuildArtifactDirectory}}/coverage --collect "XPlat Code Coverage" --settings CodeCoverage.runsettings --no-restore
+    - name: Pack
+      run: dotnet pack --no-build -c Release /p:Version=$BuildVersion /p:PackageOutputPath=${{env.BuildArtifactDirectory}}
     - name: Publish artifacts
       uses: actions/upload-artifact@v2
       with:
         name: ${{matrix.os}}
         path: ${{env.BuildArtifactDirectory}}
+
+  coverage:
+    name: Process code coverage
+    runs-on: windows-latest
+    needs: build
+    steps:
+    - name: Download coverage reports
+      uses: actions/download-artifact@v2
+    - name: Prepare coverage reports
+      run: reportgenerator -reports:*/coverage/*/coverage.cobertura.xml -reporttypes:Cobertura
+#    - name: Upload Coverage
+#      uses: codecov/codecov-action@v1.0.13
+#      with:
+#        file: Cobertura.xml
+#        fail_ci_if_error: false
