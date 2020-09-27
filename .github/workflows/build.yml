@@ -12,18 +12,19 @@ env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   # Disable sending .NET CLI telemetry to Microsoft.
   DOTNET_CLI_TELEMETRY_OPTOUT: true
+
   BuildVersion: 0.22.0-dev+A341DBH-13
+  BuildArtifactPath: ${{github.workspace}}/build-artifacts
 
 jobs:
   build:
-    name: ${{matrix.os}}
+    name: Build ${{matrix.os}}
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
 #        mongodb: [3.6]
     steps:
-#    - run: ls -la
 #    - name: Identify build version
 #      run: ./build-version.ps1
 #      shell: pwsh
@@ -57,15 +58,15 @@ jobs:
     - name: Build
       run: dotnet build -c Release --no-restore /p:Version=${{env.BuildVersion}}
     - name: Test
-      run: dotnet test --logger trx --results-directory ./build-artifacts/coverage --collect "XPlat Code Coverage" --settings CodeCoverage.runsettings
+      run: dotnet test --logger trx --results-directory ${{env.BuildArtifactPath}}/coverage --collect "XPlat Code Coverage" --settings CodeCoverage.runsettings
     - name: Pack
       if: matrix.os == 'ubuntu-latest'
-      run: dotnet pack -c Release --no-build /p:Version=${{env.BuildVersion}} /p:PackageOutputPath=./build-artifacts
+      run: dotnet pack -c Release --no-build /p:Version=${{env.BuildVersion}} /p:PackageOutputPath=${{env.BuildArtifactPath}}
     - name: Publish artifacts
       uses: actions/upload-artifact@v2
       with:
         name: ${{matrix.os}}
-        path: ./build-artifacts
+        path: ${{env.BuildArtifactPath}}
 
   coverage:
     name: Process code coverage
