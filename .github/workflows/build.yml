@@ -25,10 +25,6 @@ jobs:
         os: [ubuntu-latest, windows-latest, macOS-latest]
 #        mongodb: [3.6]
     steps:
-    - name: Identify build version
-      run: ./build-version.ps1
-#      shell: pwsh
-
     - name: Start MongoDB (Ubuntu)
       if: matrix.os == 'ubuntu-latest'
       run: sudo systemctl start mongod
@@ -36,10 +32,11 @@ jobs:
       if: matrix.os == 'macOS-latest'
       run: brew services start mongodb-community
 
-
     - name: Checkout
       uses: actions/checkout@v2
-    
+    - name: Identify build version
+      run: ./build-version.ps1
+
 #    - name: Setup MongoDB (MacOS)
 #      if: matrix.os == 'macOS-latest'
 #      run: |
