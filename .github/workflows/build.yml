@@ -6,7 +6,6 @@ on:
   pull_request: 
 
 env:
-  BuildArtifactDirectory: build-artifacts
   BuildVersion: 
 
 jobs:
@@ -18,10 +17,10 @@ jobs:
         os: [ubuntu-latest, windows-latest, macOS-latest]
 #        mongodb: [3.6]
     steps:
-    - run: ls -la
-    - name: Identify build version
-      run: ./build-version.ps1
-      shell: pwsh
+#    - run: ls -la
+#    - name: Identify build version
+#      run: ./build-version.ps1
+#      shell: pwsh
 
     - name: Checkout
       uses: actions/checkout@v2
@@ -46,16 +45,16 @@ jobs:
     - name: Install dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build -c Release /p:Version=$BuildVersion --no-restore
+      run: dotnet build -c Release --no-restore
     - name: Test
-      run: dotnet test --logger trx --results-directory ${{env.BuildArtifactDirectory}}/coverage --collect "XPlat Code Coverage" --settings CodeCoverage.runsettings --no-restore
-    - name: Pack
-      run: dotnet pack --no-build -c Release /p:Version=$BuildVersion /p:PackageOutputPath=${{env.BuildArtifactDirectory}}
+      run: dotnet test --logger trx --results-directory coverage --collect "XPlat Code Coverage" --settings CodeCoverage.runsettings --no-build
+#    - name: Pack
+#      run: dotnet pack --no-build -c Release /p:Version=$BuildVersion /p:PackageOutputPath=${{env.BuildArtifactDirectory}}
     - name: Publish artifacts
       uses: actions/upload-artifact@v2
       with:
         name: ${{matrix.os}}
-        path: ${{env.BuildArtifactDirectory}}
+        path: coverage
 
   coverage:
     name: Process code coverage
