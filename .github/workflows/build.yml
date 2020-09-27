@@ -45,20 +45,20 @@ jobs:
     - name: Install dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build -c Release --no-restore
+      run: dotnet build -c Release --no-restore /p:Version=$BuildVersion
     - name: Test
       run: dotnet test --logger trx --results-directory coverage --collect "XPlat Code Coverage" --settings CodeCoverage.runsettings --no-build
-#    - name: Pack
-#      run: dotnet pack --no-build -c Release /p:Version=$BuildVersion /p:PackageOutputPath=${{env.BuildArtifactDirectory}}
+    - name: Pack
+      if: matrix.os == 'ubuntu-latest'
+      run: dotnet pack -c Release --no-build /p:Version=$BuildVersion
     - name: Publish artifacts
       uses: actions/upload-artifact@v2
       with:
         name: ${{matrix.os}}
-        path: coverage
 
   coverage:
     name: Process code coverage
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     needs: build
     steps:
     - name: Download coverage reports
@@ -70,3 +70,15 @@ jobs:
 #      with:
 #        file: Cobertura.xml
 #        fail_ci_if_error: false
+
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release'
+    steps:
+    - name: Download build
+      uses: actions/download-artifact@v2
+      with:
+        runs-on: ubuntu-latest
+    - run: ls
+    # TODO: Do something
