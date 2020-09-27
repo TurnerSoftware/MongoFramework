@@ -51,7 +51,7 @@ jobs:
     - name: Install dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build -c Release /p:Version=${{env.BuildVersion}}
+      run: dotnet build -c Release --no-restore /p:Version=${{env.BuildVersion}}
     - name: Test
       run: dotnet test --logger trx --results-directory coverage --collect "XPlat Code Coverage" --settings CodeCoverage.runsettings
     - name: Pack
