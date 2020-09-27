@@ -77,7 +77,7 @@ jobs:
     - name: Install ReportGenerator tool
       run: dotnet tool install -g dotnet-reportgenerator-globaltool
     - name: Prepare coverage reports
-      run: reportgenerator -reports:*/coverage/*/coverage.cobertura.xml -reporttypes:Cobertura
+      run: reportgenerator -reports:*/coverage/*/coverage.cobertura.xml -targetdir:./ -reporttypes:Cobertura
     - name: Upload coverage reports
       uses: codecov/codecov-action@v1.0.13
       with:
