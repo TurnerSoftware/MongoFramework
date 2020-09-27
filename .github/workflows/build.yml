@@ -18,6 +18,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macOS-latest]
 #        mongodb: [3.6]
     steps:
+    - run: ls -la
     - name: Identify build version
       run: ./build-version.ps1
       shell: pwsh
