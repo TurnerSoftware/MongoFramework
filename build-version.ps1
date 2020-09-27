@@ -18,4 +18,5 @@ if ($prereleaseVersion) {
 	$buildVersion = "$baseBuildVersion-$prereleaseVersion+$buildMetadata"
 }
 
-Set-Env BuildVersion $buildVersion
+Write-Host $buildVersion
+Exit 1
