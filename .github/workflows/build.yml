@@ -57,14 +57,15 @@ jobs:
     - name: Build
       run: dotnet build -c Release --no-restore /p:Version=${{env.BuildVersion}}
     - name: Test
-      run: dotnet test --logger trx --results-directory coverage --collect "XPlat Code Coverage" --settings CodeCoverage.runsettings
+      run: dotnet test --logger trx --results-directory ./build-artifacts/coverage --collect "XPlat Code Coverage" --settings CodeCoverage.runsettings
     - name: Pack
       if: matrix.os == 'ubuntu-latest'
-      run: dotnet pack -c Release --no-build /p:Version=${{env.BuildVersion}}
+      run: dotnet pack -c Release --no-build /p:Version=${{env.BuildVersion}} /p:PackageOutputPath=./build-artifacts
     - name: Publish artifacts
       uses: actions/upload-artifact@v2
       with:
         name: ${{matrix.os}}
+        path: ./build-artifacts
 
   coverage:
     name: Process code coverage
@@ -75,11 +76,11 @@ jobs:
       uses: actions/download-artifact@v2
     - name: Prepare coverage reports
       run: reportgenerator -reports:*/coverage/*/coverage.cobertura.xml -reporttypes:Cobertura
-#    - name: Upload coverage reports
-#      uses: codecov/codecov-action@v1.0.13
-#      with:
-#        file: Cobertura.xml
-#        fail_ci_if_error: false
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v1.0.13
+      with:
+        file: Cobertura.xml
+        fail_ci_if_error: false
 
   release:
     name: Release
