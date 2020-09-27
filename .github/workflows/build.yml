@@ -74,6 +74,8 @@ jobs:
     steps:
     - name: Download coverage reports
       uses: actions/download-artifact@v2
+    - name: Install ReportGenerator tool
+      run: dotnet tool install -g dotnet-reportgenerator-globaltool
     - name: Prepare coverage reports
       run: reportgenerator -reports:*/coverage/*/coverage.cobertura.xml -reporttypes:Cobertura
     - name: Upload coverage reports
@@ -85,6 +87,7 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    needs: build
     if: github.event_name == 'release'
     steps:
     - name: Download build
