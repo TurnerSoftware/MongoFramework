@@ -7,7 +7,7 @@ on:
 
 env:
   BuildArtifactDirectory: build-artifacts
-  BuildVersion: -${{GITHUB_RUN_ID}}
+  BuildVersion: 
 
 jobs:
   build:
