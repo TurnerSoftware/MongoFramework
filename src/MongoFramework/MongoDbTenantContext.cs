@@ -1,4 +1,5 @@
 ﻿using MongoFramework.Infrastructure.Commands;
+using MongoFramework.Utilities;
 using System;
 
 namespace MongoFramework
@@ -9,7 +10,8 @@ namespace MongoFramework
 
 		public MongoDbTenantContext(IMongoDbConnection connection, string tenantId) : base(connection)
 		{
-			TenantId = tenantId ?? throw new ArgumentNullException(nameof(tenantId));
+			Check.NotNull(tenantId, nameof(tenantId));
+			TenantId = tenantId;
 		}
 
 		protected override void AfterDetectChanges()

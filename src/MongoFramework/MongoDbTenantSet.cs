@@ -1,10 +1,11 @@
-﻿using MongoFramework.Infrastructure.Linq;
+using MongoFramework.Infrastructure.Linq;
 using MongoFramework.Infrastructure.Linq.Processors;
 using MongoFramework.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using MongoFramework.Utilities;
 
 namespace MongoFramework
 {
@@ -24,10 +25,8 @@ namespace MongoFramework
 
 		protected virtual void CheckEntity(TEntity entity)
 		{
-			if (entity == null)
-			{
-				throw new ArgumentNullException(nameof(entity));
-			}
+			Check.NotNull(entity, nameof(entity));
+			
 			if (entity.TenantId != Context.TenantId)
 			{
 				throw new MultiTenantException($"Entity type {entity.GetType().Name}, tenant ID does not match. Expected: {Context.TenantId}, Entity has: {entity.TenantId}");
@@ -36,10 +35,8 @@ namespace MongoFramework
 
 		protected virtual void CheckEntities(IEnumerable<TEntity> entities)
 		{
-			if (entities == null)
-			{
-				throw new ArgumentNullException(nameof(entities));
-			}
+			Check.NotNull(entities, nameof(entities));
+			
 			foreach (var entity in entities)
 			{
 				CheckEntity(entity);
@@ -48,20 +45,15 @@ namespace MongoFramework
 
 		public override void Add(TEntity entity)
 		{
-			if (entity == null)
-			{
-				throw new ArgumentNullException(nameof(entity));
-			}
+			Check.NotNull(entity, nameof(entity));
+
 			entity.TenantId = Context.TenantId;
 			base.Add(entity);
 		}
 
 		public override void AddRange(IEnumerable<TEntity> entities)
 		{
-			if (entities == null)
-			{
-				throw new ArgumentNullException(nameof(entities));
-			}
+			Check.NotNull(entities, nameof(entities));
 
 			foreach (var entity in entities)
 			{

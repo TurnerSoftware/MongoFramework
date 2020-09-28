@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using MongoDB.Bson.Serialization;
 using MongoFramework.Attributes;
+using MongoFramework.Utilities;
 
 namespace MongoFramework.Infrastructure.Serialization
 {
@@ -14,10 +15,7 @@ namespace MongoFramework.Infrastructure.Serialization
 
 		public override IBsonSerializer GetSerializer(Type type, IBsonSerializerRegistry serializerRegistry)
 		{
-			if (type == null)
-			{
-				throw new ArgumentNullException(nameof(type));
-			}
+			Check.NotNull(type, nameof(type));
 
 			if (Enabled && (type.GetCustomAttribute<RuntimeTypeDiscoveryAttribute>() != null || type == typeof(object)))
 			{

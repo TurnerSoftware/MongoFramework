@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using MongoDB.Driver;
 using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Diagnostics;
+using MongoFramework.Utilities;
 
 namespace MongoFramework
 {
@@ -34,10 +35,7 @@ namespace MongoFramework
 
 		public static MongoDbConnection FromUrl(MongoUrl mongoUrl)
 		{
-			if (mongoUrl == null)
-			{
-				throw new ArgumentNullException(nameof(mongoUrl));
-			}
+			Check.NotNull(mongoUrl, nameof(mongoUrl));
 
 			return new MongoDbConnection
 			{

@@ -9,6 +9,7 @@ using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Commands;
 using MongoFramework.Infrastructure.Indexing;
 using MongoFramework.Infrastructure.Mapping;
+using MongoFramework.Utilities;
 
 namespace MongoFramework
 {
@@ -24,7 +25,8 @@ namespace MongoFramework
 
 		public MongoDbBucketSet(IMongoDbContext context, IDbSetOptions options)
 		{
-			Context = context ?? throw new ArgumentNullException(nameof(context));
+			Check.NotNull(context, nameof(context));
+			Context = context;
 
 			if (options is BucketSetOptions bucketOptions)
 			{
@@ -55,30 +57,16 @@ namespace MongoFramework
 
 		public virtual void Add(TGroup group, TSubEntity entity)
 		{
-			if (group == null)
-			{
-				throw new ArgumentNullException(nameof(group));
-			}
-
-			if (entity == null)
-			{
-				throw new ArgumentNullException(nameof(entity));
-			}
+			Check.NotNull(group, nameof(group));
+			Check.NotNull(entity, nameof(entity));
 
 			Context.CommandStaging.Add(new AddToBucketCommand<TGroup, TSubEntity>(group, entity, EntityTimeProperty, BucketSize));
 		}
 
 		public virtual void AddRange(TGroup group, IEnumerable<TSubEntity> entities)
 		{
-			if (group == null)
-			{
-				throw new ArgumentNullException(nameof(group));
-			}
-
-			if (entities == null)
-			{
-				throw new ArgumentNullException(nameof(entities));
-			}
+			Check.NotNull(group, nameof(group));
+			Check.NotNull(entities, nameof(entities));
 
 			foreach (var entity in entities)
 			{
@@ -88,10 +76,7 @@ namespace MongoFramework
 
 		public virtual void Remove(TGroup group)
 		{
-			if (group == null)
-			{
-				throw new ArgumentNullException(nameof(group));
-			}
+			Check.NotNull(group, nameof(group));
 
 			Context.CommandStaging.Add(new RemoveBucketCommand<TGroup, TSubEntity>(group));
 		}
