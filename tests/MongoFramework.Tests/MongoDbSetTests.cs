@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -59,7 +60,7 @@ namespace MongoFramework.Tests
 
 			var model = new TestModel
 			{
-				Description = "ValueSync"
+				Description = "SuccessfulInsertAndFind"
 			};
 
 			dbSet.Add(model);
@@ -68,8 +69,8 @@ namespace MongoFramework.Tests
 
 			context = new MongoDbContext(connection);
 			dbSet = new MongoDbSet<TestModel>(context);
-			Assert.IsTrue(dbSet.Find(model.Id).Description == "ValueSync");
-			Assert.IsTrue(context.ChangeTracker.GetEntry(model).State == MongoFramework.Infrastructure.EntityEntryState.NoChanges);			
+			Assert.AreEqual("SuccessfulInsertAndFind", dbSet.Find(model.Id).Description);
+			Assert.AreEqual(MongoFramework.Infrastructure.EntityEntryState.NoChanges, context.ChangeTracker.GetEntry(model).State);			
 		}
 
 		[TestMethod]
@@ -81,7 +82,7 @@ namespace MongoFramework.Tests
 
 			var model = new TestModel
 			{
-				Description = "ValueSync"
+				Description = "SuccessfulNullFind"
 			};
 
 			dbSet.Add(model);
@@ -101,14 +102,24 @@ namespace MongoFramework.Tests
 			var model = new TestModel
 			{
 				Id = "abcd",
-				Description = "ValueSync"
+				Description = "SuccessfullyFindTracked"
 			};
 
 			dbSet.Add(model);
 
 			//Note: not saving, but still should be found as tracked
-			Assert.IsTrue(dbSet.Find(model.Id).Description == "ValueSync");
-			Assert.IsTrue(context.ChangeTracker.GetEntry(model).State == MongoFramework.Infrastructure.EntityEntryState.Added);
+			Assert.AreEqual("SuccessfullyFindTracked", dbSet.Find(model.Id).Description);
+			Assert.AreEqual(MongoFramework.Infrastructure.EntityEntryState.Added, context.ChangeTracker.GetEntry(model).State);
+		}
+
+		[TestMethod]
+		public void FindRequiresId()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<TestModel>(context);
+
+			Assert.ThrowsException<ArgumentNullException>(() => dbSet.Find(null));
 		}
 
 		[TestMethod]

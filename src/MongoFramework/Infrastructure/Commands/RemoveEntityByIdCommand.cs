@@ -18,10 +18,10 @@ namespace MongoFramework.Infrastructure.Commands
 			EntityId = entityId;
 		}
 
-		public IEnumerable<WriteModel<TEntity>> GetModel()
+		public IEnumerable<WriteModel<TEntity>> GetModel(WriteModelOptions options)
 		{
 			var definition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
-			yield return new DeleteOneModel<TEntity>(definition.CreateIdFilter<TEntity>(EntityId));
+			yield return new DeleteOneModel<TEntity>(definition.CreateIdFilter<TEntity>(EntityId, options?.TenantId));
 		}
 	}
 }

@@ -46,7 +46,9 @@ namespace MongoFramework
 		public virtual TEntity Find(object id) 
 		{
 			if (id == null)
+			{
 				throw new ArgumentNullException(nameof(id));
+			}
 
 			var tracked = Context.ChangeTracker.GetEntryById<TEntity>(id);
 
@@ -190,7 +192,7 @@ namespace MongoFramework
 
 		#region IQueryable Implementation
 
-		private IQueryable<TEntity> GetQueryable()
+		protected virtual IQueryable<TEntity> GetQueryable()
 		{
 			var queryable = Context.Query<TEntity>();
 			var provider = queryable.Provider as IMongoFrameworkQueryProvider<TEntity>;

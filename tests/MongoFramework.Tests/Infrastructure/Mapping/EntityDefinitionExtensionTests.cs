@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MongoFramework.Infrastructure.Commands;
 using MongoFramework.Infrastructure.Mapping;
 
 namespace MongoFramework.Tests.Infrastructure.Mapping
@@ -58,6 +59,12 @@ namespace MongoFramework.Tests.Infrastructure.Mapping
 		public class OverridePropertyGrandChildModel : OverridePropertyChildModel
 		{
 
+		}
+
+		public class TenantModel : IHaveTenantId
+		{
+			public string Id { get; set; }
+			public string TenantId { get; set; }
 		}
 
 		[TestMethod]
@@ -124,5 +131,13 @@ namespace MongoFramework.Tests.Infrastructure.Mapping
 			Assert.AreEqual(1, allProperties.Length);
 			Assert.AreEqual(typeof(OverridePropertyBaseModel), allProperties[0].EntityType);
 		}
+
+		[TestMethod]
+		public void GetTenantModelIdRequiresTenant()
+		{
+			var definition = EntityMapping.RegisterType(typeof(TenantModel));
+			Assert.ThrowsException<ArgumentException>(() => definition.CreateIdFilter<TenantModel>("id"));
+		}
+
 	}
 }
