@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MongoFramework.Bson;
 using MongoFramework.Infrastructure.Mapping;
+using MongoFramework.Utilities;
 
 namespace MongoFramework.Infrastructure
 {
@@ -36,10 +37,7 @@ namespace MongoFramework.Infrastructure
 
 		public EntityEntry GetEntry<TCollectionBase>(TCollectionBase entity)
 		{
-			if (entity is null)
-			{
-				throw new ArgumentNullException(nameof(entity));
-			}
+			Check.NotNull(entity, nameof(entity));
 
 			var collectionType = typeof(TCollectionBase);
 
@@ -90,10 +88,7 @@ namespace MongoFramework.Infrastructure
 		}
 		public EntityEntry SetEntityState<TCollectionBase>(TCollectionBase entity, EntityEntryState state) where TCollectionBase : class
 		{
-			if (entity is null)
-			{
-				throw new ArgumentNullException(nameof(entity));
-			}
+			Check.NotNull(entity, nameof(entity));
 
 			var entry = GetEntry(entity);
 			if (entry != null)

@@ -1,9 +1,10 @@
-﻿using MongoDB.Driver;
+using MongoDB.Driver;
 using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Commands;
 using MongoFramework.Infrastructure.Linq;
 using MongoFramework.Infrastructure.Linq.Processors;
 using MongoFramework.Infrastructure.Mapping;
+using MongoFramework.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -24,7 +25,8 @@ namespace MongoFramework
 
 		public MongoDbSet(IMongoDbContext context)
 		{
-			Context = context ?? throw new ArgumentNullException(nameof(context));
+			Check.NotNull(context, nameof(context));
+			Context = context;
 		}
 
 		public virtual TEntity Create()
@@ -45,10 +47,7 @@ namespace MongoFramework
 		/// <returns>The entity found, or null.</returns>
 		public virtual TEntity Find(object id) 
 		{
-			if (id == null)
-			{
-				throw new ArgumentNullException(nameof(id));
-			}
+			Check.NotNull(id, nameof(id));
 
 			var tracked = Context.ChangeTracker.GetEntryById<TEntity>(id);
 
@@ -78,10 +77,7 @@ namespace MongoFramework
 		/// <param name="entity"></param>
 		public virtual void Add(TEntity entity)
 		{
-			if (entity == null)
-			{
-				throw new ArgumentNullException(nameof(entity));
-			}
+			Check.NotNull(entity, nameof(entity));
 
 			Context.ChangeTracker.SetEntityState(entity, EntityEntryState.Added);
 		}
@@ -91,10 +87,7 @@ namespace MongoFramework
 		/// <param name="entities"></param>
 		public virtual void AddRange(IEnumerable<TEntity> entities)
 		{
-			if (entities == null)
-			{
-				throw new ArgumentNullException(nameof(entities));
-			}
+			Check.NotNull(entities, nameof(entities));
 
 			foreach (var entity in entities)
 			{
@@ -108,10 +101,7 @@ namespace MongoFramework
 		/// <param name="entity"></param>
 		public virtual void Update(TEntity entity)
 		{
-			if (entity == null)
-			{
-				throw new ArgumentNullException(nameof(entity));
-			}
+			Check.NotNull(entity, nameof(entity));
 
 			Context.ChangeTracker.SetEntityState(entity, EntityEntryState.Updated);
 		}
@@ -121,10 +111,7 @@ namespace MongoFramework
 		/// <param name="entities"></param>
 		public virtual void UpdateRange(IEnumerable<TEntity> entities)
 		{
-			if (entities == null)
-			{
-				throw new ArgumentNullException(nameof(entities));
-			}
+			Check.NotNull(entities, nameof(entities));
 
 			foreach (var entity in entities)
 			{
@@ -138,10 +125,7 @@ namespace MongoFramework
 		/// <param name="entity"></param>
 		public virtual void Remove(TEntity entity)
 		{
-			if (entity == null)
-			{
-				throw new ArgumentNullException(nameof(entity));
-			}
+			Check.NotNull(entity, nameof(entity));
 
 			Context.ChangeTracker.SetEntityState(entity, EntityEntryState.Deleted);
 		}
@@ -151,10 +135,7 @@ namespace MongoFramework
 		/// <param name="entities"></param>
 		public virtual void RemoveRange(IEnumerable<TEntity> entities)
 		{
-			if (entities == null)
-			{
-				throw new ArgumentNullException(nameof(entities));
-			}
+			Check.NotNull(entities, nameof(entities));
 
 			foreach (var entity in entities)
 			{
