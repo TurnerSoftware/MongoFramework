@@ -71,7 +71,7 @@ jobs:
       run: dotnet build -c Release --no-restore /p:Version=${{env.BuildVersion}}
     - name: Test
       run: dotnet test --logger trx --results-directory ${{env.BuildArtifactPath}}/coverage --collect "XPlat Code Coverage" --settings CodeCoverage.runsettings
-    - name: Pack
+    - name: Pack (Ubuntu)
       if: matrix.os == 'ubuntu-latest'
       run: dotnet pack -c Release --no-build /p:Version=${{env.BuildVersion}} /p:PackageOutputPath=${{env.BuildArtifactPath}}
     - name: Publish artifacts
