@@ -32,7 +32,7 @@ jobs:
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
     - name: Get Version
-      run: > 
+      run: | 
       $githubRunId = $env:GITHUB_RUN_ID;
       $prNumber = $env:GITHUB_PR;
       $gitSourceVersion = git describe --tags --abbrev=7 --always 2>$1;
