@@ -47,6 +47,10 @@ jobs:
     - name: Configure Build Version
       run: ./.github/workflows/buildversion.ps1
       shell: pwsh
+      env:
+        GITHUB_PR: ${{steps.findPr.output.pr}}
+    - name: Print Build Version
+      run: echo ${{env.BuildVersion}}
 
 #    - name: Setup MongoDB (MacOS)
 #      if: matrix.os == 'macOS-latest'
