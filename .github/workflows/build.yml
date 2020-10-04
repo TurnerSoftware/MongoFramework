@@ -19,30 +19,9 @@ env:
   BuildArtifactPath: ${{github.workspace}}/build-artifacts
 
 jobs:
-  version:
-    name: Identify Build Version
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Fetch all Git tags
-      run: git fetch --prune --unshallow --tags
-    - name: Get PR Number
-      uses: jwalton/gh-find-current-pr@v1
-      id: findPr
-      with:
-        github-token: ${{secrets.GITHUB_TOKEN}}
-    - name: Get BuildVersion
-      run: ./.github/workflows/buildversion.ps1
-      shell: pwsh
-      env:
-        GITHUB_PR: ${{steps.findPr.outputs.pr}}
-
-
   build:
     name: Build ${{matrix.os}}
     runs-on: ${{matrix.os}}
-    needs: version
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
@@ -57,8 +36,16 @@ jobs:
 
     - name: Checkout
       uses: actions/checkout@v2
-    - name: Identify build version
-      run: ./build-version.ps1
+
+    - name: Fetch all Git tags
+      run: git fetch --prune --unshallow --tags
+    - name: Get PR Number
+      uses: jwalton/gh-find-current-pr@v1
+      id: findPr
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+    - name: Configure Build Version
+      run: ./.github/workflows/buildversion.ps1
       shell: pwsh
 
 #    - name: Setup MongoDB (MacOS)

@@ -12,5 +12,4 @@ if ($gitSourceVersionSplit.length -eq 2) {
 }
 $buildMetadata = "$($commitHash)-$($githubRunId)";
 $customSuffix = $(if($prNumber -ne ''){"-PR$($prNumber)"}elseif($commitsSinceTag -ne '0'){"-dev"});
-$version = "$($version)$($customSuffix)";
-echo "::set-env name=BuildVersion::$($version)+$($buildMetadata)";
+echo "::set-env name=BuildVersion::$($version)$($customSuffix)+$($buildMetadata)";
