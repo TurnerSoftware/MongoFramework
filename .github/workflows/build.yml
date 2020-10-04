@@ -34,7 +34,7 @@ jobs:
     - name: Get Version
       run: > 
       $githubRunId = $env:GITHUB_RUN_ID;
-      $prNumber = "${{steps.findPr.outputs.pr}}";
+      $prNumber = $env:GITHUB_PR;
       $gitSourceVersion = git describe --tags --abbrev=7 --always 2>$1;
       $version = $(if($gitSourceVersion.length -eq 1){"0.0.0"}else{$gitSourceVersion[0]});
       $commitsSinceTag = '0';
@@ -48,6 +48,8 @@ jobs:
       $version = "$(version)$(if($prNumber -Not ''){"-PR$($prNumber)"}elseif($commitsSinceTag -Not '0'){"-dev"})";
       echo "::set-env name=BuildVersion::$($version)+$($buildMetadata)";
       shell: pwsh
+      env:
+        GITHUB_PR: ${{steps.findPr.outputs.pr}}
 
 
   build:
