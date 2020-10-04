@@ -20,7 +20,8 @@ env:
 
 jobs:
   version:
-    name: Identify Version
+    name: Identify Build Version
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v2
