@@ -33,10 +33,10 @@ jobs:
         github-token: ${{secrets.GITHUB_TOKEN}}
     - name: Get Version
       run: |
-      $githubRunId = $env:GITHUB_RUN_ID;
-      $prNumber = $env:GITHUB_PR;
+      $githubRunId = $env&#58;GITHUB_RUN_ID;
+      $prNumber = $env&#58;GITHUB_PR;
       $gitSourceVersion = git describe --tags --abbrev=7 --always 2>$1;
-      $gitSourceVersionSplit = [regex]::split($gitSourceVersion, "-(?=\d+-\w+)");
+      $gitSourceVersionSplit = [regex]&#58;&#58;split($gitSourceVersion, "-(?=\d+-\w+)");
       $version = $(if($gitSourceVersionSplit.length -eq 1){"0.0.0"}else{$gitSourceVersionSplit[0]});
       $commitsSinceTag = '0';
       $commitHash = $gitSourceVersionSplit[0];
@@ -48,7 +48,7 @@ jobs:
       $buildMetadata = "$($commitHash)-$($githubRunId)";
       $customSuffix = $(if($prNumber -ne ''){"-PR$($prNumber)"}elseif($commitsSinceTag -ne '0'){"-dev"});
       $version = "$($version)$($customSuffix)";
-      echo "::set-env name=BuildVersion::$($version)+$($buildMetadata)";
+      echo "&#58;&#58;set-env name=BuildVersion&#58;&#58;$($version)+$($buildMetadata)";
       shell: pwsh
       env:
         GITHUB_PR: ${{steps.findPr.outputs.pr}}
