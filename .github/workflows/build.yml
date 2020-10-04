@@ -32,20 +32,22 @@ jobs:
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
     - name: Get Version
-      run: | 
+      run: |
       $githubRunId = $env:GITHUB_RUN_ID;
       $prNumber = $env:GITHUB_PR;
       $gitSourceVersion = git describe --tags --abbrev=7 --always 2>$1;
-      $version = $(if($gitSourceVersion.length -eq 1){"0.0.0"}else{$gitSourceVersion[0]});
+      $gitSourceVersionSplit = [regex]::split($gitSourceVersion, "-(?=\d+-\w+)");
+      $version = $(if($gitSourceVersionSplit.length -eq 1){"0.0.0"}else{$gitSourceVersionSplit[0]});
       $commitsSinceTag = '0';
-      $commitHash = $gitSourceVersion[0];
-      if ($gitSourceVersion.length -eq 2) {
-          $gitMetadata = $gitSourceVersion[1].split("-");
+      $commitHash = $gitSourceVersionSplit[0];
+      if ($gitSourceVersionSplit.length -eq 2) {
+          $gitMetadata = $gitSourceVersionSplit[1].split("-");
           $commitsSinceTag = $gitMetadata[0];
           $commitHash = $gitMetadata[1];
       }
       $buildMetadata = "$($commitHash)-$($githubRunId)";
-      $version = "$(version)$(if($prNumber -Not ''){"-PR$($prNumber)"}elseif($commitsSinceTag -Not '0'){"-dev"})";
+      $customSuffix = $(if($prNumber -ne ''){"-PR$($prNumber)"}elseif($commitsSinceTag -ne '0'){"-dev"});
+      $version = "$($version)$($customSuffix)";
       echo "::set-env name=BuildVersion::$($version)+$($buildMetadata)";
       shell: pwsh
       env:
