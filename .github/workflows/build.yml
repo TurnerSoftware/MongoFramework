@@ -48,7 +48,7 @@ jobs:
       run: ./.github/workflows/buildversion.ps1
       shell: pwsh
       env:
-        GITHUB_PR: ${{steps.findPr.output.pr}}
+        GITHUB_PR: ${{steps.findPr.outputs.pr}}
     - name: Print Build Version
       run: echo ${{env.BuildVersion}}
 
