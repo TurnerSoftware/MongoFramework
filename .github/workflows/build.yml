@@ -32,7 +32,9 @@ jobs:
       run: git fetch --prune --unshallow --tags
     - name: Get current commit hash
       id: commitHash
-      run: echo "::set-output name=sha::$(git rev-parse HEAD)"
+      run: |
+        $commitHashes = $(git rev-list --parents -n 1 HEAD).split(' ');
+        echo "::set-env name=PR_COMMIT_HASH::$($commitHashes[$commitHashes.length - 1])";
     #- name: Get PR Number
     #  run: ./.github/actions/prnumber.ps1
     #  shell: pwsh
@@ -41,7 +43,7 @@ jobs:
       id: findPr
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
-        sha: ${{steps.commitHash.outputs.sha}}
+        sha: ${{env.PR_COMMIT_HASH}}
     - name: Debug PR number
       run: echo "$PR_NUMBER"
     - name: Configure build version
