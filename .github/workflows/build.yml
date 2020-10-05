@@ -34,7 +34,7 @@ jobs:
       run: ./.github/actions/prnumber.ps1
       shell: pwsh
     - name: Debug PR Number
-      run: echo "$GITHUB_PR"
+      run: echo "$PR_NUMBER"
     - name: Configure Build Version
       run: ./.github/actions/buildversion.ps1
       shell: pwsh

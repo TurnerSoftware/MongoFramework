@@ -1,5 +1,5 @@
 $githubRunId = $env:GITHUB_RUN_ID;
-$prNumber = $env:GITHUB_PR;
+$prNumber = $env:PR_NUMBER;
 $gitSourceVersion = git describe --tags --abbrev=7 --always 2>$1;
 $gitSourceVersionSplit = [regex]::split($gitSourceVersion, "-(?=\d+-\w+)");
 $version = $(if($gitSourceVersionSplit.length -eq 1){"0.0.0"}else{$gitSourceVersionSplit[0]});
