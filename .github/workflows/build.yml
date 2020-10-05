@@ -32,9 +32,7 @@ jobs:
       run: git fetch --prune --unshallow --tags
     - name: Get current commit hash
       id: commitHash
-      run: git rev-parse HEAD
-      outputs:
-        sha:
+      run: echo "::set-output name=sha::$(git rev-parse HEAD)"
     #- name: Get PR Number
     #  run: ./.github/actions/prnumber.ps1
     #  shell: pwsh
