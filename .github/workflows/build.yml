@@ -27,7 +27,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-    
     - name: Fetch all Git tags
       run: git fetch --prune --unshallow --tags
     - name: Get PR's commit hash
@@ -35,13 +34,13 @@ jobs:
       run: |
         $commitHashes = $(git rev-list --parents -n 1 HEAD).split(' ');
         echo "::set-env name=PR_COMMIT_HASH::$($commitHashes[$commitHashes.length - 1])";
-    - name: Get PR number
+    - name: Find PR number
       uses: jwalton/gh-find-current-pr@v1
       id: findPr
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
         sha: ${{env.PR_COMMIT_HASH}}
-    - name: Debug PR number
+    - name: Print PR number
       run: echo "$PR_NUMBER"
       env:
         PR_NUMBER: ${{steps.findPr.outputs.pr}}
