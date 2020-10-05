@@ -29,21 +29,6 @@ jobs:
       uses: actions/checkout@v2
     - name: Fetch all Git tags
       run: git fetch --prune --unshallow --tags
-    - name: Get PR's commit hash
-      shell: pwsh
-      run: |
-        $commitHashes = $(git rev-list --parents -n 1 HEAD).split(' ');
-        echo "::set-env name=PR_COMMIT_HASH::$($commitHashes[$commitHashes.length - 1])";
-    - name: Find PR number
-      uses: jwalton/gh-find-current-pr@v1
-      id: findPr
-      with:
-        github-token: ${{secrets.GITHUB_TOKEN}}
-        sha: ${{env.PR_COMMIT_HASH}}
-    - name: Print PR number
-      run: echo "$PR_NUMBER"
-      env:
-        PR_NUMBER: ${{steps.findPr.outputs.pr}}
     - name: Configure build version
       run: |
         $githubRunId = $env:GITHUB_RUN_ID;
@@ -63,7 +48,7 @@ jobs:
         echo "::set-env name=BUILD_VERSION::$($version)$($customSuffix)+$($buildMetadata)";
       shell: pwsh
       env:
-        PR_NUMBER: ${{steps.findPr.outputs.pr}}
+        PR_NUMBER: ${{github.event.number}}
     - name: Print build version
       run: echo ${{env.BUILD_VERSION}}
 
