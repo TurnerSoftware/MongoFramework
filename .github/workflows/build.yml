@@ -30,8 +30,7 @@ jobs:
     
     - name: Fetch all Git tags
       run: git fetch --prune --unshallow --tags
-    - name: Get current commit hash
-      id: commitHash
+    - name: Get PR's commit hash
       shell: pwsh
       run: |
         $commitHashes = $(git rev-list --parents -n 1 HEAD).split(' ');
@@ -47,9 +46,13 @@ jobs:
         sha: ${{env.PR_COMMIT_HASH}}
     - name: Debug PR number
       run: echo "$PR_NUMBER"
+      env:
+        PR_NUMBER: ${{steps.findPr.outputs.pr}}
     - name: Configure build version
       run: ./.github/actions/buildversion.ps1
       shell: pwsh
+      env:
+        PR_NUMBER: ${{steps.findPr.outputs.pr}}
     - name: Print build version
       run: echo ${{env.BUILD_VERSION}}
 
