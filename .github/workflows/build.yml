@@ -77,22 +77,13 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-        mongodb: [3.6, 4.0, 4.4]
     steps:
     - name: Configure MongoDB (MacOS)
       if: matrix.os == 'macOS-latest'
-      run: |
-        brew tap mongodb/brew
-        brew install mongodb-community@${{matrix.mongodb}}
-        brew services start mongodb-community@${{matrix.mongodb}}
+      run: brew services start mongodb-community
     - name: Configure MongoDB (Ubuntu)
       if: matrix.os == 'ubuntu-latest'
-      run: |
-        sudo apt-get install mongodb=${{matrix.mongodb}}.0
-        sudo systemctl start mongod
-    - name: Configure MongoDB (Windows)
-      if: matrix.os == 'windows-latest'
-      run: choco install mongodb --version=${{matrix.mongodb}}.0
+      run: sudo systemctl start mongod
 
     - name: Checkout
       uses: actions/checkout@v2
