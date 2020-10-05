@@ -32,6 +32,7 @@ jobs:
       run: git fetch --prune --unshallow --tags
     - name: Get current commit hash
       id: commitHash
+      shell: pwsh
       run: |
         $commitHashes = $(git rev-list --parents -n 1 HEAD).split(' ');
         echo "::set-env name=PR_COMMIT_HASH::$($commitHashes[$commitHashes.length - 1])";
