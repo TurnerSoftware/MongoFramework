@@ -28,16 +28,11 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
     
-    - name: Fetch all Git tags
-      run: git fetch --prune --unshallow --tags
     - name: Get PR's commit hash
       shell: pwsh
       run: |
         $commitHashes = $(git rev-list --parents -n 1 HEAD).split(' ');
         echo "::set-env name=PR_COMMIT_HASH::$($commitHashes[$commitHashes.length - 1])";
-    #- name: Get PR Number
-    #  run: ./.github/actions/prnumber.ps1
-    #  shell: pwsh
     - name: Get PR number
       uses: jwalton/gh-find-current-pr@v1
       id: findPr
