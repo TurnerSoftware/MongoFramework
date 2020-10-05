@@ -1,7 +1,6 @@
 [CmdletBinding(PositionalBinding=$false)]
 param(
 	[bool] $RunTests = $true,
-	[bool] $CheckCoverage,
 	[bool] $CreatePackages,
 	[string] $BuildVersion
 )
@@ -22,7 +21,6 @@ if (-not $BuildVersion) {
 
 Write-Host "Run Parameters:" -ForegroundColor Cyan
 Write-Host "  RunTests: $RunTests"
-Write-Host "  CheckCoverage: $CheckCoverage"
 Write-Host "  CreatePackages: $CreatePackages"
 Write-Host "  BuildVersion: $BuildVersion"
 Write-Host "Configuration:" -ForegroundColor Cyan
@@ -40,46 +38,13 @@ if ($LastExitCode -ne 0) {
 Write-Host "Solution built!" -ForegroundColor "Green"
 
 if ($RunTests) {
-	if (-Not $CheckCoverage) {
-		Write-Host "Running tests without coverage..." -ForegroundColor "Magenta"
-		dotnet test $config.TestProject
-		if ($LastExitCode -ne 0) {
-			Write-Host "Tests failed, aborting build!" -Foreground "Red"
-			Exit 1
-		}
-		Write-Host "Tests passed!" -ForegroundColor "Green"
+	Write-Host "Running tests..." -ForegroundColor "Magenta"
+	dotnet test $config.TestProject
+	if ($LastExitCode -ne 0) {
+		Write-Host "Tests failed, aborting build!" -Foreground "Red"
+		Exit 1
 	}
-	else {
-		Write-Host "Running tests with coverage..." -ForegroundColor "Magenta"
-		dotnet test $config.TestProject --logger trx --results-directory $packageOutputFolder\coverage --collect "XPlat Code Coverage" --settings CodeCoverage.runsettings
-
-		if ($LastExitCode -ne 0 -Or -Not $?) {
-			Write-Host "Failure performing tests with coverage, aborting!" -Foreground "Red"
-			Exit 1
-		}
-		else {
-			Write-Host "Tests passed!" -ForegroundColor "Green"
-
-			Write-Host "Finalising coverage report..." -ForegroundColor "Magenta"
-			reportgenerator -reports:$packageOutputFolder/coverage/*/coverage.cobertura.xml -targetdir:$packageOutputFolder -reporttypes:Cobertura
-			if ($LastExitCode -ne 0) {
-				Write-Host "Failure finalising coverage report, aborting!" -Foreground "Red"
-				Exit 1
-			}
-			Rename-Item -Path $packageOutputFolder/Cobertura.xml -NewName $packageOutputFolder/coverage.xml
-			Write-Host "Coverage report finalised!" -ForegroundColor "Green"
-
-			Write-Host "Saving code coverage..." -ForegroundColor "Magenta"
-			codecov -f "$packageOutputFolder\coverage.xml"
-			if ($LastExitCode -ne 0 -Or -Not $?) {
-				Write-Host "Failure saving code coverage!" -Foreground "Red"
-				Exit 1
-			}
-			else {
-				Write-Host "Coverage saved!" -ForegroundColor "Green"
-			}
-		}
-	}
+	Write-Host "Tests passed!" -ForegroundColor "Green"
 }
 
 if ($CreatePackages) {
