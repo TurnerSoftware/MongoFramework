@@ -31,19 +31,12 @@ jobs:
     - name: Fetch all Git tags
       run: git fetch --prune --unshallow --tags
     - name: Get PR Number
-      uses: jwalton/gh-find-current-pr@v1
-      id: findPr
-      with:
-        github-token: ${{secrets.GITHUB_TOKEN}}
-    - name: Debug PR Data
-      env:
-        STEPS_CONTEXT: ${{ toJson(steps.findPr.outputs) }}
-      run: echo "$STEPS_CONTEXT"
+      run: ./.github/actions/prnumber.ps1
+    - name: Debug PR Number
+      run: echo "$GITHUB_PR"
     - name: Configure Build Version
-      run: ./.github/workflows/buildversion.ps1
+      run: ./.github/actions/buildversion.ps1
       shell: pwsh
-      env:
-        GITHUB_PR: ${{steps.findPr.outputs.pr}}
     - name: Print Build Version
       run: echo ${{env.BUILD_VERSION}}
 
