@@ -77,30 +77,25 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-#        mongodb: [3.6]
+        mongodb: [3.6, 4.0, 4.4]
     steps:
-    - name: Start MongoDB (Ubuntu)
-      if: matrix.os == 'ubuntu-latest'
-      run: sudo systemctl start mongod
-    - name: Start MongoDB (MacOS)
+    - name: Configure MongoDB (MacOS)
       if: matrix.os == 'macOS-latest'
-      run: brew services start mongodb-community
+      run: |
+        brew tap mongodb/brew
+        brew install mongodb-community@${{matrix.mongodb}}
+        brew services start mongodb-community@${{matrix.mongodb}}
+    - name: Configure MongoDB (Ubuntu)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get install mongodb=${{matrix.mongodb}}.0
+        sudo systemctl start mongod
+    - name: Configure MongoDB (Windows)
+      if: matrix.os == 'windows-latest'
+      run: choco install mongodb --version=${{matrix.mongodb}}.0
 
     - name: Checkout
       uses: actions/checkout@v2
-
-#    - name: Setup MongoDB (MacOS)
-#      if: matrix.os == 'macOS-latest'
-#      run: |
-#        brew tap mongodb/brew | 
-#        brew install mongodb-community@${{matrix.mongodb}} |
-#        brew services start mongodb-community@${{matrix.mongodb}}
-#    - name: Setup MongoDB (Ubuntu)
-#      if: matrix.os == 'ubuntu-latest'
-#      run: sudo apt-get install mongodb=${{matrix.mongodb}}.0
-#    - name: Setup MongoDB (Windows)
-#      if: matrix.os == 'windows-latest'
-#      run: choco install mongodb --version=${{matrix.mongodb}}.0
 
     - name: Install dependencies
       run: dotnet restore
@@ -108,8 +103,7 @@ jobs:
       run: dotnet build -c Release --no-restore /p:Version=${{env.BUILD_VERSION}}
     - name: Test
       run: dotnet test --logger trx --results-directory ${{env.BUILD_ARTIFACT_PATH}}/coverage --collect "XPlat Code Coverage" --settings CodeCoverage.runsettings
-    - name: Pack (Ubuntu)
-      if: matrix.os == 'ubuntu-latest'
+    - name: Pack
       run: dotnet pack -c Release --no-build /p:Version=${{env.BUILD_VERSION}} /p:PackageOutputPath=${{env.BUILD_ARTIFACT_PATH}}
     - name: Publish artifacts
       uses: actions/upload-artifact@v2
