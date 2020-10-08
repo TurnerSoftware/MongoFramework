@@ -64,7 +64,7 @@ namespace MongoFramework.Infrastructure.Indexing
 					builder.Ascending(indexDefinition.Property.FullPath) : builder.Descending(indexDefinition.Property.FullPath);
 			}
 
-			if (typeof(IHaveTenantId).IsAssignableFrom(typeof(TEntity)))
+			if (indexDefinition.IndexTenant && typeof(IHaveTenantId).IsAssignableFrom(typeof(TEntity)))
 			{
 				var tenantKey = indexDefinition.SortOrder == IndexSortOrder.Ascending ?
 					builder.Ascending("TenantId") : builder.Descending("TenantId");

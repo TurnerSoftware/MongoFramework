@@ -9,5 +9,6 @@ namespace MongoFramework.Infrastructure.Mapping
 		IndexSortOrder SortOrder { get; }
 		int IndexPriority { get; }
 		IndexType IndexType { get; }
+		bool IndexTenant { get; set; }
 	}
 }
