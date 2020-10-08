@@ -1,8 +1,10 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using MongoDB.Driver;
+using MongoFramework.Attributes;
 
 namespace MongoFramework.Tests
 {
@@ -17,7 +19,14 @@ namespace MongoFramework.Tests
 			public string Description { get; set; }
 			public bool BooleanField { get; set; }
 		}
+		public class TestUniqueModel : IHaveTenantId
+		{
+			public string Id { get; set; }
+			public string TenantId { get; set; }
 
+			[Index(IndexType.Standard, IsUnique = true)]
+			public string UserName { get; set; }
+		}
 		[TestMethod]
 		public void SuccessfulCreateTenantId()
 		{
@@ -533,6 +542,50 @@ namespace MongoFramework.Tests
 			Assert.ThrowsException<ArgumentNullException>(() => dbSet.AddRange(null));
 			Assert.ThrowsException<ArgumentNullException>(() => dbSet.Update(null));
 			Assert.ThrowsException<ArgumentNullException>(() => dbSet.UpdateRange(null));
+		}
+
+		[TestMethod]
+		public void AllowsUniquesByTenant()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbTenantContext(connection, tenantId);
+			var dbSet = new MongoDbTenantSet<TestUniqueModel>(context);
+
+			var context2 = new MongoDbTenantContext(connection, tenantId + "-alt");
+			var dbSet2 = new MongoDbTenantSet<TestUniqueModel>(context2);
+
+			dbSet.Add(new TestUniqueModel{UserName = "AllowsUniquesByTenant.1"});
+			dbSet.Add(new TestUniqueModel{UserName = "AllowsUniquesByTenant.2"});
+			dbSet2.Add(new TestUniqueModel{UserName = "AllowsUniquesByTenant.1"});
+			dbSet2.Add(new TestUniqueModel{UserName = "AllowsUniquesByTenant.2"});
+
+			context.SaveChanges();
+			context2.SaveChanges();
+
+			Assert.AreEqual(2, dbSet.Count());
+			Assert.AreEqual(2, dbSet2.Count());
+		}
+
+		[TestMethod]
+		public void BlocksDuplicatesByTenant()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbTenantContext(connection, tenantId);
+			var dbSet = new MongoDbTenantSet<TestUniqueModel>(context);
+
+			var context2 = new MongoDbTenantContext(connection, tenantId + "-alt");
+			var dbSet2 = new MongoDbTenantSet<TestUniqueModel>(context2);
+
+			dbSet.Add(new TestUniqueModel{UserName = "BlocksDuplicatesByTenant"});
+			dbSet2.Add(new TestUniqueModel{UserName = "BlocksDuplicatesByTenant"});
+
+			context.SaveChanges();
+			context2.SaveChanges();
+
+			dbSet.Add(new TestUniqueModel{UserName = "BlocksDuplicatesByTenant"});
+			Assert.ThrowsException<MongoBulkWriteException<TestUniqueModel>>(() => context.SaveChanges());
 		}
 
 	}
