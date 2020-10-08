@@ -28,7 +28,7 @@ namespace MongoFramework.Attributes
 		/// <summary>
 		/// Whether the index should add a tenant key.
 		/// </summary>
-		public bool IndexTenant { get; set; }
+		public bool IsTenantExclusve { get; set; }
 
 		/// <summary>
 		/// Applies a standard index to the property with the specified sort order.

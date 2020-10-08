@@ -88,7 +88,7 @@ namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 		{
 			public string TenantId { get; set; }
 
-			[Index("UniqueIndex", IndexSortOrder.Ascending, IsUnique = true, IndexTenant = true)]
+			[Index("UniqueIndex", IndexSortOrder.Ascending, IsUnique = true, IsTenantExclusve = true)]
 			public string UniqueIndex { get; set; }
 		}
 
@@ -201,7 +201,7 @@ namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 
 			var indexBsonDocument = indexModel.First().Keys.Render(null, null).ToString();
 
-			Assert.AreEqual("{ \"UniqueIndex\" : 1, \"TenantId\" : 1 }", indexBsonDocument);
+			Assert.AreEqual("{ \"TenantId\" : 1, \"UniqueIndex\" : 1 }", indexBsonDocument);
 		}
 
 
