@@ -24,7 +24,8 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 						IsUnique = indexAttribute.IsUnique,
 						SortOrder = indexAttribute.SortOrder,
 						IndexPriority = indexAttribute.IndexPriority,
-						IndexType = indexAttribute.IndexType
+						IndexType = indexAttribute.IndexType,
+						IsTenantExclusive = indexAttribute.IsTenantExclusve
 					});
 				}
 			}

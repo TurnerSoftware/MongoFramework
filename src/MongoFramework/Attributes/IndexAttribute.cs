@@ -25,6 +25,10 @@ namespace MongoFramework.Attributes
 		/// The type of index to be applied.
 		/// </summary>
 		public IndexType IndexType { get; }
+		/// <summary>
+		/// Whether the index should add a tenant key.
+		/// </summary>
+		public bool IsTenantExclusve { get; set; }
 
 		/// <summary>
 		/// Applies a standard index to the property with the specified sort order.

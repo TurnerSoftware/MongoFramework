@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Driver.GeoJsonObjectModel;
 using MongoFramework.Attributes;
 using MongoFramework.Infrastructure.Indexing;
@@ -84,6 +84,14 @@ namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 			[Index(IndexType.Geo2dSphere)]
 			public GeoJsonPoint<GeoJson2DGeographicCoordinates> SomeCoordinates { get; set; }
 		}
+		public class TenantUniqueConstraintModel : IHaveTenantId
+		{
+			public string TenantId { get; set; }
+
+			[Index("UniqueIndex", IndexSortOrder.Ascending, IsUnique = true, IsTenantExclusve = true)]
+			public string UniqueIndex { get; set; }
+		}
+
 
 		[TestMethod]
 		public void IndexNaming()
@@ -185,5 +193,17 @@ namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 			var results = indexModel.Select(i => i.Keys.Render(null, null)).FirstOrDefault();
 			Assert.IsTrue(results.Any(e => e.Name == "SomeCoordinates" && e.Value == "2dsphere"));
 		}
+
+		[TestMethod]
+		public void AppliesTenantConstraint()
+		{
+			var indexModel = IndexModelBuilder<TenantUniqueConstraintModel>.BuildModel();
+
+			var indexBsonDocument = indexModel.First().Keys.Render(null, null).ToString();
+
+			Assert.AreEqual("{ \"TenantId\" : 1, \"UniqueIndex\" : 1 }", indexBsonDocument);
+		}
+
+
 	}
 }
