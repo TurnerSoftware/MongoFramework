@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Attributes;
 using System;
 using System.Linq;
@@ -22,6 +22,11 @@ namespace MongoFramework.Tests
 		{
 			public string Label { get; set; }
 			public DateTime Date { get; set; }
+		}
+
+		class SecondModel
+		{
+			public string Id { get; set; }
 		}
 
 		class MongoDbContextTestContext : MongoDbTenantContext
@@ -60,6 +65,24 @@ namespace MongoFramework.Tests
 			using (var context = new MongoDbContextTestContext(TestConfiguration.GetConnection(), TestConfiguration.GetTenantId()))
 			{
 				Assert.AreEqual(5, context.DbBucketSet.BucketSize);
+			}
+		}
+
+		[TestMethod]
+		public void GenericSetReturnsCorrectSet()
+		{
+			using (var context = new MongoDbContextTestContext(TestConfiguration.GetConnection(), TestConfiguration.GetTenantId()))
+			{
+				Assert.IsInstanceOfType(context.Set<DbSetModel>(),typeof(MongoDbTenantSet<DbSetModel>));
+			}
+		}
+
+		[TestMethod]
+		public void GenericSetReturnsNewSet()
+		{
+			using (var context = new MongoDbContextTestContext(TestConfiguration.GetConnection(), TestConfiguration.GetTenantId()))
+			{
+				Assert.IsInstanceOfType(context.Set<SecondModel>(),typeof(MongoDbSet<SecondModel>));
 			}
 		}
 
