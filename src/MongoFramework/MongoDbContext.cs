@@ -1,4 +1,4 @@
-﻿using MongoFramework.Infrastructure;
+using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Commands;
 using MongoFramework.Infrastructure.Indexing;
 using MongoFramework.Infrastructure.Internal;
@@ -115,6 +115,14 @@ namespace MongoFramework
 
 		public virtual IMongoDbSet<TEntity> Set<TEntity>() where TEntity : class
 		{
+			var properties = DbSetInitializer.GetDbSetProperties(this);
+			var existing = properties.FirstOrDefault(p => p.PropertyType.GenericTypeArguments[0] == typeof(TEntity));
+
+			if (existing != null)
+			{
+				return existing.GetValue(this) as IMongoDbSet<TEntity>;
+			}
+
 			return new MongoDbSet<TEntity>(this);
 		}
 
