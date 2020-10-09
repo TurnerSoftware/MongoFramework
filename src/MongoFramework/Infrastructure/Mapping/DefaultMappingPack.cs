@@ -16,7 +16,8 @@ namespace MongoFramework.Infrastructure.Mapping
 			new DecimalSerializationProcessor(),
 			new TypeDiscoveryProcessor(),
 			new BsonKnownTypesProcessor(),
-			new IndexProcessor()
+			new IndexProcessor(),
+			new MappingAdapterProcessor()
 		};
 	}
 }
