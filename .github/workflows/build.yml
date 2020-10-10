@@ -78,7 +78,11 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build -c Release --no-restore /p:Version=${{env.BUILD_VERSION}}
-    - name: Test
+    - name: Test (Windows and MacOS)
+      if: matrix.os != 'ubuntu-latest'
+      run: dotnet test
+    - name: Test with Coverage (Ubuntu)
+      if: matrix.os == 'ubuntu-latest'
       run: dotnet test --logger trx --results-directory ${{env.BUILD_ARTIFACT_PATH}}/coverage --collect "XPlat Code Coverage" --settings CodeCoverage.runsettings
     - name: Pack
       run: dotnet pack -c Release --no-build /p:Version=${{env.BUILD_VERSION}} /p:PackageOutputPath=${{env.BUILD_ARTIFACT_PATH}}
