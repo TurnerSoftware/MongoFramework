@@ -78,11 +78,7 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build -c Release --no-restore /p:Version=${{env.BUILD_VERSION}}
-    - name: Test (Windows and MacOS)
-      if: matrix.os != 'ubuntu-latest'
-      run: dotnet test
-    - name: Test with Coverage (Ubuntu)
-      if: matrix.os == 'ubuntu-latest'
+    - name: Test with Coverage
       run: dotnet test --logger trx --results-directory ${{env.BUILD_ARTIFACT_PATH}}/coverage --collect "XPlat Code Coverage" --settings CodeCoverage.runsettings
     - name: Pack
       run: dotnet pack -c Release --no-build /p:Version=${{env.BUILD_VERSION}} /p:PackageOutputPath=${{env.BUILD_ARTIFACT_PATH}}
@@ -104,7 +100,7 @@ jobs:
     - name: Install ReportGenerator tool
       run: dotnet tool install -g dotnet-reportgenerator-globaltool
     - name: Prepare coverage reports
-      run: reportgenerator -reports:ubuntu-latest/coverage/*/coverage.cobertura.xml -targetdir:./ -reporttypes:Cobertura
+      run: reportgenerator -reports:*/coverage/*/coverage.cobertura.xml -targetdir:./ -reporttypes:Cobertura
     - name: Upload coverage report
       uses: codecov/codecov-action@v1.0.13
       with:
