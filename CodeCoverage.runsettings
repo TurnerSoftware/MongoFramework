@@ -6,7 +6,7 @@
         <Configuration>
           <Format>cobertura</Format>
           <Exclude>[MongoFramework.Tests]*</Exclude>
-          <Include>[MongoFramework.*]*</Include>
+          <Include>[MongoFramework]*,[MongoFramework.*]*</Include>
         </Configuration>
       </DataCollector>
     </DataCollectors>  
