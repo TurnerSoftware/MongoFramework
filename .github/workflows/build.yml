@@ -77,11 +77,11 @@ jobs:
     - name: Install dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build -c Release --no-restore /p:Version=${{env.BUILD_VERSION}}
+      run: dotnet build -c Release --no-restore /p:Version=${{env.BUILD_VERSION}} /p:CI=true
     - name: Test
-      run: dotnet test --logger trx --results-directory ${{env.BUILD_ARTIFACT_PATH}}/coverage --collect "XPlat Code Coverage" --settings CodeCoverage.runsettings
+      run: dotnet test --logger trx --results-directory ${{env.BUILD_ARTIFACT_PATH}}/coverage --collect "XPlat Code Coverage" --settings CodeCoverage.runsettings /p:CI=true
     - name: Pack
-      run: dotnet pack -c Release --no-build /p:Version=${{env.BUILD_VERSION}} /p:PackageOutputPath=${{env.BUILD_ARTIFACT_PATH}}
+      run: dotnet pack -c Release --no-build /p:Version=${{env.BUILD_VERSION}} /p:PackageOutputPath=${{env.BUILD_ARTIFACT_PATH}} /p:CI=true
     - name: Publish artifacts
       uses: actions/upload-artifact@v2
       with:
