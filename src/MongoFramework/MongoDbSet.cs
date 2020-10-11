@@ -45,7 +45,7 @@ namespace MongoFramework
 		/// </summary>
 		/// <param name="id">The value of the primary key for the entity to be found.</param>
 		/// <returns>The entity found, or null.</returns>
-		public virtual TEntity Find(object id) 
+		public virtual TEntity Find(object id)
 		{
 			Check.NotNull(id, nameof(id));
 
@@ -70,6 +70,42 @@ namespace MongoFramework
 
 			return entity;
 		}
+
+		/// <summary>
+		///     Finds an entity with the given primary key value. If an entity with the given primary key value
+		///     is being tracked by the context, then it is returned immediately without making a request to the
+		///     database. Otherwise, a query is made to the database for an entity with the given primary key value
+		///     and this entity, if found, is attached to the context and returned. If no entity is found, then
+		///     null is returned.
+		/// </summary>
+		/// <param name="id">The value of the primary key for the entity to be found.</param>
+		/// <returns>The entity found, or null.</returns>
+		public virtual async ValueTask<TEntity> FindAsync(object id)
+		{
+			Check.NotNull(id, nameof(id));
+
+			var tracked = Context.ChangeTracker.GetEntryById<TEntity>(id);
+
+			if (tracked != null)
+			{
+				return tracked.Entity as TEntity;
+			}
+
+			var entityDefinition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
+			var filter = entityDefinition.CreateIdFilter<TEntity>(id);
+
+			var collection = Context.Connection.GetDatabase().GetCollection<TEntity>(entityDefinition.CollectionName);
+			var cursor = await collection.FindAsync(filter);
+			var entity = await cursor.FirstOrDefaultAsync();
+
+			if (entity != null)
+			{
+				Context.ChangeTracker.SetEntityState(entity, EntityEntryState.NoChanges);
+			}
+
+			return entity;
+		}
+
 
 		/// <summary>
 		/// Marks the entity for insertion into the database.

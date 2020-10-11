@@ -18,6 +18,7 @@ namespace MongoFramework
 	{
 		IMongoDbContext Context { get; }
 		TEntity Find(object id);
+		ValueTask<TEntity> FindAsync(object id);
 		TEntity Create();
 		void Add(TEntity entity);
 		void AddRange(IEnumerable<TEntity> entities);

@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -120,6 +120,77 @@ namespace MongoFramework.Tests
 			var dbSet = new MongoDbSet<TestModel>(context);
 
 			Assert.ThrowsException<ArgumentNullException>(() => dbSet.Find(null));
+		}
+
+		[TestMethod]
+		public async Task SuccessfulInsertAndFindAsync()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<TestModel>(context);
+
+			var model = new TestModel
+			{
+				Description = "SuccessfulInsertAndFind"
+			};
+
+			dbSet.Add(model);
+
+			context.SaveChanges();
+
+			context = new MongoDbContext(connection);
+			dbSet = new MongoDbSet<TestModel>(context);
+			Assert.AreEqual("SuccessfulInsertAndFind", (await dbSet.FindAsync(model.Id)).Description);
+			Assert.AreEqual(MongoFramework.Infrastructure.EntityEntryState.NoChanges, context.ChangeTracker.GetEntry(model).State);
+		}
+
+		[TestMethod]
+		public async Task SuccessfulNullFindAsync()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<TestModel>(context);
+
+			var model = new TestModel
+			{
+				Description = "SuccessfulNullFind"
+			};
+
+			dbSet.Add(model);
+
+			context.SaveChanges();
+
+			Assert.IsNull(await dbSet.FindAsync("abcd"));
+		}
+
+		[TestMethod]
+		public async Task SuccessfullyFindAsyncTracked()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<TestModel>(context);
+
+			var model = new TestModel
+			{
+				Id = "abcd",
+				Description = "SuccessfullyFindTracked"
+			};
+
+			dbSet.Add(model);
+
+			//Note: not saving, but still should be found as tracked
+			Assert.AreEqual("SuccessfullyFindTracked", (await dbSet.FindAsync(model.Id)).Description);
+			Assert.AreEqual(MongoFramework.Infrastructure.EntityEntryState.Added, context.ChangeTracker.GetEntry(model).State);
+		}
+
+		[TestMethod]
+		public async Task FindAsyncRequiresId()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<TestModel>(context);
+
+			await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await dbSet.FindAsync(null));
 		}
 
 		[TestMethod]
