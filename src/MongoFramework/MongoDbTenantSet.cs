@@ -5,6 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
+using MongoDB.Driver;
+using MongoFramework.Infrastructure;
+using MongoFramework.Infrastructure.Commands;
+using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Utilities;
 
 namespace MongoFramework
@@ -41,6 +46,86 @@ namespace MongoFramework
 			{
 				CheckEntity(entity);
 			}
+		}
+
+				/// <summary>
+		///     Finds an entity with the given primary key value. If an entity with the given primary key value
+		///     is being tracked by the context, then it is returned immediately without making a request to the
+		///     database. Otherwise, a query is made to the database for an entity with the given primary key value
+		///     and this entity, if found, is attached to the context and returned. If no entity is found, then
+		///     null is returned.
+		/// </summary>
+		/// <param name="id">The value of the primary key for the entity to be found.</param>
+		/// <returns>The entity found, or null.</returns>
+		public override TEntity Find(object id)
+		{
+			Check.NotNull(id, nameof(id));
+
+			var tracked = Context.ChangeTracker.GetEntryById<TEntity>(id);
+
+			if (tracked != null)
+			{
+				if (tracked.Entity is IHaveTenantId tenantEntity)
+				{
+					if (tenantEntity.TenantId == Context.TenantId)
+					{
+						return tracked.Entity as TEntity;
+					}
+				}
+				else
+				{
+					return tracked.Entity as TEntity;
+				}
+			}
+
+			var entityDefinition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
+			var filter = entityDefinition.CreateIdFilter<TEntity>(id, Context.TenantId);
+
+			var collection = Context.Connection.GetDatabase().GetCollection<TEntity>(entityDefinition.CollectionName);
+			var cursor = collection.Find(filter);
+			var entity = cursor.FirstOrDefault();
+
+			if (entity != null)
+			{
+				Context.ChangeTracker.SetEntityState(entity, EntityEntryState.NoChanges);
+			}
+
+			return entity;
+		}
+
+		/// <summary>
+		///     Finds an entity with the given primary key value. If an entity with the given primary key value
+		///     is being tracked by the context, then it is returned immediately without making a request to the
+		///     database. Otherwise, a query is made to the database for an entity with the given primary key value
+		///     and this entity, if found, is attached to the context and returned. If no entity is found, then
+		///     null is returned.
+		/// </summary>
+		/// <param name="id">The value of the primary key for the entity to be found.</param>
+		/// <returns>The entity found, or null.</returns>
+		public override async ValueTask<TEntity> FindAsync(object id)
+		{
+			Check.NotNull(id, nameof(id));
+
+			var tracked = Context.ChangeTracker.GetEntryById<TEntity>(id);
+
+			if (tracked != null)
+			{
+				return tracked.Entity as TEntity;
+			}
+
+			var entityDefinition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
+			var filter = entityDefinition.CreateIdFilter<TEntity>(id, Context.TenantId);
+
+			var collection = Context.Connection.GetDatabase().GetCollection<TEntity>(entityDefinition.CollectionName);
+			var cursor = await collection.FindAsync(filter);
+			var entity = await cursor.FirstOrDefaultAsync();
+
+			if (entity != null)
+			{
+				Context.ChangeTracker.SetEntityState(entity, EntityEntryState.NoChanges);
+			}
+
+			return entity;
 		}
 
 		public override void Add(TEntity entity)

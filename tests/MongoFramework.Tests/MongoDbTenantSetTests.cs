@@ -129,6 +129,238 @@ namespace MongoFramework.Tests
 		}
 
 		[TestMethod]
+		public void SuccessfulInsertAndFind()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbTenantContext(connection, tenantId);
+			var dbSet = new MongoDbTenantSet<TestModel>(context);
+
+			var context2 = new MongoDbTenantContext(connection, tenantId + "-alt");
+			var dbSet2 = new MongoDbTenantSet<TestModel>(context2);
+
+			var entity1 = new TestModel {Description = "SuccessfulInsertAndFind.1"};
+			var entity2 = new TestModel {Description = "SuccessfulInsertAndFind.2"};
+
+			dbSet.Add(entity1);
+			dbSet2.Add(entity2);
+
+			context.SaveChanges();
+			context2.SaveChanges();
+
+			context = new MongoDbTenantContext(connection, tenantId);
+			dbSet = new MongoDbTenantSet<TestModel>(context);
+			Assert.AreEqual("SuccessfulInsertAndFind.1", dbSet.Find(entity1.Id).Description);
+			Assert.AreEqual(MongoFramework.Infrastructure.EntityEntryState.NoChanges, context.ChangeTracker.GetEntry(entity1).State);
+		}
+
+		[TestMethod]
+		public void SuccessfulNullFind()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbTenantContext(connection, tenantId);
+			var dbSet = new MongoDbTenantSet<TestModel>(context);
+
+			var context2 = new MongoDbTenantContext(connection, tenantId + "-alt");
+			var dbSet2 = new MongoDbTenantSet<TestModel>(context2);
+
+			var entity1 = new TestModel {Description = "SuccessfulInsertAndFind.1"};
+			var entity2 = new TestModel {Description = "SuccessfulInsertAndFind.2"};
+
+			dbSet.Add(entity1);
+			dbSet2.Add(entity2);
+
+			context.SaveChanges();
+			context2.SaveChanges();
+
+			Assert.IsNull(dbSet.Find("abcd"));
+		}
+
+		[TestMethod]
+		public void BlocksWrongTenantFind()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbTenantContext(connection, tenantId);
+			var dbSet = new MongoDbTenantSet<TestModel>(context);
+
+			var context2 = new MongoDbTenantContext(connection, tenantId + "-alt");
+			var dbSet2 = new MongoDbTenantSet<TestModel>(context2);
+
+			var entity1 = new TestModel {Description = "SuccessfulInsertAndFind.1"};
+			var entity2 = new TestModel {Description = "SuccessfulInsertAndFind.2"};
+
+			dbSet.Add(entity1);
+			dbSet2.Add(entity2);
+
+			context.SaveChanges();
+			context2.SaveChanges();
+
+			Assert.IsNull(dbSet.Find(entity2.Id));
+		}
+
+		[TestMethod]
+		public void SuccessfullyFindTracked()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbTenantContext(connection, tenantId);
+			var dbSet = new MongoDbTenantSet<TestModel>(context);
+
+			var context2 = new MongoDbTenantContext(connection, tenantId + "-alt");
+			var dbSet2 = new MongoDbTenantSet<TestModel>(context2);
+
+			var model = new TestModel
+			{
+				Id = "abcd",
+				Description = "SuccessfullyFindTracked.1"
+			};
+
+			var model2 = new TestModel
+			{
+				Id = "abcd",
+				Description = "SuccessfullyFindTracked.2"
+			};
+
+			dbSet.Add(model);
+			dbSet2.Add(model2);
+
+			//Note: not saving, but still should be found as tracked
+			Assert.AreEqual("SuccessfullyFindTracked.1", dbSet.Find(model.Id).Description);
+			Assert.AreEqual("SuccessfullyFindTracked.2", dbSet2.Find(model2.Id).Description);
+			Assert.AreEqual(MongoFramework.Infrastructure.EntityEntryState.Added, context.ChangeTracker.GetEntry(model).State);
+			Assert.AreEqual(MongoFramework.Infrastructure.EntityEntryState.Added, context.ChangeTracker.GetEntry(model2).State);
+		}
+
+		[TestMethod]
+		public void FindRequiresId()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbTenantContext(connection, tenantId);
+			var dbSet = new MongoDbTenantSet<TestModel>(context);
+
+			Assert.ThrowsException<ArgumentNullException>(() => dbSet.Find(null));
+		}
+
+		[TestMethod]
+		public async Task SuccessfulInsertAndFindAsync()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbTenantContext(connection, tenantId);
+			var dbSet = new MongoDbTenantSet<TestModel>(context);
+
+			var context2 = new MongoDbTenantContext(connection, tenantId + "-alt");
+			var dbSet2 = new MongoDbTenantSet<TestModel>(context2);
+
+			var entity1 = new TestModel {Description = "SuccessfulInsertAndFind.1"};
+			var entity2 = new TestModel {Description = "SuccessfulInsertAndFind.2"};
+
+			dbSet.Add(entity1);
+			dbSet2.Add(entity2);
+
+			context.SaveChanges();
+			context2.SaveChanges();
+
+			context = new MongoDbTenantContext(connection, tenantId);
+			dbSet = new MongoDbTenantSet<TestModel>(context);
+			Assert.AreEqual("SuccessfulInsertAndFind.1", (await dbSet.FindAsync(entity1.Id)).Description);
+			Assert.AreEqual(MongoFramework.Infrastructure.EntityEntryState.NoChanges, context.ChangeTracker.GetEntry(entity1).State);
+		}
+
+		[TestMethod]
+		public async Task SuccessfulNullFindAsync()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbTenantContext(connection, tenantId);
+			var dbSet = new MongoDbTenantSet<TestModel>(context);
+
+			var context2 = new MongoDbTenantContext(connection, tenantId + "-alt");
+			var dbSet2 = new MongoDbTenantSet<TestModel>(context2);
+
+			var entity1 = new TestModel {Description = "SuccessfulInsertAndFind.1"};
+			var entity2 = new TestModel {Description = "SuccessfulInsertAndFind.1"};
+
+			dbSet.Add(entity1);
+			dbSet2.Add(entity2);
+
+			context.SaveChanges();
+			context2.SaveChanges();
+
+			Assert.IsNull(await dbSet.FindAsync("abcd"));
+		}
+
+		[TestMethod]
+		public async Task BlocksWrongTenantFindAsync()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbTenantContext(connection, tenantId);
+			var dbSet = new MongoDbTenantSet<TestModel>(context);
+
+			var context2 = new MongoDbTenantContext(connection, tenantId + "-alt");
+			var dbSet2 = new MongoDbTenantSet<TestModel>(context2);
+
+			var entity1 = new TestModel {Description = "SuccessfulInsertAndFind.1"};
+			var entity2 = new TestModel {Description = "SuccessfulInsertAndFind.1"};
+
+			dbSet.Add(entity1);
+			dbSet2.Add(entity2);
+
+			context.SaveChanges();
+			context2.SaveChanges();
+
+			Assert.IsNull(await dbSet.FindAsync(entity2.Id));
+		}
+
+		[TestMethod]
+		public async Task SuccessfullyFindAsyncTracked()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbTenantContext(connection, tenantId);
+			var dbSet = new MongoDbTenantSet<TestModel>(context);
+
+			var context2 = new MongoDbTenantContext(connection, tenantId + "-alt");
+			var dbSet2 = new MongoDbTenantSet<TestModel>(context2);
+
+			var model = new TestModel
+			{
+				Id = "abcd",
+				Description = "SuccessfullyFindTracked.1"
+			};
+
+			var model2 = new TestModel
+			{
+				Id = "abcd",
+				Description = "SuccessfullyFindTracked.2"
+			};
+
+			dbSet.Add(model);
+			dbSet2.Add(model2);
+
+			//Note: not saving, but still should be found as tracked
+			Assert.AreEqual("SuccessfullyFindTracked.1", (await dbSet.FindAsync(model.Id)).Description);
+			Assert.AreEqual("SuccessfullyFindTracked.2", (await dbSet2.FindAsync(model2.Id)).Description);
+			Assert.AreEqual(MongoFramework.Infrastructure.EntityEntryState.Added, context.ChangeTracker.GetEntry(model).State);
+			Assert.AreEqual(MongoFramework.Infrastructure.EntityEntryState.Added, context.ChangeTracker.GetEntry(model2).State);
+		}
+
+		[TestMethod]
+		public async Task FindAsyncRequiresId()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbTenantContext(connection, tenantId);
+			var dbSet = new MongoDbTenantSet<TestModel>(context);
+
+			await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await dbSet.FindAsync(null));
+		}
+
+		[TestMethod]
 		public void SuccessfullyUpdateEntity()
 		{
 			var connection = TestConfiguration.GetConnection();
