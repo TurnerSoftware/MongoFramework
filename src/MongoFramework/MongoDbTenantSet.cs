@@ -65,14 +65,7 @@ namespace MongoFramework
 
 			if (tracked != null)
 			{
-				if (tracked.Entity is IHaveTenantId tenantEntity)
-				{
-					if (tenantEntity.TenantId == Context.TenantId)
-					{
-						return tracked.Entity as TEntity;
-					}
-				}
-				else
+				if ((tracked.Entity as IHaveTenantId)?.TenantId == Context.TenantId)
 				{
 					return tracked.Entity as TEntity;
 				}
