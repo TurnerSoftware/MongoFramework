@@ -4,9 +4,6 @@ skip_branch_with_pr: true
 
 services:
   - mongodb
-install:
-  - choco install reportgenerator.portable codecov
-  - ps: .\build\dotnet-install.ps1 -Version 3.0.100
 
   
 build_script:
