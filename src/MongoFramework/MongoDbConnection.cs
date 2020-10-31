@@ -9,7 +9,7 @@ namespace MongoFramework
 {
 	public class MongoDbConnection : IMongoDbConnection
 	{
-		public MongoUrl Url { get; private set; }
+		public MongoUrl Url { get; protected set; }
 		private bool IsDisposed { get; set; }
 
 		private IMongoClient InternalClient;
