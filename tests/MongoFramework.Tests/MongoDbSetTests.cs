@@ -3,6 +3,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using MongoFramework.Linq;
 
 namespace MongoFramework.Tests
 {
@@ -363,5 +364,59 @@ namespace MongoFramework.Tests
 			Assert.AreEqual(1, dbSet.Count(m => m.Description == "SuccessfullyRemoveRangeByPredicate"));
 			Assert.IsNotNull(dbSet.FirstOrDefault(m => m.Id == entities[0].Id));
 		}
+
+		[TestMethod]
+		public void SuccessfullyLinqFindTracked()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<TestModel>(context);
+
+			var model = new TestModel
+			{
+				Id = "abcd",
+				Description = "SuccessfullyFindTracked.1"
+			};
+
+			dbSet.Add(model);
+
+			context.SaveChanges();
+
+			ResetMongoDb();
+
+			var result = dbSet.FirstOrDefault();
+			result.Description = "changed";
+			context.ChangeTracker.DetectChanges();
+
+			Assert.AreEqual(MongoFramework.Infrastructure.EntityEntryState.Updated, context.ChangeTracker.GetEntry(result).State);
+		}
+
+		[TestMethod]
+		public async Task SuccessfullyLinqFindTrackedAsync()
+		{
+			var connection = TestConfiguration.GetConnection();			
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<TestModel>(context);
+
+			var model = new TestModel
+			{
+				Id = "abcd",
+				Description = "SuccessfullyFindTracked.1"
+			};
+
+			dbSet.Add(model);
+
+			context.SaveChanges();
+
+			ResetMongoDb();
+
+			var result = await dbSet.FirstOrDefaultAsync();
+			result.Description = "changed";
+			context.ChangeTracker.DetectChanges();
+
+			Assert.AreEqual(MongoFramework.Infrastructure.EntityEntryState.Updated, context.ChangeTracker.GetEntry(result).State);
+		}
+
 	}
+
 }
