@@ -234,7 +234,10 @@ namespace MongoFramework.Infrastructure.Linq
 					var resultBatch = underlyingCursor.Current;
 					foreach (var item in resultBatch)
 					{
-						if (item is TEntity entityItem && (model.ResultTransformer == null || model.ResultTransformer.ReturnType == typeof(TEntity)))
+						if (item is TEntity entityItem &&
+						    (model.ResultTransformer == null ||
+							model.ResultTransformer.ReturnType == typeof(ValueTask<TEntity>) ||
+							model.ResultTransformer.ReturnType == typeof(Task<TEntity>)))
 						{
 							EntityProcessors.ProcessEntity(entityItem, Connection);
 						}
