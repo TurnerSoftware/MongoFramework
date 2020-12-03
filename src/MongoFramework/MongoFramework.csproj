@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0; net5.0</TargetFrameworks>
     <AssemblyName>MongoFramework</AssemblyName>
     <Title>MongoFramework</Title>
     <Description>An "Entity Framework"-like interface for the MongoDB C# Driver</Description>
@@ -11,10 +11,25 @@
 
   <ItemGroup>
     <PackageReference Include="MongoDB.Driver" Version="2.11.4" />
-    <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="1.1.1" />
-    <PackageReference Include="System.Linq.Async" Version="4.1.1" />
   </ItemGroup>
+
+  <Choose>
+    <When Condition=" '$(TargetFramework)' == 'net5.0' ">
+      <ItemGroup>
+        <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+        <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
+        <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="5.0.0" />
+        <PackageReference Include="System.Linq.Async" Version="5.0.0" />
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
+        <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
+        <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="1.1.1" />
+        <PackageReference Include="System.Linq.Async" Version="4.1.1" />
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
 
 </Project>
