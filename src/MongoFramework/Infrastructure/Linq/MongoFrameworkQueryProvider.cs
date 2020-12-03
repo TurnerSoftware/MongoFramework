@@ -169,11 +169,11 @@ namespace MongoFramework.Infrastructure.Linq
 			var pipeline = PipelineDefinition<TEntity, TResult>.Create(model.Stages, serializer);
 			using (var diagnostics = DiagnosticRunner.Start<TEntity>(Connection, model))
 			{
-				IEnumerable<TResult> underlyingResult;
+				IAsyncCursor<TResult> underlyingCursor;
 
 				try
 				{
-					underlyingResult = GetCollection().Aggregate(pipeline).ToEnumerable();
+					underlyingCursor = GetCollection().Aggregate(pipeline);
 				}
 				catch (Exception exception)
 				{
@@ -181,22 +181,23 @@ namespace MongoFramework.Infrastructure.Linq
 					throw;
 				}
 
-				using (var enumerator = underlyingResult.GetEnumerator())
+				var hasFirstResult = false;
+				while (underlyingCursor.MoveNext())
 				{
-					var hasFirstResult = false;
-					while (enumerator.MoveNext())
+					if (!hasFirstResult)
 					{
-						if (!hasFirstResult)
-						{
-							hasFirstResult = true;
-							diagnostics.FirstReadResult<TResult>();
-						}
+						hasFirstResult = true;
+						diagnostics.FirstReadResult<TResult>();
+					}
 
-						var item = enumerator.Current;
+					var resultBatch = underlyingCursor.Current;
+					foreach (var item in resultBatch)
+					{
 						if (item is TEntity entityItem && (model.ResultTransformer == null || model.ResultTransformer.ReturnType == typeof(TEntity)))
 						{
 							EntityProcessors.ProcessEntity(entityItem, Connection);
 						}
+
 						yield return item;
 					}
 				}
