@@ -12,6 +12,8 @@ namespace MongoFramework.Infrastructure.Linq.Translation
 			ExpressionTranslation.AddTranslator(new WhereTranslator());
 			ExpressionTranslation.AddTranslator(new OrderByTranslator());
 			ExpressionTranslation.AddTranslator(new SelectTranslator());
+			ExpressionTranslation.AddTranslator(new SkipTranslator());
+			ExpressionTranslation.AddTranslator(new TakeTranslator());
 		}
 	}
 }
