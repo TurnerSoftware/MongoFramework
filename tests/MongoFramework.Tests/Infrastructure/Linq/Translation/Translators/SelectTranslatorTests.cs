@@ -24,8 +24,7 @@ namespace MongoFramework.Tests.Infrastructure.Linq.Translation.Translators
 					"$project",
 					new BsonDocument
 					{
-						{ "Id", "$Id" },
-						{ "_id", 0 }
+						{ "_id", "$_id" }
 					}
 				}
 			};
