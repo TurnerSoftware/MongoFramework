@@ -88,7 +88,7 @@ namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 		{
 			public string TenantId { get; set; }
 
-			[Index("UniqueIndex", IndexSortOrder.Ascending, IsUnique = true, IsTenantExclusve = true)]
+			[Index("UniqueIndex", IndexSortOrder.Ascending, IsUnique = true, IsTenantExclusive = true)]
 			public string UniqueIndex { get; set; }
 		}
 

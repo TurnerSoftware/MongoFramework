@@ -26,7 +26,7 @@ namespace MongoFramework.Tests
 			public string Id { get; set; }
 			public string TenantId { get; set; }
 
-			[Index(IndexType.Standard, IsUnique = true, IsTenantExclusve = true)]
+			[Index(IndexType.Standard, IsUnique = true, IsTenantExclusive = true)]
 			public string UserName { get; set; }
 		}
 		[TestMethod]
