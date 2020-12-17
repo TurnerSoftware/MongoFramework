@@ -92,6 +92,15 @@ namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 			public string UniqueIndex { get; set; }
 		}
 
+		public class MultipleIndexesOnSinglePropertyModel
+		{
+			[Index("MyMainIndex", IndexSortOrder.Ascending)]
+			[Index("MyCompoundIndex", IndexSortOrder.Ascending, IndexPriority = 1)]
+			public string MyCustomField { get; set; }
+
+			[Index("MyCompoundIndex", IndexSortOrder.Descending, IndexPriority = 2)]
+			public string OtherField { get; set; }
+		}
 
 		[TestMethod]
 		public void IndexNaming()
@@ -204,6 +213,16 @@ namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 			Assert.AreEqual("{ \"TenantId\" : 1, \"UniqueIndex\" : 1 }", indexBsonDocument);
 		}
 
+		[TestMethod]
+		public void MultipleIndexesOnSingleProperty()
+		{
+			var indexModel = IndexModelBuilder<MultipleIndexesOnSinglePropertyModel>.BuildModel();
 
+			Assert.AreEqual(2, indexModel.Count());
+
+			var results = indexModel.Select(i => i.Keys.Render(null, null));
+			Assert.IsTrue(results.Any(e => e.Contains("MyCustomField") && e.ElementCount == 1));
+			Assert.IsTrue(results.Any(e => e.Contains("MyCustomField") && e.Contains("OtherField") && e.ElementCount == 2));
+		}
 	}
 }

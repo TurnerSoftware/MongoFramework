@@ -2,7 +2,7 @@
 
 namespace MongoFramework.Attributes
 {
-	[AttributeUsage(AttributeTargets.Property)]
+	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 	public class IndexAttribute : Attribute
 	{
 		/// <summary>
