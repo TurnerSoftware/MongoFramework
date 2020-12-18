@@ -112,7 +112,7 @@ namespace MongoFramework.Tests
 			}
 		}
 		
-				[TestMethod]
+		[TestMethod]
 		public void SuccessfullyAttachUntrackedEntity()
 		{
 			var connection = TestConfiguration.GetConnection();
