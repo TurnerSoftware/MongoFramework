@@ -23,11 +23,14 @@ namespace MongoFramework
 		TEntity Create();
 		void Add(TEntity entity);
 		void AddRange(IEnumerable<TEntity> entities);
+		void Attach(TEntity entity);
+		void AttachRange(IEnumerable<TEntity> entities);
 		void Update(TEntity entity);
 		void UpdateRange(IEnumerable<TEntity> entities);
 		void Remove(TEntity entity);
 		void RemoveRange(IEnumerable<TEntity> entities);
 		void RemoveRange(Expression<Func<TEntity, bool>> predicate);
 		void RemoveById(object entityId);
+		IQueryable<TEntity> AsNoTracking();
 	}
 }

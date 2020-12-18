@@ -140,6 +140,18 @@ namespace MongoFramework
 			base.AddRange(entities);
 		}
 
+		public override void Attach(TEntity entity)
+		{
+			CheckEntity(entity);
+			base.Attach(entity);
+		}
+
+		public override void AttachRange(IEnumerable<TEntity> entities)
+		{
+			CheckEntities(entities);
+			base.AttachRange(entities);
+		}
+
 		public override void Update(TEntity entity)
 		{
 			CheckEntity(entity);
@@ -173,12 +185,15 @@ namespace MongoFramework
 		
 		#region IQueryable Implementation
 
-		protected override IQueryable<TEntity> GetQueryable()
+		protected override IQueryable<TEntity> GetQueryable(bool trackEntities)
 		{
 			var key = Context.TenantId;
 			var queryable = Context.Query<TEntity>().Where(c => c.TenantId == key);
-			var provider = queryable.Provider as IMongoFrameworkQueryProvider<TEntity>;
-			provider.EntityProcessors.Add(new EntityTrackingProcessor<TEntity>(Context));
+			if (trackEntities)
+			{
+				var provider = queryable.Provider as IMongoFrameworkQueryProvider<TEntity>;
+				provider.EntityProcessors.Add(new EntityTrackingProcessor<TEntity>(Context));
+			}
 			return queryable;
 		}
 		

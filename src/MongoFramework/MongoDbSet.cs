@@ -132,6 +132,30 @@ namespace MongoFramework
 		}
 
 		/// <summary>
+		/// Marks the entity as unchanged in the change tracker and starts tracking.
+		/// </summary>
+		/// <param name="entity"></param>
+		public virtual void Attach(TEntity entity)
+		{
+			Check.NotNull(entity, nameof(entity));
+
+			Context.ChangeTracker.SetEntityState(entity, EntityEntryState.NoChanges);
+		}
+		/// <summary>
+		/// Marks the collection of entities as unchanged in the change tracker and starts tracking.
+		/// </summary>
+		/// <param name="entities"></param>
+		public virtual void AttachRange(IEnumerable<TEntity> entities)
+		{
+			Check.NotNull(entities, nameof(entities));
+
+			foreach (var entity in entities)
+			{
+				Context.ChangeTracker.SetEntityState(entity, EntityEntryState.NoChanges);
+			}
+		}
+
+		/// <summary>
 		/// Marks the entity for updating.
 		/// </summary>
 		/// <param name="entity"></param>
@@ -209,23 +233,26 @@ namespace MongoFramework
 
 		#region IQueryable Implementation
 
-		protected virtual IQueryable<TEntity> GetQueryable()
+		protected virtual IQueryable<TEntity> GetQueryable(bool trackEntities)
 		{
 			var queryable = Context.Query<TEntity>();
-			var provider = queryable.Provider as IMongoFrameworkQueryProvider<TEntity>;
-			provider.EntityProcessors.Add(new EntityTrackingProcessor<TEntity>(Context));
+			if (trackEntities)
+			{
+				var provider = queryable.Provider as IMongoFrameworkQueryProvider<TEntity>;
+				provider.EntityProcessors.Add(new EntityTrackingProcessor<TEntity>(Context));
+			}
 			return queryable;
 		}
 
-		public Expression Expression => GetQueryable().Expression;
+		public Expression Expression => GetQueryable(true).Expression;
 
-		public Type ElementType => GetQueryable().ElementType;
+		public Type ElementType => GetQueryable(true).ElementType;
 
-		public IQueryProvider Provider => GetQueryable().Provider;
+		public IQueryProvider Provider => GetQueryable(true).Provider;
 
 		public IEnumerator<TEntity> GetEnumerator()
 		{
-			return GetQueryable().GetEnumerator();
+			return GetQueryable(true).GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
@@ -233,6 +260,23 @@ namespace MongoFramework
 			return GetEnumerator();
 		}
 
+		public virtual IQueryable<TEntity> AsNoTracking()
+		{
+			return GetQueryable(false);
+		}
+
 		#endregion
+
 	}
+
+	public static class DbSetExtensions 
+	{
+		public static IQueryable<TEntity> NoTracking<TEntity>(this IMongoDbSet<TEntity> dbSet) where TEntity : class
+		{
+			var queryable = dbSet.Context.Query<TEntity>();
+			var provider = queryable.Provider as IMongoFrameworkQueryProvider<TEntity>;
+			return queryable;
+		}
+	}
+
 }

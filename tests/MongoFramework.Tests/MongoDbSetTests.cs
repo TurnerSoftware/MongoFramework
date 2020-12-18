@@ -417,6 +417,125 @@ namespace MongoFramework.Tests
 			Assert.AreEqual(MongoFramework.Infrastructure.EntityEntryState.Updated, context.ChangeTracker.GetEntry(result).State);
 		}
 
+		[TestMethod]
+		public void SuccessfullyLinqFindNoTracking()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<TestModel>(context);
+
+			var model = new TestModel
+			{
+				Id = "abcd",
+				Description = "SuccessfullyLinqFindNoTracking.1"
+			};
+
+			dbSet.Add(model);
+
+			context.SaveChanges();
+
+			ResetMongoDb();
+
+			context = new MongoDbContext(connection);
+			dbSet = new MongoDbSet<TestModel>(context);
+
+			var result = dbSet.AsNoTracking().FirstOrDefault();
+
+			Assert.IsNull(context.ChangeTracker.GetEntry(result));
+		}
+
+		[TestMethod]
+		public async Task SuccessfullyLinqFindNoTrackingAsync()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<TestModel>(context);
+
+			var model = new TestModel
+			{
+				Id = "abcd",
+				Description = "SuccessfullyFindTracked.1"
+			};
+
+			dbSet.Add(model);
+
+			context.SaveChanges();
+
+			ResetMongoDb();
+
+			context = new MongoDbContext(connection);
+			dbSet = new MongoDbSet<TestModel>(context);
+
+			var result = await dbSet.AsNoTracking().FirstOrDefaultAsync();
+
+			Assert.IsNull(context.ChangeTracker.GetEntry(result));
+		}
+
+		[TestMethod]
+		public void SuccessfullyAttachUntrackedEntity()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<TestModel>(context);
+
+			var model = new TestModel
+			{
+				Id = "abcd",
+				Description = "SuccessfullyAttachUntrackedEntity.1"
+			};
+
+			dbSet.Add(model);
+
+			context.SaveChanges();
+
+			ResetMongoDb();
+
+			context = new MongoDbContext(connection);
+			dbSet = new MongoDbSet<TestModel>(context);
+
+			var result = dbSet.AsNoTracking().FirstOrDefault();
+
+			dbSet.Attach(result);
+
+			Assert.AreEqual(MongoFramework.Infrastructure.EntityEntryState.NoChanges, context.ChangeTracker.GetEntry(result).State);
+		}
+
+		[TestMethod]
+		public void SuccessfullyAttachUntrackedEntities()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<TestModel>(context);
+
+			var entities = new[] {
+				new TestModel
+				{
+					Description = "SuccessfullyAttachUntrackedEntities.1"
+				},
+				new TestModel
+				{
+					Description = "SuccessfullyAttachUntrackedEntities.2",
+					BooleanField = true
+				}
+			};
+
+			dbSet.AddRange(entities);
+
+			context.SaveChanges();
+
+			ResetMongoDb();
+
+			context = new MongoDbContext(connection);
+			dbSet = new MongoDbSet<TestModel>(context);
+
+			var result = dbSet.AsNoTracking().ToList();
+
+			dbSet.AttachRange(result);
+
+			Assert.AreEqual(MongoFramework.Infrastructure.EntityEntryState.NoChanges, context.ChangeTracker.GetEntry(result[0]).State);
+			Assert.AreEqual(MongoFramework.Infrastructure.EntityEntryState.NoChanges, context.ChangeTracker.GetEntry(result[1]).State);
+		}
+
 	}
 
 }
