@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using MongoFramework.Utilities;
 
 namespace MongoFramework
 {
@@ -107,6 +108,7 @@ namespace MongoFramework
 			ChangeTracker.CommitChanges();
 			CommandStaging.CommitChanges();
 		}
+		
 		private static async Task InternalSaveChangesAsync<TEntity>(IMongoDbConnection connection, IEnumerable<IWriteCommand> commands, WriteModelOptions options, CancellationToken cancellationToken) where TEntity : class
 		{
 			await EntityIndexWriter.ApplyIndexingAsync<TEntity>(connection);
@@ -131,7 +133,30 @@ namespace MongoFramework
 			var provider = new MongoFrameworkQueryProvider<TEntity>(Connection);
 			return new MongoFrameworkQueryable<TEntity>(provider);
 		}
+		
+		/// <summary>
+		/// Marks the entity as unchanged in the change tracker and starts tracking.
+		/// </summary>
+		/// <param name="entity"></param>
+		public virtual void Attach<TEntity>(TEntity entity) where TEntity : class
+		{
+			Check.NotNull(entity, nameof(entity));
+			ChangeTracker.SetEntityState(entity, EntityEntryState.NoChanges);
+		}
 
+		/// <summary>
+		/// Marks the collection of entities as unchanged in the change tracker and starts tracking.
+		/// </summary>
+		/// <param name="entities"></param>
+		public virtual void AttachRange<TEntity>(IEnumerable<TEntity> entities) where TEntity : class
+		{
+			Check.NotNull(entities, nameof(entities));
+			foreach (var entity in entities)
+			{
+				ChangeTracker.SetEntityState(entity, EntityEntryState.NoChanges);
+			}
+		}
+		
 		public void Dispose()
 		{
 			Dispose(true);

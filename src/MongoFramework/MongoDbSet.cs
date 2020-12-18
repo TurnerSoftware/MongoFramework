@@ -130,7 +130,7 @@ namespace MongoFramework
 				Context.ChangeTracker.SetEntityState(entity, EntityEntryState.Added);
 			}
 		}
-
+		
 		/// <summary>
 		/// Marks the entity for updating.
 		/// </summary>
@@ -209,23 +209,26 @@ namespace MongoFramework
 
 		#region IQueryable Implementation
 
-		protected virtual IQueryable<TEntity> GetQueryable()
+		protected virtual IQueryable<TEntity> GetQueryable(bool trackEntities)
 		{
 			var queryable = Context.Query<TEntity>();
-			var provider = queryable.Provider as IMongoFrameworkQueryProvider<TEntity>;
-			provider.EntityProcessors.Add(new EntityTrackingProcessor<TEntity>(Context));
+			if (trackEntities)
+			{
+				var provider = queryable.Provider as IMongoFrameworkQueryProvider<TEntity>;
+				provider.EntityProcessors.Add(new EntityTrackingProcessor<TEntity>(Context));
+			}
 			return queryable;
 		}
 
-		public Expression Expression => GetQueryable().Expression;
+		public Expression Expression => GetQueryable(true).Expression;
 
-		public Type ElementType => GetQueryable().ElementType;
+		public Type ElementType => GetQueryable(true).ElementType;
 
-		public IQueryProvider Provider => GetQueryable().Provider;
+		public IQueryProvider Provider => GetQueryable(true).Provider;
 
 		public IEnumerator<TEntity> GetEnumerator()
 		{
-			return GetQueryable().GetEnumerator();
+			return GetQueryable(true).GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
@@ -233,6 +236,13 @@ namespace MongoFramework
 			return GetEnumerator();
 		}
 
+		public virtual IQueryable<TEntity> AsNoTracking()
+		{
+			return GetQueryable(false);
+		}
+
 		#endregion
+
 	}
+
 }

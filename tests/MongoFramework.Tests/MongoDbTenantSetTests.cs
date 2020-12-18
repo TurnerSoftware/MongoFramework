@@ -875,5 +875,61 @@ namespace MongoFramework.Tests
 			Assert.AreEqual(MongoFramework.Infrastructure.EntityEntryState.Updated, context.ChangeTracker.GetEntry(result).State);
 		}
 
+		[TestMethod]
+		public void SuccessfullyLinqFindNoTracking()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbTenantContext(connection, tenantId);
+			var dbSet = new MongoDbTenantSet<TestModel>(context);
+
+			var model = new TestModel
+			{
+				Id = "abcd",
+				Description = "SuccessfullyLinqFindNoTracking.1"
+			};
+
+			dbSet.Add(model);
+
+			context.SaveChanges();
+
+			ResetMongoDb();
+
+			context = new MongoDbTenantContext(connection, tenantId);
+			dbSet = new MongoDbTenantSet<TestModel>(context);
+
+			var result = dbSet.AsNoTracking().FirstOrDefault();
+
+			Assert.IsNull(context.ChangeTracker.GetEntry(result));
+		}
+
+		[TestMethod]
+		public async Task SuccessfullyLinqFindNoTrackingAsync()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var tenantId = TestConfiguration.GetTenantId();
+			var context = new MongoDbTenantContext(connection, tenantId);
+			var dbSet = new MongoDbTenantSet<TestModel>(context);
+
+			var model = new TestModel
+			{
+				Id = "abcd",
+				Description = "SuccessfullyFindTracked.1"
+			};
+
+			dbSet.Add(model);
+
+			context.SaveChanges();
+
+			ResetMongoDb();
+
+			context = new MongoDbTenantContext(connection, tenantId);
+			dbSet = new MongoDbTenantSet<TestModel>(context);
+
+			var result = await dbSet.AsNoTracking().FirstOrDefaultAsync();
+
+			Assert.IsNull(context.ChangeTracker.GetEntry(result));		
+		}
+
 	}
 }

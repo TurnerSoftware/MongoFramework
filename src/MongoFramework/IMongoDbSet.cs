@@ -29,5 +29,6 @@ namespace MongoFramework
 		void RemoveRange(IEnumerable<TEntity> entities);
 		void RemoveRange(Expression<Func<TEntity, bool>> predicate);
 		void RemoveById(object entityId);
+		IQueryable<TEntity> AsNoTracking();
 	}
 }
