@@ -19,5 +19,8 @@ namespace MongoFramework
 
 		void SaveChanges();
 		Task SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
+		
+		void Attach<TEntity>(TEntity entity) where TEntity : class;
+		void AttachRange<TEntity>(IEnumerable<TEntity> entities) where TEntity : class;
 	}
 }

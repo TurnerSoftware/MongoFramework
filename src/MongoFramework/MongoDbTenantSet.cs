@@ -27,28 +27,8 @@ namespace MongoFramework
 		{
 			Context = context as IMongoDbTenantContext ?? throw new ArgumentException("Context provided to a MongoDbTenantSet must be IMongoDbTenantContext",nameof(context));
 		}
-
-		protected virtual void CheckEntity(TEntity entity)
-		{
-			Check.NotNull(entity, nameof(entity));
-			
-			if (entity.TenantId != Context.TenantId)
-			{
-				throw new MultiTenantException($"Entity type {entity.GetType().Name}, tenant ID does not match. Expected: {Context.TenantId}, Entity has: {entity.TenantId}");
-			}
-		}
-
-		protected virtual void CheckEntities(IEnumerable<TEntity> entities)
-		{
-			Check.NotNull(entities, nameof(entities));
-			
-			foreach (var entity in entities)
-			{
-				CheckEntity(entity);
-			}
-		}
-
-				/// <summary>
+		
+		/// <summary>
 		///     Finds an entity with the given primary key value. If an entity with the given primary key value
 		///     is being tracked by the context, then it is returned immediately without making a request to the
 		///     database. Otherwise, a query is made to the database for an entity with the given primary key value
@@ -139,40 +119,28 @@ namespace MongoFramework
 			}
 			base.AddRange(entities);
 		}
-
-		public override void Attach(TEntity entity)
-		{
-			CheckEntity(entity);
-			base.Attach(entity);
-		}
-
-		public override void AttachRange(IEnumerable<TEntity> entities)
-		{
-			CheckEntities(entities);
-			base.AttachRange(entities);
-		}
-
+		
 		public override void Update(TEntity entity)
 		{
-			CheckEntity(entity);
+			Context.CheckEntity(entity);
 			base.Update(entity);
 		}
 
 		public override void UpdateRange(IEnumerable<TEntity> entities)
 		{
-			CheckEntities(entities);
+			Context.CheckEntities(entities);
 			base.UpdateRange(entities);
 		}
 
 		public override void Remove(TEntity entity)
 		{
-			CheckEntity(entity);
+			Context.CheckEntity(entity);
 			base.Remove(entity);
 		}
 
 		public override void RemoveRange(IEnumerable<TEntity> entities)
 		{
-			CheckEntities(entities);
+			Context.CheckEntities(entities);
 			base.RemoveRange(entities);
 		}
 

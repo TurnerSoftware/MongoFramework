@@ -85,5 +85,69 @@ namespace MongoFramework.Tests
 				Assert.IsTrue(context.DbSet.Any());
 			}
 		}
+		
+		[TestMethod]
+		public void SuccessfullyAttachUntrackedEntity()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<DbSetModel>(context);
+
+			var model = new DbSetModel
+			{
+				Id = "abcd"
+			};
+
+			dbSet.Add(model);
+
+			context.SaveChanges();
+
+			ResetMongoDb();
+
+			context = new MongoDbContext(connection);
+			dbSet = new MongoDbSet<DbSetModel>(context);
+
+			var result = dbSet.AsNoTracking().FirstOrDefault();
+
+			context.Attach(result);
+
+			Assert.AreEqual(MongoFramework.Infrastructure.EntityEntryState.NoChanges, context.ChangeTracker.GetEntry(result).State);
+		}
+
+		[TestMethod]
+		public void SuccessfullyAttachUntrackedEntities()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<DbSetModel>(context);
+
+			var entities = new[] {
+				new DbSetModel
+				{
+					Id = "abcd"
+				},
+				new DbSetModel
+				{
+					Id = "efgh"
+				}
+			};
+
+			dbSet.AddRange(entities);
+
+			context.SaveChanges();
+
+			ResetMongoDb();
+
+			context = new MongoDbContext(connection);
+			dbSet = new MongoDbSet<DbSetModel>(context);
+
+			var result = dbSet.AsNoTracking().ToList();
+
+			context.AttachRange(result);
+
+			Assert.AreEqual(MongoFramework.Infrastructure.EntityEntryState.NoChanges, context.ChangeTracker.GetEntry(result[0]).State);
+			Assert.AreEqual(MongoFramework.Infrastructure.EntityEntryState.NoChanges, context.ChangeTracker.GetEntry(result[1]).State);
+		}
+
 	}
 }

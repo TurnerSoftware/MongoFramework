@@ -130,31 +130,7 @@ namespace MongoFramework
 				Context.ChangeTracker.SetEntityState(entity, EntityEntryState.Added);
 			}
 		}
-
-		/// <summary>
-		/// Marks the entity as unchanged in the change tracker and starts tracking.
-		/// </summary>
-		/// <param name="entity"></param>
-		public virtual void Attach(TEntity entity)
-		{
-			Check.NotNull(entity, nameof(entity));
-
-			Context.ChangeTracker.SetEntityState(entity, EntityEntryState.NoChanges);
-		}
-		/// <summary>
-		/// Marks the collection of entities as unchanged in the change tracker and starts tracking.
-		/// </summary>
-		/// <param name="entities"></param>
-		public virtual void AttachRange(IEnumerable<TEntity> entities)
-		{
-			Check.NotNull(entities, nameof(entities));
-
-			foreach (var entity in entities)
-			{
-				Context.ChangeTracker.SetEntityState(entity, EntityEntryState.NoChanges);
-			}
-		}
-
+		
 		/// <summary>
 		/// Marks the entity for updating.
 		/// </summary>
