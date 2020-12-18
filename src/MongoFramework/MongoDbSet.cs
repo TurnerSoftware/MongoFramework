@@ -269,14 +269,4 @@ namespace MongoFramework
 
 	}
 
-	public static class DbSetExtensions 
-	{
-		public static IQueryable<TEntity> NoTracking<TEntity>(this IMongoDbSet<TEntity> dbSet) where TEntity : class
-		{
-			var queryable = dbSet.Context.Query<TEntity>();
-			var provider = queryable.Provider as IMongoFrameworkQueryProvider<TEntity>;
-			return queryable;
-		}
-	}
-
 }
