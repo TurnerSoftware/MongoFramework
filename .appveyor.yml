@@ -4,10 +4,11 @@ skip_branch_with_pr: true
 
 services:
   - mongodb
-
   
 build_script:
-  - ps: .\build.appveyor.ps1
+  - ps: dotnet build -c Release
+  - ps: dotnet test
+  - ps: dotnet pack --no-build -c Release /p:PackageOutputPath=build-artifacts
   
 test: false
 artifacts:
