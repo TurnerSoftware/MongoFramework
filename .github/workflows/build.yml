@@ -27,8 +27,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-    - name: Fetch all Git tags
-      run: git fetch --prune --unshallow --tags
     - name: Configure build version
       id: configureBuildVersion
       run: |
