@@ -6,8 +6,9 @@ services:
   - mongodb
   
 build_script:
-  - ps: dotnet build -c Release
-  - ps: dotnet test
+  - ps: dotnet restore
+  - ps: dotnet build --no-restore -c Release
+  - ps: dotnet test --no-restore /p:SkipBuildVersioning=true
   - ps: dotnet pack --no-build -c Release /p:PackageOutputPath=build-artifacts
   
 test: false
