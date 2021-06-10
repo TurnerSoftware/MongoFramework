@@ -91,7 +91,7 @@ jobs:
     if: github.ref == 'refs/heads/main' || github.event_name == 'release'
     environment:
       name: 'GitHub Packages'
-      url: https://github.com/TurnerSoftware/RobotsExclusionTools/packages
+      url: https://github.com/TurnerSoftware/MongoFramework/packages
     permissions:
       packages: write
     runs-on: ubuntu-latest
@@ -111,7 +111,7 @@ jobs:
     if: github.event_name == 'release'
     environment:
       name: 'NuGet'
-      url: https://www.nuget.org/packages/TurnerSoftware.RobotsExclusionTools
+      url: https://www.nuget.org/packages/MongoFramework
     runs-on: ubuntu-latest
     steps:
       - name: 'Download build'
