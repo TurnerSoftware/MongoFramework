@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request: 
   release:
     types: [ published ]
@@ -84,14 +84,39 @@ jobs:
       with:
         name: coverage-report
         path: Cobertura.xml
-      
-  release:
-    name: Release
+
+  push-to-github-packages:
+    name: 'Push GitHub Packages'
+    needs: build
+    if: github.ref == 'refs/heads/main' || github.event_name == 'release'
+    environment:
+      name: 'GitHub Packages'
+      url: https://github.com/TurnerSoftware/RobotsExclusionTools/packages
+    permissions:
+      packages: write
     runs-on: ubuntu-latest
+    steps:
+      - name: 'Download build'
+        uses: actions/download-artifact@v2
+        with:
+          name: 'ubuntu-latest'
+      - name: 'Add NuGet source'
+        run: dotnet nuget add source https://nuget.pkg.github.com/TurnerSoftware/index.json --name GitHub --username Turnerj --password ${{secrets.GITHUB_TOKEN}} --store-password-in-clear-text
+      - name: 'Upload NuGet package'
+        run: dotnet nuget push *.nupkg --api-key ${{secrets.GH_PACKAGE_REGISTRY_API_KEY}} --source GitHub --skip-duplicate --no-symbols true
+
+  push-to-nuget:
+    name: 'Push NuGet Packages'
     needs: build
     if: github.event_name == 'release'
+    environment:
+      name: 'NuGet'
+      url: https://www.nuget.org/packages/TurnerSoftware.RobotsExclusionTools
+    runs-on: ubuntu-latest
     steps:
-    - name: Download build
-      uses: actions/download-artifact@v2
-    - run: ls /ubuntu-latest
-    # TODO: Upload to NuGet & GitHub Packages
+      - name: 'Download build'
+        uses: actions/download-artifact@v2
+        with:
+          name: 'ubuntu-latest'
+      - name: 'Upload NuGet package and symbols'
+        run: dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --skip-duplicate --api-key ${{secrets.NUGET_API_KEY}}
