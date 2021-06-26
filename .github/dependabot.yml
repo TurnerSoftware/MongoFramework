@@ -4,9 +4,4 @@ updates:
   directory: "/"
   schedule:
     interval: daily
-    time: "19:30"
   open-pull-requests-limit: 10
-  ignore:
-  - dependency-name: Microsoft.NET.Test.Sdk
-    versions:
-    - 16.9.4
