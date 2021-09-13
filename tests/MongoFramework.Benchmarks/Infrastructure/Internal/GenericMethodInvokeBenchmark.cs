@@ -7,7 +7,7 @@ using MongoFramework.Infrastructure.Internal;
 
 namespace MongoFramework.Benchmarks.Infrastructure.Internal
 {
-	[ShortRunJob(RuntimeMoniker.NetCoreApp30), MemoryDiagnoser]
+	[ShortRunJob(RuntimeMoniker.Net50), MemoryDiagnoser]
 	public class GenericMethodInvokeBenchmark
 	{
 		[Benchmark]

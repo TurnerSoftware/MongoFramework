@@ -10,7 +10,7 @@ using MongoFramework.Infrastructure.Mapping;
 
 namespace MongoFramework.Benchmarks.Infrastructure.Indexing
 {
-	[SimpleJob(RuntimeMoniker.NetCoreApp30), MemoryDiagnoser]
+	[SimpleJob(RuntimeMoniker.Net50), MemoryDiagnoser]
 	public class IndexModelBuilderBenchmark
 	{
 		public class FlatIndexModel

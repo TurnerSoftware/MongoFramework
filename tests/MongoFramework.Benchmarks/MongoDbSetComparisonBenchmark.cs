@@ -8,7 +8,7 @@ using MongoFramework.Attributes;
 
 namespace MongoFramework.Benchmarks
 {
-	[SimpleJob(RuntimeMoniker.NetCoreApp30), MemoryDiagnoser]
+	[SimpleJob(RuntimeMoniker.Net50), MemoryDiagnoser]
 	public class MongoDbSetComparisonBenchmark
 	{
 		private class TestModel

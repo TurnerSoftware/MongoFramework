@@ -7,7 +7,7 @@ using MongoFramework.Infrastructure.Mapping;
 namespace MongoFramework.Benchmarks.Infrastructure.Linq
 {
 
-	[SimpleJob(RuntimeMoniker.NetCoreApp30), MemoryDiagnoser]
+	[SimpleJob(RuntimeMoniker.Net50), MemoryDiagnoser]
 	public class LinqBenchmark
 	{
 		private IMongoDbConnection Connection { get; set; }

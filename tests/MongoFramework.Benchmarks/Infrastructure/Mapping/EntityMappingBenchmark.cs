@@ -9,7 +9,7 @@ using MongoFramework.Infrastructure.Mapping;
 
 namespace MongoFramework.Benchmarks.Infrastructure.Mapping
 {
-	[SimpleJob(RuntimeMoniker.NetCoreApp30), MemoryDiagnoser]
+	[SimpleJob(RuntimeMoniker.Net50), MemoryDiagnoser]
 	public class EntityMappingBenchmark
 	{
 		public class PersonModel
