@@ -6,7 +6,6 @@ using MongoFramework.Infrastructure.Mapping;
 
 namespace MongoFramework.Benchmarks.Infrastructure.Linq
 {
-
 	[SimpleJob(RuntimeMoniker.Net50), MemoryDiagnoser]
 	public class LinqBenchmark
 	{
@@ -28,6 +27,7 @@ namespace MongoFramework.Benchmarks.Infrastructure.Linq
 			ToArray();
 			Count();
 			Any();
+			Where_OfType_OrderBy_Select_FirstOrDefault();
 		}
 
 		private IMongoFrameworkQueryable<TestModel> GetQueryable()
@@ -55,9 +55,15 @@ namespace MongoFramework.Benchmarks.Infrastructure.Linq
 		}
 
 		[Benchmark]
-		public int Any()
+		public bool Any()
 		{
-			return GetQueryable().Count();
+			return GetQueryable().Any();
+		}
+
+		[Benchmark]
+		public object Where_OfType_OrderBy_Select_FirstOrDefault()
+		{
+			return GetQueryable().Where(e => e.Id == "123").OfType<TestModel>().OrderBy(e => e.Id).Select(e => new { A = e.Id, B = e.Id }).FirstOrDefault();
 		}
 	}
 }
