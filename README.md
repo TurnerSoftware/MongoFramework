@@ -1,3 +1,6 @@
+<div align="center">
+<img src="images/mongoframework-min.svg" alt="Icon" width="80">
+
 # MongoFramework
 An "Entity Framework"-like interface for MongoDB
 
@@ -5,6 +8,7 @@ An "Entity Framework"-like interface for MongoDB
 [![Codecov](https://img.shields.io/codecov/c/github/turnersoftware/mongoframework/main.svg)](https://codecov.io/gh/TurnerSoftware/MongoFramework)
 [![NuGet](https://img.shields.io/nuget/v/MongoFramework.svg)](https://www.nuget.org/packages/MongoFramework/)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/62fa31c90bf94f3d8e201b9684a7a4ca)](https://www.codacy.com/app/Turnerj/MongoFramework)
+</div>
 
 ## Overview
 MongoFramework tries to bring some of the nice features from Entity Framework into the world of MongoDB.
@@ -27,6 +31,14 @@ These extensions are official packages that enhance the functionality of MongoFr
 [![NuGet](https://img.shields.io/nuget/v/MongoFramework.Profiling.MiniProfiler.svg)](https://www.nuget.org/packages/MongoFramework.Profiling.MiniProfiler/)
 
 Supports profiling database reads and writes, pushing the data into [MiniProfiler](https://github.com/MiniProfiler/dotnet/).
+
+## Licensing and Support
+
+MongoFramework is under the MIT license and is free to use in personal and commercial projects.
+
+There are [support plans](https://turnersoftware.com.au/support-plans) available that cover all active Turner Software OSS projects.
+Support plans provide private email support, expert usage advice for our projects, priority bug fixes and more.
+These support plans help fund our OSS commitments and provide better software for everyone.
 
 ## Documentation
 
