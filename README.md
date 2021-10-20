@@ -1,6 +1,6 @@
 <div align="center">
-<img src="images/icon.png" alt="Icon">
 
+![Icon](images/icon.png)
 # MongoFramework
 An "Entity Framework"-like interface for MongoDB
 
