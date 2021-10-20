@@ -9,7 +9,6 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>icon.png</PackageIcon>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageProjectUrl>https://github.com/TurnerSoftware/MongoFramework</PackageProjectUrl>
     <PackageBaseTags>mongo;mongodb;data;database;orm</PackageBaseTags>
     
@@ -31,8 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\images\$(PackageIcon)" Pack="true" PackagePath="/"/>
-    <None Include="..\..\$(PackageReadmeFile)" Pack="true" PackagePath="/"/>
+    <None Include="..\..\images\$(PackageIcon)" Pack="true" PackagePath="/" />
   </ItemGroup>
   
 </Project>
