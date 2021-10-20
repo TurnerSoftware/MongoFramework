@@ -1,5 +1,5 @@
 <div align="center">
-<img src="images/mongoframework-min.svg" alt="Icon" width="80">
+<img src="images/icon.png" alt="Icon">
 
 # MongoFramework
 An "Entity Framework"-like interface for MongoDB
@@ -24,21 +24,21 @@ Some of the major features include:
 
 MongoFramework is currently built on-top of the official MongoDB C# driver.
 
-## Extensions
+## Licensing and Support
+
+MongoFramework is licensed under the MIT license. It is free to use in personal and commercial projects.
+
+There are [support plans](https://turnersoftware.com.au/support-plans) available that cover all active [Turner Software OSS projects](https://github.com/TurnerSoftware).
+Support plans provide private email support, expert usage advice for our projects, priority bug fixes and more.
+These support plans help fund our OSS commitments to provide better software for everyone.
+
+## MongoFramework Extensions
 These extensions are official packages that enhance the functionality of MongoFramework, integrating it with other systems and tools.
 
 ### MongoFramework.Profiling.MiniProfiler
 [![NuGet](https://img.shields.io/nuget/v/MongoFramework.Profiling.MiniProfiler.svg)](https://www.nuget.org/packages/MongoFramework.Profiling.MiniProfiler/)
 
 Supports profiling database reads and writes, pushing the data into [MiniProfiler](https://github.com/MiniProfiler/dotnet/).
-
-## Licensing and Support
-
-MongoFramework is under the MIT license and is free to use in personal and commercial projects.
-
-There are [support plans](https://turnersoftware.com.au/support-plans) available that cover all active Turner Software OSS projects.
-Support plans provide private email support, expert usage advice for our projects, priority bug fixes and more.
-These support plans help fund our OSS commitments and provide better software for everyone.
 
 ## Documentation
 
