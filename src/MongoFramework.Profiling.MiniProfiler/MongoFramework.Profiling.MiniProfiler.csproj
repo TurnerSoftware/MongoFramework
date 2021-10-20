@@ -5,7 +5,7 @@
     <AssemblyName>MongoFramework.Profiling.MiniProfiler</AssemblyName>
     <Title>MiniProfiler for MongoFramework</Title>
     <Description>MongoFramework integration for MiniProfiler</Description>
-    <PackageTags>miniprofiler;$(PackageBaseTags)</PackageTags>
+    <PackageTags>miniprofiler;performance;$(PackageBaseTags)</PackageTags>
     <Authors>James Turner</Authors>
   </PropertyGroup>
 
