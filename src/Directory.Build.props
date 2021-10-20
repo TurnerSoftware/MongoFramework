@@ -11,10 +11,6 @@
     <PackageIcon>icon.png</PackageIcon>
     <PackageProjectUrl>https://github.com/TurnerSoftware/MongoFramework</PackageProjectUrl>
     <PackageBaseTags>mongo;mongodb;data;database;orm</PackageBaseTags>
-    
-    <RepositoryUrl>https://github.com/TurnerSoftware/MongoFramework.git</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryBranch>master</RepositoryBranch>
 
     <!-- SourceLink Support -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
