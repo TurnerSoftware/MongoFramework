@@ -1,5 +1,6 @@
 ﻿using System;
 using MongoDB.Bson;
+using MongoFramework.Infrastructure.Mapping;
 
 namespace MongoFramework.Infrastructure
 {
@@ -32,6 +33,9 @@ namespace MongoFramework.Infrastructure
 			State = state;
 			Entity = entity;
 			EntityType = entity.GetType();
+
+			// Ensure the entity type is registered before we potentially serialize the entity to a BSON document
+			EntityMapping.TryRegisterType(EntityType, out _);
 
 			if (state == EntityEntryState.NoChanges)
 			{
