@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AssemblyName>MongoFramework.Tests</AssemblyName>
     <RootNamespace>MongoFramework.Tests</RootNamespace>
-    <TargetFrameworks>net461;netcoreapp2.1;netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>net461;net48;netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -18,19 +18,6 @@
     </PackageReference>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" PrivateAssets="All" Version="1.0.2" />
   </ItemGroup>
-
-  <Choose>
-    <When Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">
-      <ItemGroup>
-        <PackageReference Include="System.Linq.Async" Version="4.1.1" />
-      </ItemGroup>
-    </When>
-    <Otherwise>
-      <ItemGroup>
-         <PackageReference Include="System.Linq.Async" Version="5.1.0" />
-      </ItemGroup>
-    </Otherwise>
-  </Choose>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\MongoFramework.Profiling.MiniProfiler\MongoFramework.Profiling.MiniProfiler.csproj" />
