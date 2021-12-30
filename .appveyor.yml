@@ -1,10 +1,10 @@
 version: 'Build {build}'
-image: Visual Studio 2019
+image: Visual Studio 2022
 skip_branch_with_pr: true
 
 services:
   - mongodb
-  
+
 build_script:
   - ps: dotnet restore
   - ps: dotnet build --no-restore -c Release
