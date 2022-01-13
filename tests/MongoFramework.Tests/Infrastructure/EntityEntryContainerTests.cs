@@ -1,7 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Infrastructure;
-using System;
-using System.Linq;
 
 namespace MongoFramework.Tests.Infrastructure
 {

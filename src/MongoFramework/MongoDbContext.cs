@@ -1,14 +1,14 @@
-using MongoFramework.Infrastructure;
-using MongoFramework.Infrastructure.Commands;
-using MongoFramework.Infrastructure.Indexing;
-using MongoFramework.Infrastructure.Internal;
-using MongoFramework.Infrastructure.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using MongoFramework.Infrastructure;
+using MongoFramework.Infrastructure.Commands;
+using MongoFramework.Infrastructure.Indexing;
+using MongoFramework.Infrastructure.Internal;
+using MongoFramework.Infrastructure.Linq;
 using MongoFramework.Utilities;
 
 namespace MongoFramework
@@ -59,9 +59,9 @@ namespace MongoFramework
 			}
 		}
 
-		protected virtual void AfterDetectChanges() {}
+		protected virtual void AfterDetectChanges() { }
 
-		protected virtual WriteModelOptions GetWriteModelOptions() => WriteModelOptions.Default;		
+		protected virtual WriteModelOptions GetWriteModelOptions() => WriteModelOptions.Default;
 
 		public virtual void SaveChanges()
 		{
@@ -95,7 +95,7 @@ namespace MongoFramework
 			AfterDetectChanges();
 			var commands = GenerateWriteCommands();
 			var writeModelOptions = GetWriteModelOptions();
-	
+
 			var commandsByEntityType = commands.GroupBy(c => c.EntityType);
 			foreach (var entityTypeCommands in commandsByEntityType)
 			{
@@ -108,7 +108,7 @@ namespace MongoFramework
 			ChangeTracker.CommitChanges();
 			CommandStaging.CommitChanges();
 		}
-		
+
 		private static async Task InternalSaveChangesAsync<TEntity>(IMongoDbConnection connection, IEnumerable<IWriteCommand> commands, WriteModelOptions options, CancellationToken cancellationToken) where TEntity : class
 		{
 			await EntityIndexWriter.ApplyIndexingAsync<TEntity>(connection);
@@ -133,7 +133,7 @@ namespace MongoFramework
 			var provider = new MongoFrameworkQueryProvider<TEntity>(Connection);
 			return new MongoFrameworkQueryable<TEntity>(provider);
 		}
-		
+
 		/// <summary>
 		/// Marks the entity as unchanged in the change tracker and starts tracking.
 		/// </summary>
@@ -156,7 +156,7 @@ namespace MongoFramework
 				ChangeTracker.SetEntityState(entity, EntityEntryState.NoChanges);
 			}
 		}
-		
+
 		public void Dispose()
 		{
 			Dispose(true);

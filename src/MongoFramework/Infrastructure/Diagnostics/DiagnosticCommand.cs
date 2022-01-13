@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using MongoDB.Driver;
-using MongoFramework.Infrastructure.Linq;
 
 namespace MongoFramework.Infrastructure.Diagnostics
 {

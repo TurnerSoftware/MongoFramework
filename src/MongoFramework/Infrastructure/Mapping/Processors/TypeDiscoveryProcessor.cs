@@ -1,7 +1,4 @@
-﻿using System;
-using MongoDB.Bson.Serialization;
-using System.Reflection;
-using MongoFramework.Attributes;
+﻿using MongoDB.Bson.Serialization;
 using MongoFramework.Infrastructure.Serialization;
 
 namespace MongoFramework.Infrastructure.Mapping.Processors

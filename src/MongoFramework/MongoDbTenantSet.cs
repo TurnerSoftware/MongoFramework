@@ -1,6 +1,3 @@
-using MongoFramework.Infrastructure.Linq;
-using MongoFramework.Infrastructure.Linq.Processors;
-using MongoFramework.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +6,10 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Commands;
+using MongoFramework.Infrastructure.Linq;
+using MongoFramework.Infrastructure.Linq.Processors;
 using MongoFramework.Infrastructure.Mapping;
+using MongoFramework.Linq;
 using MongoFramework.Utilities;
 
 namespace MongoFramework
@@ -25,9 +25,9 @@ namespace MongoFramework
 
 		public MongoDbTenantSet(IMongoDbContext context) : base(context)
 		{
-			Context = context as IMongoDbTenantContext ?? throw new ArgumentException("Context provided to a MongoDbTenantSet must be IMongoDbTenantContext",nameof(context));
+			Context = context as IMongoDbTenantContext ?? throw new ArgumentException("Context provided to a MongoDbTenantSet must be IMongoDbTenantContext", nameof(context));
 		}
-		
+
 		/// <summary>
 		///     Finds an entity with the given primary key value. If an entity with the given primary key value
 		///     is being tracked by the context, then it is returned immediately without making a request to the
@@ -119,7 +119,7 @@ namespace MongoFramework
 			}
 			base.AddRange(entities);
 		}
-		
+
 		public override void Update(TEntity entity)
 		{
 			Context.CheckEntity(entity);
@@ -150,7 +150,7 @@ namespace MongoFramework
 			var filter = predicate.AndAlso(o => o.TenantId == key);
 			base.RemoveRange(filter);
 		}
-		
+
 		#region IQueryable Implementation
 
 		protected override IQueryable<TEntity> GetQueryable(bool trackEntities)
@@ -164,9 +164,9 @@ namespace MongoFramework
 			}
 			return queryable;
 		}
-		
+
 		public IQueryable<TEntity> GetSearchTextQueryable(string search)
-		{			
+		{
 			var key = Context.TenantId;
 			var queryable = Context.Query<TEntity>().WhereFilter(b => b.Text(search)).Where(c => c.TenantId == key);
 			var provider = queryable.Provider as IMongoFrameworkQueryProvider<TEntity>;

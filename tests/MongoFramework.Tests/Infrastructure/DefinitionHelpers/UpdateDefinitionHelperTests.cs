@@ -1,10 +1,10 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using MongoFramework.Infrastructure.DefinitionHelpers;
-using System;
-using System.Collections.Generic;
 
 namespace MongoFramework.Tests.Infrastructure.DefinitionHelpers
 {

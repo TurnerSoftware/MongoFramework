@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MongoFramework.Infrastructure;
-using MongoFramework.Infrastructure.Linq;
-using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Linq;
 
 namespace MongoFramework.Tests.Linq
@@ -39,7 +35,7 @@ namespace MongoFramework.Tests.Linq
 			var context = new MongoDbTenantContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<QueryableAsyncModel>(context);
 
-			var context2 = new MongoDbTenantContext(connection, tenantId+"-2");
+			var context2 = new MongoDbTenantContext(connection, tenantId + "-2");
 			var dbSet2 = new MongoDbTenantSet<QueryableAsyncModel>(context2);
 
 			dbSet.AddRange(GetModels());
@@ -102,7 +98,7 @@ namespace MongoFramework.Tests.Linq
 			dbSet.AddRange(GetModels());
 			context.SaveChanges();
 
-			var context2 = new MongoDbTenantContext(connection, tenantId+"-2");
+			var context2 = new MongoDbTenantContext(connection, tenantId + "-2");
 			var dbSet2 = new MongoDbTenantSet<QueryableAsyncModel>(context2);
 
 			await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await dbSet2.FirstAsync());
@@ -139,7 +135,7 @@ namespace MongoFramework.Tests.Linq
 			dbSet.AddRange(GetModels());
 			context.SaveChanges();
 
-			var context2 = new MongoDbTenantContext(connection, tenantId+"-2");
+			var context2 = new MongoDbTenantContext(connection, tenantId + "-2");
 			var dbSet2 = new MongoDbTenantSet<QueryableAsyncModel>(context2);
 
 			Assert.IsNull(await dbSet2.FirstOrDefaultAsync());
@@ -176,7 +172,7 @@ namespace MongoFramework.Tests.Linq
 			dbSet.AddRange(GetModels());
 			context.SaveChanges();
 
-			var context2 = new MongoDbTenantContext(connection, tenantId+"-2");
+			var context2 = new MongoDbTenantContext(connection, tenantId + "-2");
 			var dbSet2 = new MongoDbTenantSet<QueryableAsyncModel>(context2);
 
 			await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await dbSet2.SingleAsync());
@@ -192,7 +188,7 @@ namespace MongoFramework.Tests.Linq
 			dbSet.AddRange(GetModels());
 			context.SaveChanges();
 
-			var context2 = new MongoDbTenantContext(connection, tenantId+"-2");
+			var context2 = new MongoDbTenantContext(connection, tenantId + "-2");
 			var dbSet2 = new MongoDbTenantSet<QueryableAsyncModel>(context2);
 
 			dbSet2.Add(new QueryableAsyncModel { Title = "SingleAsync_HasValue.1" });
@@ -230,7 +226,7 @@ namespace MongoFramework.Tests.Linq
 			dbSet.AddRange(GetModels());
 			context.SaveChanges();
 
-			var context2 = new MongoDbTenantContext(connection, tenantId+"-2");
+			var context2 = new MongoDbTenantContext(connection, tenantId + "-2");
 			var dbSet2 = new MongoDbTenantSet<QueryableAsyncModel>(context2);
 
 			Assert.IsNull(await dbSet2.SingleOrDefaultAsync());
@@ -246,7 +242,7 @@ namespace MongoFramework.Tests.Linq
 			dbSet.AddRange(GetModels());
 			context.SaveChanges();
 
-			var context2 = new MongoDbTenantContext(connection, tenantId+"-2");
+			var context2 = new MongoDbTenantContext(connection, tenantId + "-2");
 			var dbSet2 = new MongoDbTenantSet<QueryableAsyncModel>(context2);
 
 			dbSet2.Add(new QueryableAsyncModel { Title = "SingleOrDefaultAsync_HasValue.1" });
@@ -284,7 +280,7 @@ namespace MongoFramework.Tests.Linq
 			dbSet.AddRange(GetModels());
 			context.SaveChanges();
 
-			var context2 = new MongoDbTenantContext(connection, tenantId+"-2");
+			var context2 = new MongoDbTenantContext(connection, tenantId + "-2");
 			var dbSet2 = new MongoDbTenantSet<QueryableAsyncModel>(context2);
 
 			var result = await dbSet2.CountAsync();
@@ -320,7 +316,7 @@ namespace MongoFramework.Tests.Linq
 			dbSet.AddRange(GetModels());
 			context.SaveChanges();
 
-			var context2 = new MongoDbTenantContext(connection, tenantId+"-2");
+			var context2 = new MongoDbTenantContext(connection, tenantId + "-2");
 			var dbSet2 = new MongoDbTenantSet<QueryableAsyncModel>(context2);
 
 			await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await dbSet2.Select(e => e.IntNumber).MaxAsync());
@@ -364,7 +360,7 @@ namespace MongoFramework.Tests.Linq
 			dbSet.AddRange(GetModels());
 			context.SaveChanges();
 
-			var context2 = new MongoDbTenantContext(connection, tenantId+"-2");
+			var context2 = new MongoDbTenantContext(connection, tenantId + "-2");
 			var dbSet2 = new MongoDbTenantSet<QueryableAsyncModel>(context2);
 
 			await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await dbSet2.Select(e => e.IntNumber).MinAsync());
@@ -408,7 +404,7 @@ namespace MongoFramework.Tests.Linq
 			dbSet.AddRange(GetModels());
 			context.SaveChanges();
 
-			var context2 = new MongoDbTenantContext(connection, tenantId+"-2");
+			var context2 = new MongoDbTenantContext(connection, tenantId + "-2");
 			var dbSet2 = new MongoDbTenantSet<QueryableAsyncModel>(context2);
 
 			var result = await dbSet2.AnyAsync();

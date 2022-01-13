@@ -25,8 +25,8 @@ namespace MongoFramework.Benchmarks.Infrastructure.Internal
 		public string GenericHelper()
 		{
 			var method = GenericsHelper.GetMethodDelegate<Func<Type, string, string>>(
-				typeof(GenericMethodInvokeBenchmark), 
-				nameof(MyGenericMethod), 
+				typeof(GenericMethodInvokeBenchmark),
+				nameof(MyGenericMethod),
 				typeof(int)
 			);
 

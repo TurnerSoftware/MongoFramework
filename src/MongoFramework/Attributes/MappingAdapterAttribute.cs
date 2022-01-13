@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using MongoFramework.Infrastructure.Mapping;
 
 namespace MongoFramework.Attributes

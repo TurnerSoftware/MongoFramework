@@ -26,8 +26,8 @@ namespace MongoFramework.Infrastructure.Commands
 			Validator.ValidateObject(entity, validationContext);
 
 			var definition = EntityMapping.GetOrCreateDefinition(typeof(TEntity));
-			var updateDefintion = UpdateDefinitionHelper.CreateFromDiff<TEntity>(EntityEntry.OriginalValues, EntityEntry.CurrentValues);
-			yield return new UpdateOneModel<TEntity>(definition.CreateIdFilterFromEntity(entity), updateDefintion);
+			var updateDefinition = UpdateDefinitionHelper.CreateFromDiff<TEntity>(EntityEntry.OriginalValues, EntityEntry.CurrentValues);
+			yield return new UpdateOneModel<TEntity>(definition.CreateIdFilterFromEntity(entity), updateDefinition);
 		}
 	}
 }

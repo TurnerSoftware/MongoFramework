@@ -1,10 +1,9 @@
-﻿using MongoDB.Bson;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Reflection;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.IdGenerators;
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Reflection;
 
 namespace MongoFramework.Infrastructure.Mapping.Processors
 {
@@ -20,7 +19,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 					idProperty = property;
 					break;
 				}
-				
+
 				if (property.ElementName.Equals("id", StringComparison.InvariantCultureIgnoreCase))
 				{
 					//We don't break here just in case another property has the KeyAttribute

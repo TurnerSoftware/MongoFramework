@@ -119,7 +119,7 @@ namespace MongoFramework.Tests.Profiling.MiniProfiler
 						Name = "ProfilingRead"
 					});
 				}
-				
+
 				context.SaveChanges();
 
 				var profiler = SEProfiling.MiniProfiler.StartNew();

@@ -1,8 +1,8 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MongoFramework.Attributes;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MongoFramework.Attributes;
 
 namespace MongoFramework.Tests
 {
@@ -73,7 +73,7 @@ namespace MongoFramework.Tests
 		{
 			using (var context = new MongoDbContextTestContext(TestConfiguration.GetConnection(), TestConfiguration.GetTenantId()))
 			{
-				Assert.IsInstanceOfType(context.Set<DbSetModel>(),typeof(MongoDbTenantSet<DbSetModel>));
+				Assert.IsInstanceOfType(context.Set<DbSetModel>(), typeof(MongoDbTenantSet<DbSetModel>));
 			}
 		}
 
@@ -82,7 +82,7 @@ namespace MongoFramework.Tests
 		{
 			using (var context = new MongoDbContextTestContext(TestConfiguration.GetConnection(), TestConfiguration.GetTenantId()))
 			{
-				Assert.IsInstanceOfType(context.Set<SecondModel>(),typeof(MongoDbSet<SecondModel>));
+				Assert.IsInstanceOfType(context.Set<SecondModel>(), typeof(MongoDbSet<SecondModel>));
 			}
 		}
 
@@ -111,7 +111,7 @@ namespace MongoFramework.Tests
 				Assert.AreEqual(TestConfiguration.GetTenantId(), context.DbSet.First().TenantId);
 			}
 		}
-		
+
 		[TestMethod]
 		public void SuccessfullyAttachUntrackedEntity()
 		{

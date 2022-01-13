@@ -65,9 +65,9 @@ namespace MongoFramework.Infrastructure
 
 			return null;
 		}
-		
+
 		public EntityEntry GetEntryById<TCollectionBase>(object id)
-		{		
+		{
 			var collectionType = typeof(TCollectionBase);
 
 			if (EntryLookupByType.TryGetValue(collectionType, out var entries))

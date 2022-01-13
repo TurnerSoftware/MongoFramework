@@ -1,10 +1,4 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using MongoDB.Driver;
-using MongoDB.Driver.Linq;
-using MongoFramework.Infrastructure.Diagnostics;
-using MongoFramework.Infrastructure.Mapping;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -12,6 +6,12 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Driver;
+using MongoDB.Driver.Linq;
+using MongoFramework.Infrastructure.Diagnostics;
+using MongoFramework.Infrastructure.Mapping;
 
 namespace MongoFramework.Infrastructure.Linq
 {
@@ -102,7 +102,7 @@ namespace MongoFramework.Infrastructure.Linq
 			if (model.ResultTransformer != null)
 			{
 				executor = Expression.Invoke(
-					model.ResultTransformer, 
+					model.ResultTransformer,
 					Expression.Convert(executor, model.ResultTransformer.Parameters[0].Type),
 					Expression.Constant(cancellationToken)
 				);
@@ -157,7 +157,7 @@ namespace MongoFramework.Infrastructure.Linq
 				result.ResultTransformer = ResultTransformers.Transform(expression, serializer.ValueType, isAsync) as LambdaExpression;
 
 				//Note: In the future this can change from the initial reflection to a `TryTransform` function where it checks the expression itself
-				//		The reason we are doing this method first is to weed out the bugs and any core missing functionality.					
+				//		The reason we are doing this method first is to weed out the bugs and any core missing functionality.
 			}
 
 			return result;
@@ -236,7 +236,7 @@ namespace MongoFramework.Infrastructure.Linq
 					foreach (var item in resultBatch)
 					{
 						if (item is TEntity entityItem &&
-						    (model.ResultTransformer == null ||
+							(model.ResultTransformer == null ||
 							model.ResultTransformer.ReturnType == typeof(ValueTask<TEntity>) ||
 							model.ResultTransformer.ReturnType == typeof(Task<TEntity>)))
 						{

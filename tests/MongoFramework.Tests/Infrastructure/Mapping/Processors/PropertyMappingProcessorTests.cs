@@ -1,10 +1,10 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mapping.Processors;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 
 namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 {

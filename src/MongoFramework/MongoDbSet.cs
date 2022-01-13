@@ -1,10 +1,3 @@
-using MongoDB.Driver;
-using MongoFramework.Infrastructure;
-using MongoFramework.Infrastructure.Commands;
-using MongoFramework.Infrastructure.Linq;
-using MongoFramework.Infrastructure.Linq.Processors;
-using MongoFramework.Infrastructure.Mapping;
-using MongoFramework.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,6 +5,13 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using MongoDB.Driver;
+using MongoFramework.Infrastructure;
+using MongoFramework.Infrastructure.Commands;
+using MongoFramework.Infrastructure.Linq;
+using MongoFramework.Infrastructure.Linq.Processors;
+using MongoFramework.Infrastructure.Mapping;
+using MongoFramework.Utilities;
 
 namespace MongoFramework
 {
@@ -130,7 +130,7 @@ namespace MongoFramework
 				Context.ChangeTracker.SetEntityState(entity, EntityEntryState.Added);
 			}
 		}
-		
+
 		/// <summary>
 		/// Marks the entity for updating.
 		/// </summary>

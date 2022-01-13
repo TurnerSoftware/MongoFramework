@@ -1,15 +1,11 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MongoDB.Bson;
+﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.IdGenerators;
 using MongoFramework.Attributes;
 using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mapping.Processors;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 
 namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 {
@@ -26,7 +22,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 				var definitionIndexes = definition.Indexes.ToList();
 
 				definitionIndexes.Add(new EntityIndex
-				{					
+				{
 					Property = definition.GetProperty("UserName"),
 					IsUnique = true,
 					SortOrder = IndexSortOrder.Ascending
@@ -53,7 +49,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[MappingAdapter(typeof(AdapterTestModelMappingAdapterNoInterface))]
 		public class AdapterTestModelNoInterface
 		{
-			// broken adapter 
+			// broken adapter
 		}
 
 		public class AdapterTestModelMappingAdapterConstructor : IMappingProcessor
@@ -72,7 +68,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[MappingAdapter(typeof(AdapterTestModelMappingAdapterConstructor))]
 		public class AdapterTestModelConstructor
 		{
-			// broken adapter 
+			// broken adapter
 		}
 
 		[TestMethod]

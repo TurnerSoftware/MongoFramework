@@ -1,8 +1,8 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MongoFramework.Attributes;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MongoFramework.Attributes;
 
 namespace MongoFramework.Tests
 {
@@ -85,7 +85,7 @@ namespace MongoFramework.Tests
 				Assert.IsTrue(context.DbSet.Any());
 			}
 		}
-		
+
 		[TestMethod]
 		public void SuccessfullyAttachUntrackedEntity()
 		{

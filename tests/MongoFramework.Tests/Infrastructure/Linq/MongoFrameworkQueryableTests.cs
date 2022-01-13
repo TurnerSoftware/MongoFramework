@@ -1,9 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Driver;
 using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Linq;
 using MongoFramework.Infrastructure.Mapping;
-using System.Linq;
 
 namespace MongoFramework.Tests.Infrastructure.Linq
 {

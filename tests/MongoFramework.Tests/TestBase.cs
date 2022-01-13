@@ -3,7 +3,6 @@ using MongoDB.Driver;
 using MongoFramework.Infrastructure.Indexing;
 using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Serialization;
-using System;
 
 namespace MongoFramework.Tests
 {

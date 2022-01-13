@@ -1,3 +1,8 @@
+using System;
+using System.Collections;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
@@ -5,11 +10,6 @@ using MongoDB.Driver.GeoJsonObjectModel;
 using MongoDB.Driver.Linq;
 using MongoFramework.Infrastructure.Linq;
 using MongoFramework.Infrastructure.Mapping;
-using System;
-using System.Collections;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
 
 namespace MongoFramework.Linq
 {
@@ -21,7 +21,7 @@ namespace MongoFramework.Linq
 			{
 				return mongoFrameworkQueryable.ToQuery();
 			}
-			
+
 			throw new ArgumentException($"Queryable must implement interface {nameof(IMongoFrameworkQueryable)}", nameof(queryable));
 		}
 

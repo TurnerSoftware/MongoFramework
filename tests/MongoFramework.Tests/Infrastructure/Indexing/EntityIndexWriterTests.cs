@@ -1,10 +1,10 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Driver;
 using MongoDB.Driver.GeoJsonObjectModel;
 using MongoFramework.Attributes;
 using MongoFramework.Infrastructure.Indexing;
-using System;
-using System.Threading.Tasks;
 
 namespace MongoFramework.Tests.Infrastructure.Indexing
 {

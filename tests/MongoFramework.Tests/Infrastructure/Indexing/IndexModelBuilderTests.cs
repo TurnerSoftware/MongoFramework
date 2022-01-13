@@ -1,9 +1,9 @@
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Driver.GeoJsonObjectModel;
 using MongoFramework.Attributes;
 using MongoFramework.Infrastructure.Indexing;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 {
@@ -106,7 +106,7 @@ namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 		public void IndexNaming()
 		{
 			var indexModel = IndexModelBuilder<IndexNamingModel>.BuildModel();
-			
+
 			Assert.AreEqual(2, indexModel.Count());
 			Assert.IsTrue(indexModel.Any(m => m.Options.Name == null));
 			Assert.IsTrue(indexModel.Any(m => m.Options.Name == "MyCustomIndexName"));

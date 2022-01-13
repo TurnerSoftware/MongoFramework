@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Infrastructure.Commands;
 using MongoFramework.Infrastructure.Mapping;
@@ -28,7 +26,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping
 			public NestedTraverseMappingModel NestedModel { get; set; }
 			public NestedTraverseMappingModel RepeatedType { get; set; }
 			public TraverseMappingModel RecursionType { get; set; }
-			
+
 			public NestedTraverseMappingModel[] ArrayModel { get; set; }
 			public IEnumerable<NestedTraverseMappingModel> EnumerableModel { get; set; }
 			public List<NestedTraverseMappingModel> ListModel { get; set; }

@@ -1,10 +1,5 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
+﻿using MongoDB.Bson.Serialization;
 using MongoFramework.Infrastructure.Internal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 
 namespace MongoFramework.Infrastructure.Mapping.Processors
 {

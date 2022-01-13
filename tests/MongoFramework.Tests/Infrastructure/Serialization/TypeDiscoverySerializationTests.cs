@@ -1,4 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
@@ -6,8 +8,6 @@ using MongoFramework.Attributes;
 using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mapping.Processors;
 using MongoFramework.Infrastructure.Serialization;
-using System;
-using System.Collections.Generic;
 
 namespace MongoFramework.Tests.Infrastructure.Serialization
 {
