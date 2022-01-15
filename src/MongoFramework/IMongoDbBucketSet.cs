@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace MongoFramework
 {
-	public interface IMongoDbBucketSet<TGroup, TSubEntity> : IMongoDbSet, IQueryable<EntityBucket<TGroup, TSubEntity>> 
+	public interface IMongoDbBucketSet<TGroup, TSubEntity> : IMongoDbSet, IQueryable<EntityBucket<TGroup, TSubEntity>>
 		where TGroup : class
 		where TSubEntity : class
 	{

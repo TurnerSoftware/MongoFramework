@@ -1,9 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MongoFramework.Infrastructure.Mapping;
-using System;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
+﻿using System;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MongoFramework.Infrastructure.Mapping;
 
 namespace MongoFramework.Tests.Infrastructure.Mapping
 {
@@ -18,7 +16,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping
 		/// <summary>
 		/// A potentially common issue for web application startup, this tests that multiple threads
 		/// can map a class at the same time without concurrency issues.
-		/// 
+		///
 		/// Relates to: https://github.com/TurnerSoftware/MongoFramework/issues/7
 		/// </summary>
 		[TestMethod]

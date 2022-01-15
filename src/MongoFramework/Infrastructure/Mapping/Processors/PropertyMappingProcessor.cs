@@ -1,9 +1,7 @@
-﻿using MongoDB.Bson.Serialization;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 using System.Reflection;
+using MongoDB.Bson.Serialization;
 
 namespace MongoFramework.Infrastructure.Mapping.Processors
 {
@@ -23,7 +21,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 					continue;
 				}
 
-				//Skip overridden properties 
+				//Skip overridden properties
 				var getMethod = property.GetMethod;
 				if (property.GetMethod.IsVirtual && getMethod.GetBaseDefinition().DeclaringType != entityType)
 				{
@@ -45,7 +43,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 
 				//Do the mapping
 				var memberMap = classMap.MapMember(property);
-				
+
 				//Set custom element name with the "ColumnAttribute"
 				var columnAttribute = property.GetCustomAttribute<ColumnAttribute>();
 				if (columnAttribute != null)

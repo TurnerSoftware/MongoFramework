@@ -1,13 +1,12 @@
-﻿using MongoDB.Bson;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
-using System;
-using System.Collections.Concurrent;
-using System.Linq;
-using System.Threading;
 using MongoFramework.Infrastructure.Mapping;
-using System.Collections.Generic;
 
 namespace MongoFramework.Infrastructure.Serialization
 {
@@ -167,29 +166,26 @@ namespace MongoFramework.Infrastructure.Serialization
 			{
 				return new DictionaryInterfaceImplementerSerializer<Dictionary<string, object>>();
 			}
-			else if (type.IsGenericType && DictionaryTypes.Contains(type.GetGenericTypeDefinition()))
+
+			if (type.IsGenericType && DictionaryTypes.Contains(type.GetGenericTypeDefinition()))
 			{
 				var serializerType = typeof(DictionaryInterfaceImplementerSerializer<>).MakeGenericType(type);
 				var serializer = (IBsonSerializer)Activator.CreateInstance(serializerType);
 				return serializer;
 			}
-			else
-			{
-				if (EntityMapping.IsValidTypeToMap(type))
-				{
-					//Force the type to be processed by the Entity Mapper
-					EntityMapping.TryRegisterType(type, out _);
 
-					var classMap = BsonClassMap.LookupClassMap(type);
-					var serializerType = typeof(BsonClassMapSerializer<>).MakeGenericType(type);
-					var serializer = (IBsonSerializer)Activator.CreateInstance(serializerType, classMap);
-					return serializer;
-				}
-				else
-				{
-					return BsonSerializer.LookupSerializer(type);
-				}
+			if (EntityMapping.IsValidTypeToMap(type))
+			{
+				//Force the type to be processed by the Entity Mapper
+				EntityMapping.TryRegisterType(type, out _);
+
+				var classMap = BsonClassMap.LookupClassMap(type);
+				var serializerType = typeof(BsonClassMapSerializer<>).MakeGenericType(type);
+				var serializer = (IBsonSerializer)Activator.CreateInstance(serializerType, classMap);
+				return serializer;
 			}
+
+			return BsonSerializer.LookupSerializer(type);
 		}
 
 		public void Serialize(BsonSerializationContext context, BsonSerializationArgs args, object value)

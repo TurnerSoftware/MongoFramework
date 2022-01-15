@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Commands;
 using MongoFramework.Utilities;
 
@@ -24,11 +23,11 @@ namespace MongoFramework
 		{
 			return new WriteModelOptions { TenantId = TenantId };
 		}
-		
+
 		public virtual void CheckEntity(IHaveTenantId entity)
 		{
 			Check.NotNull(entity, nameof(entity));
-			
+
 			if (entity.TenantId != TenantId)
 			{
 				throw new MultiTenantException($"Entity type {entity.GetType().Name}, tenant ID does not match. Expected: {TenantId}, Entity has: {entity.TenantId}");
@@ -38,13 +37,13 @@ namespace MongoFramework
 		public virtual void CheckEntities(IEnumerable<IHaveTenantId> entities)
 		{
 			Check.NotNull(entities, nameof(entities));
-			
+
 			foreach (var entity in entities)
 			{
 				CheckEntity(entity);
 			}
 		}
-		
+
 		/// <summary>
 		/// Marks the entity as unchanged in the change tracker and starts tracking.
 		/// </summary>

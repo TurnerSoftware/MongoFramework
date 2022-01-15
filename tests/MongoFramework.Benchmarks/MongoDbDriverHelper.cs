@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 
@@ -15,7 +12,7 @@ namespace MongoFramework.Benchmarks
 		public static void ResetDriver()
 		{
 			//Primarily introduced to better test TypeDiscoverySerializer, this is designed to reset the MongoDB driver
-			//as if the assembly just loaded. It is likely incomplete and would be easily subject to breaking in future 
+			//as if the assembly just loaded. It is likely incomplete and would be easily subject to breaking in future
 			//driver updates. If someone knows a better way to reset the MongoDB driver, please open a pull request!
 
 			var classMapField = typeof(BsonClassMap).GetField("__classMaps", BindingFlags.NonPublic | BindingFlags.Static);

@@ -1,14 +1,12 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoFramework.Attributes;
-using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Linq;
 using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace MongoFramework.Tests.Linq
 {
@@ -91,7 +89,7 @@ namespace MongoFramework.Tests.Linq
 
 			var provider = new MongoFrameworkQueryProvider<WhereIdMatchesGuidModel>(connection);
 			var queryable = new MongoFrameworkQueryable<WhereIdMatchesGuidModel>(provider);
-			
+
 			var entityIds = entityCollection.Select(e => e.Id).Take(2);
 
 			var idMatchQueryable = LinqExtensions.WhereIdMatches(queryable, entityIds);
@@ -119,7 +117,7 @@ namespace MongoFramework.Tests.Linq
 
 			var provider = new MongoFrameworkQueryProvider<WhereIdMatchesObjectIdModel>(connection);
 			var queryable = new MongoFrameworkQueryable<WhereIdMatchesObjectIdModel>(provider);
-			
+
 			var entityIds = entityCollection.Select(e => e.Id).Take(2);
 
 			var idMatchQueryable = LinqExtensions.WhereIdMatches(queryable, entityIds);
@@ -147,7 +145,7 @@ namespace MongoFramework.Tests.Linq
 
 			var provider = new MongoFrameworkQueryProvider<WhereIdMatchesStringModel>(connection);
 			var queryable = new MongoFrameworkQueryable<WhereIdMatchesStringModel>(provider);
-			
+
 			var entityIds = entityCollection.Select(e => e.Id).Take(2);
 
 			var idMatchQueryable = LinqExtensions.WhereIdMatches(queryable, entityIds);

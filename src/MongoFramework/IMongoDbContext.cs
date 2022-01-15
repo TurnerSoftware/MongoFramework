@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoFramework.Infrastructure;
-using MongoFramework.Infrastructure.Commands;
 
 namespace MongoFramework
 {
@@ -19,7 +18,7 @@ namespace MongoFramework
 
 		void SaveChanges();
 		Task SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
-		
+
 		void Attach<TEntity>(TEntity entity) where TEntity : class;
 		void AttachRange<TEntity>(IEnumerable<TEntity> entities) where TEntity : class;
 	}

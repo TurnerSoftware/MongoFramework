@@ -9,7 +9,7 @@ namespace MongoFramework.Infrastructure.Mapping
 	{
 		public static IEntityProperty GetIdProperty(this IEntityDefinition definition)
 		{
-			return definition.GetAllProperties().Where(m => m.IsKey).FirstOrDefault();
+			return definition.GetAllProperties().FirstOrDefault(m => m.IsKey);
 		}
 
 		public static string GetIdName(this IEntityDefinition definition)
@@ -25,7 +25,7 @@ namespace MongoFramework.Infrastructure.Mapping
 		public static object GetDefaultId(this IEntityDefinition definition)
 		{
 			var idPropertyType = definition.GetIdProperty()?.PropertyType;
-			if (idPropertyType != null && idPropertyType.IsValueType)
+			if (idPropertyType is { IsValueType: true })
 			{
 				return Activator.CreateInstance(idPropertyType);
 			}
@@ -73,11 +73,12 @@ namespace MongoFramework.Infrastructure.Mapping
 			return default;
 		}
 
-		private class TraversalState
+		private sealed class TraversalState
 		{
 			public HashSet<Type> SeenTypes { get; set; }
 			public IEnumerable<IEntityProperty> Properties { get; set; }
 		}
+
 		public static IEnumerable<IEntityProperty> TraverseProperties(this IEntityDefinition definition)
 		{
 			var stack = new Stack<TraversalState>();

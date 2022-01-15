@@ -1,12 +1,12 @@
-﻿using MongoDB.Driver;
-using MongoFramework.Infrastructure.Commands;
-using MongoFramework.Infrastructure.Diagnostics;
-using MongoFramework.Infrastructure.Mapping;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MongoDB.Driver;
+using MongoFramework.Infrastructure.Commands;
+using MongoFramework.Infrastructure.Diagnostics;
+using MongoFramework.Infrastructure.Mapping;
 
 namespace MongoFramework.Infrastructure
 {

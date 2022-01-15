@@ -1,10 +1,10 @@
-﻿using MongoFramework.Infrastructure.Diagnostics;
-using MongoFramework.Infrastructure.Mapping;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MongoFramework.Infrastructure.Diagnostics;
+using MongoFramework.Infrastructure.Mapping;
 
 namespace MongoFramework.Infrastructure.Indexing
 {

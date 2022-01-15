@@ -279,7 +279,7 @@ namespace MongoFramework.Tests
 				BucketSize = 2,
 				EntityTimeProperty = "Date"
 			});
-			
+
 			dbSet.AddRange(new EntityGroup
 			{
 				Name = "Group1"

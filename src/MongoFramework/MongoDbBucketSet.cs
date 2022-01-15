@@ -5,15 +5,13 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Commands;
-using MongoFramework.Infrastructure.Indexing;
 using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Utilities;
 
 namespace MongoFramework
 {
-	public class MongoDbBucketSet<TGroup, TSubEntity> : IMongoDbBucketSet<TGroup, TSubEntity> 
+	public class MongoDbBucketSet<TGroup, TSubEntity> : IMongoDbBucketSet<TGroup, TSubEntity>
 		where TGroup : class
 		where TSubEntity : class
 	{
@@ -114,7 +112,7 @@ namespace MongoFramework
 		{
 			return Context.Query<EntityBucket<TGroup, TSubEntity>>();
 		}
-	
+
 		public Type ElementType => GetQueryable().ElementType;
 
 		public Expression Expression => GetQueryable().Expression;

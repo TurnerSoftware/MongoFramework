@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
-using System.Text;
 using MongoDB.Bson.Serialization;
 using MongoFramework.Attributes;
 
@@ -14,7 +11,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 		{
 			var adapterAttribute = definition.EntityType.GetCustomAttribute<MappingAdapterAttribute>();
 
-			if (adapterAttribute == null)				
+			if (adapterAttribute == null)
 			{
 				return;
 			}

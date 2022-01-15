@@ -1,8 +1,7 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Linq;
 
 namespace MongoFramework.Tests
@@ -71,7 +70,7 @@ namespace MongoFramework.Tests
 			context = new MongoDbContext(connection);
 			dbSet = new MongoDbSet<TestModel>(context);
 			Assert.AreEqual("SuccessfulInsertAndFind", dbSet.Find(model.Id).Description);
-			Assert.AreEqual(MongoFramework.Infrastructure.EntityEntryState.NoChanges, context.ChangeTracker.GetEntry(model).State);			
+			Assert.AreEqual(MongoFramework.Infrastructure.EntityEntryState.NoChanges, context.ChangeTracker.GetEntry(model).State);
 		}
 
 		[TestMethod]
@@ -307,7 +306,7 @@ namespace MongoFramework.Tests
 			Assert.IsFalse(dbSet.Any(m => m.Description == "SuccessfullyRemoveRange.1"));
 			Assert.IsFalse(dbSet.Any(m => m.Description == "SuccessfullyRemoveRange.2"));
 		}
-		
+
 		[TestMethod]
 		public void SuccessfullyRemoveEntityById()
 		{
@@ -394,7 +393,7 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public async Task SuccessfullyLinqFindTrackedAsync()
 		{
-			var connection = TestConfiguration.GetConnection();			
+			var connection = TestConfiguration.GetConnection();
 			var context = new MongoDbContext(connection);
 			var dbSet = new MongoDbSet<TestModel>(context);
 
@@ -470,7 +469,7 @@ namespace MongoFramework.Tests
 
 			Assert.IsNull(context.ChangeTracker.GetEntry(result));
 		}
-		
+
 	}
 
 }

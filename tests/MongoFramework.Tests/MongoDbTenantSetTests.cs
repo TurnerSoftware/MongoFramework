@@ -1,11 +1,9 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Driver;
 using MongoFramework.Attributes;
-using System.Runtime.CompilerServices;
 using MongoFramework.Linq;
 
 namespace MongoFramework.Tests
@@ -141,8 +139,8 @@ namespace MongoFramework.Tests
 			var context2 = new MongoDbTenantContext(connection, tenantId + "-alt");
 			var dbSet2 = new MongoDbTenantSet<TestModel>(context2);
 
-			var entity1 = new TestModel {Description = "SuccessfulInsertAndFind.1"};
-			var entity2 = new TestModel {Description = "SuccessfulInsertAndFind.2"};
+			var entity1 = new TestModel { Description = "SuccessfulInsertAndFind.1" };
+			var entity2 = new TestModel { Description = "SuccessfulInsertAndFind.2" };
 
 			dbSet.Add(entity1);
 			dbSet2.Add(entity2);
@@ -167,8 +165,8 @@ namespace MongoFramework.Tests
 			var context2 = new MongoDbTenantContext(connection, tenantId + "-alt");
 			var dbSet2 = new MongoDbTenantSet<TestModel>(context2);
 
-			var entity1 = new TestModel {Description = "SuccessfulInsertAndFind.1"};
-			var entity2 = new TestModel {Description = "SuccessfulInsertAndFind.2"};
+			var entity1 = new TestModel { Description = "SuccessfulInsertAndFind.1" };
+			var entity2 = new TestModel { Description = "SuccessfulInsertAndFind.2" };
 
 			dbSet.Add(entity1);
 			dbSet2.Add(entity2);
@@ -190,8 +188,8 @@ namespace MongoFramework.Tests
 			var context2 = new MongoDbTenantContext(connection, tenantId + "-alt");
 			var dbSet2 = new MongoDbTenantSet<TestModel>(context2);
 
-			var entity1 = new TestModel {Description = "SuccessfulInsertAndFind.1"};
-			var entity2 = new TestModel {Description = "SuccessfulInsertAndFind.2"};
+			var entity1 = new TestModel { Description = "SuccessfulInsertAndFind.1" };
+			var entity2 = new TestModel { Description = "SuccessfulInsertAndFind.2" };
 
 			dbSet.Add(entity1);
 			dbSet2.Add(entity2);
@@ -257,8 +255,8 @@ namespace MongoFramework.Tests
 			var context2 = new MongoDbTenantContext(connection, tenantId + "-alt");
 			var dbSet2 = new MongoDbTenantSet<TestModel>(context2);
 
-			var entity1 = new TestModel {Description = "SuccessfulInsertAndFind.1"};
-			var entity2 = new TestModel {Description = "SuccessfulInsertAndFind.2"};
+			var entity1 = new TestModel { Description = "SuccessfulInsertAndFind.1" };
+			var entity2 = new TestModel { Description = "SuccessfulInsertAndFind.2" };
 
 			dbSet.Add(entity1);
 			dbSet2.Add(entity2);
@@ -283,8 +281,8 @@ namespace MongoFramework.Tests
 			var context2 = new MongoDbTenantContext(connection, tenantId + "-alt");
 			var dbSet2 = new MongoDbTenantSet<TestModel>(context2);
 
-			var entity1 = new TestModel {Description = "SuccessfulInsertAndFind.1"};
-			var entity2 = new TestModel {Description = "SuccessfulInsertAndFind.1"};
+			var entity1 = new TestModel { Description = "SuccessfulInsertAndFind.1" };
+			var entity2 = new TestModel { Description = "SuccessfulInsertAndFind.1" };
 
 			dbSet.Add(entity1);
 			dbSet2.Add(entity2);
@@ -306,8 +304,8 @@ namespace MongoFramework.Tests
 			var context2 = new MongoDbTenantContext(connection, tenantId + "-alt");
 			var dbSet2 = new MongoDbTenantSet<TestModel>(context2);
 
-			var entity1 = new TestModel {Description = "SuccessfulInsertAndFind.1"};
-			var entity2 = new TestModel {Description = "SuccessfulInsertAndFind.1"};
+			var entity1 = new TestModel { Description = "SuccessfulInsertAndFind.1" };
+			var entity2 = new TestModel { Description = "SuccessfulInsertAndFind.1" };
 
 			dbSet.Add(entity1);
 			dbSet2.Add(entity2);
@@ -585,7 +583,7 @@ namespace MongoFramework.Tests
 			Assert.IsFalse(dbSet.Any(m => m.Description == "SuccessfullyRemoveRange.1"));
 			Assert.IsFalse(dbSet.Any(m => m.Description == "SuccessfullyRemoveRange.2"));
 		}
-		
+
 		[TestMethod]
 		public void SuccessfullyBlocksRemoveRange()
 		{
@@ -789,10 +787,10 @@ namespace MongoFramework.Tests
 			var context2 = new MongoDbTenantContext(connection, tenantId + "-alt");
 			var dbSet2 = new MongoDbTenantSet<TestUniqueModel>(context2);
 
-			dbSet.Add(new TestUniqueModel{UserName = "AllowsUniquesByTenant.1"});
-			dbSet.Add(new TestUniqueModel{UserName = "AllowsUniquesByTenant.2"});
-			dbSet2.Add(new TestUniqueModel{UserName = "AllowsUniquesByTenant.1"});
-			dbSet2.Add(new TestUniqueModel{UserName = "AllowsUniquesByTenant.2"});
+			dbSet.Add(new TestUniqueModel { UserName = "AllowsUniquesByTenant.1" });
+			dbSet.Add(new TestUniqueModel { UserName = "AllowsUniquesByTenant.2" });
+			dbSet2.Add(new TestUniqueModel { UserName = "AllowsUniquesByTenant.1" });
+			dbSet2.Add(new TestUniqueModel { UserName = "AllowsUniquesByTenant.2" });
 
 			context.SaveChanges();
 			context2.SaveChanges();
@@ -812,13 +810,13 @@ namespace MongoFramework.Tests
 			var context2 = new MongoDbTenantContext(connection, tenantId + "-alt");
 			var dbSet2 = new MongoDbTenantSet<TestUniqueModel>(context2);
 
-			dbSet.Add(new TestUniqueModel{UserName = "BlocksDuplicatesByTenant"});
-			dbSet2.Add(new TestUniqueModel{UserName = "BlocksDuplicatesByTenant"});
+			dbSet.Add(new TestUniqueModel { UserName = "BlocksDuplicatesByTenant" });
+			dbSet2.Add(new TestUniqueModel { UserName = "BlocksDuplicatesByTenant" });
 
 			context.SaveChanges();
 			context2.SaveChanges();
 
-			dbSet.Add(new TestUniqueModel{UserName = "BlocksDuplicatesByTenant"});
+			dbSet.Add(new TestUniqueModel { UserName = "BlocksDuplicatesByTenant" });
 			Assert.ThrowsException<MongoBulkWriteException<TestUniqueModel>>(() => context.SaveChanges());
 		}
 		[TestMethod]
@@ -928,7 +926,7 @@ namespace MongoFramework.Tests
 
 			var result = await dbSet.AsNoTracking().FirstOrDefaultAsync();
 
-			Assert.IsNull(context.ChangeTracker.GetEntry(result));		
+			Assert.IsNull(context.ChangeTracker.GetEntry(result));
 		}
 
 	}

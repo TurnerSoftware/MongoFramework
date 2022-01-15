@@ -1,6 +1,6 @@
-﻿using MongoDB.Bson;
+﻿using System.Linq;
+using MongoDB.Bson;
 using MongoDB.Driver;
-using System.Linq;
 
 namespace MongoFramework.Infrastructure.DefinitionHelpers
 {
@@ -17,7 +17,7 @@ namespace MongoFramework.Infrastructure.DefinitionHelpers
 			var documentAProperties = documentA?.Names ?? Enumerable.Empty<string>();
 			var documentBProperties = documentB?.Names ?? Enumerable.Empty<string>();
 			var propertyNames = documentAProperties.Union(documentBProperties);
-			
+
 			var baseName = name;
 			if (!string.IsNullOrEmpty(baseName))
 			{

@@ -1,5 +1,4 @@
 ﻿using MongoDB.Bson.Serialization;
-using System;
 
 namespace MongoFramework.Infrastructure.Mapping
 {
