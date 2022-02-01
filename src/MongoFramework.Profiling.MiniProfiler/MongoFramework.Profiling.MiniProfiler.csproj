@@ -1,20 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net5.0;net6.0</TargetFrameworks>
-    <AssemblyName>MongoFramework.Profiling.MiniProfiler</AssemblyName>
-    <Title>MiniProfiler for MongoFramework</Title>
-    <Description>MongoFramework integration for MiniProfiler</Description>
-    <PackageTags>miniprofiler;performance;$(PackageBaseTags)</PackageTags>
-    <Authors>James Turner</Authors>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
+		<AssemblyName>MongoFramework.Profiling.MiniProfiler</AssemblyName>
+		<Title>MiniProfiler for MongoFramework</Title>
+		<Description>MongoFramework integration for MiniProfiler</Description>
+		<PackageTags>miniprofiler;profiler;profiling;timing;performance;$(PackageBaseTags)</PackageTags>
+		<Authors>James Turner</Authors>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="MiniProfiler.Shared" Version="4.2.22" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="MiniProfiler.Shared" Version="4.2.22" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\MongoFramework\MongoFramework.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\MongoFramework\MongoFramework.csproj" />
+	</ItemGroup>
 
 </Project>
