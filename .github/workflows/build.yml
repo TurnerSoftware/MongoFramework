@@ -31,7 +31,7 @@ jobs:
       run: brew services list
     - name: Configure MongoDB (MacOS)
       if: matrix.os == 'macOS-latest'
-      run: brew services start mongod
+      run: brew services start mongodb-community
     - name: Configure MongoDB (Ubuntu)
       if: matrix.os == 'ubuntu-latest'
       run: sudo systemctl start mongod
