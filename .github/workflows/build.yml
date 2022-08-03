@@ -28,9 +28,6 @@ jobs:
     steps:
     - name: Configure MongoDB (MacOS)
       if: matrix.os == 'macOS-latest'
-      run: brew services list
-    - name: Configure MongoDB (MacOS)
-      if: matrix.os == 'macOS-latest'
       run: brew services start mongodb-community@5.0
     - name: Configure MongoDB (Ubuntu)
       if: matrix.os == 'ubuntu-latest'
