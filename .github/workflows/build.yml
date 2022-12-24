@@ -34,8 +34,12 @@ jobs:
       run: |
         wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add -
         echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/4.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.2.list
+        echo Update
         sudo apt-get update
+        echo Install
         sudo apt-get install -y mongodb-org
+        echo Start
+        sudo systemctl start mongod
 
     - name: Checkout
       uses: actions/checkout@v2
