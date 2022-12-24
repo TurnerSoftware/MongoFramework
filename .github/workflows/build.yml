@@ -43,7 +43,8 @@ jobs:
         sudo systemctl start mongod
     - name: Configure MongoDB (Windows)
       if: matrix.os == 'windows-latest'
-      run: choco install mongodb --version=6.0.2
+      run: net start MongoDB
+      #run: choco install mongodb --version=6.0.2
 
     - name: Checkout
       uses: actions/checkout@v2
