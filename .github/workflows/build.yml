@@ -32,6 +32,7 @@ jobs:
       if: matrix.os == 'macOS-latest'
       run: |
         brew tap mongodb/brew
+        brew update
         brew services start mongodb-community@${{env.MONGODB_SHORT_VERSION}}
     - name: Configure MongoDB (Ubuntu)
       if: matrix.os == 'ubuntu-latest'
