@@ -16,7 +16,7 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
   BUILD_ARTIFACT_PATH: ${{github.workspace}}/build-artifacts
-  MONGODB_VERSION: 4.2
+  MONGODB_VERSION: 5.0
 
 jobs:
 
