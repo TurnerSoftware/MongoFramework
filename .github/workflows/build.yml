@@ -39,7 +39,7 @@ jobs:
         echo Check
         cat /etc/apt/sources.list.d/mongodb-org-4.2.list
         echo Install
-        sudo apt-get install -y mongodb-org
+        sudo apt-get install -y mongodb-org=4.2.18
         echo Start
         sudo systemctl start mongod
 
