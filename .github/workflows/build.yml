@@ -36,6 +36,8 @@ jobs:
         echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/4.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.2.list
         echo Update
         sudo apt-get update
+        echo Check
+        cat /etc/apt/sources.list.d/mongodb-org-4.2.list
         echo Install
         sudo apt-get install -y mongodb-org
         echo Start
