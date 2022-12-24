@@ -32,14 +32,14 @@ jobs:
     - name: Configure MongoDB (Ubuntu)
       if: matrix.os == 'ubuntu-latest'
       run: |
-        wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add -
-        echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/4.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.2.list
+        wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+        echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
         echo Update
         sudo apt-get update
         echo Check
-        cat /etc/apt/sources.list.d/mongodb-org-4.2.list
+        cat /etc/apt/sources.list.d/mongodb-org-4.4.list
         echo Install
-        sudo apt-get install -y mongodb-org=4.2.18
+        sudo apt-get install -y mongodb-org=4.4.18 mongodb-org-server=4.4.18 mongodb-org-shell=4.4.18 mongodb-org-mongos=4.4.18 mongodb-org-tools=4.4.18
         echo Start
         sudo systemctl start mongod
 
