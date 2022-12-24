@@ -30,7 +30,7 @@ jobs:
     steps:
     - name: Configure MongoDB (MacOS)
       if: matrix.os == 'macOS-latest'
-      run: brew services start mongodb-community@5.0
+      run: brew services start mongodb-community@6.0
     - name: Configure MongoDB (Ubuntu)
       if: matrix.os == 'ubuntu-latest'
       run: |
@@ -39,6 +39,9 @@ jobs:
         sudo apt update
         sudo apt install mongodb-org=${{env.MONGODB_LONG_VERSION}}
         sudo systemctl start mongod
+    - name: Configure MongoDB (Windows)
+      if: matrix.os == 'windows-latest'
+      run: choco install mongodb=${{env.MONGODB_LONG_VERSION}}
 
     - name: Checkout
       uses: actions/checkout@v2
