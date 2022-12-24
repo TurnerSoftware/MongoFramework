@@ -16,8 +16,6 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
   BUILD_ARTIFACT_PATH: ${{github.workspace}}/build-artifacts
-  MONGODB_SHORT_VERSION: '6.0'
-  MONGODB_LONG_VERSION: '6.0.3'
 
 jobs:
 
@@ -33,18 +31,18 @@ jobs:
       run: |
         brew tap mongodb/brew
         brew update
-        brew services start mongodb-community@${{env.MONGODB_SHORT_VERSION}}
+        brew services start mongodb-community@6.0
     - name: Configure MongoDB (Ubuntu)
       if: matrix.os == 'ubuntu-latest'
       run: |
-        wget -qO - https://www.mongodb.org/static/pgp/server-${{env.MONGODB_SHORT_VERSION}}.asc | gpg --dearmor | sudo tee /usr/share/keyrings/mongodb.gpg > /dev/null
-        echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/${{env.MONGODB_SHORT_VERSION}} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${{env.MONGODB_SHORT_VERSION}}.list
+        wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | gpg --dearmor | sudo tee /usr/share/keyrings/mongodb.gpg > /dev/null
+        echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
         sudo apt update
-        sudo apt install mongodb-org=${{env.MONGODB_LONG_VERSION}}
+        sudo apt install mongodb-org=6.0.3
         sudo systemctl start mongod
     - name: Configure MongoDB (Windows)
       if: matrix.os == 'windows-latest'
-      run: choco install mongodb --version=${{env.MONGODB_LONG_VERSION}}
+      run: choco install mongodb --version=6.0.2
 
     - name: Checkout
       uses: actions/checkout@v2
