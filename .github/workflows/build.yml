@@ -44,10 +44,12 @@ jobs:
         brew update
         brew install mongodb-community@${{matrix.mongodb}}
         brew services start mongodb-community@${{matrix.mongodb}}
-    - name: Configure MongoDB (Ubuntu)
+    - name: Configure MongoDB (Ubuntu (20.04))
+      if: matrix.os == 'ubuntu-20.04'
+      run: sudo apt remove mongodb-org
+    - name: Configure MongoDB (Ubuntu (All))
       if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-20.04'
       run: |
-        sudo apt remove mongodb-org
         wget -qO - https://www.mongodb.org/static/pgp/server-${{matrix.mongodb}}.asc | gpg --dearmor | sudo tee /usr/share/keyrings/mongodb.gpg > /dev/null
         echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb.gpg ] https://repo.mongodb.org/apt/ubuntu ${{matrix.ubuntu}}/mongodb-org/${{matrix.mongodb}} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${{matrix.mongodb}}.list
         sudo apt update
