@@ -24,10 +24,15 @@ jobs:
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        os: [windows-latest, macOS-latest]
+        mongodb: ['4.4', '5.0', '6.0']
         include:
-          - mongodb: '6.0'
-          - mongodb: '5.0'
+          - os: ubuntu-20.04
+            mongodb: '4.4'
+          - os: ubuntu-20.04
+            mongodb: '5.0'
+          - os: ubuntu-latest
+            mongodb: '6.0'
     steps:
     - name: Configure MongoDB (MacOS)
       if: matrix.os == 'macOS-latest'
