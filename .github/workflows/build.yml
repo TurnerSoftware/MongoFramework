@@ -52,7 +52,7 @@ jobs:
       shell: powershell
       # TODO: Maybe use PowerShell to find latest patch version like the GH Action runner?
       run: |
-        choco uninstall mongodb.install
+        choco uninstall mongodb.install mongodb
         $latestPackageVersion = Get-LatestChocoPackageVersion -TargetVersion ${{matrix.mongodb}} -PackageName "mongodb.install"
         choco install mongodb.install --version=$latestPackageVersion
         sc config MongoDB start=demand
