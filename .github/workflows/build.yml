@@ -49,10 +49,13 @@ jobs:
         sudo systemctl start mongod
     - name: Configure MongoDB (Windows)
       if: matrix.os == 'windows-latest'
+      shell: powershell
       # TODO: Maybe use PowerShell to find latest patch version like the GH Action runner?
       run: |
-        choco uninstall mongodb
-        choco install mongodb --version=${{matrix.mongodb}}.0
+        choco uninstall mongodb.install
+        $latestPackageVersion = Get-LatestChocoPackageVersion -TargetVersion ${{matrix.mongodb}} -PackageName "mongodb.install"
+        choco install mongodb.install --version=$latestPackageVersion
+        sc config MongoDB start=demand
         net start MongoDB
 
     - name: Checkout
