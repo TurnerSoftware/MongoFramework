@@ -29,10 +29,13 @@ jobs:
         include:
           - os: ubuntu-20.04
             mongodb: '4.4'
+            ubuntu: 'focal'
           - os: ubuntu-20.04
             mongodb: '5.0'
+            ubuntu: 'focal'
           - os: ubuntu-latest
             mongodb: '6.0'
+            ubuntu: 'jammy'
     steps:
     - name: Configure MongoDB (MacOS)
       if: matrix.os == 'macOS-latest'
@@ -44,8 +47,9 @@ jobs:
     - name: Configure MongoDB (Ubuntu)
       if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-20.04'
       run: |
+        sudo apt remove mongodb-org
         wget -qO - https://www.mongodb.org/static/pgp/server-${{matrix.mongodb}}.asc | gpg --dearmor | sudo tee /usr/share/keyrings/mongodb.gpg > /dev/null
-        echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/${{matrix.mongodb}} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${{matrix.mongodb}}.list
+        echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb.gpg ] https://repo.mongodb.org/apt/ubuntu ${{matrix.ubuntu}}/mongodb-org/${{matrix.mongodb}} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${{matrix.mongodb}}.list
         sudo apt update
         sudo apt install mongodb-org
         sudo systemctl start mongod
