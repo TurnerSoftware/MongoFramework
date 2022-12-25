@@ -20,33 +20,40 @@ env:
 jobs:
 
   build:
-    name: Build ${{matrix.os}}
+    name: Build (${{matrix.os}}, MongoDB ${{matrix.mongodb}})
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
+        include:
+          - mongodb: '6.0'
+          #- mongodb: '5.0'
+          #  mongodb_patch: '5.0.3'
+          #- mongodb: '4.4'
+          #  mongodb_patch: '4.4.3'
     steps:
     - name: Configure MongoDB (MacOS)
       if: matrix.os == 'macOS-latest'
       run: |
         brew tap mongodb/brew
         brew update
-        brew install mongodb-community@6.0
-        brew services start mongodb-community@6.0
+        brew install mongodb-community@${{matrix.mongodb}}
+        brew services start mongodb-community@${{matrix.mongodb}}
     - name: Configure MongoDB (Ubuntu)
       if: matrix.os == 'ubuntu-latest'
       run: |
-        wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | gpg --dearmor | sudo tee /usr/share/keyrings/mongodb.gpg > /dev/null
-        echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+        wget -qO - https://www.mongodb.org/static/pgp/server-${{matrix.mongodb}}.asc | gpg --dearmor | sudo tee /usr/share/keyrings/mongodb.gpg > /dev/null
+        echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/${{matrix.mongodb}} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${{matrix.mongodb}}.list
         sudo apt update
-        sudo apt install mongodb-org=6.0.3
+        sudo apt install mongodb-org
         sudo systemctl start mongod
     - name: Configure MongoDB (Windows)
       if: matrix.os == 'windows-latest'
+      # TODO: Maybe use PowerShell to find latest patch version like the GH Action runner?
       run: |
-        sc config MongoDB start=demand
+        choco uninstall mongodb
+        choco install mongodb --version=${{matrix.mongodb}}.0
         net start MongoDB
-      #run: choco install mongodb --version=6.0.2
 
     - name: Checkout
       uses: actions/checkout@v2
