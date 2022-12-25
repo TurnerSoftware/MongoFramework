@@ -54,10 +54,11 @@ jobs:
       run: |
         choco uninstall mongodb mongodb.install
         $latestPackageVersion = Get-LatestChocoPackageVersion -TargetVersion ${{matrix.mongodb}} -PackageName "mongodb.install"
-        choco install mongodb.install --version=$latestPackageVersion --install-arguments="'/l*v c:\mongodb.install_msi_install.log'"
-        Get-Content -Path c:\mongodb.install_msi_install.log
-        Set-Service MongoDB -StartupType Demand
-        Start-Service MongoDB
+        choco install mongodb.portable --version=$latestPackageVersion 
+        #--install-arguments="'/l*v c:\mongodb.install_msi_install.log'"
+        #Get-Content -Path c:\mongodb.install_msi_install.log
+        #Set-Service MongoDB -StartupType Manual
+        #Start-Service MongoDB
         #Choco-Install mongodb.install --version=$latestPackageVersion
 
     - name: Checkout
