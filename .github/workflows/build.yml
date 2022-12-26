@@ -64,7 +64,7 @@ jobs:
         choco install mongodb.portable --version=$latestPackageVersion 
 
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Setup dotnet SDK
       uses: actions/setup-dotnet@v1
       with:
@@ -91,7 +91,7 @@ jobs:
     needs: build
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Download coverage reports
       uses: actions/download-artifact@v2
     - name: Install ReportGenerator tool
