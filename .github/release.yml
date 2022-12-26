@@ -11,7 +11,7 @@
         - enhancement
     - title: Bug Fixes
       labels:
-        - bug-fix
+        - bug
     - title: Dependency Updates
       labels:
         - dependencies
