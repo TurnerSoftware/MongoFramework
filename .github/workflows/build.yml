@@ -20,18 +20,48 @@ env:
 jobs:
 
   build:
-    name: Build ${{matrix.os}}
+    name: Build (${{matrix.os}}, MongoDB ${{matrix.mongodb}})
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        os: [windows-latest, macOS-latest]
+        mongodb: ['4.4', '5.0', '6.0']
+        include:
+          - os: ubuntu-20.04
+            mongodb: '4.4'
+            ubuntu: 'focal'
+          - os: ubuntu-20.04
+            mongodb: '5.0'
+            ubuntu: 'focal'
+          - os: ubuntu-latest
+            mongodb: '6.0'
+            ubuntu: 'jammy'
     steps:
     - name: Configure MongoDB (MacOS)
       if: matrix.os == 'macOS-latest'
-      run: brew services start mongodb-community@5.0
-    - name: Configure MongoDB (Ubuntu)
-      if: matrix.os == 'ubuntu-latest'
-      run: sudo systemctl start mongod
+      run: |
+        brew tap mongodb/brew
+        brew update
+        brew install mongodb-community@${{matrix.mongodb}}
+        brew services start mongodb-community@${{matrix.mongodb}}
+    - name: Configure MongoDB (Ubuntu (20.04))
+      if: matrix.os == 'ubuntu-20.04'
+      run: sudo apt remove mongodb-org
+    - name: Configure MongoDB (Ubuntu (All))
+      if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-20.04'
+      run: |
+        wget -qO - https://www.mongodb.org/static/pgp/server-${{matrix.mongodb}}.asc | gpg --dearmor | sudo tee /usr/share/keyrings/mongodb.gpg > /dev/null
+        echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb.gpg ] https://repo.mongodb.org/apt/ubuntu ${{matrix.ubuntu}}/mongodb-org/${{matrix.mongodb}} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${{matrix.mongodb}}.list
+        sudo apt update
+        sudo apt install mongodb-org
+        sudo systemctl start mongod
+    - name: Configure MongoDB (Windows)
+      if: matrix.os == 'windows-latest'
+      shell: powershell
+      run: |
+        choco uninstall mongodb mongodb.install
+        $latestPackageVersion = Get-LatestChocoPackageVersion -TargetVersion ${{matrix.mongodb}} -PackageName "mongodb.install"
+        choco install mongodb.portable --version=$latestPackageVersion 
 
     - name: Checkout
       uses: actions/checkout@v2
