@@ -1,0 +1,20 @@
+﻿changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+  categories:
+    - title: ⚠ Breaking Changes
+      labels:
+        - breaking-change
+    - title: Features and Improvements
+      labels:
+        - enhancement
+    - title: Bug Fixes
+      labels:
+        - bug
+    - title: Dependency Updates
+      labels:
+        - dependencies
+    - title: Other Changes
+      labels:
+        - "*"

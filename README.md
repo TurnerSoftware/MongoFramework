@@ -4,7 +4,7 @@
 # MongoFramework
 An "Entity Framework"-like interface for MongoDB
 
-![Build](https://img.shields.io/github/workflow/status/TurnerSoftware/mongoframework/Build)
+![Build](https://img.shields.io/github/actions/workflow/status/TurnerSoftware/mongoframework/build.yml?branch=main)
 [![Codecov](https://img.shields.io/codecov/c/github/turnersoftware/mongoframework/main.svg)](https://codecov.io/gh/TurnerSoftware/MongoFramework)
 [![NuGet](https://img.shields.io/nuget/v/MongoFramework.svg)](https://www.nuget.org/packages/MongoFramework/)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/62fa31c90bf94f3d8e201b9684a7a4ca)](https://www.codacy.com/app/Turnerj/MongoFramework)
