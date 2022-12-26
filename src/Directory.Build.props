@@ -1,32 +1,31 @@
 <Project>
 
-  <PropertyGroup>
-    <RootNamespace>MongoFramework</RootNamespace>
+	<PropertyGroup>
+		<RootNamespace>MongoFramework</RootNamespace>
 
-    <Company>Turner Software</Company>
+		<Company>Turner Software</Company>
 
-    <PackageId>$(AssemblyName)</PackageId>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageIcon>icon.png</PackageIcon>
-    <PackageProjectUrl>https://github.com/TurnerSoftware/MongoFramework</PackageProjectUrl>
-    <PackageBaseTags>mongo;mongodb;data;database;orm</PackageBaseTags>
+		<PackageId>$(AssemblyName)</PackageId>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageIcon>icon.png</PackageIcon>
+		<PackageProjectUrl>https://github.com/TurnerSoftware/MongoFramework</PackageProjectUrl>
+		<PackageBaseTags>mongo;mongodb;data;database;orm</PackageBaseTags>
 
-    <!-- SourceLink Support -->
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<!-- SourceLink Support -->
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<DebugType>embedded</DebugType>
 
-    <LangVersion>Latest</LangVersion>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-    <PackageReference Include="TurnerSoftware.BuildVersioning" Version="0.4.0" PrivateAssets="All" />
-  </ItemGroup>
+		<LangVersion>Latest</LangVersion>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+		<PackageReference Include="TurnerSoftware.BuildVersioning" Version="0.4.0" PrivateAssets="All" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Include="..\..\images\$(PackageIcon)" Pack="true" PackagePath="/" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\..\images\$(PackageIcon)" Pack="true" PackagePath="/" />
+	</ItemGroup>
 
 </Project>
