@@ -27,11 +27,7 @@ namespace MongoFramework.Linq
 
 		public static IQueryable<TEntity> WhereIdMatches<TEntity>(this IQueryable<TEntity> queryable, IEnumerable entityIds) where TEntity : class
 		{
-			var idProperty = EntityMapping.GetOrCreateDefinition(typeof(TEntity))
-				.GetAllProperties()
-				.Where(p => p.IsKey)
-				.FirstOrDefault();
-
+			var idProperty = EntityMapping.GetOrCreateDefinition(typeof(TEntity)).Key.Property;
 			return queryable.WherePropertyMatches(idProperty, entityIds);
 		}
 
@@ -39,14 +35,14 @@ namespace MongoFramework.Linq
 		{
 			//The cast allows for handling identifiers generically as "IEnumerable<object>". Without the Cast call, we can't handle ObjectId etc.
 			var castMethod = typeof(Enumerable).GetMethod("Cast", BindingFlags.Public | BindingFlags.Static);
-			var castedIdentifiers = castMethod.MakeGenericMethod(property.PropertyType).Invoke(null, new[] { values });
+			var castedIdentifiers = castMethod.MakeGenericMethod(property.PropertyInfo.PropertyType).Invoke(null, new[] { values });
 
 			//Dynamically build the LINQ query, it looks something like: e => castedIdentifiers.Contains(e.{propertyName})
 			var entityParameter = Expression.Parameter(typeof(TEntity), "e");
 			var propertyExpression = Expression.Property(entityParameter, property.PropertyInfo.Name);
 			var identifiersExpression = Expression.Constant(castedIdentifiers);
 			var expression = Expression.Lambda<Func<TEntity, bool>>(
-				Expression.Call(typeof(Enumerable), "Contains", new[] { property.PropertyType }, identifiersExpression, propertyExpression),
+				Expression.Call(typeof(Enumerable), "Contains", new[] { property.PropertyInfo.PropertyType }, identifiersExpression, propertyExpression),
 				entityParameter
 			);
 

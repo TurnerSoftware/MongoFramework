@@ -29,26 +29,32 @@ internal static class DriverMappingInterop
 		}
 
 		// Key / ID
-		var idMemberMap = classMap.MapIdMember(definition.Key.Property.PropertyInfo);
-		idMemberMap.SetIdGenerator(new DriverKeyGeneratorWrapper(definition.Key.KeyGenerator));
+		if (definition.Key is not null)
+		{
+			var idMemberMap = classMap.MapIdMember(definition.Key.Property.PropertyInfo);
+			idMemberMap.SetIdGenerator(new DriverKeyGeneratorWrapper(definition.Key.KeyGenerator));
+		}
 
 		// Extra Elements
-		if (definition.ExtraElements.IgnoreExtraElements)
+		if (definition.ExtraElements is not null)
 		{
-			classMap.SetIgnoreExtraElements(true);
-			classMap.SetIgnoreExtraElementsIsInherited(definition.ExtraElements.IgnoreInherited);
-		}
-		else
-		{
-			classMap.SetIgnoreExtraElements(false);
-
-			var extraElementsProperty = definition.ExtraElements.Property;
-			foreach (var memberMap in classMap.DeclaredMemberMaps)
+			if (definition.ExtraElements.IgnoreExtraElements)
 			{
-				if (memberMap.ElementName == extraElementsProperty.ElementName)
+				classMap.SetIgnoreExtraElements(true);
+				classMap.SetIgnoreExtraElementsIsInherited(definition.ExtraElements.IgnoreInherited);
+			}
+			else
+			{
+				classMap.SetIgnoreExtraElements(false);
+
+				var extraElementsProperty = definition.ExtraElements.Property;
+				foreach (var memberMap in classMap.DeclaredMemberMaps)
 				{
-					classMap.SetExtraElementsMember(memberMap);
-					break;
+					if (memberMap.ElementName == extraElementsProperty.ElementName)
+					{
+						classMap.SetExtraElementsMember(memberMap);
+						break;
+					}
 				}
 			}
 		}

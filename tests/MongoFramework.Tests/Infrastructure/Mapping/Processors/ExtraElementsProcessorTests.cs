@@ -38,6 +38,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		[TestMethod]
 		public void ObeysIgnoreExtraElementsAttribute()
 		{
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			EntityMapping.AddMappingProcessor(new ExtraElementsProcessor());
 			EntityMapping.RegisterType(typeof(IgnoreExtraElementsModel));
 

@@ -9,7 +9,12 @@ namespace MongoFramework.Infrastructure.Mapping
 	{
 		public static IEntityPropertyDefinition GetIdProperty(this IEntityDefinition definition)
 		{
-			return definition.GetAllProperties().FirstOrDefault(m => m.IsKey);
+			if (definition.Key is null)
+			{
+				return EntityMapping.GetOrCreateDefinition(definition.EntityType.BaseType).GetIdProperty();
+			}
+
+			return definition.Key?.Property;
 		}
 
 		public static string GetIdName(this IEntityDefinition definition)
@@ -24,7 +29,7 @@ namespace MongoFramework.Infrastructure.Mapping
 
 		public static object GetDefaultId(this IEntityDefinition definition)
 		{
-			var idPropertyType = definition.GetIdProperty()?.PropertyType;
+			var idPropertyType = definition.GetIdProperty()?.PropertyInfo.PropertyType;
 			if (idPropertyType is { IsValueType: true })
 			{
 				return Activator.CreateInstance(idPropertyType);
@@ -95,7 +100,7 @@ namespace MongoFramework.Infrastructure.Mapping
 				{
 					yield return property;
 
-					var propertyType = property.PropertyType;
+					var propertyType = property.PropertyInfo.PropertyType;
 					propertyType = propertyType.GetEnumerableItemTypeOrDefault();
 
 					if (EntityMapping.IsValidTypeToMap(propertyType) && !state.SeenTypes.Contains(propertyType))
@@ -104,11 +109,11 @@ namespace MongoFramework.Infrastructure.Mapping
 							.GetAllProperties()
 							.Select(p => new EntityPropertyDefinition
 							{
-								EntityType = p.EntityType,
-								IsKey = p.IsKey,
+								//EntityType = p.EntityType,
+								//IsKey = p.IsKey,
 								ElementName = p.ElementName,
 								FullPath = $"{property.FullPath}.{p.ElementName}",
-								PropertyType = p.PropertyType,
+								//PropertyType = p.PropertyType,
 								PropertyInfo = p.PropertyInfo
 							});
 

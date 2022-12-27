@@ -18,21 +18,21 @@ public class EntityKeyGenerators
 
 internal class EntityKeyGenerator : IEntityKeyGenerator
 {
-	internal IIdGenerator IdGenerator { get; }
+	private readonly IIdGenerator idGenerator;
 
 	public EntityKeyGenerator(IIdGenerator idGenerator)
 	{
-		IdGenerator = idGenerator;
+		this.idGenerator = idGenerator;
 	}
 
 	public object Generate()
 	{
-		return IdGenerator.GenerateId(null, null);
+		return idGenerator.GenerateId(null, null);
 	}
 
 	public bool IsEmpty(object id)
 	{
-		return IdGenerator.IsEmpty(id);
+		return idGenerator.IsEmpty(id);
 	}
 }
 

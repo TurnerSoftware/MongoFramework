@@ -23,8 +23,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 			}
 			else
 			{
-				//If any of the Entity's properties have the "ExtraElementsAttribute", assign that against the BsonClassMap
-
+				//If any of the Entity's properties have the "ExtraElementsAttribute", use that
 				foreach (var property in definition.Properties)
 				{
 					var extraElementsAttribute = property.PropertyInfo.GetCustomAttribute<ExtraElementsAttribute>();
@@ -35,8 +34,10 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 							Property = property,
 							IgnoreExtraElements = false
 						};
+						break;
 					}
 				}
+
 			}
 		}
 	}

@@ -82,8 +82,6 @@ namespace MongoFramework.Tests.Infrastructure.Mapping
 			var result = definition.TraverseProperties().ToArray();
 
 			Assert.AreEqual(32, result.Length);
-			Assert.IsTrue(result.Any(m => m.EntityType == typeof(NestedTraverseMappingModel)));
-			Assert.IsTrue(result.Any(m => m.EntityType == typeof(InnerNestedTraverseMappingModel)));
 
 			Assert.IsTrue(result.Any(m => m.FullPath == "RecursionType"));
 
