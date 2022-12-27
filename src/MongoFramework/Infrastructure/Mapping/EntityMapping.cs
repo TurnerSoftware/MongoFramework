@@ -92,21 +92,19 @@ namespace MongoFramework.Infrastructure.Mapping
 						//We will treat success of this check as if we have registered it just now
 						return definition;
 					}
-
-					var classMap = new BsonClassMap(entityType);
 					definition = new EntityDefinition
 					{
 						EntityType = entityType
 					};
 
 					EntityDefinitions.TryAdd(entityType, definition);
-					BsonClassMap.RegisterClassMap(classMap);
 
 					foreach (var processor in MappingProcessors)
 					{
-						processor.ApplyMapping(definition, classMap);
+						processor.ApplyMapping(definition, null);
 					}
 
+					DriverMappingInterop.RegisterDefinition(definition);
 					return definition;
 				}
 				finally
@@ -165,20 +163,19 @@ namespace MongoFramework.Infrastructure.Mapping
 						return true;
 					}
 
-					var classMap = new BsonClassMap(entityType);
 					definition = new EntityDefinition
 					{
 						EntityType = entityType
 					};
 
 					EntityDefinitions.TryAdd(entityType, definition);
-					BsonClassMap.RegisterClassMap(classMap);
 
 					foreach (var processor in MappingProcessors)
 					{
-						processor.ApplyMapping(definition, classMap);
+						processor.ApplyMapping(definition, null);
 					}
 
+					DriverMappingInterop.RegisterDefinition(definition);
 					return true;
 				}
 				finally

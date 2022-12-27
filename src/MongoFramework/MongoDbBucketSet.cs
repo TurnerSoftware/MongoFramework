@@ -19,7 +19,7 @@ namespace MongoFramework
 
 		internal int BucketSize { get; }
 
-		internal IEntityProperty EntityTimeProperty { get; }
+		internal IEntityPropertyDefinition EntityTimeProperty { get; }
 
 		public MongoDbBucketSet(IMongoDbContext context, IDbSetOptions options)
 		{

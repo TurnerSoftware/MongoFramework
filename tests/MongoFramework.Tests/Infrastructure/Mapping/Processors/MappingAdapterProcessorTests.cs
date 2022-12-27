@@ -21,7 +21,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 
 				var definitionIndexes = definition.Indexes.ToList();
 
-				definitionIndexes.Add(new EntityIndex
+				definitionIndexes.Add(new EntityIndexDefinition
 				{
 					Property = definition.GetProperty("UserName"),
 					IsUnique = true,

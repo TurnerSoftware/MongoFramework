@@ -7,7 +7,7 @@ namespace MongoFramework.Infrastructure.Mapping
 {
 	public static class EntityDefinitionExtensions
 	{
-		public static IEntityProperty GetIdProperty(this IEntityDefinition definition)
+		public static IEntityPropertyDefinition GetIdProperty(this IEntityDefinition definition)
 		{
 			return definition.GetAllProperties().FirstOrDefault(m => m.IsKey);
 		}
@@ -32,7 +32,7 @@ namespace MongoFramework.Infrastructure.Mapping
 			return null;
 		}
 
-		public static IEnumerable<IEntityProperty> GetInheritedProperties(this IEntityDefinition definition)
+		public static IEnumerable<IEntityPropertyDefinition> GetInheritedProperties(this IEntityDefinition definition)
 		{
 			var currentType = definition.EntityType.BaseType;
 			while (currentType != typeof(object) && currentType != null)
@@ -47,7 +47,7 @@ namespace MongoFramework.Infrastructure.Mapping
 			}
 		}
 
-		public static IEnumerable<IEntityProperty> GetAllProperties(this IEntityDefinition definition)
+		public static IEnumerable<IEntityPropertyDefinition> GetAllProperties(this IEntityDefinition definition)
 		{
 			foreach (var property in definition.Properties)
 			{
@@ -60,7 +60,7 @@ namespace MongoFramework.Infrastructure.Mapping
 			}
 		}
 
-		public static IEntityProperty GetProperty(this IEntityDefinition definition, string name)
+		public static IEntityPropertyDefinition GetProperty(this IEntityDefinition definition, string name)
 		{
 			foreach (var property in definition.GetAllProperties())
 			{
@@ -76,10 +76,10 @@ namespace MongoFramework.Infrastructure.Mapping
 		private sealed class TraversalState
 		{
 			public HashSet<Type> SeenTypes { get; set; }
-			public IEnumerable<IEntityProperty> Properties { get; set; }
+			public IEnumerable<IEntityPropertyDefinition> Properties { get; set; }
 		}
 
-		public static IEnumerable<IEntityProperty> TraverseProperties(this IEntityDefinition definition)
+		public static IEnumerable<IEntityPropertyDefinition> TraverseProperties(this IEntityDefinition definition)
 		{
 			var stack = new Stack<TraversalState>();
 			stack.Push(new TraversalState
@@ -102,7 +102,7 @@ namespace MongoFramework.Infrastructure.Mapping
 					{
 						var nestedProperties = EntityMapping.GetOrCreateDefinition(propertyType)
 							.GetAllProperties()
-							.Select(p => new EntityProperty
+							.Select(p => new EntityPropertyDefinition
 							{
 								EntityType = p.EntityType,
 								IsKey = p.IsKey,

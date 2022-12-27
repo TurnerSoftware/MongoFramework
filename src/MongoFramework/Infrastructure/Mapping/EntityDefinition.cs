@@ -7,47 +7,68 @@ namespace MongoFramework.Infrastructure.Mapping;
 
 public interface IEntityDefinition
 {
-	Type EntityType { get; set; }
-	string CollectionName { get; set; }
-	IEntityKeyGenerator KeyGenerator { get; set; }
-	IEnumerable<IEntityProperty> Properties { get; set; }
-	IEnumerable<IEntityIndex> Indexes { get; set; }
+	public Type EntityType { get; set; }
+	public string CollectionName { get; set; }
+	public IEntityKeyDefinition Key { get; set; }
+	public IEnumerable<IEntityPropertyDefinition> Properties { get; set; }
+	public IEnumerable<IEntityIndexDefinition> Indexes { get; set; }
+	public IEntityExtraElementsDefinition ExtraElements { get; set; }
 }
 
-public interface IEntityProperty
+public interface IEntityPropertyDefinition
 {
-	Type EntityType { get; }
-	bool IsKey { get; }
-	string ElementName { get; }
-	string FullPath { get; }
-	Type PropertyType { get; }
-	PropertyInfo PropertyInfo { get; }
+	[Obsolete("Replace with IEntityDefinition _if_ actually needed")]
+	public Type EntityType { get; }
+	[Obsolete("Key is defined on IEntityDefinition")]
+	public bool IsKey { get; }
+	public string ElementName { get; }
+	[Obsolete("This should be on a custom EntityProperty type (WalkedEntityProperty)?")]
+	public string FullPath { get; }
+	[Obsolete("This is accessible from PropertyInfo")]
+	public Type PropertyType { get; }
+	public PropertyInfo PropertyInfo { get; }
 
-	object GetValue(object entity);
-	void SetValue(object entity, object value);
+	public object GetValue(object entity);
+	public void SetValue(object entity, object value);
 }
 
-public interface IEntityIndex
+public interface IEntityIndexDefinition
 {
-	IEntityProperty Property { get; }
-	string IndexName { get; }
-	bool IsUnique { get; }
-	IndexSortOrder SortOrder { get; }
-	int IndexPriority { get; }
-	IndexType IndexType { get; }
-	bool IsTenantExclusive { get; set; }
+	public IReadOnlyCollection<IEntityPropertyDefinition> Properties { get; }
+	[Obsolete("Index definition can point to multiple properties directly")]
+	public IEntityPropertyDefinition Property { get; }
+	public string IndexName { get; }
+	public bool IsUnique { get; }
+	public IndexSortOrder SortOrder { get; }
+	public int IndexPriority { get; }
+	public IndexType IndexType { get; }
+	public bool IsTenantExclusive { get; }
+}
+
+public interface IEntityExtraElementsDefinition
+{
+	public IEntityPropertyDefinition Property { get; }
+	public bool IgnoreExtraElements { get; }
+	public bool IgnoreInherited { get; }
+}
+
+public interface IEntityKeyDefinition
+{
+	public IEntityPropertyDefinition Property { get; }
+	public IEntityKeyGenerator KeyGenerator { get; }
 }
 
 public class EntityDefinition : IEntityDefinition
 {
 	public Type EntityType { get; set; }
 	public string CollectionName { get; set; }
-	public IEntityKeyGenerator KeyGenerator { get; set; }
-	public IEnumerable<IEntityProperty> Properties { get; set; } = Enumerable.Empty<IEntityProperty>();
-	public IEnumerable<IEntityIndex> Indexes { get; set; } = Enumerable.Empty<IEntityIndex>();
+	public IEntityKeyDefinition Key { get; set; }
+	public IEnumerable<IEntityPropertyDefinition> Properties { get; set; } = Enumerable.Empty<IEntityPropertyDefinition>();
+	public IEnumerable<IEntityIndexDefinition> Indexes { get; set; } = Enumerable.Empty<IEntityIndexDefinition>();
+	public IEntityExtraElementsDefinition ExtraElements { get; set; }
 }
 
-public class EntityProperty : IEntityProperty
+public class EntityPropertyDefinition : IEntityPropertyDefinition
 {
 	public Type EntityType { get; set; }
 	public bool IsKey { get; set; }
@@ -67,13 +88,27 @@ public class EntityProperty : IEntityProperty
 	}
 }
 
-public class EntityIndex : IEntityIndex
+public class EntityIndexDefinition : IEntityIndexDefinition
 {
-	public IEntityProperty Property { get; set; }
+	public IReadOnlyCollection<IEntityPropertyDefinition> Properties { get; set; }
+	public IEntityPropertyDefinition Property { get; set; }
 	public string IndexName { get; set; }
 	public bool IsUnique { get; set; }
 	public IndexSortOrder SortOrder { get; set; }
 	public int IndexPriority { get; set; }
 	public IndexType IndexType { get; set; }
 	public bool IsTenantExclusive { get; set; }
+}
+
+public sealed record EntityKeyDefinition : IEntityKeyDefinition
+{
+	public IEntityPropertyDefinition Property { get; init; }
+	public IEntityKeyGenerator KeyGenerator { get; init; }
+}
+
+public sealed record EntityExtraElementsDefinition : IEntityExtraElementsDefinition
+{
+	public IEntityPropertyDefinition Property { get; init; }
+	public bool IgnoreExtraElements { get; init; }
+	public bool IgnoreInherited { get; init; }
 }

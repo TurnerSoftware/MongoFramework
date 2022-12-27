@@ -9,12 +9,12 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 	{
 		public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
 		{
-			var definitionIndexes = new List<EntityIndex>();
+			var definitionIndexes = new List<EntityIndexDefinition>();
 			foreach (var property in definition.TraverseProperties())
 			{
 				foreach (var indexAttribute in property.PropertyInfo.GetCustomAttributes<IndexAttribute>())
 				{
-					definitionIndexes.Add(new EntityIndex
+					definitionIndexes.Add(new EntityIndexDefinition
 					{
 						Property = property,
 						IndexName = indexAttribute.Name,

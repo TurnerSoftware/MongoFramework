@@ -12,7 +12,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 			var entityType = definition.EntityType;
 			var properties = entityType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
-			var definitionProperties = new List<IEntityProperty>();
+			var definitionProperties = new List<IEntityPropertyDefinition>();
 
 			foreach (var property in properties)
 			{
@@ -41,22 +41,20 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 					continue;
 				}
 
-				//Do the mapping
-				var memberMap = classMap.MapMember(property);
+				var elementName = property.Name;
 
 				//Set custom element name with the "ColumnAttribute"
 				var columnAttribute = property.GetCustomAttribute<ColumnAttribute>();
 				if (columnAttribute != null)
 				{
-					var mappedName = columnAttribute.Name;
-					memberMap.SetElementName(mappedName);
+					elementName = columnAttribute.Name;
 				}
 
-				definitionProperties.Add(new EntityProperty
+				definitionProperties.Add(new EntityPropertyDefinition
 				{
 					EntityType = definition.EntityType,
-					ElementName = memberMap.ElementName,
-					FullPath = memberMap.ElementName,
+					ElementName = elementName,
+					FullPath = elementName,
 					PropertyType = property.PropertyType,
 					PropertyInfo = property
 				});

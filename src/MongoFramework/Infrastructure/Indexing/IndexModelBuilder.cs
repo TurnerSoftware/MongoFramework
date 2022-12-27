@@ -43,7 +43,7 @@ namespace MongoFramework.Infrastructure.Indexing
 			}
 		}
 
-		private static CreateIndexModel<TEntity> CreateIndexModel(IEntityIndex indexDefinition)
+		private static CreateIndexModel<TEntity> CreateIndexModel(IEntityIndexDefinition indexDefinition)
 		{
 			var builder = Builders<TEntity>.IndexKeys;
 			IndexKeysDefinition<TEntity> keyModel;
