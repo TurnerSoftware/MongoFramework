@@ -8,7 +8,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 	{
 		private bool SerializerAdded { get; set; }
 
-		public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
+		public void ApplyMapping(IEntityDefinition definition)
 		{
 			if (!SerializerAdded)
 			{

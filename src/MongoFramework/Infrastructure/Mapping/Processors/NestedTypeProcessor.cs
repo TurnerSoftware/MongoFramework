@@ -5,7 +5,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 {
 	public class NestedTypeProcessor : IMappingProcessor
 	{
-		public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
+		public void ApplyMapping(IEntityDefinition definition)
 		{
 			var entityType = definition.EntityType;
 			var properties = definition.Properties;

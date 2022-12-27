@@ -4,6 +4,6 @@ namespace MongoFramework.Infrastructure.Mapping
 {
 	public interface IMappingProcessor
 	{
-		void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap);
+		void ApplyMapping(IEntityDefinition definition);
 	}
 }

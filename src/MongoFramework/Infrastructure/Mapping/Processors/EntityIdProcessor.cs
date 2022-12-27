@@ -8,7 +8,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 {
 	public class EntityIdProcessor : IMappingProcessor
 	{
-		public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
+		public void ApplyMapping(IEntityDefinition definition)
 		{
 			var keyDefinition = definition.Key;
 			var idProperty = keyDefinition?.Property;

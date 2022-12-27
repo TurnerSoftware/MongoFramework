@@ -7,7 +7,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 {
 	public class IndexProcessor : IMappingProcessor
 	{
-		public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
+		public void ApplyMapping(IEntityDefinition definition)
 		{
 			var definitionIndexes = new List<EntityIndexDefinition>();
 			foreach (var property in definition.TraverseProperties())

@@ -101,7 +101,7 @@ namespace MongoFramework.Infrastructure.Mapping
 
 					foreach (var processor in MappingProcessors)
 					{
-						processor.ApplyMapping(definition, null);
+						processor.ApplyMapping(definition);
 					}
 
 					DriverMappingInterop.RegisterDefinition(definition);
@@ -172,7 +172,7 @@ namespace MongoFramework.Infrastructure.Mapping
 
 					foreach (var processor in MappingProcessors)
 					{
-						processor.ApplyMapping(definition, null);
+						processor.ApplyMapping(definition);
 					}
 
 					DriverMappingInterop.RegisterDefinition(definition);

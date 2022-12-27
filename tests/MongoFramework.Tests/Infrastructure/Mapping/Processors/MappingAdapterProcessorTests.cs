@@ -15,7 +15,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 
 		public class AdapterTestModelMappingAdapter : IMappingProcessor
 		{
-			public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
+			public void ApplyMapping(IEntityDefinition definition)
 			{
 				definition.CollectionName = "Custom";
 
@@ -59,7 +59,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 
 			}
 
-			public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
+			public void ApplyMapping(IEntityDefinition definition)
 			{
 				throw new NotImplementedException();
 			}
