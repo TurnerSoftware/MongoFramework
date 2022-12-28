@@ -1,35 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
-namespace MongoFramework.Infrastructure.Internal
+namespace MongoFramework.Infrastructure.Internal;
+
+internal static class TypeExtensions
 {
-	internal static class TypeExtensions
+	private static readonly HashSet<Type> CommonGenericEnumerables = new()
 	{
-		public static Type GetEnumerableItemTypeOrDefault(this Type type)
+		typeof(IEnumerable<>),
+		typeof(IList<>),
+		typeof(ICollection<>),
+		typeof(IReadOnlyList<>),
+		typeof(IReadOnlyCollection<>)
+	};
+
+	public static Type GetEnumerableItemTypeOrDefault(this Type type)
+	{
+		if (type.IsArray)
 		{
-			if (type.IsArray)
+			return type.GetElementType();
+		}
+		else if (type.IsGenericType)
+		{
+			if (CommonGenericEnumerables.Contains(type.GetGenericTypeDefinition()))
 			{
-				return type.GetElementType();
+				return type.GetGenericArguments()[0];
 			}
-			else if (type.IsGenericType)
+			else
 			{
-				if (type.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+				//Unlike when the type is directly a known generic enumerable interface, if we start making assumptions
+				//like that on the interfaces of the type, we can hit edge cases where a type implements multiple interfaces.
+				foreach (var interfaceType in type.GetInterfaces())
 				{
-					return type.GetGenericArguments()[0];
-				}
-				else
-				{
-					var compatibleInterfaces = type.GetInterfaces().Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>));
-					var targetInterface = compatibleInterfaces.FirstOrDefault();
-					if (targetInterface != null)
+					if (interfaceType.IsGenericType && interfaceType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
 					{
 						return type.GetGenericArguments()[0];
 					}
 				}
 			}
-
-			return type;
 		}
+
+		return type;
 	}
 }
