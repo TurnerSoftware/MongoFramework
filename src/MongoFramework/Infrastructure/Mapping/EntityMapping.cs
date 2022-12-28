@@ -17,6 +17,8 @@ namespace MongoFramework.Infrastructure.Mapping
 
 		static EntityMapping()
 		{
+			DriverAbstractionRules.ApplyRules();
+
 			EntityDefinitions = new ConcurrentDictionary<Type, IEntityDefinition>();
 			MappingProcessors = new List<IMappingProcessor>();
 
