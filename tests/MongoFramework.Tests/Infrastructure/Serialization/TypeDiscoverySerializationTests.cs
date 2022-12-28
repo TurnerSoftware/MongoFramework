@@ -46,10 +46,16 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 			public IDictionary<string, object> Dictionary { get; set; }
 		}
 
+		public class NoTypeDiscovery_KnownBaseModel
+		{
+		}
+		public class NoTypeDiscovery_UnknownChildModel : NoTypeDiscovery_KnownBaseModel
+		{
+		}
+
 		[TestMethod]
 		public void NullDeserialization()
 		{
-			EntityMapping.AddMappingProcessor(new TypeDiscoveryProcessor());
 			EntityMapping.RegisterType(typeof(KnownBaseModel));
 
 			var serializer = TypeDiscoverySerializationProvider.Instance.GetSerializer(typeof(KnownBaseModel));
@@ -78,7 +84,6 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 		[TestMethod]
 		public void DeserializeChildTypeDiscoveryForRootEntity()
 		{
-			EntityMapping.AddMappingProcessor(new TypeDiscoveryProcessor());
 			EntityMapping.RegisterType(typeof(KnownBaseModel));
 
 			var document = new BsonDocument
@@ -93,7 +98,6 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 		[TestMethod]
 		public void DeserializeGrandChildTypeDiscoveryForRootEntity()
 		{
-			EntityMapping.AddMappingProcessor(new TypeDiscoveryProcessor());
 			EntityMapping.RegisterType(typeof(KnownBaseModel));
 
 			var document = new BsonDocument
@@ -108,26 +112,21 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 		[TestMethod]
 		public void DeserializeWithoutTypeDiscovery()
 		{
-			EntityMapping.AddMappingProcessor(new TypeDiscoveryProcessor());
-			EntityMapping.RegisterType(typeof(KnownBaseModel));
-
-			TypeDiscoverySerializationProvider.Instance.Enabled = false;
+			//This test primarily confirms the behaviour of the driver without type discovery
+			EntityMapping.RegisterType(typeof(NoTypeDiscovery_KnownBaseModel));
 
 			var document = new BsonDocument
 			{
 				{ "_t", "UnknownChildModel" }
 			};
 
-			var deserializedResult = BsonSerializer.Deserialize<KnownBaseModel>(document);
-			Assert.IsNotInstanceOfType(deserializedResult, typeof(UnknownChildModel));
-
-			TypeDiscoverySerializationProvider.Instance.Enabled = true;
+			var deserializedResult = BsonSerializer.Deserialize<NoTypeDiscovery_KnownBaseModel>(document);
+			Assert.IsNotInstanceOfType(deserializedResult, typeof(NoTypeDiscovery_UnknownChildModel));
 		}
 
 		[TestMethod]
 		public void DeserializeCollection()
 		{
-			EntityMapping.AddMappingProcessor(new TypeDiscoveryProcessor());
 			EntityMapping.RegisterType(typeof(CollectionBaseModel));
 
 			var document = new BsonDocument
@@ -162,7 +161,6 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 		[TestMethod]
 		public void ReserializationWithoutDataLoss()
 		{
-			EntityMapping.AddMappingProcessor(new TypeDiscoveryProcessor());
 			EntityMapping.RegisterType(typeof(CollectionBaseModel));
 
 			var initialEntity = new CollectionBaseModel
@@ -193,7 +191,6 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 		[TestMethod]
 		public void DeserializeNullForUnknownPropertyType()
 		{
-			EntityMapping.AddMappingProcessor(new TypeDiscoveryProcessor());
 			EntityMapping.RegisterType(typeof(UnknownPropertyTypeSerializationModel));
 
 			var document = new BsonDocument
@@ -209,7 +206,6 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 		[TestMethod]
 		public void DeserializeDictionaryForUnknownPropertyType()
 		{
-			EntityMapping.AddMappingProcessor(new TypeDiscoveryProcessor());
 			EntityMapping.RegisterType(typeof(UnknownPropertyTypeSerializationModel));
 
 			var document = new BsonDocument
@@ -235,7 +231,6 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 		[TestMethod]
 		public void DeserializeSpecifiedForUnknownPropertyType()
 		{
-			EntityMapping.AddMappingProcessor(new TypeDiscoveryProcessor());
 			EntityMapping.RegisterType(typeof(UnknownPropertyTypeSerializationModel));
 
 			var document = new BsonDocument
@@ -257,7 +252,6 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 		[TestMethod]
 		public void DeserializeStringForUnknownPropertyType()
 		{
-			EntityMapping.AddMappingProcessor(new TypeDiscoveryProcessor());
 			EntityMapping.RegisterType(typeof(UnknownPropertyTypeSerializationModel));
 
 			var document = new BsonDocument
@@ -276,7 +270,6 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 		[TestMethod]
 		public void DeserializeBooleanForUnknownPropertyType()
 		{
-			EntityMapping.AddMappingProcessor(new TypeDiscoveryProcessor());
 			EntityMapping.RegisterType(typeof(UnknownPropertyTypeSerializationModel));
 
 			var document = new BsonDocument
@@ -295,7 +288,6 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 		[TestMethod]
 		public void DeserializeUnknownTypesInDictionary()
 		{
-			EntityMapping.AddMappingProcessor(new TypeDiscoveryProcessor());
 			EntityMapping.RegisterType(typeof(UnknownDictionaryValueModel));
 
 			var document = new BsonDocument
