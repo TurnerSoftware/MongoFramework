@@ -37,6 +37,8 @@ public interface IEntityIndexDefinition
 	public IReadOnlyCollection<IEntityPropertyDefinition> Properties { get; }
 	[Obsolete("Index definition can point to multiple properties directly")]
 	public IEntityPropertyDefinition Property { get; }
+	//TODO: This will be made redundant when the broader change to support fluent comes in
+	public string Path { get; }
 	public string IndexName { get; }
 	public bool IsUnique { get; }
 	public IndexSortOrder SortOrder { get; }
@@ -92,6 +94,7 @@ public class EntityIndexDefinition : IEntityIndexDefinition
 {
 	public IReadOnlyCollection<IEntityPropertyDefinition> Properties { get; set; }
 	public IEntityPropertyDefinition Property { get; set; }
+	public string Path { get; set; }
 	public string IndexName { get; set; }
 	public bool IsUnique { get; set; }
 	public IndexSortOrder SortOrder { get; set; }

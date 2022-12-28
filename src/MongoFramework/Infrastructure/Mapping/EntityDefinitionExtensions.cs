@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using MongoFramework.Infrastructure.Internal;
 
 namespace MongoFramework.Infrastructure.Mapping
 {
@@ -76,58 +75,6 @@ namespace MongoFramework.Infrastructure.Mapping
 			}
 
 			return default;
-		}
-
-		private sealed class TraversalState
-		{
-			public HashSet<Type> SeenTypes { get; set; }
-			public IEnumerable<IEntityPropertyDefinition> Properties { get; set; }
-		}
-
-		public static IEnumerable<IEntityPropertyDefinition> TraverseProperties(this IEntityDefinition definition)
-		{
-			var stack = new Stack<TraversalState>();
-			stack.Push(new TraversalState
-			{
-				SeenTypes = new HashSet<Type> { definition.EntityType },
-				Properties = definition.GetAllProperties()
-			});
-
-			while (stack.Count > 0)
-			{
-				var state = stack.Pop();
-				foreach (var property in state.Properties)
-				{
-					yield return property;
-
-					var propertyType = property.PropertyInfo.PropertyType;
-					propertyType = propertyType.GetEnumerableItemTypeOrDefault();
-
-					if (EntityMapping.IsValidTypeToMap(propertyType) && !state.SeenTypes.Contains(propertyType))
-					{
-						var nestedProperties = EntityMapping.GetOrCreateDefinition(propertyType)
-							.GetAllProperties()
-							.Select(p => new EntityPropertyDefinition
-							{
-								//EntityType = p.EntityType,
-								//IsKey = p.IsKey,
-								ElementName = p.ElementName,
-								FullPath = $"{property.FullPath}.{p.ElementName}",
-								//PropertyType = p.PropertyType,
-								PropertyInfo = p.PropertyInfo
-							});
-
-						stack.Push(new TraversalState
-						{
-							SeenTypes = new HashSet<Type>(state.SeenTypes)
-							{
-								propertyType
-							},
-							Properties = nestedProperties
-						});
-					}
-				}
-			}
 		}
 	}
 }

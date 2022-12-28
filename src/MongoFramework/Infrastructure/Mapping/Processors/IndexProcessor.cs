@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
-using MongoDB.Bson.Serialization;
 using MongoFramework.Attributes;
 
 namespace MongoFramework.Infrastructure.Mapping.Processors
@@ -12,11 +11,12 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 			var definitionIndexes = new List<EntityIndexDefinition>();
 			foreach (var property in definition.TraverseProperties())
 			{
-				foreach (var indexAttribute in property.PropertyInfo.GetCustomAttributes<IndexAttribute>())
+				foreach (var indexAttribute in property.Property.PropertyInfo.GetCustomAttributes<IndexAttribute>())
 				{
 					definitionIndexes.Add(new EntityIndexDefinition
 					{
-						Property = property,
+						Property = property.Property,
+						Path = property.GetPath(),
 						IndexName = indexAttribute.Name,
 						IsUnique = indexAttribute.IsUnique,
 						SortOrder = indexAttribute.SortOrder,
