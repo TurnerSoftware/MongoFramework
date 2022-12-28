@@ -17,15 +17,8 @@ public interface IEntityDefinition
 
 public interface IEntityPropertyDefinition
 {
-	[Obsolete("Replace with IEntityDefinition _if_ actually needed")]
-	public Type EntityType { get; }
-	[Obsolete("Key is defined on IEntityDefinition")]
-	public bool IsKey { get; }
+	public IEntityDefinition EntityDefinition { get; }
 	public string ElementName { get; }
-	[Obsolete("This should be on a custom EntityProperty type (WalkedEntityProperty)?")]
-	public string FullPath { get; }
-	[Obsolete("This is accessible from PropertyInfo")]
-	public Type PropertyType { get; }
 	public PropertyInfo PropertyInfo { get; }
 
 	public object GetValue(object entity);
@@ -72,11 +65,8 @@ public class EntityDefinition : IEntityDefinition
 
 public class EntityPropertyDefinition : IEntityPropertyDefinition
 {
-	public Type EntityType { get; set; }
-	public bool IsKey { get; set; }
+	public IEntityDefinition EntityDefinition { get; set; }
 	public string ElementName { get; set; }
-	public string FullPath { get; set; }
-	public Type PropertyType { get; set; }
 	public PropertyInfo PropertyInfo { get; set; }
 
 	public object GetValue(object entity)

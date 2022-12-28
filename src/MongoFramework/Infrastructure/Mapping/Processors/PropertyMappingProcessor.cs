@@ -52,10 +52,8 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 
 				definitionProperties.Add(new EntityPropertyDefinition
 				{
-					EntityType = definition.EntityType,
+					EntityDefinition = definition,
 					ElementName = elementName,
-					FullPath = elementName,
-					PropertyType = property.PropertyType,
 					PropertyInfo = property
 				});
 			}

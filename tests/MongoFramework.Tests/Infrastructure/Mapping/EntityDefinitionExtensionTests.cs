@@ -57,7 +57,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping
 			var definition = EntityMapping.RegisterType(typeof(OverridePropertyGrandChildModel));
 			var inheritedProperties = definition.GetInheritedProperties().ToArray();
 			Assert.AreEqual(1, inheritedProperties.Length);
-			Assert.AreEqual(typeof(OverridePropertyBaseModel), inheritedProperties[0].EntityType);
+			Assert.AreEqual(typeof(OverridePropertyBaseModel), inheritedProperties[0].EntityDefinition.EntityType);
 		}
 		[TestMethod]
 		public void GetAllPropertiesTakesBaseProperties()
@@ -65,7 +65,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping
 			var definition = EntityMapping.RegisterType(typeof(OverridePropertyChildModel));
 			var allProperties = definition.GetAllProperties().ToArray();
 			Assert.AreEqual(1, allProperties.Length);
-			Assert.AreEqual(typeof(OverridePropertyBaseModel), allProperties[0].EntityType);
+			Assert.AreEqual(typeof(OverridePropertyBaseModel), allProperties[0].EntityDefinition.EntityType);
 		}
 
 		[TestMethod]

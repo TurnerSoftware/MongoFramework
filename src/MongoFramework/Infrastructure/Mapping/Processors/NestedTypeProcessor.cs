@@ -1,5 +1,4 @@
-﻿using MongoDB.Bson.Serialization;
-using MongoFramework.Infrastructure.Internal;
+﻿using MongoFramework.Infrastructure.Internal;
 
 namespace MongoFramework.Infrastructure.Mapping.Processors
 {
@@ -12,7 +11,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 
 			foreach (var property in properties)
 			{
-				var propertyType = property.PropertyType;
+				var propertyType = property.PropertyInfo.PropertyType;
 				propertyType = propertyType.GetEnumerableItemTypeOrDefault();
 
 				//Maps the property type for handling property nesting

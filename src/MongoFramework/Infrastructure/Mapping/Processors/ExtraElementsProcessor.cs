@@ -27,7 +27,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 				foreach (var property in definition.Properties)
 				{
 					var extraElementsAttribute = property.PropertyInfo.GetCustomAttribute<ExtraElementsAttribute>();
-					if (extraElementsAttribute != null && typeof(IDictionary<string, object>).IsAssignableFrom(property.PropertyType))
+					if (extraElementsAttribute != null && typeof(IDictionary<string, object>).IsAssignableFrom(property.PropertyInfo.PropertyType))
 					{
 						definition.ExtraElements = new EntityExtraElementsDefinition
 						{
