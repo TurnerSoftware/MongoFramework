@@ -7,7 +7,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 {
 	public class ExtraElementsProcessor : IMappingProcessor
 	{
-		public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
+		public void ApplyMapping(IEntityDefinition definition)
 		{
 			var entityType = definition.EntityType;
 
@@ -15,30 +15,29 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 			var ignoreExtraElements = entityType.GetCustomAttribute<IgnoreExtraElementsAttribute>();
 			if (ignoreExtraElements != null)
 			{
-				classMap.SetIgnoreExtraElements(true);
-				classMap.SetIgnoreExtraElementsIsInherited(ignoreExtraElements.IgnoreInherited);
+				definition.ExtraElements = new EntityExtraElementsDefinition
+				{
+					IgnoreExtraElements = true,
+					IgnoreInherited = ignoreExtraElements.IgnoreInherited
+				};
 			}
 			else
 			{
-				classMap.SetIgnoreExtraElements(false);
-
-				//If any of the Entity's properties have the "ExtraElementsAttribute", assign that against the BsonClassMap
-
+				//If any of the Entity's properties have the "ExtraElementsAttribute", use that
 				foreach (var property in definition.Properties)
 				{
 					var extraElementsAttribute = property.PropertyInfo.GetCustomAttribute<ExtraElementsAttribute>();
-					if (extraElementsAttribute != null && typeof(IDictionary<string, object>).IsAssignableFrom(property.PropertyType))
+					if (extraElementsAttribute != null && typeof(IDictionary<string, object>).IsAssignableFrom(property.PropertyInfo.PropertyType))
 					{
-						foreach (var memberMap in classMap.DeclaredMemberMaps)
+						definition.ExtraElements = new EntityExtraElementsDefinition
 						{
-							if (memberMap.ElementName == property.ElementName)
-							{
-								classMap.SetExtraElementsMember(memberMap);
-								return;
-							}
-						}
+							Property = property,
+							IgnoreExtraElements = false
+						};
+						break;
 					}
 				}
+
 			}
 		}
 	}

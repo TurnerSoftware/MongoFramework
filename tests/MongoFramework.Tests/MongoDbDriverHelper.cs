@@ -38,14 +38,6 @@ namespace MongoFramework.Tests
 			{
 				discriminators.Clear();
 			}
-
-			var serializerRegistryField = typeof(BsonSerializer).GetField("__serializerRegistry", BindingFlags.NonPublic | BindingFlags.Static);
-			if (serializerRegistryField.GetValue(null) is BsonSerializerRegistry registry)
-			{
-				var cacheField = typeof(BsonSerializerRegistry).GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance);
-				var registryCache = cacheField.GetValue(registry) as ConcurrentDictionary<Type, IBsonSerializer>;
-				registryCache.Clear();
-			}
 		}
 	}
 }

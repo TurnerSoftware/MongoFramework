@@ -3,15 +3,15 @@ using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.IdGenerators;
 
 namespace MongoFramework.Infrastructure.Mapping.Processors
 {
 	public class EntityIdProcessor : IMappingProcessor
 	{
-		public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
+		public void ApplyMapping(IEntityDefinition definition)
 		{
-			IEntityProperty idProperty = default;
+			var keyDefinition = definition.Key;
+			var idProperty = keyDefinition?.Property;
 			foreach (var property in definition.Properties)
 			{
 				if (property.PropertyInfo.GetCustomAttribute<KeyAttribute>() != null)
@@ -28,29 +28,30 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 				}
 			}
 
-			if (idProperty is EntityProperty entityProperty)
+			if (idProperty is EntityPropertyDefinition entityProperty)
 			{
-				classMap.MapIdMember(idProperty.PropertyInfo);
-				entityProperty.IsKey = true;
+				var keyGenerator = keyDefinition?.KeyGenerator;
 
 				//Set an Id Generator based on the member type
-				var idMemberMap = classMap.IdMemberMap;
-				var memberType = BsonClassMap.GetMemberInfoType(idMemberMap.MemberInfo);
+				var memberType = entityProperty.PropertyInfo.PropertyType;
 				if (memberType == typeof(string))
 				{
-					idMemberMap.SetIdGenerator(StringObjectIdGenerator.Instance);
-					definition.KeyGenerator = new EntityKeyGenerator(StringObjectIdGenerator.Instance);
+					keyGenerator = EntityKeyGenerators.StringKeyGenerator;
 				}
 				else if (memberType == typeof(Guid))
 				{
-					idMemberMap.SetIdGenerator(CombGuidGenerator.Instance);
-					definition.KeyGenerator = new EntityKeyGenerator(CombGuidGenerator.Instance);
+					keyGenerator = EntityKeyGenerators.GuidKeyGenerator;
 				}
 				else if (memberType == typeof(ObjectId))
 				{
-					idMemberMap.SetIdGenerator(ObjectIdGenerator.Instance);
-					definition.KeyGenerator = new EntityKeyGenerator(ObjectIdGenerator.Instance);
+					keyGenerator = EntityKeyGenerators.ObjectIdKeyGenerator;
 				}
+
+				definition.Key = new EntityKeyDefinition
+				{
+					Property = entityProperty,
+					KeyGenerator = keyGenerator
+				};
 			}
 		}
 	}

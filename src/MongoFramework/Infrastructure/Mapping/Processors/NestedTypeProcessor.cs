@@ -1,18 +1,17 @@
-﻿using MongoDB.Bson.Serialization;
-using MongoFramework.Infrastructure.Internal;
+﻿using MongoFramework.Infrastructure.Internal;
 
 namespace MongoFramework.Infrastructure.Mapping.Processors
 {
 	public class NestedTypeProcessor : IMappingProcessor
 	{
-		public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
+		public void ApplyMapping(IEntityDefinition definition)
 		{
 			var entityType = definition.EntityType;
 			var properties = definition.Properties;
 
 			foreach (var property in properties)
 			{
-				var propertyType = property.PropertyType;
+				var propertyType = property.PropertyInfo.PropertyType;
 				propertyType = propertyType.GetEnumerableItemTypeOrDefault();
 
 				//Maps the property type for handling property nesting

@@ -58,12 +58,9 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		{
 			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			EntityMapping.AddMappingProcessor(new EntityIdProcessor());
-			EntityMapping.RegisterType(typeof(StringIdGeneratorTestModel));
+			var definition = EntityMapping.RegisterType(typeof(StringIdGeneratorTestModel));
 
-			var classMap = BsonClassMap.GetRegisteredClassMaps()
-				.Where(cm => cm.ClassType == typeof(StringIdGeneratorTestModel)).FirstOrDefault();
-
-			Assert.AreEqual(typeof(StringObjectIdGenerator), classMap.IdMemberMap.IdGenerator?.GetType());
+			Assert.AreEqual(EntityKeyGenerators.StringKeyGenerator, definition.Key.KeyGenerator);
 		}
 
 		[TestMethod]
@@ -71,12 +68,9 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		{
 			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			EntityMapping.AddMappingProcessor(new EntityIdProcessor());
-			EntityMapping.RegisterType(typeof(GuidIdGeneratorTestModel));
+			var definition = EntityMapping.RegisterType(typeof(GuidIdGeneratorTestModel));
 
-			var classMap = BsonClassMap.GetRegisteredClassMaps()
-				.Where(cm => cm.ClassType == typeof(GuidIdGeneratorTestModel)).FirstOrDefault();
-
-			Assert.AreEqual(typeof(CombGuidGenerator), classMap.IdMemberMap.IdGenerator?.GetType());
+			Assert.AreEqual(EntityKeyGenerators.GuidKeyGenerator, definition.Key.KeyGenerator);
 		}
 
 		[TestMethod]
@@ -84,12 +78,9 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		{
 			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			EntityMapping.AddMappingProcessor(new EntityIdProcessor());
-			EntityMapping.RegisterType(typeof(ObjectIdGeneratorTestModel));
+			var definition = EntityMapping.RegisterType(typeof(ObjectIdGeneratorTestModel));
 
-			var classMap = BsonClassMap.GetRegisteredClassMaps()
-				.Where(cm => cm.ClassType == typeof(ObjectIdGeneratorTestModel)).FirstOrDefault();
-
-			Assert.AreEqual(typeof(ObjectIdGenerator), classMap.IdMemberMap.IdGenerator?.GetType());
+			Assert.AreEqual(EntityKeyGenerators.ObjectIdKeyGenerator, definition.Key.KeyGenerator);
 		}
 
 		[TestMethod]

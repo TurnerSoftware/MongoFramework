@@ -7,7 +7,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 {
 	public class MappingAdapterProcessor : IMappingProcessor
 	{
-		public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
+		public void ApplyMapping(IEntityDefinition definition)
 		{
 			var adapterAttribute = definition.EntityType.GetCustomAttribute<MappingAdapterAttribute>();
 
@@ -20,7 +20,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 
 			if (instance != null)
 			{
-				instance.ApplyMapping(definition, classMap);
+				instance.ApplyMapping(definition);
 			}
 
 		}

@@ -6,7 +6,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 {
 	public class CollectionNameProcessor : IMappingProcessor
 	{
-		public void ApplyMapping(IEntityDefinition definition, BsonClassMap classMap)
+		public void ApplyMapping(IEntityDefinition definition)
 		{
 			var entityType = definition.EntityType;
 			var collectionName = entityType.Name;

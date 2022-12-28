@@ -43,23 +43,23 @@ namespace MongoFramework.Infrastructure.Indexing
 			}
 		}
 
-		private static CreateIndexModel<TEntity> CreateIndexModel(IEntityIndex indexDefinition)
+		private static CreateIndexModel<TEntity> CreateIndexModel(IEntityIndexDefinition indexDefinition)
 		{
 			var builder = Builders<TEntity>.IndexKeys;
 			IndexKeysDefinition<TEntity> keyModel;
 
 			if (indexDefinition.IndexType == IndexType.Text)
 			{
-				keyModel = builder.Text(indexDefinition.Property.FullPath);
+				keyModel = builder.Text(indexDefinition.Path);
 			}
 			else if (indexDefinition.IndexType == IndexType.Geo2dSphere)
 			{
-				keyModel = builder.Geo2DSphere(indexDefinition.Property.FullPath);
+				keyModel = builder.Geo2DSphere(indexDefinition.Path);
 			}
 			else
 			{
 				keyModel = indexDefinition.SortOrder == IndexSortOrder.Ascending ?
-					builder.Ascending(indexDefinition.Property.FullPath) : builder.Descending(indexDefinition.Property.FullPath);
+					builder.Ascending(indexDefinition.Path) : builder.Descending(indexDefinition.Path);
 			}
 
 			if (indexDefinition.IsTenantExclusive && typeof(IHaveTenantId).IsAssignableFrom(typeof(TEntity)))

@@ -11,12 +11,12 @@ namespace MongoFramework.Infrastructure.Commands
 	{
 		private TGroup Group { get; }
 		private TSubEntity SubEntity { get; }
-		private IEntityProperty EntityTimeProperty { get; }
+		private IEntityPropertyDefinition EntityTimeProperty { get; }
 		private int BucketSize { get; }
 
 		public Type EntityType => typeof(EntityBucket<TGroup, TSubEntity>);
 
-		public AddToBucketCommand(TGroup group, TSubEntity subEntity, IEntityProperty entityTimeProperty, int bucketSize)
+		public AddToBucketCommand(TGroup group, TSubEntity subEntity, IEntityPropertyDefinition entityTimeProperty, int bucketSize)
 		{
 			Group = group;
 			SubEntity = subEntity;
@@ -42,7 +42,7 @@ namespace MongoFramework.Infrastructure.Commands
 				.Min(b => b.Min, itemTimeValue)
 				.Max(b => b.Max, itemTimeValue)
 				.SetOnInsert(b => b.BucketSize, BucketSize)
-				.SetOnInsert(b => b.Id, entityDefinition.KeyGenerator.Generate());
+				.SetOnInsert(b => b.Id, entityDefinition.Key.KeyGenerator.Generate());
 
 			yield return new UpdateOneModel<EntityBucket<TGroup, TSubEntity>>(filter, updateDefinition)
 			{

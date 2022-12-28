@@ -19,7 +19,7 @@ namespace MongoFramework
 
 		internal int BucketSize { get; }
 
-		internal IEntityProperty EntityTimeProperty { get; }
+		internal IEntityPropertyDefinition EntityTimeProperty { get; }
 
 		public MongoDbBucketSet(IMongoDbContext context, IDbSetOptions options)
 		{
@@ -40,7 +40,7 @@ namespace MongoFramework
 					throw new ArgumentException($"Property {bucketOptions.EntityTimeProperty} doesn't exist on bucket item.");
 				}
 
-				if (property.PropertyType != typeof(DateTime))
+				if (property.PropertyInfo.PropertyType != typeof(DateTime))
 				{
 					throw new ArgumentException($"Property {bucketOptions.EntityTimeProperty} on bucket item isn't of type DateTime");
 				}
