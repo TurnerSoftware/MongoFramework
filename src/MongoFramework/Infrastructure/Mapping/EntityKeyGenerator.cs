@@ -9,14 +9,14 @@ public interface IEntityKeyGenerator
 	public bool IsEmpty(object id);
 }
 
-public class EntityKeyGenerators
+public static class EntityKeyGenerators
 {
 	public static readonly IEntityKeyGenerator StringKeyGenerator = new EntityKeyGenerator(StringObjectIdGenerator.Instance);
 	public static readonly IEntityKeyGenerator GuidKeyGenerator = new EntityKeyGenerator(CombGuidGenerator.Instance);
 	public static readonly IEntityKeyGenerator ObjectIdKeyGenerator = new EntityKeyGenerator(ObjectIdGenerator.Instance);
 }
 
-internal class EntityKeyGenerator : IEntityKeyGenerator
+internal sealed class EntityKeyGenerator : IEntityKeyGenerator
 {
 	private readonly IIdGenerator idGenerator;
 
@@ -36,7 +36,7 @@ internal class EntityKeyGenerator : IEntityKeyGenerator
 	}
 }
 
-internal class DriverKeyGeneratorWrapper : IIdGenerator
+internal sealed class DriverKeyGeneratorWrapper : IIdGenerator
 {
 	private readonly IEntityKeyGenerator entityKeyGenerator;
 
