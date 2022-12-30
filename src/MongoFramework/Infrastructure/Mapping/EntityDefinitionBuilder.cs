@@ -35,7 +35,7 @@ public class EntityDefinitionBuilder
 		var propertyInfo = EntityType.GetProperty(propertyName);
 		if (propertyInfo is null)
 		{
-			throw new ArgumentException($"Property \"{propertyInfo.Name}\" can not be found on \"{EntityType.Name}\".", nameof(propertyName));
+			throw new ArgumentException($"Property \"{propertyName}\" can not be found on \"{EntityType.Name}\".", nameof(propertyName));
 		}
 		return propertyInfo;
 	}
