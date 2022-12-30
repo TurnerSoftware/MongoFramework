@@ -189,6 +189,8 @@ public class EntityDefinitionBuilder<TEntity> : EntityDefinitionBuilder
 
 	public EntityDefinitionBuilder<TEntity> HasExtraElements(Expression<Func<TEntity, object>> propertyExpression)
 		=> HasExtraElements(GetPropertyInfo(propertyExpression)) as EntityDefinitionBuilder<TEntity>;
+
+	public new EntityDefinitionBuilder<TEntity> IgnoreExtraElements() => base.IgnoreExtraElements() as EntityDefinitionBuilder<TEntity>;
 }
 
 public sealed class EntityPropertyBuilder
