@@ -168,7 +168,7 @@ public class EntityDefinitionBuilder<TEntity> : EntityDefinitionBuilder
 	{
 		if (indexExpression.Body is MemberExpression memberExpression)
 		{
-			var properties = new PropertyPath[] { PropertyPath.FromExpression(memberExpression) };
+			var properties = new[] { PropertyPath.FromExpression(memberExpression) };
 			return HasIndex(properties, builder) as EntityDefinitionBuilder<TEntity>;
 		}
 		else if (indexExpression.Body is NewExpression newObjExpression)
