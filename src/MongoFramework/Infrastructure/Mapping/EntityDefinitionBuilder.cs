@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
+using MongoFramework.Infrastructure.Internal;
+using MongoFramework.Infrastructure.Linq;
 
 namespace MongoFramework.Infrastructure.Mapping;
 
@@ -92,43 +94,23 @@ public class EntityDefinitionBuilder
 		return this;
 	}
 
-	public EntityDefinitionBuilder HasIndex(IReadOnlyCollection<PropertyInfo> properties, Action<EntityIndexBuilder> builder)
+	public EntityDefinitionBuilder HasIndex(IEnumerable<string> propertyPaths, Action<EntityIndexBuilder> builder)
 	{
-		//TODO: This needs to be far smarter as indexes can be complex through deeply nested types
-		foreach (var propertyInfo in properties)
+		var properties = new List<PropertyPath>();
+		foreach (var propertyPath in propertyPaths)
 		{
-			if (!propertyInfo.DeclaringType.IsAssignableFrom(EntityType))
-			{
-				throw new ArgumentException($"Property \"{propertyInfo.Name}\" is not accessible from \"{EntityType.Name}\".", nameof(properties));
-			}
-
-			if (!propertyInfo.CanWrite || !propertyInfo.CanRead)
-			{
-				throw new ArgumentException($"Property \"{propertyInfo.Name}\" must be both readable and writeable.", nameof(properties));
-			}
+			properties.Add(PropertyPath.FromString(EntityType, propertyPath));
 		}
 
+		return HasIndex(properties, builder);
+	}
+	public EntityDefinitionBuilder HasIndex(IReadOnlyList<PropertyPath> properties, Action<EntityIndexBuilder> builder)
+	{
 		var indexBuilder = new EntityIndexBuilder(properties);
 		indexBuilders.Add(indexBuilder);
 
 		builder(indexBuilder);
 		return this;
-	}
-
-	public EntityDefinitionBuilder HasIndex(IEnumerable<string> propertyNames, Action<EntityIndexBuilder> builder)
-	{
-		var properties = new List<PropertyInfo>();
-		foreach (var name in propertyNames)
-		{
-			var propertyInfo = EntityType.GetProperty(name);
-			if (propertyInfo is null)
-			{
-				throw new ArgumentException($"Property \"{propertyInfo.Name}\" can not be found on \"{EntityType.Name}\" or any base types.", nameof(propertyNames));
-			}
-			properties.Add(propertyInfo);
-		}
-
-		return HasIndex(properties, builder);
 	}
 
 	public EntityDefinitionBuilder HasExtraElements(string propertyName) => HasExtraElements(GetPropertyInfo(propertyName));
@@ -184,22 +166,18 @@ public class EntityDefinitionBuilder<TEntity> : EntityDefinitionBuilder
 
 	public EntityDefinitionBuilder<TEntity> HasIndex(Expression<Func<TEntity, object>> indexExpression, Action<EntityIndexBuilder> builder)
 	{
-		//TODO: This needs to be far smarter as indexes can be complex through deeply nested types
-		if (indexExpression.Body is MemberExpression memberExpression && memberExpression.Member is PropertyInfo singleIndexPropertyInfo)
+		if (indexExpression.Body is MemberExpression memberExpression)
 		{
-			var properties = new PropertyInfo[] { singleIndexPropertyInfo };
+			var properties = new PropertyPath[] { PropertyPath.FromExpression(memberExpression) };
 			return HasIndex(properties, builder) as EntityDefinitionBuilder<TEntity>;
 		}
 		else if (indexExpression.Body is NewExpression newObjExpression)
 		{
-			var properties = new List<PropertyInfo>();
+			var properties = new List<PropertyPath>();
 			foreach (var expression in newObjExpression.Arguments)
 			{
-				if (expression is not MemberExpression argumentMemberExpression || argumentMemberExpression.Member is not PropertyInfo multiIndexPropertyInfo)
-				{
-					throw new ArgumentException($"Invalid expression \"{expression}\" for index. Must be a property to be bound as an index.", nameof(indexExpression));
-				}
-				properties.Add(multiIndexPropertyInfo);
+				var propertyInfoChain = PropertyPath.FromExpression(expression);
+				properties.Add(propertyInfoChain);
 			}
 			return HasIndex(properties, builder) as EntityDefinitionBuilder<TEntity>;
 		}
@@ -230,9 +208,88 @@ public sealed class EntityPropertyBuilder
 	}
 }
 
+public readonly record struct PropertyPath(IReadOnlyCollection<PropertyInfo> PropertyChain)
+{
+	/// <summary>
+	/// Returns a <see cref="PropertyPath"/> based on the resolved properties through the <paramref name="pathExpression"/>.
+	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// For example, take the expression body: <c>v.Thing.Items.First().Name</c><br/>
+	/// We want <c>[Thing, Items, Name]</c> but the expression is actually: <c>Name.First().Items.Thing.v</c><br/>
+	/// This is also expressed as <c>[MemberExpression, MethodCallExpression, MemberExpression, MemberExpression, ParameterExpression]</c>.
+	/// </para>
+	/// This is why we have a stack (for our result to be the "correct" order) and we exit on <see cref="ParameterExpression"/>.
+	/// </remarks>
+	/// <param name="pathExpression"></param>
+	/// <returns></returns>
+	/// <exception cref="ArgumentException"></exception>
+	public static PropertyPath FromExpression(Expression pathExpression)
+	{
+		var propertyInfoChain = new Stack<PropertyInfo>();
+		var current = pathExpression;
+
+		while (current is not ParameterExpression)
+		{
+			if (current is MemberExpression memberExpression && memberExpression.Member is PropertyInfo propertyInfo)
+			{
+				propertyInfoChain.Push(propertyInfo);
+				current = memberExpression.Expression;
+			}
+			else if (current is MethodCallExpression methodExpression)
+			{
+				if (methodExpression.Method == MethodInfoCache.Enumerable.First_1 || methodExpression.Method == MethodInfoCache.Enumerable.Single_1)
+				{
+					var callerExpression = methodExpression.Arguments[0];
+					current = callerExpression;
+				}
+				else
+				{
+					throw new ArgumentException($"Invalid method \"{methodExpression.Method.Name}\". Only \"Enumerable.First()\" and \"Enumerable.Single()\" methods are allowed in chained expressions", nameof(pathExpression));
+				}
+
+			}
+			else
+			{
+				throw new ArgumentException($"Unexpected expression \"{current}\" when processing chained expression", nameof(pathExpression));
+			}
+		}
+
+		return new(propertyInfoChain);
+	}
+
+	/// <summary>
+	/// Returns a <see cref="PropertyPath"/> based on the resolved properties (by name) through the provided string.
+	/// </summary>
+	/// <remarks>
+	/// For example, take this string: <c>Thing.Items.Name</c><br />
+	/// This would be resolved as <c>[Thing, Items, Name]</c> including going through any array/enumerable that might exist.
+	/// </remarks>
+	/// <param name="propertyPath"></param>
+	/// <returns></returns>
+	public static PropertyPath FromString(Type baseType, string propertyPath)
+	{
+		var inputChain = propertyPath.Split('.');
+		var propertyInfoChain = new PropertyInfo[inputChain.Length];
+		
+		var currentType = baseType;
+		for (var i = 0; i < inputChain.Length; i++)
+		{
+			var propertyName = inputChain[i];
+			var property = currentType.GetProperty(propertyName) ?? throw new ArgumentException($"Property \"{propertyName}\" is not found on reflected entity types", nameof(propertyPath));
+			propertyInfoChain[i] = property;
+
+			var propertyType = property.PropertyType.GetEnumerableItemTypeOrDefault();
+			currentType = propertyType;
+		}
+
+		return new(propertyInfoChain);
+	}
+}
+
 public sealed class EntityIndexBuilder
 {
-	public IReadOnlyCollection<PropertyInfo> Properties { get; }
+	public IReadOnlyCollection<PropertyPath> Properties { get; }
 	public string IndexName { get; }
 
 	public IReadOnlyCollection<IndexType> PropertyIndexTypes { get; private set; }
@@ -241,7 +298,7 @@ public sealed class EntityIndexBuilder
 
 	public bool TenantExclusive { get; private set; }
 
-	public EntityIndexBuilder(IReadOnlyCollection<PropertyInfo> properties, string indexName = null)
+	public EntityIndexBuilder(IReadOnlyCollection<PropertyPath> properties, string indexName = null)
 	{
 		Properties = properties;
 		IndexName = indexName;
