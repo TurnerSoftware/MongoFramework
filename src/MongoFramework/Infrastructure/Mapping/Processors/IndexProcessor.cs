@@ -133,6 +133,12 @@ public class IndexProcessor : IMappingProcessor
 		foreach (var index in indexTracker)
 		{
 			var indexName = index.Key;
+			if (indexName.Length == 0)
+			{
+				//We don't want the empty string we set earlier
+				//We only did it because the dictionary needed it
+				indexName = null;
+			}
 			var indexProperties = index.Value
 				.OrderBy(p => p.IndexAttribute.IndexPriority)
 				.Select(p => new IndexProperty(
