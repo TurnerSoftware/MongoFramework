@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using MongoFramework.Infrastructure.Internal;
@@ -9,17 +10,38 @@ namespace MongoFramework.Infrastructure.Mapping;
 
 public class EntityDefinitionBuilder
 {
-	private readonly Dictionary<PropertyInfo, EntityPropertyBuilder> propertyBuilders = new();
-	private readonly List<EntityIndexBuilder> indexBuilders = new();
-	private EntityKeyBuilder keyBuilder;
-
 	public Type EntityType { get; private set; }
 	public string CollectionName { get; private set; }
 	public PropertyInfo ExtraElementsProperty { get; private set; }
+	public EntityKeyBuilder KeyBuilder { get; private set; }
 
-	protected EntityDefinitionBuilder(Type entityType)
+
+	private readonly Dictionary<PropertyInfo, EntityPropertyBuilder> propertyBuilders;
+	public IReadOnlyCollection<EntityPropertyBuilder> Properties => propertyBuilders.Values;
+
+
+	private readonly List<EntityIndexBuilder> indexBuilders;
+	public IReadOnlyCollection<EntityIndexBuilder> Indexes => indexBuilders;
+
+	public MappingBuilder MappingBuilder { get; }
+
+	public EntityDefinitionBuilder(Type entityType, MappingBuilder mappingBuilder)
 	{
 		EntityType = entityType;
+		MappingBuilder = mappingBuilder;
+		propertyBuilders = new();
+		indexBuilders = new();
+	}
+
+	public EntityDefinitionBuilder(EntityDefinitionBuilder definitionBuilder)
+	{
+		EntityType = definitionBuilder.EntityType;
+		MappingBuilder = definitionBuilder.MappingBuilder;
+		CollectionName = definitionBuilder.CollectionName;
+		ExtraElementsProperty = definitionBuilder.ExtraElementsProperty;
+		KeyBuilder = definitionBuilder.KeyBuilder;
+		propertyBuilders = definitionBuilder.propertyBuilders;
+		indexBuilders = definitionBuilder.indexBuilders;
 	}
 
 	private static void CheckPropertyReadWrite(PropertyInfo propertyInfo)
@@ -32,11 +54,7 @@ public class EntityDefinitionBuilder
 
 	private PropertyInfo GetPropertyInfo(string propertyName)
 	{
-		var propertyInfo = EntityType.GetProperty(propertyName);
-		if (propertyInfo is null)
-		{
-			throw new ArgumentException($"Property \"{propertyName}\" can not be found on \"{EntityType.Name}\".", nameof(propertyName));
-		}
+		var propertyInfo = EntityType.GetProperty(propertyName) ?? throw new ArgumentException($"Property \"{propertyName}\" can not be found on \"{EntityType.Name}\".", nameof(propertyName));
 		return propertyInfo;
 	}
 
@@ -55,9 +73,9 @@ public class EntityDefinitionBuilder
 		}
 
 		CheckPropertyReadWrite(propertyInfo);
-		keyBuilder = new EntityKeyBuilder(propertyInfo);
+		KeyBuilder = new EntityKeyBuilder(propertyInfo);
 
-		builder(keyBuilder);
+		builder(KeyBuilder);
 		return this;
 	}
 
@@ -70,9 +88,21 @@ public class EntityDefinitionBuilder
 		}
 
 		propertyBuilders.Remove(propertyInfo);
+
+		if (KeyBuilder is not null && KeyBuilder.Property == propertyInfo)
+		{
+			KeyBuilder = null;
+		}
+
+		if (ExtraElementsProperty == propertyInfo)
+		{
+			IgnoreExtraElements();
+		}
+
+		indexBuilders.RemoveAll(b => b.ContainsProperty(propertyInfo));
+
 		return this;
 	}
-
 
 	public EntityDefinitionBuilder HasProperty(string propertyName, Action<EntityPropertyBuilder> builder) => HasProperty(GetPropertyInfo(propertyName), builder);
 	public EntityDefinitionBuilder HasProperty(PropertyInfo propertyInfo, Action<EntityPropertyBuilder> builder)
@@ -104,9 +134,13 @@ public class EntityDefinitionBuilder
 
 		return HasIndex(properties, builder);
 	}
-	public EntityDefinitionBuilder HasIndex(IReadOnlyList<PropertyPath> properties, Action<EntityIndexBuilder> builder)
+	public EntityDefinitionBuilder HasIndex(IEnumerable<PropertyPath> properties, Action<EntityIndexBuilder> builder)
 	{
-		var indexBuilder = new EntityIndexBuilder(properties);
+		return HasIndex(properties.Select(p => new IndexProperty(p, IndexType.Standard, IndexSortOrder.Ascending)), builder);
+	}
+	public EntityDefinitionBuilder HasIndex(IEnumerable<IndexProperty> indexProperties, Action<EntityIndexBuilder> builder)
+	{
+		var indexBuilder = new EntityIndexBuilder(indexProperties);
 		indexBuilders.Add(indexBuilder);
 
 		builder(indexBuilder);
@@ -132,11 +166,34 @@ public class EntityDefinitionBuilder
 		ExtraElementsProperty = null;
 		return this;
 	}
+
+	public EntityDefinitionBuilder WithDerivedEntity(Type derivedType, Action<EntityDefinitionBuilder> builder)
+	{
+		if (!derivedType.IsAssignableFrom(derivedType))
+		{
+			throw new ArgumentException($"Type \"{derivedType}\" is not assignable from \"{EntityType}\"");
+		}
+
+		var definitionBuilder = MappingBuilder.Entity(derivedType);
+		builder(definitionBuilder);
+		return this;
+	}
 }
 
 public class EntityDefinitionBuilder<TEntity> : EntityDefinitionBuilder
 {
-	public EntityDefinitionBuilder() : base(typeof(TEntity)) { }
+	public EntityDefinitionBuilder(MappingBuilder mappingBuilder) : base(typeof(TEntity), mappingBuilder) { }
+
+	private EntityDefinitionBuilder(EntityDefinitionBuilder definitionBuilder) : base(definitionBuilder) { }
+	public static EntityDefinitionBuilder<TEntity> CreateFrom(EntityDefinitionBuilder definitionBuilder)
+	{
+		if (typeof(TEntity) != definitionBuilder.EntityType)
+		{
+			throw new ArgumentException("Mismatched entity types when creating a generic entity definition", nameof(definitionBuilder));
+		}
+
+		return new(definitionBuilder);
+	}
 
 	private static PropertyInfo GetPropertyInfo(Expression<Func<TEntity, object>> propertyExpression)
 	{
@@ -191,16 +248,28 @@ public class EntityDefinitionBuilder<TEntity> : EntityDefinitionBuilder
 		=> HasExtraElements(GetPropertyInfo(propertyExpression)) as EntityDefinitionBuilder<TEntity>;
 
 	public new EntityDefinitionBuilder<TEntity> IgnoreExtraElements() => base.IgnoreExtraElements() as EntityDefinitionBuilder<TEntity>;
+
+	public EntityDefinitionBuilder<TEntity> WithDerivedEntity<TDerived>(Action<EntityDefinitionBuilder<TDerived>> builder)
+	{
+		if (!typeof(TEntity).IsAssignableFrom(typeof(TDerived)))
+		{
+			throw new ArgumentException($"Type \"{typeof(TDerived)}\" is not assignable from \"{typeof(TEntity)}\"");
+		}
+
+		var definitionBuilder = MappingBuilder.Entity<TDerived>();
+		builder(definitionBuilder);
+		return this;
+	}
 }
 
 public sealed class EntityPropertyBuilder
 {
-	public PropertyInfo Property { get; }
+	public PropertyInfo PropertyInfo { get; }
 	public string ElementName { get; private set; }
 
 	public EntityPropertyBuilder(PropertyInfo propertyInfo)
 	{
-		Property = propertyInfo;
+		PropertyInfo = propertyInfo;
 	}
 
 	public EntityPropertyBuilder HasElementName(string elementName)
@@ -210,8 +279,26 @@ public sealed class EntityPropertyBuilder
 	}
 }
 
-public readonly record struct PropertyPath(IReadOnlyCollection<PropertyInfo> PropertyChain)
+public readonly record struct PropertyPath(IReadOnlyList<PropertyInfo> Properties)
 {
+	/// <summary>
+	/// Returns the entity types found through the property path.
+	/// </summary>
+	/// <returns></returns>
+	public IEnumerable<Type> GetEntityTypes()
+	{
+		foreach (var property in Properties)
+		{
+			var possibleEntityType = property.PropertyType.ElideEnumerableTypes();
+			if (EntityMapping.IsValidTypeToMap(possibleEntityType))
+			{
+				yield return possibleEntityType;
+			}
+		}
+	}
+
+	public bool Contains(PropertyInfo propertyInfo) => Properties.Contains(propertyInfo);
+
 	/// <summary>
 	/// Returns a <see cref="PropertyPath"/> based on the resolved properties through the <paramref name="pathExpression"/>.
 	/// </summary>
@@ -257,7 +344,7 @@ public readonly record struct PropertyPath(IReadOnlyCollection<PropertyInfo> Pro
 			}
 		}
 
-		return new(propertyInfoChain);
+		return new(propertyInfoChain.ToArray());
 	}
 
 	/// <summary>
@@ -281,7 +368,7 @@ public readonly record struct PropertyPath(IReadOnlyCollection<PropertyInfo> Pro
 			var property = currentType.GetProperty(propertyName) ?? throw new ArgumentException($"Property \"{propertyName}\" is not found on reflected entity types", nameof(propertyPath));
 			propertyInfoChain[i] = property;
 
-			var propertyType = property.PropertyType.GetEnumerableItemTypeOrDefault();
+			var propertyType = property.PropertyType.ElideEnumerableTypes();
 			currentType = propertyType;
 		}
 
@@ -289,21 +376,28 @@ public readonly record struct PropertyPath(IReadOnlyCollection<PropertyInfo> Pro
 	}
 }
 
+public readonly record struct IndexProperty(PropertyPath PropertyPath, IndexType IndexType, IndexSortOrder SortOrder);
 public sealed class EntityIndexBuilder
 {
-	public IReadOnlyCollection<PropertyPath> Properties { get; }
-	public string IndexName { get; }
+	private readonly IndexProperty[] indexProperties;
+	public IReadOnlyList<IndexProperty> Properties => indexProperties;
 
-	public IReadOnlyCollection<IndexType> PropertyIndexTypes { get; private set; }
-	public IReadOnlyCollection<bool> DescendingProperties { get; private set; }
+	public string IndexName { get; private set; }
 	public bool Unique { get; private set; }
 
 	public bool TenantExclusive { get; private set; }
 
-	public EntityIndexBuilder(IReadOnlyCollection<PropertyPath> properties, string indexName = null)
+	public EntityIndexBuilder(IEnumerable<IndexProperty> properties)
 	{
-		Properties = properties;
+		indexProperties = properties.ToArray();
+	}
+
+	public bool ContainsProperty(PropertyInfo propertyInfo) => Properties.Any(p => p.PropertyPath.Contains(propertyInfo));
+
+	public EntityIndexBuilder HasName(string indexName)
+	{
 		IndexName = indexName;
+		return this;
 	}
 
 	public EntityIndexBuilder HasType(params IndexType[] indexTypes)
@@ -313,7 +407,14 @@ public sealed class EntityIndexBuilder
 			throw new ArgumentException("Too many items in list of descending indexes", nameof(indexTypes));
 		}
 
-		PropertyIndexTypes = indexTypes;
+		for (var i = 0; i < indexTypes.Length; i++)
+		{
+			indexProperties[i] = indexProperties[i] with
+			{
+				IndexType = indexTypes[i]
+			};
+		}
+
 		return this;
 	}
 
@@ -324,7 +425,14 @@ public sealed class EntityIndexBuilder
 			throw new ArgumentException("Too many items in list of descending indexes", nameof(descending));
 		}
 
-		DescendingProperties = descending;
+		for (var i = 0; i < descending.Length; i++)
+		{
+			indexProperties[i] = indexProperties[i] with
+			{
+				SortOrder = descending[i] ? IndexSortOrder.Descending : IndexSortOrder.Ascending
+			};
+		}
+
 		return this;
 	}
 

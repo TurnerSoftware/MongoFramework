@@ -17,9 +17,8 @@ public interface IEntityDefinition
 
 public interface IEntityPropertyDefinition
 {
-	public IEntityDefinition EntityDefinition { get; }
-	public string ElementName { get; }
 	public PropertyInfo PropertyInfo { get; }
+	public string ElementName { get; }
 
 	public object GetValue(object entity);
 	public void SetValue(object entity, object value);
@@ -27,17 +26,17 @@ public interface IEntityPropertyDefinition
 
 public interface IEntityIndexDefinition
 {
-	public IReadOnlyCollection<IEntityPropertyDefinition> Properties { get; }
-	[Obsolete("Index definition can point to multiple properties directly")]
-	public IEntityPropertyDefinition Property { get; }
-	//TODO: This will be made redundant when the broader change to support fluent comes in
-	public string Path { get; }
+	public IReadOnlyList<IEntityIndexPathDefinition> IndexPaths { get; }
 	public string IndexName { get; }
 	public bool IsUnique { get; }
-	public IndexSortOrder SortOrder { get; }
-	public int IndexPriority { get; }
-	public IndexType IndexType { get; }
 	public bool IsTenantExclusive { get; }
+}
+
+public interface IEntityIndexPathDefinition
+{
+	public string Path { get; }
+	public IndexType IndexType { get; }
+	public IndexSortOrder SortOrder { get; }
 }
 
 public interface IEntityExtraElementsDefinition
@@ -65,9 +64,8 @@ public class EntityDefinition : IEntityDefinition
 
 public class EntityPropertyDefinition : IEntityPropertyDefinition
 {
-	public IEntityDefinition EntityDefinition { get; set; }
-	public string ElementName { get; set; }
 	public PropertyInfo PropertyInfo { get; set; }
+	public string ElementName { get; set; }
 
 	public object GetValue(object entity)
 	{
@@ -80,17 +78,19 @@ public class EntityPropertyDefinition : IEntityPropertyDefinition
 	}
 }
 
-public class EntityIndexDefinition : IEntityIndexDefinition
+public sealed record EntityIndexDefinition : IEntityIndexDefinition
 {
-	public IReadOnlyCollection<IEntityPropertyDefinition> Properties { get; set; }
-	public IEntityPropertyDefinition Property { get; set; }
-	public string Path { get; set; }
-	public string IndexName { get; set; }
-	public bool IsUnique { get; set; }
-	public IndexSortOrder SortOrder { get; set; }
-	public int IndexPriority { get; set; }
-	public IndexType IndexType { get; set; }
-	public bool IsTenantExclusive { get; set; }
+	public IReadOnlyList<IEntityIndexPathDefinition> IndexPaths { get; init; }
+	public string IndexName { get; init; }
+	public bool IsUnique { get; init; }
+	public bool IsTenantExclusive { get; init; }
+}
+
+public sealed record EntityIndexPathDefinition : IEntityIndexPathDefinition
+{
+	public string Path { get; init; }
+	public IndexType IndexType { get; init; }
+	public IndexSortOrder SortOrder { get; init; }
 }
 
 public sealed record EntityKeyDefinition : IEntityKeyDefinition

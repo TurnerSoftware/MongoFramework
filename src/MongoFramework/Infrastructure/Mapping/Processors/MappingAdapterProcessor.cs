@@ -7,9 +7,9 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 {
 	public class MappingAdapterProcessor : IMappingProcessor
 	{
-		public void ApplyMapping(IEntityDefinition definition)
+		public void ApplyMapping(EntityDefinitionBuilder definitionBuilder)
 		{
-			var adapterAttribute = definition.EntityType.GetCustomAttribute<MappingAdapterAttribute>();
+			var adapterAttribute = definitionBuilder.EntityType.GetCustomAttribute<MappingAdapterAttribute>();
 
 			if (adapterAttribute == null)
 			{
@@ -20,7 +20,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 
 			if (instance != null)
 			{
-				instance.ApplyMapping(definition);
+				instance.ApplyMapping(definitionBuilder);
 			}
 
 		}

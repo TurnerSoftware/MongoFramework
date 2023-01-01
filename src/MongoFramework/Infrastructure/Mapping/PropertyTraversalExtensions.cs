@@ -79,7 +79,7 @@ public static class PropertyTraversalExtensions
 				yield return traversedProperty;
 
 				var propertyType = traversedProperty.Property.PropertyInfo.PropertyType;
-				propertyType = propertyType.GetEnumerableItemTypeOrDefault();
+				propertyType = propertyType.ElideEnumerableTypes();
 
 				if (EntityMapping.IsValidTypeToMap(propertyType) && !state.SeenTypes.Contains(propertyType))
 				{

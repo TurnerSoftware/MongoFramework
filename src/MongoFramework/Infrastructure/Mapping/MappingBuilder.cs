@@ -1,0 +1,68 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace MongoFramework.Infrastructure.Mapping;
+
+public class MappingBuilder
+{
+	private readonly IEnumerable<IMappingProcessor> mappingConventions;
+	private readonly List<EntityDefinitionBuilder> builders = new();
+
+	public IReadOnlyCollection<EntityDefinitionBuilder> Definitions => builders;
+
+	public MappingBuilder(IEnumerable<IMappingProcessor> mappingProcessors)
+	{
+		this.mappingConventions = mappingProcessors;
+	}
+
+	private bool TryGetBuilder(Type entityType, out EntityDefinitionBuilder builder)
+	{
+		builder = builders.Find(b => b.EntityType == entityType);
+		return builder != null;
+	}
+
+	private void UpdateBuilder(Type entityType, EntityDefinitionBuilder builder)
+	{
+		var index = builders.FindIndex(b => b.EntityType == entityType);
+		builders[index] = builder;
+	}
+
+	private void ApplyMappingConventions(EntityDefinitionBuilder definitionBuilder)
+	{
+		foreach (var processor in mappingConventions)
+		{
+			processor.ApplyMapping(definitionBuilder);
+		}
+	}
+
+	public EntityDefinitionBuilder Entity(Type entityType)
+	{
+		if (!TryGetBuilder(entityType, out var definitionBuilder))
+		{
+			definitionBuilder = new EntityDefinitionBuilder(entityType, this);
+			ApplyMappingConventions(definitionBuilder);
+			builders.Add(definitionBuilder);
+		}
+
+		return definitionBuilder;
+	}
+
+	public EntityDefinitionBuilder<TEntity> Entity<TEntity>()
+	{
+		if (!TryGetBuilder(typeof(TEntity), out var definitionBuilder))
+		{
+			definitionBuilder = new EntityDefinitionBuilder<TEntity>(this);
+			ApplyMappingConventions(definitionBuilder);
+			builders.Add(definitionBuilder);
+		}
+
+		//Allow upgrading from non-generic entity definition
+		if (definitionBuilder is not EntityDefinitionBuilder<TEntity>)
+		{
+			definitionBuilder = EntityDefinitionBuilder<TEntity>.CreateFrom(definitionBuilder);
+			UpdateBuilder(typeof(TEntity), definitionBuilder);
+		}
+
+		return definitionBuilder as EntityDefinitionBuilder<TEntity>;
+	}
+}

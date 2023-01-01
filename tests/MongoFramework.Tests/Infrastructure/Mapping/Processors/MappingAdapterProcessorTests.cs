@@ -15,20 +15,11 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 
 		public class AdapterTestModelMappingAdapter : IMappingProcessor
 		{
-			public void ApplyMapping(IEntityDefinition definition)
+			public void ApplyMapping(EntityDefinitionBuilder definitionBuilder)
 			{
-				definition.CollectionName = "Custom";
-
-				var definitionIndexes = definition.Indexes.ToList();
-
-				definitionIndexes.Add(new EntityIndexDefinition
-				{
-					Property = definition.GetProperty("UserName"),
-					IsUnique = true,
-					SortOrder = IndexSortOrder.Ascending
-				});
-
-				definition.Indexes = definitionIndexes;
+				definitionBuilder
+					.ToCollection("Custom")
+					.HasIndex(new[] { "UserName" }, b => b.IsUnique());
 			}
 		}
 
@@ -59,7 +50,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 
 			}
 
-			public void ApplyMapping(IEntityDefinition definition)
+			public void ApplyMapping(EntityDefinitionBuilder definitionBuilder)
 			{
 				throw new NotImplementedException();
 			}

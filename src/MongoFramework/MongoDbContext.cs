@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoFramework.Infrastructure;
@@ -9,12 +11,15 @@ using MongoFramework.Infrastructure.Commands;
 using MongoFramework.Infrastructure.Indexing;
 using MongoFramework.Infrastructure.Internal;
 using MongoFramework.Infrastructure.Linq;
+using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Utilities;
 
 namespace MongoFramework
 {
 	public class MongoDbContext : IMongoDbContext, IDisposable
 	{
+		private static readonly ConcurrentDictionary<Type, (bool isComplete, object lockObj)> DbContextEntityMapping = new();
+
 		public IMongoDbConnection Connection { get; }
 
 		public EntityEntryContainer ChangeTracker { get; } = new EntityEntryContainer();
@@ -24,7 +29,29 @@ namespace MongoFramework
 		{
 			Connection = connection;
 			InitialiseDbSets();
+			ConfigureMapping();
 		}
+
+		private void ConfigureMapping()
+		{
+			//TODO: I'm not happy with this locking mechanism to make a DbContext only do this once
+			var contextType = GetType();
+			var configureMapping = DbContextEntityMapping.GetOrAdd(contextType, static _ => (false,new()));
+			if (!configureMapping.isComplete)
+			{
+				lock (configureMapping.lockObj)
+				{
+					configureMapping = DbContextEntityMapping[contextType];
+					if (!configureMapping.isComplete)
+					{
+						EntityMapping.RegisterMapping(OnConfigureMapping);
+						DbContextEntityMapping[contextType] = (true, null);
+					}
+				}
+			}
+		}
+
+		protected virtual void OnConfigureMapping(MappingBuilder mappingBuilder) { }
 
 		private void InitialiseDbSets()
 		{

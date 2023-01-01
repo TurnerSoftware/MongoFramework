@@ -2,57 +2,50 @@
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
 
-namespace MongoFramework.Infrastructure.Mapping.Processors
+namespace MongoFramework.Infrastructure.Mapping.Processors;
+
+public class EntityIdProcessor : IMappingProcessor
 {
-	public class EntityIdProcessor : IMappingProcessor
+	public void ApplyMapping(EntityDefinitionBuilder definitionBuilder)
 	{
-		public void ApplyMapping(IEntityDefinition definition)
+		foreach (var propertyBuilder in definitionBuilder.Properties)
 		{
-			var keyDefinition = definition.Key;
-			var idProperty = keyDefinition?.Property;
-			foreach (var property in definition.Properties)
+			if (propertyBuilder.PropertyInfo.GetCustomAttribute<KeyAttribute>() == null)
 			{
-				if (property.PropertyInfo.GetCustomAttribute<KeyAttribute>() != null)
-				{
-					idProperty = property;
-					break;
-				}
-
-				if (property.ElementName.Equals("id", StringComparison.InvariantCultureIgnoreCase))
-				{
-					//We don't break here just in case another property has the KeyAttribute
-					//We preference the attribute over the name match
-					idProperty = property;
-				}
+				definitionBuilder.HasKey(
+					propertyBuilder.PropertyInfo,
+					AutoPickKeyGenerator
+				);
+				return;
 			}
 
-			if (idProperty is EntityPropertyDefinition entityProperty)
+			if (propertyBuilder.ElementName.Equals("id", StringComparison.InvariantCultureIgnoreCase))
 			{
-				var keyGenerator = keyDefinition?.KeyGenerator;
-
-				//Set an Id Generator based on the member type
-				var memberType = entityProperty.PropertyInfo.PropertyType;
-				if (memberType == typeof(string))
-				{
-					keyGenerator = EntityKeyGenerators.StringKeyGenerator;
-				}
-				else if (memberType == typeof(Guid))
-				{
-					keyGenerator = EntityKeyGenerators.GuidKeyGenerator;
-				}
-				else if (memberType == typeof(ObjectId))
-				{
-					keyGenerator = EntityKeyGenerators.ObjectIdKeyGenerator;
-				}
-
-				definition.Key = new EntityKeyDefinition
-				{
-					Property = entityProperty,
-					KeyGenerator = keyGenerator
-				};
+				//We don't stop here just in case another property has the KeyAttribute
+				//We preference the attribute over the name match
+				definitionBuilder.HasKey(
+					propertyBuilder.PropertyInfo,
+					AutoPickKeyGenerator
+				);
 			}
+		}
+	}
+
+	private static void AutoPickKeyGenerator(EntityKeyBuilder keyBuilder)
+	{
+		var propertyType = keyBuilder.Property.PropertyType;
+		if (propertyType == typeof(string))
+		{
+			keyBuilder.HasKeyGenerator(EntityKeyGenerators.StringKeyGenerator);
+		}
+		else if (propertyType == typeof(Guid))
+		{
+			keyBuilder.HasKeyGenerator(EntityKeyGenerators.GuidKeyGenerator);
+		}
+		else if (propertyType == typeof(ObjectId))
+		{
+			keyBuilder.HasKeyGenerator(EntityKeyGenerators.ObjectIdKeyGenerator);
 		}
 	}
 }

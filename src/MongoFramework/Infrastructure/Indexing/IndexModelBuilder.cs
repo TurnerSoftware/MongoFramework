@@ -1,80 +1,52 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
 using MongoDB.Driver;
 using MongoFramework.Infrastructure.Mapping;
 
-namespace MongoFramework.Infrastructure.Indexing
+namespace MongoFramework.Infrastructure.Indexing;
+
+public static class IndexModelBuilder<TEntity>
 {
-	public static class IndexModelBuilder<TEntity>
+	public static IEnumerable<CreateIndexModel<TEntity>> BuildModel()
 	{
-		public static IEnumerable<CreateIndexModel<TEntity>> BuildModel()
+		var indexBuilder = Builders<TEntity>.IndexKeys;
+		var indexes = EntityMapping.GetOrCreateDefinition(typeof(TEntity)).Indexes;
+
+		foreach (var index in indexes)
 		{
-			var indexBuilder = Builders<TEntity>.IndexKeys;
-			var indexes = EntityMapping.GetOrCreateDefinition(typeof(TEntity)).Indexes;
-			var groupedIndexes = indexes.OrderBy(i => i.IndexPriority).GroupBy(i => i.IndexName);
-
-			foreach (var indexGroup in groupedIndexes)
+			var indexKeyCount = index.IndexPaths.Count + (index.IsTenantExclusive ? 1 : 0);
+			var indexKeys = new IndexKeysDefinition<TEntity>[indexKeyCount];
+			for (var i = 0; i < index.IndexPaths.Count; i++)
 			{
-				if (indexGroup.Key != null)
-				{
-					var indexKeys = new List<IndexKeysDefinition<TEntity>>();
-					CreateIndexOptions<TEntity> indexOptions = default;
-					foreach (var index in indexGroup)
-					{
-						var indexModel = CreateIndexModel(index);
-						indexKeys.Add(indexModel.Keys);
-
-						if (indexOptions == null)
-						{
-							indexOptions = indexModel.Options;
-						}
-					}
-
-					var combinedKeyDefinition = indexBuilder.Combine(indexKeys);
-					yield return new CreateIndexModel<TEntity>(combinedKeyDefinition, indexOptions);
-				}
-				else
-				{
-					foreach (var index in indexGroup)
-					{
-						yield return CreateIndexModel(index);
-					}
-				}
+				indexKeys[i] = CreateIndexKey(index.IndexPaths[i]);
 			}
-		}
-
-		private static CreateIndexModel<TEntity> CreateIndexModel(IEntityIndexDefinition indexDefinition)
-		{
-			var builder = Builders<TEntity>.IndexKeys;
-			IndexKeysDefinition<TEntity> keyModel;
-
-			if (indexDefinition.IndexType == IndexType.Text)
+			
+			if (index.IsTenantExclusive)
 			{
-				keyModel = builder.Text(indexDefinition.Path);
-			}
-			else if (indexDefinition.IndexType == IndexType.Geo2dSphere)
-			{
-				keyModel = builder.Geo2DSphere(indexDefinition.Path);
-			}
-			else
-			{
-				keyModel = indexDefinition.SortOrder == IndexSortOrder.Ascending ?
-					builder.Ascending(indexDefinition.Path) : builder.Descending(indexDefinition.Path);
+				indexKeys[indexKeys.Length - 1] = Builders<TEntity>.IndexKeys.Ascending(nameof(IHaveTenantId.TenantId));
 			}
 
-			if (indexDefinition.IsTenantExclusive && typeof(IHaveTenantId).IsAssignableFrom(typeof(TEntity)))
+			var combinedKeyDefinition = indexBuilder.Combine(indexKeys);
+			yield return new CreateIndexModel<TEntity>(combinedKeyDefinition, new CreateIndexOptions
 			{
-				var tenantKey = indexDefinition.SortOrder == IndexSortOrder.Ascending ?
-					builder.Ascending("TenantId") : builder.Descending("TenantId");
-				keyModel = builder.Combine(tenantKey, keyModel);
-			}
-
-			return new CreateIndexModel<TEntity>(keyModel, new CreateIndexOptions
-			{
-				Name = indexDefinition.IndexName,
-				Unique = indexDefinition.IsUnique,
+				Name = index.IndexName,
+				Unique = index.IsUnique,
 				Background = true
 			});
 		}
+	}
+
+	private static IndexKeysDefinition<TEntity> CreateIndexKey(IEntityIndexPathDefinition indexPathDefinition)
+	{
+		var builder = Builders<TEntity>.IndexKeys;
+		Func<FieldDefinition<TEntity>, IndexKeysDefinition<TEntity>> builderMethod = indexPathDefinition.IndexType switch
+		{
+			IndexType.Standard when indexPathDefinition.SortOrder == IndexSortOrder.Ascending => builder.Ascending,
+			IndexType.Standard when indexPathDefinition.SortOrder == IndexSortOrder.Descending => builder.Descending,
+			IndexType.Text => builder.Text,
+			IndexType.Geo2dSphere => builder.Geo2DSphere,
+			_ => throw new ArgumentException($"Unsupported index type \"{indexPathDefinition.IndexType}\"", nameof(indexPathDefinition))
+		};
+		return builderMethod(indexPathDefinition.Path);
 	}
 }
