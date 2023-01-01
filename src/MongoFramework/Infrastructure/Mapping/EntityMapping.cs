@@ -175,7 +175,7 @@ namespace MongoFramework.Infrastructure.Mapping
 					IgnoreInherited = true
 				} : new EntityExtraElementsDefinition
 				{
-					Property = properties.First(p => p.PropertyInfo == definitionBuilder.KeyBuilder.Property)
+					Property = properties.First(p => p.PropertyInfo == definitionBuilder.ExtraElementsProperty)
 				},
 				Indexes = definitionBuilder.Indexes.Select(b => BuildIndexDefinition(definitionBuilder, b)).ToArray(),
 			};
