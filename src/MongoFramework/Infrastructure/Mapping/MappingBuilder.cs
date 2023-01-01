@@ -40,8 +40,8 @@ public class MappingBuilder
 		if (!TryGetBuilder(entityType, out var definitionBuilder))
 		{
 			definitionBuilder = new EntityDefinitionBuilder(entityType, this);
-			ApplyMappingConventions(definitionBuilder);
 			builders.Add(definitionBuilder);
+			ApplyMappingConventions(definitionBuilder);
 		}
 
 		return definitionBuilder;
@@ -52,8 +52,8 @@ public class MappingBuilder
 		if (!TryGetBuilder(typeof(TEntity), out var definitionBuilder))
 		{
 			definitionBuilder = new EntityDefinitionBuilder<TEntity>(this);
-			ApplyMappingConventions(definitionBuilder);
 			builders.Add(definitionBuilder);
+			ApplyMappingConventions(definitionBuilder);
 		}
 
 		//Allow upgrading from non-generic entity definition
