@@ -11,7 +11,7 @@ public class EntityIdProcessor : IMappingProcessor
 	{
 		foreach (var propertyBuilder in definitionBuilder.Properties)
 		{
-			if (propertyBuilder.PropertyInfo.GetCustomAttribute<KeyAttribute>() == null)
+			if (Attribute.IsDefined(propertyBuilder.PropertyInfo, typeof(KeyAttribute)))
 			{
 				definitionBuilder.HasKey(
 					propertyBuilder.PropertyInfo,
