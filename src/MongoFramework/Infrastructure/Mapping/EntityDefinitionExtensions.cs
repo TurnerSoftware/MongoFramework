@@ -6,7 +6,7 @@ namespace MongoFramework.Infrastructure.Mapping
 {
 	public static class EntityDefinitionExtensions
 	{
-		public static IEntityPropertyDefinition GetIdProperty(this IEntityDefinition definition)
+		public static PropertyDefinition GetIdProperty(this EntityDefinition definition)
 		{
 			if (definition.Key is null)
 			{
@@ -16,17 +16,17 @@ namespace MongoFramework.Infrastructure.Mapping
 			return definition.Key?.Property;
 		}
 
-		public static string GetIdName(this IEntityDefinition definition)
+		public static string GetIdName(this EntityDefinition definition)
 		{
 			return definition.GetIdProperty()?.ElementName;
 		}
 
-		public static object GetIdValue(this IEntityDefinition definition, object entity)
+		public static object GetIdValue(this EntityDefinition definition, object entity)
 		{
 			return definition.GetIdProperty()?.GetValue(entity);
 		}
 
-		public static object GetDefaultId(this IEntityDefinition definition)
+		public static object GetDefaultId(this EntityDefinition definition)
 		{
 			var idPropertyType = definition.GetIdProperty()?.PropertyInfo.PropertyType;
 			if (idPropertyType is { IsValueType: true })
@@ -36,7 +36,7 @@ namespace MongoFramework.Infrastructure.Mapping
 			return null;
 		}
 
-		public static IEnumerable<IEntityPropertyDefinition> GetInheritedProperties(this IEntityDefinition definition)
+		public static IEnumerable<PropertyDefinition> GetInheritedProperties(this EntityDefinition definition)
 		{
 			var currentType = definition.EntityType.BaseType;
 			while (currentType != typeof(object) && currentType != null)
@@ -51,7 +51,7 @@ namespace MongoFramework.Infrastructure.Mapping
 			}
 		}
 
-		public static IEnumerable<IEntityPropertyDefinition> GetAllProperties(this IEntityDefinition definition)
+		public static IEnumerable<PropertyDefinition> GetAllProperties(this EntityDefinition definition)
 		{
 			foreach (var property in definition.Properties)
 			{
@@ -64,7 +64,7 @@ namespace MongoFramework.Infrastructure.Mapping
 			}
 		}
 
-		public static IEntityPropertyDefinition GetProperty(this IEntityDefinition definition, string name)
+		public static PropertyDefinition GetProperty(this EntityDefinition definition, string name)
 		{
 			foreach (var property in definition.GetAllProperties())
 			{

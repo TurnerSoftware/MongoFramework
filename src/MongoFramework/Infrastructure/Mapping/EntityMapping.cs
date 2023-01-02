@@ -15,40 +15,17 @@ namespace MongoFramework.Infrastructure.Mapping
 	public static class EntityMapping
 	{
 		private static ReaderWriterLockSlim MappingLock { get; } = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
-		private static ConcurrentDictionary<Type, IEntityDefinition> EntityDefinitions { get; }
+		private static ConcurrentDictionary<Type, EntityDefinition> EntityDefinitions { get; }
 		private static List<IMappingProcessor> MappingProcessors { get; }
 
 		static EntityMapping()
 		{
 			DriverAbstractionRules.ApplyRules();
 
-			EntityDefinitions = new ConcurrentDictionary<Type, IEntityDefinition>();
+			EntityDefinitions = new ConcurrentDictionary<Type, EntityDefinition>();
 			MappingProcessors = new List<IMappingProcessor>();
 
 			AddMappingProcessors(DefaultProcessors.CreateProcessors());
-		}
-
-		[Obsolete("This will be removed in a future version")]
-		public static IEntityDefinition SetEntityDefinition(IEntityDefinition definition)
-		{
-			MappingLock.EnterWriteLock();
-			try
-			{
-				return EntityDefinitions.AddOrUpdate(definition.EntityType, definition, (entityType, existingValue) =>
-				{
-					return definition;
-				});
-			}
-			finally
-			{
-				MappingLock.ExitWriteLock();
-			}
-		}
-
-		[Obsolete("This will be removed in a future version")]
-		public static void RemoveEntityDefinition(IEntityDefinition definition)
-		{
-			EntityDefinitions.TryRemove(definition.EntityType, out _);
 		}
 
 		public static void RemoveAllDefinitions()
@@ -98,7 +75,7 @@ namespace MongoFramework.Infrastructure.Mapping
 			}
 		}
 
-		private static IEntityDefinition ApplyMapping(EntityDefinitionBuilder definitionBuilder)
+		private static EntityDefinition ApplyMapping(EntityDefinitionBuilder definitionBuilder)
 		{
 			//TODO: Really needs a refactor - easy to see also how messy indexes make the building process
 			static string GetElementName(EntityDefinitionBuilder definitionBuilder, PropertyInfo propertyInfo)
@@ -137,11 +114,11 @@ namespace MongoFramework.Infrastructure.Mapping
 				}
 			}
 
-			IEntityIndexDefinition BuildIndexDefinition(EntityDefinitionBuilder definitionBuilder, EntityIndexBuilder indexBuilder)
+			IndexDefinition BuildIndexDefinition(EntityDefinitionBuilder definitionBuilder, EntityIndexBuilder indexBuilder)
 			{
-				return new EntityIndexDefinition
+				return new IndexDefinition
 				{
-					IndexPaths = indexBuilder.Properties.Select(p => new EntityIndexPathDefinition
+					IndexPaths = indexBuilder.Properties.Select(p => new IndexPathDefinition
 					{
 						Path = EvaluateIndexPath(definitionBuilder, p.PropertyPath),
 						IndexType = p.IndexType,
@@ -153,7 +130,7 @@ namespace MongoFramework.Infrastructure.Mapping
 				};
 			}
 
-			var properties = definitionBuilder.Properties.Select(p => new EntityPropertyDefinition
+			var properties = definitionBuilder.Properties.Select(p => new PropertyDefinition
 			{
 				PropertyInfo = p.PropertyInfo,
 				ElementName = p.ElementName
@@ -163,17 +140,17 @@ namespace MongoFramework.Infrastructure.Mapping
 			{
 				EntityType = definitionBuilder.EntityType,
 				CollectionName = definitionBuilder.CollectionName,
-				Key = definitionBuilder.KeyBuilder is null ? null : new EntityKeyDefinition
+				Key = definitionBuilder.KeyBuilder is null ? null : new KeyDefinition
 				{
 					Property = properties.First(p => p.PropertyInfo == definitionBuilder.KeyBuilder.Property),
 					KeyGenerator = definitionBuilder.KeyBuilder.KeyGenerator,
 				},
 				Properties = properties,
-				ExtraElements = definitionBuilder.ExtraElementsProperty is null ? new EntityExtraElementsDefinition
+				ExtraElements = definitionBuilder.ExtraElementsProperty is null ? new ExtraElementsDefinition
 				{
 					IgnoreExtraElements = true,
 					IgnoreInherited = true
-				} : new EntityExtraElementsDefinition
+				} : new ExtraElementsDefinition
 				{
 					Property = properties.First(p => p.PropertyInfo == definitionBuilder.ExtraElementsProperty)
 				},
@@ -189,7 +166,7 @@ namespace MongoFramework.Infrastructure.Mapping
 			throw new InvalidOperationException("Uh oh");
 		}
 
-		public static IEntityDefinition RegisterType(Type entityType)
+		public static EntityDefinition RegisterType(Type entityType)
 		{
 			if (!IsValidTypeToMap(entityType))
 			{
@@ -237,7 +214,7 @@ namespace MongoFramework.Infrastructure.Mapping
 			}
 		}
 
-		public static IEntityDefinition GetOrCreateDefinition(Type entityType)
+		public static EntityDefinition GetOrCreateDefinition(Type entityType)
 		{
 			MappingLock.EnterUpgradeableReadLock();
 			try
@@ -255,7 +232,7 @@ namespace MongoFramework.Infrastructure.Mapping
 			}
 		}
 
-		public static bool TryRegisterType(Type entityType, out IEntityDefinition definition)
+		public static bool TryRegisterType(Type entityType, out EntityDefinition definition)
 		{
 			if (!IsValidTypeToMap(entityType))
 			{

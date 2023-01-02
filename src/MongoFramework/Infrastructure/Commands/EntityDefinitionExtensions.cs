@@ -8,11 +8,11 @@ namespace MongoFramework.Infrastructure.Commands
 {
 	public static class EntityDefinitionExtensions
 	{
-		public static FilterDefinition<TEntity> CreateIdFilterFromEntity<TEntity>(this IEntityDefinition definition, TEntity entity)
+		public static FilterDefinition<TEntity> CreateIdFilterFromEntity<TEntity>(this EntityDefinition definition, TEntity entity)
 		{
 			return Builders<TEntity>.Filter.Eq(definition.GetIdName(), definition.GetIdValue(entity));
 		}
-		public static FilterDefinition<TEntity> CreateIdFilter<TEntity>(this IEntityDefinition definition, object entityId, string tenantId = null)
+		public static FilterDefinition<TEntity> CreateIdFilter<TEntity>(this EntityDefinition definition, object entityId, string tenantId = null)
 		{
 			if (typeof(IHaveTenantId).IsAssignableFrom(typeof(TEntity)) && tenantId == null)
 			{

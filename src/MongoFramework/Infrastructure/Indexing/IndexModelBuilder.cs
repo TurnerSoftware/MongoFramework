@@ -36,7 +36,7 @@ public static class IndexModelBuilder<TEntity>
 		}
 	}
 
-	private static IndexKeysDefinition<TEntity> CreateIndexKey(IEntityIndexPathDefinition indexPathDefinition)
+	private static IndexKeysDefinition<TEntity> CreateIndexKey(IndexPathDefinition indexPathDefinition)
 	{
 		var builder = Builders<TEntity>.IndexKeys;
 		Func<FieldDefinition<TEntity>, IndexKeysDefinition<TEntity>> builderMethod = indexPathDefinition.IndexType switch

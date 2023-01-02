@@ -18,7 +18,7 @@ namespace MongoFramework.Infrastructure.Linq
 	public class MongoFrameworkQueryProvider<TEntity> : IMongoFrameworkQueryProvider<TEntity> where TEntity : class
 	{
 		public IMongoDbConnection Connection { get; }
-		private IEntityDefinition EntityDefinition { get; }
+		private EntityDefinition EntityDefinition { get; }
 
 		private BsonDocument PreStage { get; }
 
