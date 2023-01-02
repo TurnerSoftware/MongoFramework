@@ -128,17 +128,30 @@ public class IndexProcessor : IMappingProcessor
 				traversedProperties.Add((traversedProperty, indexAttribute));
 			}
 		}
+
+		//Process the unnamed group as individual indexes
+		if (indexTracker.TryGetValue(string.Empty, out var ungroupedIndexes))
+		{
+			foreach (var ungroupedIndex in ungroupedIndexes)
+			{
+				var indexAttr = ungroupedIndex.IndexAttribute;
+				var indexProperty = new IndexProperty(
+					ungroupedIndex.TraversedProperty.GetPropertyPath(),
+					indexAttr.IndexType,
+					indexAttr.SortOrder
+				);
+				definitionBuilder.HasIndex(new[] { indexProperty }, b => b
+					.IsUnique(indexAttr.IsUnique)
+					.IsTenantExclusive(indexAttr.IsTenantExclusive)
+				);
+			}
+			indexTracker.Remove(string.Empty);
+		}
 		
 		//Using the grouped indexes, apply them to the entity definition builder
 		foreach (var index in indexTracker)
 		{
 			var indexName = index.Key;
-			if (indexName.Length == 0)
-			{
-				//We don't want the empty string we set earlier
-				//We only did it because the dictionary needed it
-				indexName = null;
-			}
 			var indexProperties = index.Value
 				.OrderBy(p => p.IndexAttribute.IndexPriority)
 				.Select(p => new IndexProperty(

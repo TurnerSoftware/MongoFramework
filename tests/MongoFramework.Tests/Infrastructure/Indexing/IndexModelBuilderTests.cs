@@ -208,9 +208,10 @@ namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 		{
 			var indexModel = IndexModelBuilder<TenantUniqueConstraintModel>.BuildModel();
 
-			var indexBsonDocument = indexModel.First().Keys.Render(null, null).ToString();
+			var indexBsonDocument = indexModel.First().Keys.Render(null, null);
 
-			Assert.AreEqual("{ \"TenantId\" : 1, \"UniqueIndex\" : 1 }", indexBsonDocument);
+			Assert.AreEqual(1, indexBsonDocument["TenantId"].AsInt32);
+			Assert.AreEqual(1, indexBsonDocument["UniqueIndex"].AsInt32);
 		}
 
 		[TestMethod]
