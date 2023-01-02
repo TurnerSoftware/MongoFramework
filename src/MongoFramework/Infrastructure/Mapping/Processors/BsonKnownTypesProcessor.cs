@@ -13,7 +13,7 @@ public class BsonKnownTypesProcessor : IMappingProcessor
 		{
 			foreach (var type in bsonKnownTypesAttribute.KnownTypes)
 			{
-				EntityMapping.TryRegisterType(type, out _);
+				definitionBuilder.MappingBuilder.Entity(type);
 			}
 		}
 	}
