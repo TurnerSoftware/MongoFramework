@@ -16,7 +16,7 @@ namespace MongoFramework.Tests
 			EntityMapping.RemoveAllDefinitions();
 
 			EntityMapping.RemoveAllMappingProcessors();
-			EntityMapping.AddMappingProcessors(DefaultProcessors.CreateProcessors());
+			EntityMapping.AddMappingProcessors(DefaultMappingProcessors.Processors);
 
 			TypeDiscovery.ClearCache();
 			EntityIndexWriter.ClearCache();
