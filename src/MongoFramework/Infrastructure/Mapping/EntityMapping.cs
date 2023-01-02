@@ -220,7 +220,10 @@ namespace MongoFramework.Infrastructure.Mapping
 					}
 
 					var mappingBuilder = new MappingBuilder(MappingProcessors);
-					definition = ApplyMapping(mappingBuilder.Entity(entityType));
+					mappingBuilder.Entity(entityType);
+					RegisterMapping(mappingBuilder);
+
+					EntityDefinitions.TryGetValue(entityType, out definition);
 					return definition;
 				}
 				finally
