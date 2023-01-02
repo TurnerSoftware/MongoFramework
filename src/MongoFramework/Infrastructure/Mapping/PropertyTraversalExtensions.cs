@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace MongoFramework.Infrastructure.Mapping;
 
-[DebuggerDisplay("Property = {Property.ElementName}, Parent = {Parent?.Property?.ElementName}, Depth = {Depth}")]
+[DebuggerDisplay("{DebuggerDisplay,nq}")]
 public sealed record TraversedProperty
 {
 	private static readonly string ElementSeparator = ".";
@@ -40,6 +40,8 @@ public sealed record TraversedProperty
 			ArrayPool<string>.Shared.Return(pool);
 		}
 	}
+
+	private string DebuggerDisplay => $"Property = {Property.ElementName}, Parent = {Parent?.Property?.ElementName}, Depth = {Depth}";
 }
 
 public static class PropertyTraversalExtensions
