@@ -7,12 +7,12 @@ namespace MongoFramework.Infrastructure.Mapping;
 
 public interface IEntityDefinition
 {
-	public Type EntityType { get; set; }
-	public string CollectionName { get; set; }
-	public IEntityKeyDefinition Key { get; set; }
-	public IEnumerable<IEntityPropertyDefinition> Properties { get; set; }
-	public IEnumerable<IEntityIndexDefinition> Indexes { get; set; }
-	public IEntityExtraElementsDefinition ExtraElements { get; set; }
+	public Type EntityType { get; }
+	public string CollectionName { get; }
+	public IEntityKeyDefinition Key { get; }
+	public IEnumerable<IEntityPropertyDefinition> Properties { get; }
+	public IEnumerable<IEntityIndexDefinition> Indexes { get; }
+	public IEntityExtraElementsDefinition ExtraElements { get; }
 }
 
 public interface IEntityPropertyDefinition
@@ -52,20 +52,20 @@ public interface IEntityKeyDefinition
 	public IEntityKeyGenerator KeyGenerator { get; }
 }
 
-public class EntityDefinition : IEntityDefinition
+public sealed record EntityDefinition : IEntityDefinition
 {
-	public Type EntityType { get; set; }
-	public string CollectionName { get; set; }
-	public IEntityKeyDefinition Key { get; set; }
-	public IEnumerable<IEntityPropertyDefinition> Properties { get; set; } = Enumerable.Empty<IEntityPropertyDefinition>();
-	public IEnumerable<IEntityIndexDefinition> Indexes { get; set; } = Enumerable.Empty<IEntityIndexDefinition>();
-	public IEntityExtraElementsDefinition ExtraElements { get; set; }
+	public Type EntityType { get; init; }
+	public string CollectionName { get; init; }
+	public IEntityKeyDefinition Key { get; init; }
+	public IEnumerable<IEntityPropertyDefinition> Properties { get; init; } = Enumerable.Empty<IEntityPropertyDefinition>();
+	public IEnumerable<IEntityIndexDefinition> Indexes { get; init; } = Enumerable.Empty<IEntityIndexDefinition>();
+	public IEntityExtraElementsDefinition ExtraElements { get; init; }
 }
 
-public class EntityPropertyDefinition : IEntityPropertyDefinition
+public sealed record EntityPropertyDefinition : IEntityPropertyDefinition
 {
-	public PropertyInfo PropertyInfo { get; set; }
-	public string ElementName { get; set; }
+	public PropertyInfo PropertyInfo { get; init; }
+	public string ElementName { get; init; }
 
 	public object GetValue(object entity)
 	{
