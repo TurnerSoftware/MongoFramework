@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Driver;
+using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Indexing;
 using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Serialization;
@@ -19,6 +20,8 @@ namespace MongoFramework.Tests
 
 			TypeDiscovery.ClearCache();
 			EntityIndexWriter.ClearCache();
+
+			DriverAbstractionRules.ApplyRules();
 		}
 
 		protected static void ClearDatabase()
