@@ -41,6 +41,7 @@ public sealed record TraversedProperty
 		}
 	}
 
+	[DebuggerNonUserCode]
 	private string DebuggerDisplay => $"Property = {Property.ElementName}, Parent = {Parent?.Property?.ElementName}, Depth = {Depth}";
 }
 

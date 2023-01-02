@@ -15,6 +15,7 @@ public sealed record EntityDefinition
 	public IReadOnlyList<IndexDefinition> Indexes { get; init; } = Array.Empty<IndexDefinition>();
 	public ExtraElementsDefinition ExtraElements { get; init; }
 
+	[DebuggerNonUserCode]
 	private string DebuggerDisplay => $"EntityType = {EntityType.Name}, Collection = {CollectionName}, Properties = {Properties.Count}, Indexes = {Indexes.Count}";
 }
 
@@ -34,6 +35,7 @@ public sealed record PropertyDefinition
 		PropertyInfo.SetValue(entity, value);
 	}
 
+	[DebuggerNonUserCode]
 	private string DebuggerDisplay => $"PropertyInfo = {PropertyInfo.Name}, ElementName = {ElementName}";
 }
 
@@ -45,6 +47,7 @@ public sealed record IndexDefinition
 	public bool IsUnique { get; init; }
 	public bool IsTenantExclusive { get; init; }
 
+	[DebuggerNonUserCode]
 	private string DebuggerDisplay => $"IndexName = {IndexName}, IndexPaths = {IndexPaths.Count}, IsUnique = {IsUnique}";
 }
 
@@ -55,6 +58,7 @@ public sealed record IndexPathDefinition
 	public IndexType IndexType { get; init; }
 	public IndexSortOrder SortOrder { get; init; }
 
+	[DebuggerNonUserCode]
 	private string DebuggerDisplay => $"Path = {Path}, IndexType = {IndexType}, SortOrder = {SortOrder}";
 }
 
@@ -64,6 +68,7 @@ public sealed record KeyDefinition
 	public PropertyDefinition Property { get; init; }
 	public IEntityKeyGenerator KeyGenerator { get; init; }
 
+	[DebuggerNonUserCode]
 	private string DebuggerDisplay => $"PropertyInfo = {Property.PropertyInfo.Name}, ElementName = {Property.ElementName}";
 }
 
@@ -74,6 +79,7 @@ public sealed record ExtraElementsDefinition
 	public bool IgnoreExtraElements { get; init; }
 	public bool IgnoreInherited { get; init; }
 
+	[DebuggerNonUserCode]
 	private string DebuggerDisplay
 	{
 		get
