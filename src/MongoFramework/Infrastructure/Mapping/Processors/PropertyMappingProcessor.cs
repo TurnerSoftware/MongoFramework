@@ -12,8 +12,6 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 			var entityType = definitionBuilder.EntityType;
 			var properties = entityType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
-			var definitionProperties = new List<PropertyDefinition>();
-
 			foreach (var property in properties)
 			{
 				if (!property.CanRead || !property.CanWrite)
