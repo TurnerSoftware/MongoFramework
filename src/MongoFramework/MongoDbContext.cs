@@ -18,7 +18,11 @@ namespace MongoFramework
 {
 	public class MongoDbContext : IMongoDbContext, IDisposable
 	{
-		private static readonly ConcurrentDictionary<Type, (bool isComplete, object lockObj)> DbContextEntityMapping = new();
+		private static readonly ConcurrentDictionary<Type, ContextMappingLock> ContextMappingLocks = new();
+		private class ContextMappingLock
+		{
+			public bool HasCompleted { get; set; }
+		}
 
 		public IMongoDbConnection Connection { get; }
 
@@ -32,20 +36,22 @@ namespace MongoFramework
 			ConfigureMapping();
 		}
 
+		/// <summary>
+		/// Triggers the <see cref="OnConfigureMapping(MappingBuilder)"/> virtual method exactly once for 
+		/// this context type for the lifetime of the application.
+		/// </summary>
 		private void ConfigureMapping()
 		{
-			//TODO: I'm not happy with this locking mechanism to make a DbContext only do this once
 			var contextType = GetType();
-			var configureMapping = DbContextEntityMapping.GetOrAdd(contextType, static _ => (false,new()));
-			if (!configureMapping.isComplete)
+			var contextMappingLock = ContextMappingLocks.GetOrAdd(contextType, static _ => new());
+			if (!contextMappingLock.HasCompleted)
 			{
-				lock (configureMapping.lockObj)
+				lock (contextMappingLock)
 				{
-					configureMapping = DbContextEntityMapping[contextType];
-					if (!configureMapping.isComplete)
+					if (!contextMappingLock.HasCompleted)
 					{
 						EntityMapping.RegisterMapping(OnConfigureMapping);
-						DbContextEntityMapping[contextType] = (true, null);
+						contextMappingLock.HasCompleted = true;
 					}
 				}
 			}
