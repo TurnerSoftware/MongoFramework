@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using MongoFramework.Infrastructure.Mapping;
 
-namespace MongoFramework.Infrastructure.Mapping;
+namespace MongoFramework;
 
 public class MappingBuilder
 {
@@ -12,7 +13,7 @@ public class MappingBuilder
 
 	public MappingBuilder(IEnumerable<IMappingProcessor> mappingProcessors)
 	{
-		this.mappingConventions = mappingProcessors;
+		mappingConventions = mappingProcessors;
 	}
 
 	private bool TryGetBuilder(Type entityType, out EntityDefinitionBuilder builder)
