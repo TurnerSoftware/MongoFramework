@@ -69,7 +69,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			EntityMapping.AddMappingProcessor(new EntityIdProcessor());
 			EntityMapping.AddMappingProcessor(new MappingAdapterProcessor());
-			Assert.ThrowsException<ArgumentException>(() => EntityMapping.RegisterType(typeof(AdapterTestModelNoInterface)));
+			Assert.ThrowsException<InvalidOperationException>(() => EntityMapping.RegisterType(typeof(AdapterTestModelNoInterface)));
 		}
 
 		[TestMethod]
