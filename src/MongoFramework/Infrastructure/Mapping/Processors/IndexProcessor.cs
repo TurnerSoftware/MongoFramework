@@ -8,7 +8,6 @@ using MongoFramework.Attributes;
 
 namespace MongoFramework.Infrastructure.Mapping.Processors;
 
-//TODO: This needs another revision as it is a mess
 public class IndexProcessor : IMappingProcessor
 {
 	internal record TraversedProperty
@@ -140,9 +139,11 @@ public class IndexProcessor : IMappingProcessor
 					indexAttr.IndexType,
 					indexAttr.SortOrder
 				);
-				definitionBuilder.HasIndex(new[] { indexProperty }, b => b
-					.IsUnique(indexAttr.IsUnique)
-					.IsTenantExclusive(indexAttr.IsTenantExclusive)
+				HasIndex(
+					definitionBuilder,
+					ungroupedIndex.IndexAttribute,
+					indexName: null,
+					indexProperty
 				);
 			}
 			indexTracker.Remove(string.Empty);
@@ -151,7 +152,6 @@ public class IndexProcessor : IMappingProcessor
 		//Using the grouped indexes, apply them to the entity definition builder
 		foreach (var index in indexTracker)
 		{
-			var indexName = index.Key;
 			var indexProperties = index.Value
 				.OrderBy(p => p.IndexAttribute.IndexPriority)
 				.Select(p => new IndexProperty(
@@ -159,12 +159,26 @@ public class IndexProcessor : IMappingProcessor
 					p.IndexAttribute.IndexType,
 					p.IndexAttribute.SortOrder
 				)).ToArray();
-			var indexAttr = index.Value[0].IndexAttribute;
-			definitionBuilder.HasIndex(indexProperties, b => b
-				.HasName(indexName)
-				.IsUnique(indexAttr.IsUnique)
-				.IsTenantExclusive(indexAttr.IsTenantExclusive)
+			HasIndex(
+				definitionBuilder,
+				index.Value[0].IndexAttribute,
+				indexName: index.Key,
+				indexProperties
 			);
 		}
+	}
+
+	private static void HasIndex(
+		EntityDefinitionBuilder definitionBuilder, 
+		IndexAttribute indexAttribute,
+		string indexName = null, 
+		params IndexProperty[] indexProperties
+	)
+	{
+		definitionBuilder.HasIndex(indexProperties, b => b
+			.HasName(indexName)
+			.IsUnique(indexAttribute.IsUnique)
+			.IsTenantExclusive(indexAttribute.IsTenantExclusive)
+		);
 	}
 }
