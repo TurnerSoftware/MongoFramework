@@ -7,6 +7,8 @@ namespace MongoFramework.Infrastructure.Mapping;
 
 public static partial class EntityMapping
 {
+	private static readonly string PathSeparator = ".";
+
 	public static void RegisterMapping(Action<MappingBuilder> builder)
 	{
 		var mappingBuilder = new MappingBuilder(MappingProcessors);
@@ -19,14 +21,17 @@ public static partial class EntityMapping
 		MappingLock.EnterWriteLock();
 		try
 		{
-			foreach (var definition in mappingBuilder.Definitions)
+			foreach (var definitionBuilder in mappingBuilder.Definitions)
 			{
-				if (EntityDefinitions.ContainsKey(definition.EntityType))
+				if (EntityDefinitions.ContainsKey(definitionBuilder.EntityType))
 				{
 					continue;
 				}
 
-				CreateEntityDefinition(definition);
+				var definition = ResolveEntityDefinition(definitionBuilder);
+
+				EntityDefinitions[definition.EntityType] = definition;
+				DriverMappingInterop.RegisterDefinition(definition);
 			}
 		}
 		finally
@@ -35,94 +40,108 @@ public static partial class EntityMapping
 		}
 	}
 
-	private static EntityDefinition CreateEntityDefinition(EntityDefinitionBuilder definitionBuilder)
+	private static KeyDefinition ResolveKeyDefinition(EntityDefinitionBuilder definitionBuilder, PropertyDefinition[] properties)
 	{
-		//TODO: Really needs a refactor - easy to see also how messy indexes make the building process
-		static string GetElementName(EntityDefinitionBuilder definitionBuilder, PropertyInfo propertyInfo)
+		if (definitionBuilder.KeyBuilder is null)
 		{
-			if (propertyInfo.DeclaringType == definitionBuilder.EntityType)
-			{
-				return definitionBuilder.Properties.First(p => p.PropertyInfo == propertyInfo).ElementName;
-			}
-			else if (EntityDefinitions.TryGetValue(propertyInfo.DeclaringType, out var definition))
-			{
-				var property = definition.GetProperty(propertyInfo.Name) ?? throw new ArgumentException($"Property \"{propertyInfo.Name}\" was not found on existing definition for \"{propertyInfo.DeclaringType}\"");
-				return property.ElementName;
-			}
-			else
-			{
-				var localDefinitionBuilder = definitionBuilder.MappingBuilder.Entity(propertyInfo.DeclaringType);
-				return localDefinitionBuilder.Properties.First(p => p.PropertyInfo == propertyInfo).ElementName;
-			}
+			return null;
 		}
 
-		string EvaluateIndexPath(EntityDefinitionBuilder definitionBuilder, PropertyPath propertyPath)
+		return new KeyDefinition
 		{
-			var pool = ArrayPool<string>.Shared.Rent(propertyPath.Properties.Count);
-			try
-			{
-				for (var i = 0; i < propertyPath.Properties.Count; i++)
-				{
-					var propertyInfo = propertyPath.Properties[i];
-					pool[i] = GetElementName(definitionBuilder, propertyInfo);
-				}
-				return string.Join(".", pool, 0, propertyPath.Properties.Count);
-			}
-			finally
-			{
-				ArrayPool<string>.Shared.Return(pool);
-			}
-		}
+			Property = properties.First(p => p.PropertyInfo == definitionBuilder.KeyBuilder.Property),
+			KeyGenerator = definitionBuilder.KeyBuilder.KeyGenerator,
+		};
+	}
 
-		IndexDefinition BuildIndexDefinition(EntityDefinitionBuilder definitionBuilder, EntityIndexBuilder indexBuilder)
+	private static string ResolveElementName(EntityDefinitionBuilder definitionBuilder, PropertyInfo propertyInfo)
+	{
+		if (propertyInfo.DeclaringType == definitionBuilder.EntityType)
 		{
-			return new IndexDefinition
+			//When the definition builder is for the entity type that owns the property
+			return definitionBuilder.Properties.First(p => p.PropertyInfo == propertyInfo).ElementName;
+		}
+		else if (EntityDefinitions.TryGetValue(propertyInfo.DeclaringType, out var definition))
+		{
+			//When the type that owns the property is already registered
+			var property = definition.GetProperty(propertyInfo.Name) ?? throw new ArgumentException($"Property \"{propertyInfo.Name}\" was not found on existing definition for \"{propertyInfo.DeclaringType}\"");
+			return property.ElementName;
+		}
+		else
+		{
+			//When all else fails, find or create the appropriate definition builder for the type that owns the property
+			var localDefinitionBuilder = definitionBuilder.MappingBuilder.Entity(propertyInfo.DeclaringType);
+			return localDefinitionBuilder.Properties.First(p => p.PropertyInfo == propertyInfo).ElementName;
+		}
+	}
+
+	private static string ResolvePropertyPath(EntityDefinitionBuilder definitionBuilder, PropertyPath propertyPath)
+	{
+		var pool = ArrayPool<string>.Shared.Rent(propertyPath.Properties.Count);
+		try
+		{
+			for (var i = 0; i < propertyPath.Properties.Count; i++)
 			{
-				IndexPaths = indexBuilder.Properties.Select(p => new IndexPathDefinition
-				{
-					Path = EvaluateIndexPath(definitionBuilder, p.PropertyPath),
-					IndexType = p.IndexType,
-					SortOrder = p.SortOrder
-				}).ToArray(),
-				IndexName = indexBuilder.IndexName,
-				IsUnique = indexBuilder.Unique,
-				IsTenantExclusive = indexBuilder.TenantExclusive
+				var propertyInfo = propertyPath.Properties[i];
+				pool[i] = ResolveElementName(definitionBuilder, propertyInfo);
+			}
+			return string.Join(PathSeparator, pool, 0, propertyPath.Properties.Count);
+		}
+		finally
+		{
+			ArrayPool<string>.Shared.Return(pool);
+		}
+	}
+
+	private static IndexDefinition[] ResolveIndexDefinitions(EntityDefinitionBuilder definitionBuilder)
+	{
+		return definitionBuilder.Indexes.Select(indexBuilder => new IndexDefinition
+		{
+			IndexPaths = indexBuilder.Properties.Select(p => new IndexPathDefinition
+			{
+				Path = ResolvePropertyPath(definitionBuilder, p.PropertyPath),
+				IndexType = p.IndexType,
+				SortOrder = p.SortOrder
+			}).ToArray(),
+			IndexName = indexBuilder.IndexName,
+			IsUnique = indexBuilder.Unique,
+			IsTenantExclusive = indexBuilder.TenantExclusive
+		}).ToArray();
+	}
+
+	private static ExtraElementsDefinition ResolveExtraElementsDefinition(EntityDefinitionBuilder definitionBuilder, PropertyDefinition[] properties)
+	{
+		if (definitionBuilder.ExtraElementsProperty is null)
+		{
+			return new ExtraElementsDefinition
+			{
+				IgnoreExtraElements = true,
+				IgnoreInherited = true
 			};
 		}
 
+		return new ExtraElementsDefinition
+		{
+			Property = properties.First(p => p.PropertyInfo == definitionBuilder.ExtraElementsProperty)
+		};
+	}
+
+	private static EntityDefinition ResolveEntityDefinition(EntityDefinitionBuilder definitionBuilder)
+	{
 		var properties = definitionBuilder.Properties.Select(p => new PropertyDefinition
 		{
 			PropertyInfo = p.PropertyInfo,
 			ElementName = p.ElementName
 		}).ToArray();
 
-		var definition = new EntityDefinition
+		return new EntityDefinition
 		{
 			EntityType = definitionBuilder.EntityType,
 			CollectionName = definitionBuilder.CollectionName,
-			Key = definitionBuilder.KeyBuilder is null ? null : new KeyDefinition
-			{
-				Property = properties.First(p => p.PropertyInfo == definitionBuilder.KeyBuilder.Property),
-				KeyGenerator = definitionBuilder.KeyBuilder.KeyGenerator,
-			},
+			Key = ResolveKeyDefinition(definitionBuilder, properties),
 			Properties = properties,
-			ExtraElements = definitionBuilder.ExtraElementsProperty is null ? new ExtraElementsDefinition
-			{
-				IgnoreExtraElements = true,
-				IgnoreInherited = true
-			} : new ExtraElementsDefinition
-			{
-				Property = properties.First(p => p.PropertyInfo == definitionBuilder.ExtraElementsProperty)
-			},
-			Indexes = definitionBuilder.Indexes.Select(b => BuildIndexDefinition(definitionBuilder, b)).ToArray(),
+			ExtraElements = ResolveExtraElementsDefinition(definitionBuilder, properties),
+			Indexes = ResolveIndexDefinitions(definitionBuilder),
 		};
-
-		if (EntityDefinitions.TryAdd(definition.EntityType, definition))
-		{
-			DriverMappingInterop.RegisterDefinition(definition);
-			return definition;
-		}
-
-		throw new InvalidOperationException("Uh oh");
 	}
 }

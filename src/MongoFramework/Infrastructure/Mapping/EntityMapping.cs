@@ -18,7 +18,7 @@ public static partial class EntityMapping
 		AddMappingProcessors(DefaultMappingProcessors.Processors);
 	}
 
-	public static void RemoveAllDefinitions()
+	internal static void RemoveAllDefinitions()
 	{
 		EntityDefinitions.Clear();
 	}
@@ -83,7 +83,11 @@ public static partial class EntityMapping
 				}
 
 				var mappingBuilder = new MappingBuilder(MappingProcessors);
-				definition = CreateEntityDefinition(mappingBuilder.Entity(entityType));
+				mappingBuilder.Entity(entityType);
+
+				RegisterMapping(mappingBuilder);
+
+				definition = EntityDefinitions[entityType];
 				return true;
 			}
 			finally
@@ -129,10 +133,10 @@ public static partial class EntityMapping
 
 				var mappingBuilder = new MappingBuilder(MappingProcessors);
 				mappingBuilder.Entity(entityType);
+
 				RegisterMapping(mappingBuilder);
 
-				EntityDefinitions.TryGetValue(entityType, out definition);
-				return definition;
+				return EntityDefinitions[entityType];
 			}
 			finally
 			{
