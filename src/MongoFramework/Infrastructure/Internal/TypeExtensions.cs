@@ -19,11 +19,12 @@ internal static class TypeExtensions
 	/// </summary>
 	/// <remarks>
 	/// Unwrapped types include:<br/>
-	/// <see cref="IEnumerable{T}"/>
-	/// <see cref="IList{T}"/>
-	/// <see cref="ICollection{T}"/>
-	/// <see cref="IReadOnlyList{T}"/>
-	/// <see cref="IReadOnlyCollection{T}"/>
+	/// - <see cref="Array"/><br/>
+	/// - <see cref="IEnumerable{T}"/><br/>
+	/// - <see cref="IList{T}"/><br/>
+	/// - <see cref="ICollection{T}"/><br/>
+	/// - <see cref="IReadOnlyList{T}"/><br/>
+	/// - <see cref="IReadOnlyCollection{T}"/>
 	/// </remarks>
 	/// <param name="type"></param>
 	/// <returns></returns>
