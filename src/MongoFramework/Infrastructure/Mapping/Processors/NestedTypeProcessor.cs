@@ -12,7 +12,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 			foreach (var property in properties)
 			{
 				var propertyType = property.PropertyInfo.PropertyType;
-				propertyType = propertyType.ElideEnumerableTypes();
+				propertyType = propertyType.UnwrapEnumerableTypes();
 
 				//Maps the property type for handling property nesting
 				if (propertyType != entityType && EntityMapping.IsValidTypeToMap(propertyType))

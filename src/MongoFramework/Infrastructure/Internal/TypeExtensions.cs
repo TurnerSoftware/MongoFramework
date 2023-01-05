@@ -15,10 +15,10 @@ internal static class TypeExtensions
 	};
 
 	/// <summary>
-	/// Attempts to elide enumerable types (like <see cref="IEnumerable{T}"/>) from the current <paramref name="type"/>, returning the actual item type.
+	/// Attempts to unwrap enumerable types (like <see cref="IEnumerable{T}"/>) from the current <paramref name="type"/>, returning the actual item type.
 	/// </summary>
 	/// <remarks>
-	/// Elidded types include:<br/>
+	/// Unwrapped types include:<br/>
 	/// <see cref="IEnumerable{T}"/>
 	/// <see cref="IList{T}"/>
 	/// <see cref="ICollection{T}"/>
@@ -27,7 +27,7 @@ internal static class TypeExtensions
 	/// </remarks>
 	/// <param name="type"></param>
 	/// <returns></returns>
-	public static Type ElideEnumerableTypes(this Type type)
+	public static Type UnwrapEnumerableTypes(this Type type)
 	{
 		if (type.IsArray)
 		{

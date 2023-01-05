@@ -82,7 +82,7 @@ public class IndexProcessor : IMappingProcessor
 				yield return traversedProperty;
 
 				var propertyType = traversedProperty.Property.PropertyInfo.PropertyType;
-				propertyType = propertyType.ElideEnumerableTypes();
+				propertyType = propertyType.UnwrapEnumerableTypes();
 
 				if (EntityMapping.IsValidTypeToMap(propertyType) && !state.SeenTypes.Contains(propertyType))
 				{
