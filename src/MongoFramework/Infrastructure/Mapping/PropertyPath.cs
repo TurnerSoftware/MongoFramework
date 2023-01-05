@@ -67,6 +67,10 @@ public readonly record struct PropertyPath(IReadOnlyList<PropertyInfo> Propertie
 				}
 
 			}
+			else if (current is UnaryExpression unaryExpression && unaryExpression.NodeType == ExpressionType.Convert)
+			{
+				current = unaryExpression.Operand;
+			}
 			else
 			{
 				throw new ArgumentException($"Unexpected expression \"{current}\" when processing chained expression", nameof(pathExpression));

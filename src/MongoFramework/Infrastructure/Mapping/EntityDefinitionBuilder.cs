@@ -56,7 +56,7 @@ public class EntityDefinitionBuilder
 		return this;
 	}
 
-	public EntityDefinitionBuilder HasKey(PropertyInfo propertyInfo, Action<EntityKeyBuilder> builder)
+	public EntityDefinitionBuilder HasKey(PropertyInfo propertyInfo, Action<EntityKeyBuilder> builder = null)
 	{
 		if (!propertyInfo.DeclaringType.IsAssignableFrom(EntityType))
 		{
@@ -66,7 +66,7 @@ public class EntityDefinitionBuilder
 		CheckPropertyReadWrite(propertyInfo);
 		KeyBuilder = new EntityKeyBuilder(propertyInfo);
 
-		builder(KeyBuilder);
+		builder?.Invoke(KeyBuilder);
 		return this;
 	}
 
@@ -94,11 +94,11 @@ public class EntityDefinitionBuilder
 		return this;
 	}
 
-	public EntityDefinitionBuilder HasProperty(PropertyInfo propertyInfo, Action<EntityPropertyBuilder> builder)
+	public EntityDefinitionBuilder HasProperty(PropertyInfo propertyInfo, Action<EntityPropertyBuilder> builder = null)
 	{
 		if (propertyInfo.DeclaringType != EntityType)
 		{
-			throw new ArgumentException($"Property \"{propertyInfo.Name}\" must be declared on \"{EntityType.Name}\".", nameof(propertyInfo));
+			throw new ArgumentException($"You can only map properties that are declared on the type you're building for. Property \"{propertyInfo.Name}\" is not declared on \"{EntityType.Name}\".", nameof(propertyInfo));
 		}
 
 		CheckPropertyReadWrite(propertyInfo);
@@ -109,16 +109,16 @@ public class EntityDefinitionBuilder
 			propertyBuilders[propertyInfo] = propertyBuilder;
 		}
 
-		builder(propertyBuilder);
+		builder?.Invoke(propertyBuilder);
 		return this;
 	}
 
-	public EntityDefinitionBuilder HasIndex(IEnumerable<IndexProperty> indexProperties, Action<EntityIndexBuilder> builder)
+	public EntityDefinitionBuilder HasIndex(IEnumerable<IndexProperty> indexProperties, Action<EntityIndexBuilder> builder = null)
 	{
 		var indexBuilder = new EntityIndexBuilder(indexProperties);
 		indexBuilders.Add(indexBuilder);
 
-		builder(indexBuilder);
+		builder?.Invoke(indexBuilder);
 		return this;
 	}
 	
@@ -171,7 +171,8 @@ public class EntityDefinitionBuilder<TEntity> : EntityDefinitionBuilder
 
 	private static PropertyInfo GetPropertyInfo(Expression<Func<TEntity, object>> propertyExpression)
 	{
-		if (propertyExpression.Body is not MemberExpression memberExpression)
+		var unwrappedExpression = UnwrapExpression(propertyExpression.Body);
+		if (unwrappedExpression is not MemberExpression memberExpression)
 		{
 			throw new ArgumentException("Must be a member expression", nameof(propertyExpression));
 		}
@@ -184,25 +185,35 @@ public class EntityDefinitionBuilder<TEntity> : EntityDefinitionBuilder
 		return propertyInfo;
 	}
 
+	private static Expression UnwrapExpression(Expression expression)
+	{
+		if (expression is UnaryExpression unaryExpression && unaryExpression.NodeType == ExpressionType.Convert)
+		{
+			return unaryExpression.Operand;
+		}
+		return expression;
+	}
+
 	public new EntityDefinitionBuilder<TEntity> ToCollection(string collectionName) => base.ToCollection(collectionName) as EntityDefinitionBuilder<TEntity>;
 
-	public EntityDefinitionBuilder<TEntity> HasKey(Expression<Func<TEntity, object>> propertyExpression, Action<EntityKeyBuilder> builder)
+	public EntityDefinitionBuilder<TEntity> HasKey(Expression<Func<TEntity, object>> propertyExpression, Action<EntityKeyBuilder> builder = null)
 		=> HasKey(GetPropertyInfo(propertyExpression), builder) as EntityDefinitionBuilder<TEntity>;
 
 	public EntityDefinitionBuilder<TEntity> Ignore(Expression<Func<TEntity, object>> propertyExpression)
 		=> Ignore(GetPropertyInfo(propertyExpression)) as EntityDefinitionBuilder<TEntity>;
 
-	public EntityDefinitionBuilder<TEntity> HasProperty(Expression<Func<TEntity, object>> propertyExpression, Action<EntityPropertyBuilder> builder)
+	public EntityDefinitionBuilder<TEntity> HasProperty(Expression<Func<TEntity, object>> propertyExpression, Action<EntityPropertyBuilder> builder = null)
 		=> HasProperty(GetPropertyInfo(propertyExpression), builder) as EntityDefinitionBuilder<TEntity>;
 
-	public EntityDefinitionBuilder<TEntity> HasIndex(Expression<Func<TEntity, object>> indexExpression, Action<EntityIndexBuilder> builder)
+	public EntityDefinitionBuilder<TEntity> HasIndex(Expression<Func<TEntity, object>> indexExpression, Action<EntityIndexBuilder> builder = null)
 	{
-		if (indexExpression.Body is MemberExpression memberExpression)
+		var unwrappedExpression = UnwrapExpression(indexExpression.Body);
+		if (unwrappedExpression is MemberExpression memberExpression)
 		{
 			var properties = new[] { new IndexProperty(PropertyPath.FromExpression(memberExpression)) };
 			return HasIndex(properties, builder) as EntityDefinitionBuilder<TEntity>;
 		}
-		else if (indexExpression.Body is NewExpression newObjExpression)
+		else if (unwrappedExpression is NewExpression newObjExpression)
 		{
 			var properties = new List<IndexProperty>();
 			foreach (var expression in newObjExpression.Arguments)
