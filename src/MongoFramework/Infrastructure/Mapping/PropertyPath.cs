@@ -56,7 +56,8 @@ public readonly record struct PropertyPath(IReadOnlyList<PropertyInfo> Propertie
 			}
 			else if (current is MethodCallExpression methodExpression)
 			{
-				if (methodExpression.Method == MethodInfoCache.Enumerable.First_1 || methodExpression.Method == MethodInfoCache.Enumerable.Single_1)
+				var genericMethodDefinition = methodExpression.Method.GetGenericMethodDefinition();
+				if (genericMethodDefinition == MethodInfoCache.Enumerable.First_1 || genericMethodDefinition == MethodInfoCache.Enumerable.Single_1)
 				{
 					var callerExpression = methodExpression.Arguments[0];
 					current = callerExpression;

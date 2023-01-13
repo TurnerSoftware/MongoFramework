@@ -56,16 +56,13 @@ public class EntityDefinitionBuilder
 		return this;
 	}
 
+	private void ApplyKeyBuilder(EntityPropertyBuilder propertyBuilder)
+	{
+		KeyBuilder = new(propertyBuilder.PropertyInfo, propertyBuilder);
+	}
 	public EntityDefinitionBuilder HasKey(PropertyInfo propertyInfo, Action<EntityKeyBuilder> builder = null)
 	{
-		if (!propertyInfo.DeclaringType.IsAssignableFrom(EntityType))
-		{
-			throw new ArgumentException($"Property \"{propertyInfo.Name}\" is not accessible from \"{EntityType.Name}\".", nameof(propertyInfo));
-		}
-
-		CheckPropertyReadWrite(propertyInfo);
-		KeyBuilder = new EntityKeyBuilder(propertyInfo);
-
+		HasProperty(propertyInfo, ApplyKeyBuilder);
 		builder?.Invoke(KeyBuilder);
 		return this;
 	}
@@ -115,6 +112,22 @@ public class EntityDefinitionBuilder
 
 	public EntityDefinitionBuilder HasIndex(IEnumerable<IndexProperty> indexProperties, Action<EntityIndexBuilder> builder = null)
 	{
+		//Ensure all properties of the indexes are mapped
+		foreach (var indexProperty in indexProperties)
+		{
+			foreach (var property in indexProperty.PropertyPath.Properties)
+			{
+				if (property.DeclaringType == EntityType)
+				{
+					HasProperty(property);
+				}
+				else
+				{
+					MappingBuilder.Entity(property.DeclaringType).HasProperty(property);
+				}
+			}
+		}
+
 		var indexBuilder = new EntityIndexBuilder(indexProperties);
 		indexBuilders.Add(indexBuilder);
 
@@ -124,12 +137,12 @@ public class EntityDefinitionBuilder
 	
 	public EntityDefinitionBuilder HasExtraElements(PropertyInfo propertyInfo)
 	{
-		CheckPropertyReadWrite(propertyInfo);
-		
 		if (!typeof(IDictionary<string, object>).IsAssignableFrom(propertyInfo.PropertyType))
 		{
 			throw new ArgumentException($"Property \"{propertyInfo.Name}\" must be assignable to \"IDictionary<string, object>\".", nameof(propertyInfo));
 		}
+
+		HasProperty(propertyInfo);
 
 		ExtraElementsProperty = propertyInfo;
 		return this;
@@ -169,7 +182,7 @@ public class EntityDefinitionBuilder<TEntity> : EntityDefinitionBuilder
 		return new(definitionBuilder);
 	}
 
-	private static PropertyInfo GetPropertyInfo(Expression<Func<TEntity, object>> propertyExpression)
+	private static PropertyInfo GetPropertyInfo<TValue>(Expression<Func<TEntity, TValue>> propertyExpression)
 	{
 		var unwrappedExpression = UnwrapExpression(propertyExpression.Body);
 		if (unwrappedExpression is not MemberExpression memberExpression)
@@ -229,7 +242,7 @@ public class EntityDefinitionBuilder<TEntity> : EntityDefinitionBuilder
 		}
 	}
 
-	public EntityDefinitionBuilder<TEntity> HasExtraElements(Expression<Func<TEntity, object>> propertyExpression)
+	public EntityDefinitionBuilder<TEntity> HasExtraElements(Expression<Func<TEntity, IDictionary<string, object>>> propertyExpression)
 		=> HasExtraElements(GetPropertyInfo(propertyExpression)) as EntityDefinitionBuilder<TEntity>;
 
 	public new EntityDefinitionBuilder<TEntity> IgnoreExtraElements() => base.IgnoreExtraElements() as EntityDefinitionBuilder<TEntity>;
@@ -255,6 +268,7 @@ public sealed class EntityPropertyBuilder
 	public EntityPropertyBuilder(PropertyInfo propertyInfo)
 	{
 		PropertyInfo = propertyInfo;
+		ElementName = propertyInfo.Name;
 	}
 
 	public EntityPropertyBuilder HasElementName(string elementName)
@@ -343,17 +357,26 @@ public sealed class EntityIndexBuilder
 
 public sealed class EntityKeyBuilder
 {
+	private readonly EntityPropertyBuilder propertyBuilder;
+
 	public PropertyInfo Property { get; }
 	public IEntityKeyGenerator KeyGenerator { get; private set; }
 
-	public EntityKeyBuilder(PropertyInfo property)
+	public EntityKeyBuilder(PropertyInfo property, EntityPropertyBuilder propertyBuilder)
 	{
 		Property = property;
+		this.propertyBuilder = propertyBuilder;
 	}
 
 	public EntityKeyBuilder HasKeyGenerator(IEntityKeyGenerator keyGenerator)
 	{
 		KeyGenerator = keyGenerator;
+		return this;
+	}
+
+	public EntityKeyBuilder WithProperty(Action<EntityPropertyBuilder> builder)
+	{
+		builder(propertyBuilder);
 		return this;
 	}
 }
