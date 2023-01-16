@@ -7,7 +7,7 @@
           <Format>cobertura</Format>
           <Exclude>[MongoFramework.Tests]*</Exclude>
           <Include>[MongoFramework]*,[MongoFramework.*]*</Include>
-          <ExcludeByAttribute>Obsolete,GeneratedCodeAttribute,CompilerGeneratedAttribute,DebuggerNonUserCode</ExcludeByAttribute>
+          <ExcludeByAttribute>Obsolete,GeneratedCodeAttribute,CompilerGeneratedAttribute,DebuggerNonUserCode,DebuggerStepThrough</ExcludeByAttribute>
           <UseSourceLink>true</UseSourceLink>
           <SkipAutoProps>true</SkipAutoProps>
         </Configuration>
