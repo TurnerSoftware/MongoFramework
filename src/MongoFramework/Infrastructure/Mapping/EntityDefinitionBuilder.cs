@@ -9,6 +9,7 @@ namespace MongoFramework.Infrastructure.Mapping;
 public class EntityDefinitionBuilder
 {
 	public Type EntityType { get; private set; }
+	public bool MappingSkipped { get; private set; }
 	public string CollectionName { get; private set; }
 	public PropertyInfo ExtraElementsProperty { get; private set; }
 	public EntityKeyBuilder KeyBuilder { get; private set; }
@@ -48,6 +49,12 @@ public class EntityDefinitionBuilder
 		{
 			throw new ArgumentException($"Property \"{propertyInfo.Name}\" must be both readable and writeable.", nameof(propertyInfo));
 		}
+	}
+
+	public EntityDefinitionBuilder SkipMapping(bool skip = true)
+	{
+		MappingSkipped = skip;
+		return this;
 	}
 
 	public EntityDefinitionBuilder ToCollection(string collectionName)
@@ -207,6 +214,7 @@ public class EntityDefinitionBuilder<TEntity> : EntityDefinitionBuilder
 		return expression;
 	}
 
+	public new EntityDefinitionBuilder<TEntity> SkipMapping(bool skip = true) => base.SkipMapping(skip) as EntityDefinitionBuilder<TEntity>;
 	public new EntityDefinitionBuilder<TEntity> ToCollection(string collectionName) => base.ToCollection(collectionName) as EntityDefinitionBuilder<TEntity>;
 
 	public EntityDefinitionBuilder<TEntity> HasKey(Expression<Func<TEntity, object>> propertyExpression, Action<EntityKeyBuilder> builder = null)

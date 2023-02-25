@@ -177,12 +177,13 @@ namespace MongoFramework.Infrastructure.Serialization
 			if (EntityMapping.IsValidTypeToMap(type))
 			{
 				//Force the type to be processed by the Entity Mapper
-				EntityMapping.TryRegisterType(type, out _);
-
-				var classMap = BsonClassMap.LookupClassMap(type);
-				var serializerType = typeof(BsonClassMapSerializer<>).MakeGenericType(type);
-				var serializer = (IBsonSerializer)Activator.CreateInstance(serializerType, classMap);
-				return serializer;
+				if (EntityMapping.TryRegisterType(type, out _))
+				{
+					var classMap = BsonClassMap.LookupClassMap(type);
+					var serializerType = typeof(BsonClassMapSerializer<>).MakeGenericType(type);
+					var serializer = (IBsonSerializer)Activator.CreateInstance(serializerType, classMap);
+					return serializer;
+				}
 			}
 
 			return BsonSerializer.LookupSerializer(type);

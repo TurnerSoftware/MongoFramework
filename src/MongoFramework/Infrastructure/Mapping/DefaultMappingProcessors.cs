@@ -7,6 +7,7 @@ public static class DefaultMappingProcessors
 {
 	public static readonly IReadOnlyList<IMappingProcessor> Processors = new IMappingProcessor[]
 	{
+		new SkipMappingProcessor(),
 		new CollectionNameProcessor(),
 		new HierarchyProcessor(),
 		new PropertyMappingProcessor(),

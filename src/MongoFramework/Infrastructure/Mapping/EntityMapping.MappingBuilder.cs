@@ -21,9 +21,15 @@ public static partial class EntityMapping
 		MappingLock.EnterWriteLock();
 		try
 		{
-			foreach (var definitionBuilder in mappingBuilder.Definitions)
+			for (var i = 0; i < mappingBuilder.Definitions.Count; i++)
 			{
+				var definitionBuilder = mappingBuilder.Definitions[i];
 				if (EntityDefinitions.ContainsKey(definitionBuilder.EntityType))
+				{
+					continue;
+				}
+
+				if (definitionBuilder.MappingSkipped)
 				{
 					continue;
 				}
@@ -67,11 +73,15 @@ public static partial class EntityMapping
 			var property = definition.GetProperty(propertyInfo.Name) ?? throw new ArgumentException($"Property \"{propertyInfo.Name}\" was not found on existing definition for \"{propertyInfo.DeclaringType}\"");
 			return property.ElementName;
 		}
-		else
+		else if (IsValidTypeToMap(propertyInfo.DeclaringType))
 		{
 			//When all else fails, find or create the appropriate definition builder for the type that owns the property
 			var localDefinitionBuilder = definitionBuilder.MappingBuilder.Entity(propertyInfo.DeclaringType);
 			return localDefinitionBuilder.Properties.First(p => p.PropertyInfo == propertyInfo).ElementName;
+		}
+		else
+		{
+			throw new ArgumentException($"Property \"{propertyInfo.Name}\" has a declaring type that is not valid for mapping");
 		}
 	}
 

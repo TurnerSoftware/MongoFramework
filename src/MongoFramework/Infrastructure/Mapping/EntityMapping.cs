@@ -87,8 +87,12 @@ public static partial class EntityMapping
 
 				RegisterMapping(mappingBuilder);
 
-				definition = EntityDefinitions[entityType];
-				return true;
+				return EntityDefinitions.TryGetValue(entityType, out definition);
+			}
+			catch
+			{
+				definition = null;
+				return false;
 			}
 			finally
 			{
@@ -136,7 +140,12 @@ public static partial class EntityMapping
 
 				RegisterMapping(mappingBuilder);
 
-				return EntityDefinitions[entityType];
+				if (EntityDefinitions.TryGetValue(entityType, out definition))
+				{
+					return definition;
+				}
+
+				throw new ArgumentException($"Registration of type \"{entityType}\" was skipped", nameof(entityType));
 			}
 			finally
 			{

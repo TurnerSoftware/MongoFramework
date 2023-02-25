@@ -9,7 +9,7 @@ public class MappingBuilder
 	private readonly IEnumerable<IMappingProcessor> mappingConventions;
 	private readonly List<EntityDefinitionBuilder> builders = new();
 
-	public IReadOnlyCollection<EntityDefinitionBuilder> Definitions => builders;
+	public IReadOnlyList<EntityDefinitionBuilder> Definitions => builders;
 
 	public MappingBuilder(IEnumerable<IMappingProcessor> mappingProcessors)
 	{
