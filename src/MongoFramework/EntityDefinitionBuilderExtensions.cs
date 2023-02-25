@@ -13,16 +13,16 @@ public static class EntityDefinitionBuilderExtensions
 		return entityType.GetProperty(propertyName) ?? throw new ArgumentException($"Property \"{propertyName}\" can not be found on \"{entityType.Name}\".", nameof(propertyName));
 	}
 
-	public static EntityDefinitionBuilder HasKey(this EntityDefinitionBuilder definitionBuilder, string propertyName, Action<EntityKeyBuilder> builder)
+	public static EntityDefinitionBuilder HasKey(this EntityDefinitionBuilder definitionBuilder, string propertyName, Action<EntityKeyBuilder> builder = null)
 		=> definitionBuilder.HasKey(GetPropertyInfo(definitionBuilder.EntityType, propertyName), builder);
 
 	public static EntityDefinitionBuilder Ignore(this EntityDefinitionBuilder definitionBuilder, string propertyName)
 		=> definitionBuilder.Ignore(GetPropertyInfo(definitionBuilder.EntityType, propertyName));
 
-	public static EntityDefinitionBuilder HasProperty(this EntityDefinitionBuilder definitionBuilder, string propertyName, Action<EntityPropertyBuilder> builder)
+	public static EntityDefinitionBuilder HasProperty(this EntityDefinitionBuilder definitionBuilder, string propertyName, Action<EntityPropertyBuilder> builder = null)
 		=> definitionBuilder.HasProperty(GetPropertyInfo(definitionBuilder.EntityType, propertyName), builder);
 
-	public static EntityDefinitionBuilder HasIndex(this EntityDefinitionBuilder definitionBuilder, IEnumerable<string> propertyPaths, Action<EntityIndexBuilder> builder)
+	public static EntityDefinitionBuilder HasIndex(this EntityDefinitionBuilder definitionBuilder, IEnumerable<string> propertyPaths, Action<EntityIndexBuilder> builder = null)
 	{
 		var properties = new List<IndexProperty>();
 		foreach (var propertyPath in propertyPaths)
@@ -36,7 +36,7 @@ public static class EntityDefinitionBuilderExtensions
 
 		return definitionBuilder.HasIndex(properties, builder);
 	}
-	public static EntityDefinitionBuilder HasIndex(this EntityDefinitionBuilder definitionBuilder, IEnumerable<PropertyPath> properties, Action<EntityIndexBuilder> builder)
+	public static EntityDefinitionBuilder HasIndex(this EntityDefinitionBuilder definitionBuilder, IEnumerable<PropertyPath> properties, Action<EntityIndexBuilder> builder = null)
 	{
 		return definitionBuilder.HasIndex(properties.Select(p => new IndexProperty(p)), builder);
 	}

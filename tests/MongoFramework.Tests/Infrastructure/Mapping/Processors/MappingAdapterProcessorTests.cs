@@ -2,7 +2,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MongoDB.Bson.Serialization;
 using MongoFramework.Attributes;
 using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mapping.Processors;
@@ -93,9 +92,6 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 
 			Assert.AreEqual("Custom", definition.CollectionName);
 			Assert.AreEqual(1, definition.Indexes.Count());
-
-
-
 		}
 
 	}
