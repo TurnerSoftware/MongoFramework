@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoFramework.Attributes;
@@ -31,6 +32,18 @@ namespace MongoFramework.Tests
 			public MongoDbBucketSet<BucketGroupModel, BucketSubEntity> DbBucketSet { get; set; }
 		}
 
+		class ConfigureMappingTestContext : MongoDbContext
+		{
+			public ConfigureMappingTestContext(IMongoDbConnection connection) : base(connection) { }
+
+			public static int NumberOfTimesConfigured;
+
+			protected override void OnConfigureMapping(MappingBuilder mappingBuilder)
+			{
+				Interlocked.Increment(ref NumberOfTimesConfigured);
+			}
+		}
+
 		[TestMethod]
 		public void ContextCreatedWithOptions()
 		{
@@ -60,6 +73,14 @@ namespace MongoFramework.Tests
 			{
 				Assert.AreEqual(5, context.DbBucketSet.BucketSize);
 			}
+		}
+
+		[TestMethod]
+		public void MappingIsConfiguredOnlyOnce()
+		{
+			using var contextA = new ConfigureMappingTestContext(TestConfiguration.GetConnection());
+			using var contextB = new ConfigureMappingTestContext(TestConfiguration.GetConnection());
+			Assert.AreEqual(1, ConfigureMappingTestContext.NumberOfTimesConfigured);
 		}
 
 		[TestMethod]
