@@ -1,73 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace MongoFramework.Infrastructure.Mapping;
 
-public interface IEntityDefinition
+[DebuggerDisplay("{DebuggerDisplay,nq}")]
+public sealed record EntityDefinition
 {
-	public Type EntityType { get; set; }
-	public string CollectionName { get; set; }
-	public IEntityKeyDefinition Key { get; set; }
-	public IEnumerable<IEntityPropertyDefinition> Properties { get; set; }
-	public IEnumerable<IEntityIndexDefinition> Indexes { get; set; }
-	public IEntityExtraElementsDefinition ExtraElements { get; set; }
+	public Type EntityType { get; init; }
+	public string CollectionName { get; init; }
+	public KeyDefinition Key { get; init; }
+	public IReadOnlyList<PropertyDefinition> Properties { get; init; } = Array.Empty<PropertyDefinition>();
+	public IReadOnlyList<IndexDefinition> Indexes { get; init; } = Array.Empty<IndexDefinition>();
+	public ExtraElementsDefinition ExtraElements { get; init; }
+
+	[DebuggerNonUserCode]
+	private string DebuggerDisplay => $"EntityType = {EntityType.Name}, Collection = {CollectionName}, Properties = {Properties.Count}, Indexes = {Indexes.Count}";
 }
 
-public interface IEntityPropertyDefinition
+[DebuggerDisplay("{DebuggerDisplay,nq}")]
+public sealed record PropertyDefinition
 {
-	public IEntityDefinition EntityDefinition { get; }
-	public string ElementName { get; }
-	public PropertyInfo PropertyInfo { get; }
-
-	public object GetValue(object entity);
-	public void SetValue(object entity, object value);
-}
-
-public interface IEntityIndexDefinition
-{
-	public IReadOnlyCollection<IEntityPropertyDefinition> Properties { get; }
-	[Obsolete("Index definition can point to multiple properties directly")]
-	public IEntityPropertyDefinition Property { get; }
-	//TODO: This will be made redundant when the broader change to support fluent comes in
-	public string Path { get; }
-	public string IndexName { get; }
-	public bool IsUnique { get; }
-	public IndexSortOrder SortOrder { get; }
-	public int IndexPriority { get; }
-	public IndexType IndexType { get; }
-	public bool IsTenantExclusive { get; }
-}
-
-public interface IEntityExtraElementsDefinition
-{
-	public IEntityPropertyDefinition Property { get; }
-	public bool IgnoreExtraElements { get; }
-	public bool IgnoreInherited { get; }
-}
-
-public interface IEntityKeyDefinition
-{
-	public IEntityPropertyDefinition Property { get; }
-	public IEntityKeyGenerator KeyGenerator { get; }
-}
-
-public class EntityDefinition : IEntityDefinition
-{
-	public Type EntityType { get; set; }
-	public string CollectionName { get; set; }
-	public IEntityKeyDefinition Key { get; set; }
-	public IEnumerable<IEntityPropertyDefinition> Properties { get; set; } = Enumerable.Empty<IEntityPropertyDefinition>();
-	public IEnumerable<IEntityIndexDefinition> Indexes { get; set; } = Enumerable.Empty<IEntityIndexDefinition>();
-	public IEntityExtraElementsDefinition ExtraElements { get; set; }
-}
-
-public class EntityPropertyDefinition : IEntityPropertyDefinition
-{
-	public IEntityDefinition EntityDefinition { get; set; }
-	public string ElementName { get; set; }
-	public PropertyInfo PropertyInfo { get; set; }
+	public PropertyInfo PropertyInfo { get; init; }
+	public string ElementName { get; init; }
 
 	public object GetValue(object entity)
 	{
@@ -78,30 +34,64 @@ public class EntityPropertyDefinition : IEntityPropertyDefinition
 	{
 		PropertyInfo.SetValue(entity, value);
 	}
+
+	[DebuggerNonUserCode]
+	private string DebuggerDisplay => $"PropertyInfo = {PropertyInfo.Name}, ElementName = {ElementName}";
 }
 
-public class EntityIndexDefinition : IEntityIndexDefinition
+[DebuggerDisplay("{DebuggerDisplay,nq}")]
+public sealed record IndexDefinition
 {
-	public IReadOnlyCollection<IEntityPropertyDefinition> Properties { get; set; }
-	public IEntityPropertyDefinition Property { get; set; }
-	public string Path { get; set; }
-	public string IndexName { get; set; }
-	public bool IsUnique { get; set; }
-	public IndexSortOrder SortOrder { get; set; }
-	public int IndexPriority { get; set; }
-	public IndexType IndexType { get; set; }
-	public bool IsTenantExclusive { get; set; }
+	public IReadOnlyList<IndexPathDefinition> IndexPaths { get; init; }
+	public string IndexName { get; init; }
+	public bool IsUnique { get; init; }
+	public bool IsTenantExclusive { get; init; }
+
+	[DebuggerNonUserCode]
+	private string DebuggerDisplay => $"IndexName = {IndexName}, IndexPaths = {IndexPaths.Count}, IsUnique = {IsUnique}";
 }
 
-public sealed record EntityKeyDefinition : IEntityKeyDefinition
+[DebuggerDisplay("{DebuggerDisplay,nq}")]
+public sealed record IndexPathDefinition
 {
-	public IEntityPropertyDefinition Property { get; init; }
+	public string Path { get; init; }
+	public IndexType IndexType { get; init; }
+	public IndexSortOrder SortOrder { get; init; }
+
+	[DebuggerNonUserCode]
+	private string DebuggerDisplay => $"Path = {Path}, IndexType = {IndexType}, SortOrder = {SortOrder}";
+}
+
+[DebuggerDisplay("{DebuggerDisplay,nq}")]
+public sealed record KeyDefinition
+{
+	public PropertyDefinition Property { get; init; }
 	public IEntityKeyGenerator KeyGenerator { get; init; }
+
+	[DebuggerNonUserCode]
+	private string DebuggerDisplay => $"PropertyInfo = {Property.PropertyInfo.Name}, ElementName = {Property.ElementName}";
 }
 
-public sealed record EntityExtraElementsDefinition : IEntityExtraElementsDefinition
+[DebuggerDisplay("{DebuggerDisplay,nq}")]
+public sealed record ExtraElementsDefinition
 {
-	public IEntityPropertyDefinition Property { get; init; }
+	public PropertyDefinition Property { get; init; }
 	public bool IgnoreExtraElements { get; init; }
 	public bool IgnoreInherited { get; init; }
+
+	[DebuggerNonUserCode]
+	private string DebuggerDisplay
+	{
+		get
+		{
+			if (IgnoreExtraElements)
+			{
+				return "IgnoreExtraElements = true";
+			}
+			else
+			{
+				return $"PropertyInfo = {Property.PropertyInfo.Name}, ElementName = {Property.ElementName}";
+			}
+		}
+	}
 }

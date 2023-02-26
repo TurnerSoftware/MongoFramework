@@ -14,7 +14,21 @@ internal static class TypeExtensions
 		typeof(IReadOnlyCollection<>)
 	};
 
-	public static Type GetEnumerableItemTypeOrDefault(this Type type)
+	/// <summary>
+	/// Attempts to unwrap enumerable types (like <see cref="IEnumerable{T}"/>) from the current <paramref name="type"/>, returning the actual item type.
+	/// </summary>
+	/// <remarks>
+	/// Unwrapped types include:<br/>
+	/// - <see cref="Array"/><br/>
+	/// - <see cref="IEnumerable{T}"/><br/>
+	/// - <see cref="IList{T}"/><br/>
+	/// - <see cref="ICollection{T}"/><br/>
+	/// - <see cref="IReadOnlyList{T}"/><br/>
+	/// - <see cref="IReadOnlyCollection{T}"/>
+	/// </remarks>
+	/// <param name="type"></param>
+	/// <returns></returns>
+	public static Type UnwrapEnumerableTypes(this Type type)
 	{
 		if (type.IsArray)
 		{

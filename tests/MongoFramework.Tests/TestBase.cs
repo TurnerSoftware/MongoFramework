@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Driver;
+using MongoFramework.Infrastructure;
 using MongoFramework.Infrastructure.Indexing;
 using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Serialization;
@@ -15,10 +16,12 @@ namespace MongoFramework.Tests
 			EntityMapping.RemoveAllDefinitions();
 
 			EntityMapping.RemoveAllMappingProcessors();
-			EntityMapping.AddMappingProcessors(DefaultProcessors.CreateProcessors());
+			EntityMapping.AddMappingProcessors(DefaultMappingProcessors.Processors);
 
 			TypeDiscovery.ClearCache();
 			EntityIndexWriter.ClearCache();
+
+			DriverAbstractionRules.ApplyRules();
 		}
 
 		protected static void ClearDatabase()

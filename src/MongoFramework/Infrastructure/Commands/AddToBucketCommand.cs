@@ -11,12 +11,12 @@ namespace MongoFramework.Infrastructure.Commands
 	{
 		private TGroup Group { get; }
 		private TSubEntity SubEntity { get; }
-		private IEntityPropertyDefinition EntityTimeProperty { get; }
+		private PropertyDefinition EntityTimeProperty { get; }
 		private int BucketSize { get; }
 
 		public Type EntityType => typeof(EntityBucket<TGroup, TSubEntity>);
 
-		public AddToBucketCommand(TGroup group, TSubEntity subEntity, IEntityPropertyDefinition entityTimeProperty, int bucketSize)
+		public AddToBucketCommand(TGroup group, TSubEntity subEntity, PropertyDefinition entityTimeProperty, int bucketSize)
 		{
 			Group = group;
 			SubEntity = subEntity;

@@ -7,21 +7,13 @@ using System.Diagnostics;
 
 namespace MongoFramework.Infrastructure.Mapping;
 
-public interface ITraversedProperty
-{
-	public ITraversedProperty Parent { get; }
-	public IEntityPropertyDefinition Property { get; }
-	public int Depth { get; }
-	public string GetPath();
-}
-
-[DebuggerDisplay("Property = {Property.ElementName}, Parent = {Parent?.Property?.ElementName}, Depth = {Depth}")]
-internal record TraversedProperty : ITraversedProperty
+[DebuggerDisplay("{DebuggerDisplay,nq}")]
+public sealed record TraversedProperty
 {
 	private static readonly string ElementSeparator = ".";
 
-	public ITraversedProperty Parent { get; init; }
-	public IEntityPropertyDefinition Property { get; init; }
+	public TraversedProperty Parent { get; init; }
+	public PropertyDefinition Property { get; init; }
 	public int Depth { get; init; }
 
 	public string GetPath()
@@ -34,7 +26,7 @@ internal record TraversedProperty : ITraversedProperty
 		var pool = ArrayPool<string>.Shared.Rent(Depth + 1);
 		try
 		{
-			ITraversedProperty current = this;
+			var current = this;
 			for (var i = Depth; i >= 0; i--)
 			{
 				pool[i] = current.Property.ElementName;
@@ -48,6 +40,9 @@ internal record TraversedProperty : ITraversedProperty
 			ArrayPool<string>.Shared.Return(pool);
 		}
 	}
+
+	[DebuggerNonUserCode]
+	private string DebuggerDisplay => $"Property = {Property.ElementName}, Parent = {Parent?.Property?.ElementName}, Depth = {Depth}";
 }
 
 public static class PropertyTraversalExtensions
@@ -55,10 +50,10 @@ public static class PropertyTraversalExtensions
 	private readonly record struct TraversalState
 	{
 		public HashSet<Type> SeenTypes { get; init; }
-		public IEnumerable<ITraversedProperty> Properties { get; init; }
+		public IEnumerable<TraversedProperty> Properties { get; init; }
 	}
 
-	public static IEnumerable<ITraversedProperty> TraverseProperties(this IEntityDefinition definition)
+	public static IEnumerable<TraversedProperty> TraverseProperties(this EntityDefinition definition)
 	{
 		var stack = new Stack<TraversalState>();
 		stack.Push(new TraversalState
@@ -79,7 +74,7 @@ public static class PropertyTraversalExtensions
 				yield return traversedProperty;
 
 				var propertyType = traversedProperty.Property.PropertyInfo.PropertyType;
-				propertyType = propertyType.GetEnumerableItemTypeOrDefault();
+				propertyType = propertyType.UnwrapEnumerableTypes();
 
 				if (EntityMapping.IsValidTypeToMap(propertyType) && !state.SeenTypes.Contains(propertyType))
 				{

@@ -2,7 +2,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MongoDB.Bson.Serialization;
 using MongoFramework.Attributes;
 using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Infrastructure.Mapping.Processors;
@@ -15,20 +14,11 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 
 		public class AdapterTestModelMappingAdapter : IMappingProcessor
 		{
-			public void ApplyMapping(IEntityDefinition definition)
+			public void ApplyMapping(EntityDefinitionBuilder definitionBuilder)
 			{
-				definition.CollectionName = "Custom";
-
-				var definitionIndexes = definition.Indexes.ToList();
-
-				definitionIndexes.Add(new EntityIndexDefinition
-				{
-					Property = definition.GetProperty("UserName"),
-					IsUnique = true,
-					SortOrder = IndexSortOrder.Ascending
-				});
-
-				definition.Indexes = definitionIndexes;
+				definitionBuilder
+					.ToCollection("Custom")
+					.HasIndex(new[] { "UserName" }, b => b.IsUnique());
 			}
 		}
 
@@ -59,7 +49,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 
 			}
 
-			public void ApplyMapping(IEntityDefinition definition)
+			public void ApplyMapping(EntityDefinitionBuilder definitionBuilder)
 			{
 				throw new NotImplementedException();
 			}
@@ -78,7 +68,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
 			EntityMapping.AddMappingProcessor(new EntityIdProcessor());
 			EntityMapping.AddMappingProcessor(new MappingAdapterProcessor());
-			Assert.ThrowsException<ArgumentException>(() => EntityMapping.RegisterType(typeof(AdapterTestModelNoInterface)));
+			Assert.ThrowsException<InvalidOperationException>(() => EntityMapping.RegisterType(typeof(AdapterTestModelNoInterface)));
 		}
 
 		[TestMethod]
@@ -102,9 +92,6 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 
 			Assert.AreEqual("Custom", definition.CollectionName);
 			Assert.AreEqual(1, definition.Indexes.Count());
-
-
-
 		}
 
 	}

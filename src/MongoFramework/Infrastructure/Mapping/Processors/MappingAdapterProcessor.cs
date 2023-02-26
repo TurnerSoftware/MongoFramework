@@ -1,28 +1,26 @@
 ﻿using System;
 using System.Reflection;
-using MongoDB.Bson.Serialization;
 using MongoFramework.Attributes;
 
-namespace MongoFramework.Infrastructure.Mapping.Processors
+namespace MongoFramework.Infrastructure.Mapping.Processors;
+
+public class MappingAdapterProcessor : IMappingProcessor
 {
-	public class MappingAdapterProcessor : IMappingProcessor
+	public void ApplyMapping(EntityDefinitionBuilder definitionBuilder)
 	{
-		public void ApplyMapping(IEntityDefinition definition)
+		var adapterAttribute = definitionBuilder.EntityType.GetCustomAttribute<MappingAdapterAttribute>();
+		if (adapterAttribute == null)
 		{
-			var adapterAttribute = definition.EntityType.GetCustomAttribute<MappingAdapterAttribute>();
-
-			if (adapterAttribute == null)
-			{
-				return;
-			}
-
-			var instance = (IMappingProcessor)Activator.CreateInstance(adapterAttribute.MappingAdapter);
-
-			if (instance != null)
-			{
-				instance.ApplyMapping(definition);
-			}
-
+			return;
 		}
+
+		var adapterType = adapterAttribute.MappingAdapter;
+		if (!typeof(IMappingProcessor).IsAssignableFrom(adapterType))
+		{
+			throw new InvalidOperationException($"Mapping adapter \"{adapterType}\" doesn't implement IMappingProcessor");
+		}
+
+		var instance = (IMappingProcessor)Activator.CreateInstance(adapterType);
+		instance?.ApplyMapping(definitionBuilder);
 	}
 }

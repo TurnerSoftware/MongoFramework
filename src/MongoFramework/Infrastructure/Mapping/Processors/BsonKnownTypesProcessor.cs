@@ -1,21 +1,19 @@
 ﻿using System.Reflection;
-using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace MongoFramework.Infrastructure.Mapping.Processors
+namespace MongoFramework.Infrastructure.Mapping.Processors;
+
+public class BsonKnownTypesProcessor : IMappingProcessor
 {
-	public class BsonKnownTypesProcessor : IMappingProcessor
+	public void ApplyMapping(EntityDefinitionBuilder definitionBuilder)
 	{
-		public void ApplyMapping(IEntityDefinition definition)
+		var entityType = definitionBuilder.EntityType;
+		var bsonKnownTypesAttribute = entityType.GetCustomAttribute<BsonKnownTypesAttribute>();
+		if (bsonKnownTypesAttribute != null)
 		{
-			var entityType = definition.EntityType;
-			var bsonKnownTypesAttribute = entityType.GetCustomAttribute<BsonKnownTypesAttribute>();
-			if (bsonKnownTypesAttribute != null)
+			foreach (var type in bsonKnownTypesAttribute.KnownTypes)
 			{
-				foreach (var type in bsonKnownTypesAttribute.KnownTypes)
-				{
-					EntityMapping.TryRegisterType(type, out _);
-				}
+				definitionBuilder.MappingBuilder.Entity(type);
 			}
 		}
 	}

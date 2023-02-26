@@ -11,7 +11,7 @@ internal static class DriverMappingInterop
 	/// Registers the <paramref name="definition"/> as a <see cref="BsonClassMap"/> with all appropriate properties configured.
 	/// </summary>
 	/// <param name="definition"></param>
-	public static void RegisterDefinition(IEntityDefinition definition)
+	public static void RegisterDefinition(EntityDefinition definition)
 	{
 		var classMap = new BsonClassMap(definition.EntityType);
 

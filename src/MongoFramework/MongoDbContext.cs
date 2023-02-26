@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoFramework.Infrastructure;
@@ -9,12 +11,19 @@ using MongoFramework.Infrastructure.Commands;
 using MongoFramework.Infrastructure.Indexing;
 using MongoFramework.Infrastructure.Internal;
 using MongoFramework.Infrastructure.Linq;
+using MongoFramework.Infrastructure.Mapping;
 using MongoFramework.Utilities;
 
 namespace MongoFramework
 {
 	public class MongoDbContext : IMongoDbContext, IDisposable
 	{
+		private static readonly ConcurrentDictionary<Type, ContextMappingLock> ContextMappingLocks = new();
+		private class ContextMappingLock
+		{
+			public bool HasCompleted { get; set; }
+		}
+
 		public IMongoDbConnection Connection { get; }
 
 		public EntityEntryContainer ChangeTracker { get; } = new EntityEntryContainer();
@@ -24,7 +33,31 @@ namespace MongoFramework
 		{
 			Connection = connection;
 			InitialiseDbSets();
+			ConfigureMapping();
 		}
+
+		/// <summary>
+		/// Triggers the <see cref="OnConfigureMapping(MappingBuilder)"/> virtual method exactly once for 
+		/// this context type for the lifetime of the application.
+		/// </summary>
+		private void ConfigureMapping()
+		{
+			var contextType = GetType();
+			var contextMappingLock = ContextMappingLocks.GetOrAdd(contextType, static _ => new());
+			if (!contextMappingLock.HasCompleted)
+			{
+				lock (contextMappingLock)
+				{
+					if (!contextMappingLock.HasCompleted)
+					{
+						EntityMapping.RegisterMapping(OnConfigureMapping);
+						contextMappingLock.HasCompleted = true;
+					}
+				}
+			}
+		}
+
+		protected virtual void OnConfigureMapping(MappingBuilder mappingBuilder) { }
 
 		private void InitialiseDbSets()
 		{
