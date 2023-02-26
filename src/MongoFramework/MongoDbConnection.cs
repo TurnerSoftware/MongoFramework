@@ -22,7 +22,9 @@ namespace MongoFramework
 
 				if (InternalClient == null)
 				{
-					InternalClient = new MongoClient(Url);
+					var settings = MongoClientSettings.FromUrl(Url);
+					settings.LinqProvider = MongoDB.Driver.Linq.LinqProvider.V2;
+					InternalClient = new MongoClient(settings);
 				}
 
 				return InternalClient;
