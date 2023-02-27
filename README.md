@@ -16,6 +16,7 @@ MongoFramework tries to bring some of the nice features from Entity Framework in
 Some of the major features include:
 - Entity mapping for collections, IDs and properties through attributes
 - Indexing through attributes (including text and geospatial)
+- Fluent mapping builder
 - Entity change tracking
 - Changeset support (allowing for queuing multiple DB updates to run at once)
 - Diff-updates (only _changes_ to an entity to be written)
@@ -43,20 +44,75 @@ Supports profiling database reads and writes, pushing the data into [MiniProfile
 
 ## Documentation
 
-### Core Entity Mapping
-The core mapping of entities and their properties is automatic however there are certain attributes you can apply to your properties to alter this behaviour.
-These attributes (and a few others) are part of the `System.ComponentModel.Annotations` package.
+### Entity Mapping Basics
+The core mapping of entities and their properties is automatic however you have the choice of using the fluent mapping builder or certain attributes to alter this behaviour.
+
+**Fluent Mapping**
+```csharp
+using MongoFramework;
+
+public class MyEntity
+{
+  public string Id { get; set; }
+  public string Name { get; set; }
+  public string Description { get; set; }
+}
+
+public class MyContext : MongoDbContext
+{
+  public MyContext(IMongoDbConnection connection) : base(connection) { }
+  public MongoDbSet<MyEntity> MyEntities { get; set; }
+
+  protected override void OnConfigureMapping(MappingBuilder mappingBuilder)
+  {
+    mappingBuilder.Entity<MyEntity>()
+      .HasProperty(m => m.Name, b => b.HasElementName("MappedName"))
+      .ToCollection("MyCustomEntities");
+  }
+}
+```
+
+**Attribute Mapping**
+```csharp
+using MongoFramework;
+using System.ComponentModel.DataAnnotations;
+
+[Table("MyCustomEntities")]
+public class MyEntity
+{
+  public string Id { get; set; }
+  [Column("MappedName")]
+  public string Name { get; set; }
+  public string Description { get; set; }
+}
+
+public class MyContext : MongoDbContext
+{
+  public MyContext(IMongoDbConnection connection) : base(connection) { }
+  public MongoDbSet<MyEntity> MyEntities { get; set; }
+}
+```
+
+For attribute mapping, many of the core attributes are part of the `System.ComponentModel.Annotations` package.
 
 |Attribute|Description|
 |---------|-----------|
 |`[Table("MyFancyEntity", Schema = "MyNamespace")]`|Map the Entity to the collection specified. When a schema is specified, it is prefixed onto the name with a "." (dot) separator.|
 |`[Key]`|Map the property as the "Id" for the entity. Only required if your key doesn't have a common name like "Id" etc.|
-|`[NotMapped]`|Unmaps the property from the entity when reading/writing.|
+|`[NotMapped]`|When applied to a class or property, skips mapping when reading/writing.|
 |`[Column("NewColumnName")]`|Remaps the property with the specified name when reading/writing.|
 
 ### Indexing
-MongoFramework supports indexing specified through the `IndexAttribute` class. This is applied to the properties you want indexed and will apply the changes to the database when the context is saved.
+MongoFramework supports indexing specified through both the fluent mapping builder and the `IndexAttribute`.
+This is applied to the properties you want indexed and will apply the changes to the database when the context is saved.
 
+**Fluent Mapping**
+```csharp
+mappingBuilder.Entity<IndexExample>()
+  .HasIndex(e => e.EmailAddress, b => b.HasName("Email").IsDescending(false));
+```
+
+**Attribute Mapping**
 ```csharp
 public class IndexExample
 {
@@ -69,6 +125,7 @@ public class IndexExample
 }
 ```
 
+
 The following variations of indexes are supported across various property types:
 - [Single field](https://docs.mongodb.com/manual/core/index-single/)
 - [Compound](https://docs.mongodb.com/manual/core/index-compound/#compound-indexes)
@@ -77,9 +134,44 @@ The following variations of indexes are supported across various property types:
 To support compound indexes, define indexes with the same name across multiple properties.
 When doing this, you will want to control the order of the individual items in the compound index which is available through the `IndexPriority` property on the attribute. 
 
+For fluent mapping, you can specify multiple indexes in one declaration to combine them and handle nesting for complex data structures including through arrays.
+
+```csharp
+public class TestModelBase
+{
+  public string Id { get; set; }
+  public string Name { get; set; }
+  public IEnumerable<NestedModel> ManyOfThem { get; set; }
+}
+
+public class TestModel : TestModelBase
+{
+  public Dictionary<string, object> ExtraElements { get; set; }
+  public string OtherName { get; set; }
+  public int SomethingIndexable { get; set; }
+  public NestedModelBase OneOfThem { get; set; }
+}
+
+public class NestedModelBase
+{
+  public string Description { get; set; }
+}
+
+mappingBuilder.Entity<TestModel>()
+  .HasIndex(m => new
+  {
+    m.SomethingIndexable,
+    m.OneOfThem.Description,
+    m.ManyOfThem.First().AnotherThingIndexable
+  }, b => {
+    b.HasName("MyIndex")
+      .IsDescending(true, false, false)
+  });
+```
+
 #### Special Index Types
 MongoFramework supports [Text](https://docs.mongodb.com/manual/core/index-text/) and [2dSphere](https://docs.mongodb.com/manual/core/2dsphere/) special indexes.
-These special index types are selected through the `IndexType` property on the Index attribute.
+For attribute mapping, these special index types are selected through the `IndexType` property on the `IndexAttribute`.
 
 Please consult MongoDB's documentation on when the indexes are appropriate and their restrictions.
 
