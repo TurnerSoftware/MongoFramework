@@ -6,14 +6,24 @@ namespace MongoFramework.Infrastructure.Mapping
 {
 	public static class EntityDefinitionExtensions
 	{
-		public static PropertyDefinition GetIdProperty(this EntityDefinition definition)
+		/// <summary>
+		/// Finds the nearest <see cref="KeyDefinition"/> from <paramref name="definition"/>, recursively searching the base <see cref="EntityDefinition"/> if one exists.
+		/// </summary>
+		/// <param name="definition">The <see cref="EntityDefinition"/> to start the search from.</param>
+		/// <returns>The key definition; otherwise <see langword="null"/> if one can not be found.</returns>
+		public static KeyDefinition FindNearestKey(this EntityDefinition definition)
 		{
 			if (definition.Key is null)
 			{
-				return EntityMapping.GetOrCreateDefinition(definition.EntityType.BaseType).GetIdProperty();
+				return EntityMapping.GetOrCreateDefinition(definition.EntityType.BaseType).FindNearestKey();
 			}
 
-			return definition.Key?.Property;
+			return definition.Key;
+		}
+
+		public static PropertyDefinition GetIdProperty(this EntityDefinition definition)
+		{
+			return definition.FindNearestKey()?.Property;
 		}
 
 		public static string GetIdName(this EntityDefinition definition)

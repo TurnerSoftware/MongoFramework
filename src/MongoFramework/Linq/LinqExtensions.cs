@@ -27,7 +27,8 @@ namespace MongoFramework.Linq
 
 		public static IQueryable<TEntity> WhereIdMatches<TEntity>(this IQueryable<TEntity> queryable, IEnumerable entityIds) where TEntity : class
 		{
-			var idProperty = EntityMapping.GetOrCreateDefinition(typeof(TEntity)).Key.Property;
+			var idProperty = EntityMapping.GetOrCreateDefinition(typeof(TEntity)).GetIdProperty()
+				?? throw new ArgumentException($"No Id property was found on entity type {typeof(TEntity)} or any base types");
 			return queryable.WherePropertyMatches(idProperty, entityIds);
 		}
 

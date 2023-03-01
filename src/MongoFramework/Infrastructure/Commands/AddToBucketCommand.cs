@@ -42,7 +42,7 @@ namespace MongoFramework.Infrastructure.Commands
 				.Min(b => b.Min, itemTimeValue)
 				.Max(b => b.Max, itemTimeValue)
 				.SetOnInsert(b => b.BucketSize, BucketSize)
-				.SetOnInsert(b => b.Id, entityDefinition.Key.KeyGenerator.Generate());
+				.SetOnInsert(b => b.Id, entityDefinition.FindNearestKey().KeyGenerator.Generate());
 
 			yield return new UpdateOneModel<EntityBucket<TGroup, TSubEntity>>(filter, updateDefinition)
 			{
