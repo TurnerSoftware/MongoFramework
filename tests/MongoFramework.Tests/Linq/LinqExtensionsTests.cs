@@ -17,6 +17,14 @@ namespace MongoFramework.Tests.Linq
 		{
 			public string Id { get; set; }
 		}
+		public class WhereIdMatchesInheritanceBaseModel
+		{
+			public string Id { get; set; }
+		}
+		public class WhereIdMatchesInheritanceDerivedModel : WhereIdMatchesInheritanceBaseModel
+		{
+			public string Description { get; set; }
+		}
 		public class WhereIdMatchesGuidModel
 		{
 			public Guid Id { get; set; }
@@ -68,6 +76,34 @@ namespace MongoFramework.Tests.Linq
 		public void InvalidToQuery()
 		{
 			LinqExtensions.ToQuery(null);
+		}
+
+		[TestMethod]
+		public void WhereIdMatches_BaseTypeWithId()
+		{
+			var connection = TestConfiguration.GetConnection();
+			var context = new MongoDbContext(connection);
+			var dbSet = new MongoDbSet<WhereIdMatchesInheritanceDerivedModel>(context);
+
+			var entityCollection = new[]
+			{
+				new WhereIdMatchesInheritanceDerivedModel { Description = "1" },
+				new WhereIdMatchesInheritanceDerivedModel { Description = "2" },
+				new WhereIdMatchesInheritanceDerivedModel { Description = "3" },
+				new WhereIdMatchesInheritanceDerivedModel { Description = "4" }
+			};
+			dbSet.AddRange(entityCollection);
+			context.SaveChanges();
+
+			var provider = new MongoFrameworkQueryProvider<WhereIdMatchesInheritanceDerivedModel>(connection);
+			var queryable = new MongoFrameworkQueryable<WhereIdMatchesInheritanceDerivedModel>(provider);
+
+			var entityIds = entityCollection.Select(e => e.Id).Take(2);
+
+			var idMatchQueryable = LinqExtensions.WhereIdMatches(queryable, entityIds);
+
+			Assert.AreEqual(2, idMatchQueryable.Count());
+			Assert.IsTrue(idMatchQueryable.ToList().All(e => entityIds.Contains(e.Id)));
 		}
 
 		[TestMethod]
