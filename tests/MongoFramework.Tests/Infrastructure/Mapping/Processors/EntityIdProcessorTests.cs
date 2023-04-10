@@ -44,6 +44,13 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 			public string ActualKey { get; set; }
 		}
 
+		public class ComplexIdNoGeneratorTestModel
+		{
+			public ComplexId Id { get; set; }
+
+			public readonly record struct ComplexId(Guid Value);
+		}
+
 		[TestMethod]
 		public void IdMapsOnAttribute()
 		{
@@ -81,6 +88,16 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 			var definition = EntityMapping.RegisterType(typeof(ObjectIdGeneratorTestModel));
 
 			Assert.AreEqual(EntityKeyGenerators.ObjectIdKeyGenerator, definition.Key.KeyGenerator);
+		}
+
+		[TestMethod]
+		public void ComplexIdWithNoKnownGenerator()
+		{
+			EntityMapping.AddMappingProcessor(new PropertyMappingProcessor());
+			EntityMapping.AddMappingProcessor(new EntityIdProcessor());
+			var definition = EntityMapping.RegisterType(typeof(ComplexIdNoGeneratorTestModel));
+
+			Assert.IsNull(definition.Key.KeyGenerator);
 		}
 
 		[TestMethod]
