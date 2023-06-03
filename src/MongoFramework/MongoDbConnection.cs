@@ -10,6 +10,8 @@ namespace MongoFramework
 		public MongoUrl Url { get; protected set; }
 		private bool IsDisposed { get; set; }
 
+		private Action<MongoClientSettings> ConfigureSettings { get; init; }
+
 		private IMongoClient InternalClient;
 		public IMongoClient Client
 		{
@@ -23,6 +25,7 @@ namespace MongoFramework
 				if (InternalClient == null)
 				{
 					var settings = MongoClientSettings.FromUrl(Url);
+					ConfigureSettings?.Invoke(settings);
 					settings.LinqProvider = MongoDB.Driver.Linq.LinqProvider.V2;
 					InternalClient = new MongoClient(settings);
 				}
@@ -33,20 +36,20 @@ namespace MongoFramework
 
 		public IDiagnosticListener DiagnosticListener { get; set; } = new NoOpDiagnosticListener();
 
-		public static MongoDbConnection FromUrl(MongoUrl mongoUrl)
+		public static MongoDbConnection FromUrl(MongoUrl mongoUrl) => FromUrl(mongoUrl, configureSettings: null);
+		public static MongoDbConnection FromUrl(MongoUrl mongoUrl, Action<MongoClientSettings> configureSettings)
 		{
 			Check.NotNull(mongoUrl, nameof(mongoUrl));
 
 			return new MongoDbConnection
 			{
-				Url = mongoUrl
+				Url = mongoUrl,
+				ConfigureSettings = configureSettings
 			};
 		}
 
-		public static MongoDbConnection FromConnectionString(string connectionString)
-		{
-			return FromUrl(new MongoUrl(connectionString));
-		}
+		public static MongoDbConnection FromConnectionString(string connectionString) => FromConnectionString(connectionString, configureSettings: null);
+		public static MongoDbConnection FromConnectionString(string connectionString, Action<MongoClientSettings> configureSettings) => FromUrl(new MongoUrl(connectionString), configureSettings);
 
 		public IMongoDatabase GetDatabase()
 		{
