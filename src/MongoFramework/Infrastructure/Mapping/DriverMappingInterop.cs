@@ -32,7 +32,10 @@ internal static class DriverMappingInterop
 		if (definition.Key is not null)
 		{
 			var idMemberMap = classMap.MapIdMember(definition.Key.Property.PropertyInfo);
-			idMemberMap.SetIdGenerator(new DriverKeyGeneratorWrapper(definition.Key.KeyGenerator));
+			if (definition.Key.KeyGenerator is not null)
+			{
+				idMemberMap.SetIdGenerator(new DriverKeyGeneratorWrapper(definition.Key.KeyGenerator));
+			}
 		}
 
 		// Extra Elements
