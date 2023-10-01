@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace MongoFramework.Infrastructure.Mapping;
@@ -25,9 +26,31 @@ public sealed record PropertyDefinition
 	public PropertyInfo PropertyInfo { get; init; }
 	public string ElementName { get; init; }
 
+	private Func<object, object> getValueDelegate;
 	public object GetValue(object entity)
 	{
-		return PropertyInfo.GetValue(entity);
+		if (getValueDelegate is null)
+		{
+			// Effectively results in the following expression
+			// object t => (object)(({PropertyType})t).{PropertyName}
+			var parameter = Expression.Parameter(typeof(object), "t");
+			var lambda = Expression.Lambda<Func<object, object>>(
+				Expression.Convert(
+					Expression.MakeMemberAccess(
+						Expression.Convert(
+							parameter,
+							PropertyInfo.DeclaringType
+						),
+						PropertyInfo
+					),
+					typeof(object)
+				), 
+				parameter
+			);
+			getValueDelegate = lambda.Compile();
+		}
+
+		return getValueDelegate(entity);
 	}
 
 	public void SetValue(object entity, object value)
