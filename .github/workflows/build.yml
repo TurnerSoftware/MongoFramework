@@ -97,7 +97,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Download coverage reports
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4.1.7
     - name: Install ReportGenerator tool
       run: dotnet tool install -g dotnet-reportgenerator-globaltool
     - name: Prepare coverage reports
@@ -125,7 +125,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 'Download build'
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: 'ubuntu-latest'
       - name: 'Add NuGet source'
@@ -143,7 +143,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 'Download build'
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: 'ubuntu-latest'
       - name: 'Upload NuGet package'
