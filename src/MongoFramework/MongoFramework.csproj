@@ -12,8 +12,8 @@
 	<ItemGroup>
 		<PackageReference Include="MongoDB.Driver" Version="2.21.0" />
 		<PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-		<PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
-		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="7.0.0" />
+		<PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.2" />
+		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.2" />
 		<PackageReference Include="System.Linq.Async" Version="6.0.1" />
 	</ItemGroup>
 
