@@ -12,7 +12,7 @@ namespace MongoFramework.Infrastructure.Mapping.Processors
 
 			foreach (var property in properties)
 			{
-				if (!property.CanRead || !property.CanWrite)
+				if (!property.CanRead)
 				{
 					continue;
 				}
