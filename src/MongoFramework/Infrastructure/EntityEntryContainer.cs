@@ -46,11 +46,15 @@ namespace MongoFramework.Infrastructure
 				var entityDefinition = EntityMapping.GetOrCreateDefinition(collectionType);
 				var entityId = entityDefinition.GetIdValue(entity);
 				var defaultIdValue = entityDefinition.GetDefaultId();
+				var isDefaultId = Equals(entityId, defaultIdValue);
 				foreach (var entry in entries)
 				{
-					if (Equals(entityId, defaultIdValue) && ReferenceEquals(entry.Entity, entity))
+					if (isDefaultId)
 					{
-						return entry;
+						if (ReferenceEquals(entry.Entity, entity))
+						{
+							return entry;
+						}
 					}
 					else
 					{
