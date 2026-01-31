@@ -161,7 +161,7 @@ namespace MongoFramework.Tests.Profiling.MiniProfiler
 
 				Assert.IsTrue(profiler.Root.CustomTimings.ContainsKey("mongodb"));
 				var timings = profiler.Root.CustomTimings["mongodb"];
-				Assert.IsGreaterThan(timings[0].DurationMilliseconds.GetValueOrDefault(), 1000);
+				Assert.IsGreaterThan(1000, timings[0].DurationMilliseconds.GetValueOrDefault());
 			}
 		}
 
