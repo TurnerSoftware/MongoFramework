@@ -26,7 +26,6 @@ namespace MongoFramework
 				{
 					var settings = MongoClientSettings.FromUrl(Url);
 					ConfigureSettings?.Invoke(settings);
-					settings.LinqProvider = MongoDB.Driver.Linq.LinqProvider.V2;
 					InternalClient = new MongoClient(settings);
 				}
 
@@ -76,6 +75,8 @@ namespace MongoFramework
 
 			if (disposing)
 			{
+				// In MongoDB.Driver 3.0+, IMongoClient implements IDisposable
+				(InternalClient as IDisposable)?.Dispose();
 				InternalClient = null;
 				IsDisposed = true;
 			}

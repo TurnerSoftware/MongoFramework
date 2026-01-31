@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Driver;
 using MongoDB.Driver.GeoJsonObjectModel;
 using MongoFramework.Attributes;
 using MongoFramework.Infrastructure.Indexing;
@@ -10,6 +13,12 @@ namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 	[TestClass]
 	public class IndexModelBuilderTests : TestBase
 	{
+		private static BsonDocument RenderKeys<T>(IndexKeysDefinition<T> keys)
+		{
+			var serializer = BsonSerializer.SerializerRegistry.GetSerializer<T>();
+			return keys.Render(new RenderArgs<T>(serializer, BsonSerializer.SerializerRegistry));
+		}
+
 		public class IndexNamingModel
 		{
 			[Index(IndexSortOrder.Ascending)]
@@ -119,7 +128,7 @@ namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 
 			Assert.AreEqual(2, indexModel.Count());
 
-			var indexBsonDocument = indexModel.Select(m => m.Keys.Render(null, null)).ToArray();
+			var indexBsonDocument = indexModel.Select(m => RenderKeys(m.Keys)).ToArray();
 			Assert.AreEqual(1, indexBsonDocument[0]["AscendingIndex"]);
 			Assert.AreEqual(-1, indexBsonDocument[1]["DescendingIndex"]);
 		}
@@ -144,7 +153,7 @@ namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 			var compoundIndex = indexModel.FirstOrDefault();
 			Assert.AreEqual("MyCompoundIndex", compoundIndex.Options.Name);
 
-			var indexBsonDocument = compoundIndex.Keys.Render(null, null);
+			var indexBsonDocument = RenderKeys(compoundIndex.Keys);
 
 			Assert.AreEqual("FirstPriority", indexBsonDocument.ElementAt(0).Name);
 			Assert.AreEqual("SecondPriority", indexBsonDocument.ElementAt(1).Name);
@@ -161,7 +170,7 @@ namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 			var compoundIndex = indexModel.FirstOrDefault();
 			Assert.AreEqual("MyCompoundIndex", compoundIndex.Options.Name);
 
-			var indexBsonDocument = compoundIndex.Keys.Render(null, null);
+			var indexBsonDocument = RenderKeys(compoundIndex.Keys);
 
 			Assert.AreEqual("ChildModel.FirstPriority", indexBsonDocument.ElementAt(0).Name);
 			Assert.AreEqual("SecondPriority", indexBsonDocument.ElementAt(1).Name);
@@ -174,7 +183,7 @@ namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 
 			Assert.AreEqual(3, indexModel.Count());
 
-			var results = indexModel.Select(i => i.Keys.Render(null, null).ElementAt(0));
+			var results = indexModel.Select(i => RenderKeys(i.Keys).ElementAt(0));
 			Assert.IsTrue(results.Any(e => e.Name == "ChildEnumerable.ChildId"));
 			Assert.IsTrue(results.Any(e => e.Name == "ChildArray.ChildId"));
 			Assert.IsTrue(results.Any(e => e.Name == "ChildList.ChildId"));
@@ -187,7 +196,7 @@ namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 
 			Assert.AreEqual(1, indexModel.Count());
 
-			var results = indexModel.Select(i => i.Keys.Render(null, null)).FirstOrDefault();
+			var results = indexModel.Select(i => RenderKeys(i.Keys)).FirstOrDefault();
 			Assert.IsTrue(results.Any(e => e.Name == "SomeTextField" && e.Value == "text"));
 			Assert.IsTrue(results.Any(e => e.Name == "AnotherTextField" && e.Value == "text"));
 		}
@@ -199,7 +208,7 @@ namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 
 			Assert.AreEqual(1, indexModel.Count());
 
-			var results = indexModel.Select(i => i.Keys.Render(null, null)).FirstOrDefault();
+			var results = indexModel.Select(i => RenderKeys(i.Keys)).FirstOrDefault();
 			Assert.IsTrue(results.Any(e => e.Name == "SomeCoordinates" && e.Value == "2dsphere"));
 		}
 
@@ -208,7 +217,7 @@ namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 		{
 			var indexModel = IndexModelBuilder<TenantUniqueConstraintModel>.BuildModel();
 
-			var indexBsonDocument = indexModel.First().Keys.Render(null, null);
+			var indexBsonDocument = RenderKeys(indexModel.First().Keys);
 
 			Assert.AreEqual(1, indexBsonDocument["TenantId"].AsInt32);
 			Assert.AreEqual(1, indexBsonDocument["UniqueIndex"].AsInt32);
@@ -221,7 +230,7 @@ namespace MongoFramework.Tests.Infrastructure.Indexing.Processors
 
 			Assert.AreEqual(2, indexModel.Count());
 
-			var results = indexModel.Select(i => i.Keys.Render(null, null));
+			var results = indexModel.Select(i => RenderKeys(i.Keys));
 			Assert.IsTrue(results.Any(e => e.Contains("MyCustomField") && e.ElementCount == 1));
 			Assert.IsTrue(results.Any(e => e.Contains("MyCustomField") && e.Contains("OtherField") && e.ElementCount == 2));
 		}

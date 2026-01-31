@@ -93,18 +93,20 @@ namespace MongoFramework.Profiling.MiniProfiler
 			else if (writeModel is UpdateOneModel<TEntity> updateModel)
 			{
 				var serializer = BsonSerializer.LookupSerializer<TEntity>();
+				var renderArgs = new RenderArgs<TEntity>(serializer, BsonSerializer.SerializerRegistry);
 				return new BsonDocument
 				{
-					{ "Filter", updateModel.Filter.Render(serializer, BsonSerializer.SerializerRegistry) },
-					{ "Update", updateModel.Update.Render(serializer, BsonSerializer.SerializerRegistry) }
+					{ "Filter", updateModel.Filter.Render(renderArgs) },
+					{ "Update", updateModel.Update.Render(renderArgs) }
 				}.ToString();
 			}
 			else if (writeModel is DeleteOneModel<TEntity> deleteModel)
 			{
 				var serializer = BsonSerializer.LookupSerializer<TEntity>();
+				var renderArgs = new RenderArgs<TEntity>(serializer, BsonSerializer.SerializerRegistry);
 				return new BsonDocument
 				{
-					{ "Filter", deleteModel.Filter.Render(serializer, BsonSerializer.SerializerRegistry) }
+					{ "Filter", deleteModel.Filter.Render(renderArgs) }
 				}.ToString();
 			}
 			else
@@ -129,11 +131,12 @@ namespace MongoFramework.Profiling.MiniProfiler
 		private string GetIndexModelAsString<TEntity>(CreateIndexModel<TEntity> indexModel)
 		{
 			var serializer = BsonSerializer.LookupSerializer<TEntity>();
+			var renderArgs = new RenderArgs<TEntity>(serializer, BsonSerializer.SerializerRegistry);
 			var indexOptions = indexModel.Options;
 			return new BsonDocument
 			{
-				{ "Keys", indexModel.Keys.Render(serializer, BsonSerializer.SerializerRegistry) },
-				{ "Options", new { indexOptions.Name, indexOptions.Unique, indexOptions.Background }.ToBsonDocument() }
+				{ "Keys", indexModel.Keys.Render(renderArgs) },
+				{ "Options", new { indexOptions.Name, indexOptions.Unique }.ToBsonDocument() }
 			}.ToString();
 		}
 	}

@@ -76,13 +76,13 @@ namespace MongoFramework.Linq
 		{
 			var entitySerializer = BsonSerializer.LookupSerializer<TEntity>();
 			var keyExpressionField = new ExpressionFieldDefinition<TEntity>(targetField);
-			var keyStringField = keyExpressionField.Render(entitySerializer, BsonSerializer.SerializerRegistry);
+			var keyStringField = keyExpressionField.Render(new RenderArgs<TEntity>(entitySerializer, BsonSerializer.SerializerRegistry));
 
 			var distanceFieldName = "Distance";
 			if (distanceResultField != null)
 			{
 				var distanceResultExpressionField = new ExpressionFieldDefinition<TEntity>(distanceResultField);
-				var distanceResultStringField = distanceResultExpressionField.Render(entitySerializer, BsonSerializer.SerializerRegistry);
+				var distanceResultStringField = distanceResultExpressionField.Render(new RenderArgs<TEntity>(entitySerializer, BsonSerializer.SerializerRegistry));
 				distanceFieldName = distanceResultStringField.FieldName;
 			}
 
