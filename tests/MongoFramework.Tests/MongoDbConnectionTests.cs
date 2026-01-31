@@ -13,10 +13,10 @@ namespace MongoFramework.Tests
 			Assert.IsNotNull(connection);
 		}
 
-		[TestMethod, ExpectedException(typeof(ArgumentNullException))]
+		[TestMethod]
 		public void NullUrlThrowsException()
 		{
-			MongoDbConnection.FromUrl(null);
+			Assert.ThrowsException<ArgumentNullException>(() => MongoDbConnection.FromUrl(null));
 		}
 	}
 }

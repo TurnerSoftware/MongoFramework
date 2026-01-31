@@ -51,12 +51,15 @@ namespace MongoFramework.Tests.Infrastructure.Commands
 			Assert.AreEqual("UpdateEntityCommandTests.UpdateEntity-Updated", dbEntity.Title);
 		}
 
-		[TestMethod, ExpectedException(typeof(ValidationException))]
+		[TestMethod]
 		public void ValidationExceptionOnInvalidModel()
 		{
-			var entity = new TestValidationModel { };
-			var command = new UpdateEntityCommand<TestValidationModel>(new EntityEntry(entity, EntityEntryState.Updated));
-			command.GetModel(WriteModelOptions.Default).FirstOrDefault();
+			Assert.ThrowsException<ValidationException>(() =>
+			{
+				var entity = new TestValidationModel { };
+				var command = new UpdateEntityCommand<TestValidationModel>(new EntityEntry(entity, EntityEntryState.Updated));
+				command.GetModel(WriteModelOptions.Default).FirstOrDefault();
+			});
 		}
 	}
 }

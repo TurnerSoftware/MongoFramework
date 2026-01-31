@@ -77,11 +77,14 @@ namespace MongoFramework.Tests.Infrastructure.Indexing
 		}
 
 
-		[TestMethod, ExpectedException(typeof(Exception), AllowDerivedTypes = true)]
+		[TestMethod]
 		public void FailureFromMultipleTextIndexes()
 		{
-			var connection = TestConfiguration.GetConnection();
-			EntityIndexWriter.ApplyIndexing<MultipleTextIndexModel>(connection);
+			Assert.ThrowsException<MongoCommandException>(() =>
+			{
+				var connection = TestConfiguration.GetConnection();
+				EntityIndexWriter.ApplyIndexing<MultipleTextIndexModel>(connection);
+			});
 		}
 	}
 }

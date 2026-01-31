@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<AssemblyName>MongoFramework</AssemblyName>
 		<Title>MongoFramework</Title>
 		<Description>An "Entity Framework"-like interface for the MongoDB C# Driver</Description>
@@ -11,8 +11,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="MongoDB.Driver" Version="2.21.0" />
-		<PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
-		<PackageReference Include="System.Linq.Async" Version="6.0.1" />
+		<PackageReference Include="System.Configuration.ConfigurationManager" Version="10.0.2" />
 	</ItemGroup>
 
 </Project>

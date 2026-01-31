@@ -41,12 +41,15 @@ namespace MongoFramework.Tests.Infrastructure.Commands
 			Assert.IsNotNull(entity.Id);
 		}
 
-		[TestMethod, ExpectedException(typeof(ValidationException))]
+		[TestMethod]
 		public void ValidationExceptionOnInvalidModel()
 		{
-			var entity = new TestValidationModel { };
-			var command = new AddEntityCommand<TestValidationModel>(new EntityEntry(entity, EntityEntryState.Added));
-			command.GetModel(WriteModelOptions.Default).FirstOrDefault();
+			Assert.ThrowsException<ValidationException>(() =>
+			{
+				var entity = new TestValidationModel { };
+				var command = new AddEntityCommand<TestValidationModel>(new EntityEntry(entity, EntityEntryState.Added));
+				command.GetModel(WriteModelOptions.Default).FirstOrDefault();
+			});
 		}
 	}
 }

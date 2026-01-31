@@ -31,20 +31,22 @@ namespace MongoFramework.Tests
 			}));
 		}
 
-		[TestMethod, ExpectedException(typeof(ArgumentNullException))]
+		[TestMethod]
 		public void MustBeSuppliedContext()
 		{
-			new MongoDbBucketSet<EntityGroup, SubEntityClass>(null, new BucketSetOptions
-			{
-				BucketSize = 100,
-				EntityTimeProperty = "Date"
-			});
+			Assert.ThrowsException<ArgumentNullException>(() =>
+				new MongoDbBucketSet<EntityGroup, SubEntityClass>(null, new BucketSetOptions
+				{
+					BucketSize = 100,
+					EntityTimeProperty = "Date"
+				}));
 		}
 
-		[TestMethod, ExpectedException(typeof(ArgumentException))]
+		[TestMethod]
 		public void MustBeSuppliedOptions()
 		{
-			new MongoDbBucketSet<EntityGroup, SubEntityClass>(new Mock<IMongoDbContext>().Object, null);
+			Assert.ThrowsException<ArgumentException>(() =>
+				new MongoDbBucketSet<EntityGroup, SubEntityClass>(new Mock<IMongoDbContext>().Object, null));
 		}
 
 		[TestMethod]
@@ -97,34 +99,37 @@ namespace MongoFramework.Tests
 			Assert.IsTrue(dbSet.Any(b => b.Group.Name == "Group1" && b.Items.Any(i => i.Label == "Entry1" && i.Date == new DateTime(2020, 1, 1))));
 		}
 
-		[TestMethod, ExpectedException(typeof(ArgumentException))]
+		[TestMethod]
 		public void InvalidBucketSize()
 		{
-			new MongoDbBucketSet<EntityGroup, SubEntityClass>(new Mock<IMongoDbContext>().Object, new BucketSetOptions
-			{
-				BucketSize = 0,
-				EntityTimeProperty = "Date"
-			});
+			Assert.ThrowsException<ArgumentException>(() =>
+				new MongoDbBucketSet<EntityGroup, SubEntityClass>(new Mock<IMongoDbContext>().Object, new BucketSetOptions
+				{
+					BucketSize = 0,
+					EntityTimeProperty = "Date"
+				}));
 		}
 
-		[TestMethod, ExpectedException(typeof(ArgumentException))]
+		[TestMethod]
 		public void InvalidSubEntityTimeProperty_Missing()
 		{
-			new MongoDbBucketSet<EntityGroup, SubEntityClass>(new Mock<IMongoDbContext>().Object, new BucketSetOptions
-			{
-				BucketSize = 100,
-				EntityTimeProperty = "MissingField"
-			});
+			Assert.ThrowsException<ArgumentException>(() =>
+				new MongoDbBucketSet<EntityGroup, SubEntityClass>(new Mock<IMongoDbContext>().Object, new BucketSetOptions
+				{
+					BucketSize = 100,
+					EntityTimeProperty = "MissingField"
+				}));
 		}
 
-		[TestMethod, ExpectedException(typeof(ArgumentException))]
+		[TestMethod]
 		public void InvalidSubEntityTimeProperty_WrongType()
 		{
-			new MongoDbBucketSet<EntityGroup, SubEntityClass>(new Mock<IMongoDbContext>().Object, new BucketSetOptions
-			{
-				BucketSize = 100,
-				EntityTimeProperty = "Label"
-			});
+			Assert.ThrowsException<ArgumentException>(() =>
+				new MongoDbBucketSet<EntityGroup, SubEntityClass>(new Mock<IMongoDbContext>().Object, new BucketSetOptions
+				{
+					BucketSize = 100,
+					EntityTimeProperty = "Label"
+				}));
 		}
 
 		[TestMethod]
