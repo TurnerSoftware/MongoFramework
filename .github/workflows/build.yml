@@ -29,16 +29,13 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, macOS-latest]
-        mongodb: ['4.4', '5.0', '6.0']
+        mongodb: ['7.0', '8.0']
         include:
-          - os: ubuntu-20.04
-            mongodb: '4.4'
-            ubuntu: 'focal'
-          - os: ubuntu-20.04
-            mongodb: '5.0'
-            ubuntu: 'focal'
           - os: ubuntu-latest
-            mongodb: '6.0'
+            mongodb: '7.0'
+            ubuntu: 'jammy'
+          - os: ubuntu-latest
+            mongodb: '8.0'
             ubuntu: 'jammy'
     steps:
     - name: Configure MongoDB (MacOS)
@@ -48,11 +45,8 @@ jobs:
         brew update
         brew install mongodb-community@${{matrix.mongodb}}
         brew services start mongodb-community@${{matrix.mongodb}}
-    - name: Configure MongoDB (Ubuntu (20.04))
-      if: matrix.os == 'ubuntu-20.04'
-      run: sudo apt remove mongodb-org
-    - name: Configure MongoDB (Ubuntu (All))
-      if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-20.04'
+    - name: Configure MongoDB (Ubuntu)
+      if: matrix.os == 'ubuntu-latest'
       run: |
         wget -qO - https://www.mongodb.org/static/pgp/server-${{matrix.mongodb}}.asc | gpg --dearmor | sudo tee /usr/share/keyrings/mongodb.gpg > /dev/null
         echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb.gpg ] https://repo.mongodb.org/apt/ubuntu ${{matrix.ubuntu}}/mongodb-org/${{matrix.mongodb}} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${{matrix.mongodb}}.list
@@ -70,7 +64,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Setup dotnet SDK
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 10.0.x
     - name: Install dependencies
@@ -82,9 +76,9 @@ jobs:
     - name: Pack
       run: dotnet pack --no-build -c Release /p:PackageOutputPath=${{env.BUILD_ARTIFACT_PATH}}
     - name: Publish artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: ${{matrix.os}}
+        name: ${{matrix.os}}-mongo${{matrix.mongodb}}
         path: ${{env.BUILD_ARTIFACT_PATH}}
 
   coverage:
@@ -95,18 +89,18 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Download coverage reports
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
     - name: Install ReportGenerator tool
       run: dotnet tool install -g dotnet-reportgenerator-globaltool
     - name: Prepare coverage reports
       run: reportgenerator -reports:*/coverage/*/coverage.cobertura.xml -targetdir:./ -reporttypes:Cobertura
     - name: Upload coverage report
-      uses: codecov/codecov-action@v3.1.4
+      uses: codecov/codecov-action@v4
       with:
         file: Cobertura.xml
         fail_ci_if_error: false
     - name: Save combined coverage report as artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: coverage-report
         path: Cobertura.xml
@@ -123,9 +117,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 'Download build'
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: 'ubuntu-latest'
+          name: 'ubuntu-latest-mongo8.0'
       - name: 'Add NuGet source'
         run: dotnet nuget add source https://nuget.pkg.github.com/TurnerSoftware/index.json --name GitHub --username Turnerj --password ${{secrets.GITHUB_TOKEN}} --store-password-in-clear-text
       - name: 'Upload NuGet package'
@@ -141,8 +135,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 'Download build'
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: 'ubuntu-latest'
+          name: 'ubuntu-latest-mongo8.0'
       - name: 'Upload NuGet package'
         run: dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --skip-duplicate --api-key ${{secrets.NUGET_API_KEY}}
