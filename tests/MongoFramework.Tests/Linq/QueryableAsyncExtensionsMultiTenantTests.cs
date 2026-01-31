@@ -68,7 +68,7 @@ namespace MongoFramework.Tests.Linq
 			var result = await dbSet.ToArrayAsync();
 			Assert.AreEqual(tenantId, result[0].TenantId);
 			Assert.AreEqual(tenantId, result[3].TenantId);
-			Assert.AreEqual(4, result.Length);
+			Assert.HasCount(4, result);
 			Assert.AreEqual("ModelTitle.1", result[0].Title);
 			Assert.AreEqual("ModelTitle.4", result[3].Title);
 		}
@@ -82,7 +82,7 @@ namespace MongoFramework.Tests.Linq
 			var result = await dbSet.ToListAsync();
 			Assert.AreEqual(tenantId, result[0].TenantId);
 			Assert.AreEqual(tenantId, result[3].TenantId);
-			Assert.AreEqual(4, result.Count);
+			Assert.HasCount(4, result);
 			Assert.AreEqual("ModelTitle.1", result[0].Title);
 			Assert.AreEqual("ModelTitle.4", result[3].Title);
 		}
@@ -101,7 +101,7 @@ namespace MongoFramework.Tests.Linq
 			var context2 = new MongoDbTenantContext(connection, tenantId + "-2");
 			var dbSet2 = new MongoDbTenantSet<QueryableAsyncModel>(context2);
 
-			await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await dbSet2.FirstAsync());
+			await Assert.ThrowsAsync<InvalidOperationException>(async () => await dbSet2.FirstAsync());
 		}
 		[TestMethod]
 		public async Task FirstAsync_HasValue()
@@ -175,7 +175,7 @@ namespace MongoFramework.Tests.Linq
 			var context2 = new MongoDbTenantContext(connection, tenantId + "-2");
 			var dbSet2 = new MongoDbTenantSet<QueryableAsyncModel>(context2);
 
-			await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await dbSet2.SingleAsync());
+			await Assert.ThrowsAsync<InvalidOperationException>(async () => await dbSet2.SingleAsync());
 		}
 		[TestMethod]
 		public async Task SingleAsync_HasValue()
@@ -203,7 +203,7 @@ namespace MongoFramework.Tests.Linq
 			var tenantId = TestConfiguration.GetTenantId();
 			var dbSet = SetupTwoTenantsData(tenantId);
 
-			await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await dbSet.SingleOrDefaultAsync());
+			await Assert.ThrowsAsync<InvalidOperationException>(async () => await dbSet.SingleOrDefaultAsync());
 		}
 		[TestMethod]
 		public async Task SingleAsync_WithPredicate()
@@ -257,7 +257,7 @@ namespace MongoFramework.Tests.Linq
 			var tenantId = TestConfiguration.GetTenantId();
 			var dbSet = SetupTwoTenantsData(tenantId);
 
-			await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await dbSet.SingleOrDefaultAsync());
+			await Assert.ThrowsAsync<InvalidOperationException>(async () => await dbSet.SingleOrDefaultAsync());
 		}
 		[TestMethod]
 		public async Task SingleOrDefaultAsync_WithPredicate()
@@ -319,7 +319,7 @@ namespace MongoFramework.Tests.Linq
 			var context2 = new MongoDbTenantContext(connection, tenantId + "-2");
 			var dbSet2 = new MongoDbTenantSet<QueryableAsyncModel>(context2);
 
-			await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await dbSet2.Select(e => e.IntNumber).MaxAsync());
+			await Assert.ThrowsAsync<InvalidOperationException>(async () => await dbSet2.Select(e => e.IntNumber).MaxAsync());
 		}
 		[TestMethod]
 		public async Task MaxAsync_HasValues_Number()
@@ -363,7 +363,7 @@ namespace MongoFramework.Tests.Linq
 			var context2 = new MongoDbTenantContext(connection, tenantId + "-2");
 			var dbSet2 = new MongoDbTenantSet<QueryableAsyncModel>(context2);
 
-			await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await dbSet2.Select(e => e.IntNumber).MinAsync());
+			await Assert.ThrowsAsync<InvalidOperationException>(async () => await dbSet2.Select(e => e.IntNumber).MinAsync());
 		}
 		[TestMethod]
 		public async Task MinAsync_HasValues_Number()

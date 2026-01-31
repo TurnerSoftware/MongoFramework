@@ -119,7 +119,7 @@ namespace MongoFramework.Tests
 			var context = new MongoDbContext(connection);
 			var dbSet = new MongoDbSet<TestModel>(context);
 
-			Assert.ThrowsException<ArgumentNullException>(() => dbSet.Find(null));
+			Assert.Throws<ArgumentNullException>(() => dbSet.Find(null));
 		}
 
 		[TestMethod]
@@ -190,7 +190,7 @@ namespace MongoFramework.Tests
 			var context = new MongoDbContext(connection);
 			var dbSet = new MongoDbSet<TestModel>(context);
 
-			await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await dbSet.FindAsync(null));
+			await Assert.ThrowsAsync<ArgumentNullException>(async () => await dbSet.FindAsync(null));
 		}
 
 		[TestMethod]

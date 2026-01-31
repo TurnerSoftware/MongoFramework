@@ -46,7 +46,7 @@ namespace MongoFramework.Tests.Infrastructure.Indexing
 
 			var collection = connection.GetDatabase().GetCollection<IndexModel>("IndexModel");
 			var dbIndexes = collection.Indexes.List().ToList();
-			Assert.AreEqual(5, dbIndexes.Count);
+			Assert.HasCount(5, dbIndexes);
 		}
 
 		[TestMethod]
@@ -59,7 +59,7 @@ namespace MongoFramework.Tests.Infrastructure.Indexing
 
 			var collection = connection.GetDatabase().GetCollection<IndexModel>("IndexModel");
 			var dbIndexes = await collection.Indexes.List().ToListAsync().ConfigureAwait(false);
-			Assert.AreEqual(5, dbIndexes.Count);
+			Assert.HasCount(5, dbIndexes);
 		}
 
 		[TestMethod]
@@ -80,7 +80,7 @@ namespace MongoFramework.Tests.Infrastructure.Indexing
 		[TestMethod]
 		public void FailureFromMultipleTextIndexes()
 		{
-			Assert.ThrowsException<MongoCommandException>(() =>
+			Assert.Throws<MongoCommandException>(() =>
 			{
 				var connection = TestConfiguration.GetConnection();
 				EntityIndexWriter.ApplyIndexing<MultipleTextIndexModel>(connection);

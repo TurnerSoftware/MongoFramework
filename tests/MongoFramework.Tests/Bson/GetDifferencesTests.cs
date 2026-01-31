@@ -131,8 +131,8 @@ namespace MongoFramework.Tests.Bson
 			var arrayA = new BsonArray(Enumerable.Range(1, 5));
 			var arrayB = new BsonArray(Enumerable.Range(1, 5));
 
-			Assert.AreEqual(null, BsonDiff.GetDifferences(arrayA, arrayB).Difference);
-			Assert.AreEqual(null, BsonDiff.GetDifferences(arrayB, arrayA).Difference);
+			Assert.IsNull(BsonDiff.GetDifferences(arrayA, arrayB).Difference);
+			Assert.IsNull(BsonDiff.GetDifferences(arrayB, arrayA).Difference);
 		}
 
 		[TestMethod]
@@ -158,7 +158,7 @@ namespace MongoFramework.Tests.Bson
 
 			Assert.AreEqual(resultWithClearedValues, BsonDiff.GetDifferences(arrayA, null).Difference);
 			Assert.AreEqual(resultWithSameValues, BsonDiff.GetDifferences(null, arrayA).Difference);
-			Assert.AreEqual(null, BsonDiff.GetDifferences((BsonArray)null, null).Difference);
+			Assert.IsNull(BsonDiff.GetDifferences((BsonArray)null, null).Difference);
 		}
 
 		[TestMethod]

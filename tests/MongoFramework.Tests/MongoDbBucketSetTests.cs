@@ -34,7 +34,7 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public void MustBeSuppliedContext()
 		{
-			Assert.ThrowsException<ArgumentNullException>(() =>
+			Assert.Throws<ArgumentNullException>(() =>
 				new MongoDbBucketSet<EntityGroup, SubEntityClass>(null, new BucketSetOptions
 				{
 					BucketSize = 100,
@@ -45,7 +45,7 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public void MustBeSuppliedOptions()
 		{
-			Assert.ThrowsException<ArgumentException>(() =>
+			Assert.Throws<ArgumentException>(() =>
 				new MongoDbBucketSet<EntityGroup, SubEntityClass>(new Mock<IMongoDbContext>().Object, null));
 		}
 
@@ -102,7 +102,7 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public void InvalidBucketSize()
 		{
-			Assert.ThrowsException<ArgumentException>(() =>
+			Assert.Throws<ArgumentException>(() =>
 				new MongoDbBucketSet<EntityGroup, SubEntityClass>(new Mock<IMongoDbContext>().Object, new BucketSetOptions
 				{
 					BucketSize = 0,
@@ -113,7 +113,7 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public void InvalidSubEntityTimeProperty_Missing()
 		{
-			Assert.ThrowsException<ArgumentException>(() =>
+			Assert.Throws<ArgumentException>(() =>
 				new MongoDbBucketSet<EntityGroup, SubEntityClass>(new Mock<IMongoDbContext>().Object, new BucketSetOptions
 				{
 					BucketSize = 100,
@@ -124,7 +124,7 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public void InvalidSubEntityTimeProperty_WrongType()
 		{
-			Assert.ThrowsException<ArgumentException>(() =>
+			Assert.Throws<ArgumentException>(() =>
 				new MongoDbBucketSet<EntityGroup, SubEntityClass>(new Mock<IMongoDbContext>().Object, new BucketSetOptions
 				{
 					BucketSize = 100,
@@ -325,7 +325,7 @@ namespace MongoFramework.Tests
 				Name = "Group1"
 			}).ToArray();
 
-			Assert.AreEqual(5, results.Length);
+			Assert.HasCount(5, results);
 			Assert.AreEqual("Entry1", results[0].Label);
 			Assert.AreEqual("Entry2", results[1].Label);
 			Assert.AreEqual("Entry3", results[2].Label);
@@ -391,7 +391,7 @@ namespace MongoFramework.Tests
 
 			var results = dbSet.Groups().OrderBy(g => g.Name).ToArray();
 
-			Assert.AreEqual(2, results.Length);
+			Assert.HasCount(2, results);
 			Assert.AreEqual("Group1", results[0].Name);
 			Assert.AreEqual("Group2", results[1].Name);
 		}
@@ -444,9 +444,9 @@ namespace MongoFramework.Tests
 				EntityTimeProperty = "Date"
 			});
 
-			Assert.ThrowsException<ArgumentNullException>(() => dbSet.Add(null, new SubEntityClass()));
-			Assert.ThrowsException<ArgumentNullException>(() => dbSet.AddRange(null, null));
-			Assert.ThrowsException<ArgumentNullException>(() => dbSet.AddRange(new EntityGroup(), null));
+			Assert.Throws<ArgumentNullException>(() => dbSet.Add(null, new SubEntityClass()));
+			Assert.Throws<ArgumentNullException>(() => dbSet.AddRange(null, null));
+			Assert.Throws<ArgumentNullException>(() => dbSet.AddRange(new EntityGroup(), null));
 		}
 
 		[TestMethod]
@@ -458,7 +458,7 @@ namespace MongoFramework.Tests
 				EntityTimeProperty = "Date"
 			});
 
-			Assert.ThrowsException<ArgumentNullException>(() => dbSet.Remove(null));
+			Assert.Throws<ArgumentNullException>(() => dbSet.Remove(null));
 		}
 
 		[TestMethod]

@@ -14,49 +14,49 @@ namespace MongoFramework.Tests.Utilities
 		[TestMethod]
 		public void Not_null_throws_when_arg_is_null()
 		{
-			Assert.ThrowsException<ArgumentNullException>(() => Check.NotNull<string>(null, "foo"));
+			Assert.Throws<ArgumentNullException>(() => Check.NotNull<string>(null, "foo"));
 		}
 
 		[TestMethod]
 		public void Not_null_throws_when_arg_name_empty()
 		{
-			Assert.ThrowsException<ArgumentException>(() => Check.NotNull(null as object, string.Empty));
+			Assert.Throws<ArgumentException>(() => Check.NotNull(null as object, string.Empty));
 		}
 
 		[TestMethod]
 		public void Not_empty_throws_when_empty()
 		{
-			Assert.ThrowsException<ArgumentException>(() => Check.NotEmpty("", string.Empty));
+			Assert.Throws<ArgumentException>(() => Check.NotEmpty("", string.Empty));
 		}
 
 		[TestMethod]
 		public void Not_empty_throws_when_whitespace()
 		{
-			Assert.ThrowsException<ArgumentException>(() => Check.NotEmpty(" ", string.Empty));
+			Assert.Throws<ArgumentException>(() => Check.NotEmpty(" ", string.Empty));
 		}
 
 		[TestMethod]
 		public void Not_empty_throws_when_parameter_name_null()
 		{
-			Assert.ThrowsException<ArgumentNullException>(() => Check.NotEmpty(null, null));
+			Assert.Throws<ArgumentNullException>(() => Check.NotEmpty(null, null));
 		}
 
 		[TestMethod]
 		public void Generic_Not_empty_throws_when_arg_is_empty()
 		{
-			Assert.ThrowsException<ArgumentException>(() => Check.NotEmpty(Array.Empty<string>(), "foo"));
+			Assert.Throws<ArgumentException>(() => Check.NotEmpty(Array.Empty<string>(), "foo"));
 		}
 
 		[TestMethod]
 		public void Generic_Not_empty_throws_when_arg_is_null()
 		{
-			Assert.ThrowsException<ArgumentNullException>(() => Check.NotEmpty<object>(null, "foo"));
+			Assert.Throws<ArgumentNullException>(() => Check.NotEmpty<object>(null, "foo"));
 		}
 
 		[TestMethod]
 		public void Generic_Not_empty_throws_when_arg_name_empty()
 		{
-			Assert.ThrowsException<ArgumentException>(() => Check.NotEmpty(null, string.Empty));
+			Assert.Throws<ArgumentException>(() => Check.NotEmpty(null, string.Empty));
 		}
 	}
 }

@@ -210,8 +210,8 @@ namespace MongoFramework.Tests.Infrastructure
 			};
 			entryContainer.SetEntityState(entity, EntityEntryState.Added);
 
-			Assert.ThrowsException<MultiTenantException>(() => entryContainer.EnforceMultiTenant(null));
-			Assert.ThrowsException<MultiTenantException>(() => entryContainer.EnforceMultiTenant(" "));
+			Assert.Throws<MultiTenantException>(() => entryContainer.EnforceMultiTenant(null));
+			Assert.Throws<MultiTenantException>(() => entryContainer.EnforceMultiTenant(" "));
 		}
 
 		[TestMethod]
@@ -234,7 +234,7 @@ namespace MongoFramework.Tests.Infrastructure
 
 			entryContainer.EnforceMultiTenant(TestConfiguration.GetTenantId());
 
-			Assert.AreEqual(entryContainer.Entries().Count(), 2);
+			Assert.AreEqual(2, entryContainer.Entries().Count());
 		}
 
 	}

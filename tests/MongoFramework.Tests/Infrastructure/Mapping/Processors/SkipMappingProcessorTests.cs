@@ -23,8 +23,8 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 		{
 			EntityMapping.AddMappingProcessor(new SkipMappingProcessor());
 
-			var exception = Assert.ThrowsException<ArgumentException>(() => EntityMapping.RegisterType(typeof(SkippedMappingModel)));
-			Assert.IsTrue(exception.Message.Contains("was skipped"));
+			var exception = Assert.Throws<ArgumentException>(() => EntityMapping.RegisterType(typeof(SkippedMappingModel)));
+			StringAssert.Contains(exception.Message, "was skipped");
 		}
 
 		[TestMethod]

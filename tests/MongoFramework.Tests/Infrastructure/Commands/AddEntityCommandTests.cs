@@ -44,7 +44,7 @@ namespace MongoFramework.Tests.Infrastructure.Commands
 		[TestMethod]
 		public void ValidationExceptionOnInvalidModel()
 		{
-			Assert.ThrowsException<ValidationException>(() =>
+			Assert.Throws<ValidationException>(() =>
 			{
 				var entity = new TestValidationModel { };
 				var command = new AddEntityCommand<TestValidationModel>(new EntityEntry(entity, EntityEntryState.Added));

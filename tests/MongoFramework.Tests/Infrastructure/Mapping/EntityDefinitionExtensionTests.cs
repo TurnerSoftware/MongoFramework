@@ -56,7 +56,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping
 		{
 			var definition = EntityMapping.RegisterType(typeof(OverridePropertyGrandChildModel));
 			var inheritedProperties = definition.GetInheritedProperties().ToArray();
-			Assert.AreEqual(1, inheritedProperties.Length);
+			Assert.HasCount(1, inheritedProperties);
 			Assert.AreEqual(typeof(OverridePropertyBaseModel), inheritedProperties[0].PropertyInfo.DeclaringType);
 		}
 		[TestMethod]
@@ -64,7 +64,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping
 		{
 			var definition = EntityMapping.RegisterType(typeof(OverridePropertyChildModel));
 			var allProperties = definition.GetAllProperties().ToArray();
-			Assert.AreEqual(1, allProperties.Length);
+			Assert.HasCount(1, allProperties);
 			Assert.AreEqual(typeof(OverridePropertyBaseModel), allProperties[0].PropertyInfo.DeclaringType);
 		}
 
@@ -72,7 +72,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping
 		public void GetTenantModelIdRequiresTenant()
 		{
 			var definition = EntityMapping.RegisterType(typeof(TenantModel));
-			Assert.ThrowsException<ArgumentException>(() => definition.CreateIdFilter<TenantModel>("id"));
+			Assert.Throws<ArgumentException>(() => definition.CreateIdFilter<TenantModel>("id"));
 		}
 
 	}

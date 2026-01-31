@@ -182,7 +182,7 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 
 			var deserializedResult = BsonSerializer.Deserialize<CollectionBaseModel>(document);
 
-			Assert.AreEqual(3, deserializedResult.KnownList.Count);
+			Assert.HasCount(3, deserializedResult.KnownList);
 			Assert.IsInstanceOfType(deserializedResult.KnownList[0], typeof(KnownBaseModel));
 			Assert.IsInstanceOfType(deserializedResult.KnownList[1], typeof(UnknownChildModel));
 			Assert.IsInstanceOfType(deserializedResult.KnownList[2], typeof(UnknownGrandChildModel));
@@ -312,7 +312,7 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 			Assert.AreEqual("ObjectValueAsString", result.Dictionary["String"]);
 			Assert.AreEqual(1, result.Dictionary["Number"]);
 			Assert.AreEqual(new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc), result.Dictionary["Date"]);
-			Assert.AreEqual(true, result.Dictionary["Boolean"]);
+			Assert.IsTrue((bool)result.Dictionary["Boolean"]);
 			Assert.AreEqual(20, ((object[])result.Dictionary["Array"])[1]);
 			Assert.AreEqual(ObjectId.Parse("507f1f77bcf86cd799439011"), result.Dictionary["ObjectId"]);
 		}

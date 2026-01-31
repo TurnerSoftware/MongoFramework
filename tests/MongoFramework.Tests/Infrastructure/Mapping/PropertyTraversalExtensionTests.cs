@@ -38,7 +38,7 @@ public class PropertyTraversalExtensionTests : TestBase
 		var definition = EntityMapping.RegisterType(typeof(TraverseMappingModel));
 		var result = definition.TraverseProperties().ToArray();
 
-		Assert.AreEqual(32, result.Length);
+		Assert.HasCount(32, result);
 
 		Assert.IsTrue(result.Any(m => m.GetPath() == "RecursionType" && m.Depth == 0));
 

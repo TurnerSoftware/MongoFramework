@@ -84,7 +84,7 @@ namespace MongoFramework.Tests.Linq
 
 			Assert.AreNotEqual(0, results[0].CustomDistanceField);
 			Assert.AreNotEqual(0, results[1].CustomDistanceField);
-			Assert.IsTrue(results[0].CustomDistanceField < results[1].CustomDistanceField);
+			Assert.IsLessThan(results[0].CustomDistanceField, results[1].CustomDistanceField);
 
 			Assert.IsNull(results[0].ExtraElements);
 		}
@@ -122,23 +122,23 @@ namespace MongoFramework.Tests.Linq
 
 			var results = GetResults(maxDistance: 3000000);
 			Assert.AreEqual(3, results.Count());
-			Assert.IsTrue(results.Max(e => e.CustomDistanceField) < 3000000);
+			Assert.IsLessThan(results.Max(e => e.CustomDistanceField), 3000000);
 
 			results = GetResults(maxDistance: 600000);
 			Assert.AreEqual(1, results.Count());
-			Assert.IsTrue(results.Max(e => e.CustomDistanceField) < 600000);
+			Assert.IsLessThan(results.Max(e => e.CustomDistanceField), 600000);
 
 			results = GetResults(maxDistance: 17000000);
 			Assert.AreEqual(4, results.Count());
 
 			results = GetResults(minDistance: 600000);
 			Assert.AreEqual(3, results.Count());
-			Assert.IsTrue(results.Min(e => e.CustomDistanceField) > 600000);
+			Assert.IsGreaterThan(results.Min(e => e.CustomDistanceField), 600000);
 
 			results = GetResults(maxDistance: 3000000, minDistance: 600000);
 			Assert.AreEqual(2, results.Count());
-			Assert.IsTrue(results.Max(e => e.CustomDistanceField) < 3000000);
-			Assert.IsTrue(results.Min(e => e.CustomDistanceField) > 600000);
+			Assert.IsLessThan(results.Max(e => e.CustomDistanceField), 3000000);
+			Assert.IsGreaterThan(results.Min(e => e.CustomDistanceField), 600000);
 		}
 
 		[TestMethod]

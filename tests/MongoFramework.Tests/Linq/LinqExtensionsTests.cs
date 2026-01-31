@@ -74,7 +74,7 @@ namespace MongoFramework.Tests.Linq
 		[TestMethod]
 		public void InvalidToQuery()
 		{
-			Assert.ThrowsException<ArgumentException>(() => LinqExtensions.ToQuery(null));
+			Assert.Throws<ArgumentException>(() => LinqExtensions.ToQuery(null));
 		}
 
 		[TestMethod]

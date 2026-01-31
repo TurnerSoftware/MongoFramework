@@ -66,7 +66,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping.Processors
 			EntityMapping.RegisterType(typeof(IgnoreExtraElementsModel));
 			classMap = BsonClassMap.GetRegisteredClassMaps()
 				.Where(cm => cm.ClassType == typeof(IgnoreExtraElementsModel)).FirstOrDefault();
-			Assert.AreEqual(null, classMap.ExtraElementsMemberMap);
+			Assert.IsNull(classMap.ExtraElementsMemberMap);
 		}
 
 		[TestMethod]

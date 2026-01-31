@@ -241,7 +241,7 @@ namespace MongoFramework.Tests
 			var context = new MongoDbTenantContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
-			Assert.ThrowsException<ArgumentNullException>(() => dbSet.Find(null));
+			Assert.Throws<ArgumentNullException>(() => dbSet.Find(null));
 		}
 
 		[TestMethod]
@@ -357,7 +357,7 @@ namespace MongoFramework.Tests
 			var context = new MongoDbTenantContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
-			await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await dbSet.FindAsync(null));
+			await Assert.ThrowsAsync<ArgumentNullException>(async () => await dbSet.FindAsync(null));
 		}
 
 		[TestMethod]
@@ -384,7 +384,7 @@ namespace MongoFramework.Tests
 			Assert.IsFalse(dbSet.Any(m => m.Description == "SuccessfullyUpdateEntity-Updated"));
 			context.SaveChanges();
 			Assert.IsTrue(dbSet.Any(m => m.Description == "SuccessfullyUpdateEntity-Updated"));
-			Assert.IsTrue(dbSet.First(m => m.Description == "SuccessfullyUpdateEntity-Updated").TenantId == tenantId);
+			Assert.AreEqual(tenantId, dbSet.First(m => m.Description == "SuccessfullyUpdateEntity-Updated").TenantId);
 		}
 
 
@@ -407,7 +407,7 @@ namespace MongoFramework.Tests
 			dbSet = new MongoDbTenantSet<TestModel>(context);
 			entity.TenantId = "qweasd";
 			entity.Description = "SuccessfullyBlocksUpdateEntity-Updated";
-			Assert.ThrowsException<MultiTenantException>(() => dbSet.Update(entity));
+			Assert.Throws<MultiTenantException>(() => dbSet.Update(entity));
 
 		}
 
@@ -432,7 +432,7 @@ namespace MongoFramework.Tests
 
 			//changing tenant ID after state is updated
 			entity.TenantId = "qweasd";
-			Assert.ThrowsException<MultiTenantException>(() => context.SaveChanges());
+			Assert.Throws<MultiTenantException>(() => context.SaveChanges());
 		}
 
 
@@ -499,7 +499,7 @@ namespace MongoFramework.Tests
 
 			entities[1].Description = "SuccessfullyBlocksUpdateRange.2-Updated";
 			entities[1].TenantId = "qweasd";
-			Assert.ThrowsException<MultiTenantException>(() => dbSet.UpdateRange(entities));
+			Assert.Throws<MultiTenantException>(() => dbSet.UpdateRange(entities));
 		}
 
 		[TestMethod]
@@ -547,7 +547,7 @@ namespace MongoFramework.Tests
 
 			dbSet = new MongoDbTenantSet<TestModel>(context);
 
-			Assert.ThrowsException<MultiTenantException>(() => dbSet.Remove(entity));
+			Assert.Throws<MultiTenantException>(() => dbSet.Remove(entity));
 
 		}
 
@@ -611,7 +611,7 @@ namespace MongoFramework.Tests
 			entities[0].TenantId = "qweasd";
 			entities[1].TenantId = "qweasd";
 
-			Assert.ThrowsException<MultiTenantException>(() => dbSet.RemoveRange(entities));
+			Assert.Throws<MultiTenantException>(() => dbSet.RemoveRange(entities));
 
 		}
 
@@ -770,10 +770,10 @@ namespace MongoFramework.Tests
 			var context = new MongoDbTenantContext(connection, tenantId);
 			var dbSet = new MongoDbTenantSet<TestModel>(context);
 
-			Assert.ThrowsException<ArgumentNullException>(() => dbSet.Add(null));
-			Assert.ThrowsException<ArgumentNullException>(() => dbSet.AddRange(null));
-			Assert.ThrowsException<ArgumentNullException>(() => dbSet.Update(null));
-			Assert.ThrowsException<ArgumentNullException>(() => dbSet.UpdateRange(null));
+			Assert.Throws<ArgumentNullException>(() => dbSet.Add(null));
+			Assert.Throws<ArgumentNullException>(() => dbSet.AddRange(null));
+			Assert.Throws<ArgumentNullException>(() => dbSet.Update(null));
+			Assert.Throws<ArgumentNullException>(() => dbSet.UpdateRange(null));
 		}
 
 		[TestMethod]
@@ -817,7 +817,7 @@ namespace MongoFramework.Tests
 			context2.SaveChanges();
 
 			dbSet.Add(new TestUniqueModel { UserName = "BlocksDuplicatesByTenant" });
-			Assert.ThrowsException<MongoBulkWriteException<TestUniqueModel>>(() => context.SaveChanges());
+			Assert.Throws<MongoBulkWriteException<TestUniqueModel>>(() => context.SaveChanges());
 		}
 		[TestMethod]
 		public void SuccessfullyLinqFindTracked()

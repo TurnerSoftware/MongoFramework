@@ -53,8 +53,8 @@ namespace MongoFramework.Tests.Profiling.MiniProfiler
 
 				Assert.IsTrue(profiler.Root.CustomTimings.ContainsKey("mongodb"));
 				var timings = profiler.Root.CustomTimings["mongodb"];
-				Assert.IsTrue(timings[0].CommandString.Contains("InsertOne"));
-				Assert.IsTrue(timings[0].CommandString.Contains("ProfilingInsert"));
+				StringAssert.Contains(timings[0].CommandString, "InsertOne");
+				StringAssert.Contains(timings[0].CommandString, "ProfilingInsert");
 			}
 		}
 
@@ -77,8 +77,8 @@ namespace MongoFramework.Tests.Profiling.MiniProfiler
 
 				Assert.IsTrue(profiler.Root.CustomTimings.ContainsKey("mongodb"));
 				var timings = profiler.Root.CustomTimings["mongodb"];
-				Assert.IsTrue(timings[0].CommandString.Contains("UpdateOne"));
-				Assert.IsTrue(timings[0].CommandString.Contains("ProfilingUpdate-Updated"));
+				StringAssert.Contains(timings[0].CommandString, "UpdateOne");
+				StringAssert.Contains(timings[0].CommandString, "ProfilingUpdate-Updated");
 			}
 		}
 
@@ -101,8 +101,8 @@ namespace MongoFramework.Tests.Profiling.MiniProfiler
 
 				Assert.IsTrue(profiler.Root.CustomTimings.ContainsKey("mongodb"));
 				var timings = profiler.Root.CustomTimings["mongodb"];
-				Assert.IsTrue(timings[0].CommandString.Contains("DeleteOne"));
-				Assert.IsTrue(timings[0].CommandString.Contains(entity.Id));
+				StringAssert.Contains(timings[0].CommandString, "DeleteOne");
+				StringAssert.Contains(timings[0].CommandString, entity.Id);
 			}
 		}
 
@@ -130,8 +130,8 @@ namespace MongoFramework.Tests.Profiling.MiniProfiler
 
 				Assert.IsTrue(profiler.Root.CustomTimings.ContainsKey("mongodb"));
 				var timings = profiler.Root.CustomTimings["mongodb"];
-				Assert.IsTrue(timings[0].CommandString.Contains("$skip"));
-				Assert.IsTrue(timings[0].CommandString.Contains("78"));
+				StringAssert.Contains(timings[0].CommandString, "$skip");
+				StringAssert.Contains(timings[0].CommandString, "78");
 			}
 		}
 
@@ -161,7 +161,7 @@ namespace MongoFramework.Tests.Profiling.MiniProfiler
 
 				Assert.IsTrue(profiler.Root.CustomTimings.ContainsKey("mongodb"));
 				var timings = profiler.Root.CustomTimings["mongodb"];
-				Assert.IsTrue(timings[0].DurationMilliseconds > 1000);
+				Assert.IsGreaterThan(timings[0].DurationMilliseconds.GetValueOrDefault(), 1000);
 			}
 		}
 
@@ -178,8 +178,8 @@ namespace MongoFramework.Tests.Profiling.MiniProfiler
 
 				Assert.IsTrue(profiler.Root.CustomTimings.ContainsKey("mongodb"));
 				var timings = profiler.Root.CustomTimings["mongodb"];
-				Assert.IsTrue(timings[0].CommandString.Contains("TestIndex"));
-				Assert.IsTrue(timings[0].CommandString.Contains("IndexSpecificDescriptionField"));
+				StringAssert.Contains(timings[0].CommandString, "TestIndex");
+				StringAssert.Contains(timings[0].CommandString, "IndexSpecificDescriptionField");
 			}
 		}
 	}

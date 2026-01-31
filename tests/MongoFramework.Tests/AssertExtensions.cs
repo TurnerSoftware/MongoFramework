@@ -23,12 +23,6 @@ namespace MongoFramework.Tests
 			{
 				Assert.Fail(exceptionMessage);
 			}
-			catch (Exception)
-			{
-				Assert.IsTrue(true);
-			}
-
-			Assert.IsTrue(true);
 		}
 
 		/// <summary>
@@ -48,12 +42,6 @@ namespace MongoFramework.Tests
 			{
 				Assert.Fail(exceptionMessage);
 			}
-			catch (Exception)
-			{
-				Assert.IsTrue(true);
-			}
-
-			Assert.IsTrue(true);
 		}
 	}
 }

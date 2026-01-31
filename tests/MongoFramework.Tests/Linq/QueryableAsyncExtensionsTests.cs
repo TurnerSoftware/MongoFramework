@@ -53,7 +53,7 @@ namespace MongoFramework.Tests.Linq
 			context.SaveChanges();
 
 			var result = await queryable.ToArrayAsync();
-			Assert.AreEqual(1, result.Length);
+			Assert.HasCount(1, result);
 			Assert.AreEqual("ToArrayAsync", result[0].Title);
 		}
 
@@ -71,7 +71,7 @@ namespace MongoFramework.Tests.Linq
 			context.SaveChanges();
 
 			var result = await queryable.ToListAsync();
-			Assert.AreEqual(1, result.Count);
+			Assert.HasCount(1, result);
 			Assert.AreEqual("ToListAsync", result[0].Title);
 		}
 
@@ -84,7 +84,7 @@ namespace MongoFramework.Tests.Linq
 			var provider = new MongoFrameworkQueryProvider<QueryableAsyncModel>(connection);
 			var queryable = new MongoFrameworkQueryable<QueryableAsyncModel>(provider);
 
-			await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await queryable.FirstAsync());
+			await Assert.ThrowsAsync<InvalidOperationException>(async () => await queryable.FirstAsync());
 		}
 		[TestMethod]
 		public async Task FirstAsync_HasValue()
@@ -176,7 +176,7 @@ namespace MongoFramework.Tests.Linq
 			var provider = new MongoFrameworkQueryProvider<QueryableAsyncModel>(connection);
 			var queryable = new MongoFrameworkQueryable<QueryableAsyncModel>(provider);
 
-			await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await queryable.SingleAsync());
+			await Assert.ThrowsAsync<InvalidOperationException>(async () => await queryable.SingleAsync());
 		}
 		[TestMethod]
 		public async Task SingleAsync_HasValue()
@@ -208,7 +208,7 @@ namespace MongoFramework.Tests.Linq
 			context.ChangeTracker.SetEntityState(new QueryableAsyncModel { Title = "SingleAsync_HasMoreThanOneValue.2" }, EntityEntryState.Added);
 			context.SaveChanges();
 
-			await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await queryable.SingleOrDefaultAsync());
+			await Assert.ThrowsAsync<InvalidOperationException>(async () => await queryable.SingleOrDefaultAsync());
 		}
 		[TestMethod]
 		public async Task SingleAsync_WithPredicate()
@@ -269,7 +269,7 @@ namespace MongoFramework.Tests.Linq
 			context.ChangeTracker.SetEntityState(new QueryableAsyncModel { Title = "SingleOrDefaultAsync_HasMoreThanOneValue.2" }, EntityEntryState.Added);
 			context.SaveChanges();
 
-			await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await queryable.SingleOrDefaultAsync());
+			await Assert.ThrowsAsync<InvalidOperationException>(async () => await queryable.SingleOrDefaultAsync());
 		}
 		[TestMethod]
 		public async Task SingleOrDefaultAsync_WithPredicate()
@@ -351,7 +351,7 @@ namespace MongoFramework.Tests.Linq
 
 			context.SaveChanges();
 
-			await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await queryable.Select(e => e.IntNumber).MaxAsync());
+			await Assert.ThrowsAsync<InvalidOperationException>(async () => await queryable.Select(e => e.IntNumber).MaxAsync());
 		}
 		[TestMethod]
 		public async Task MaxAsync_HasValues_Number()
@@ -417,7 +417,7 @@ namespace MongoFramework.Tests.Linq
 
 			context.SaveChanges();
 
-			await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await queryable.Select(e => e.IntNumber).MinAsync());
+			await Assert.ThrowsAsync<InvalidOperationException>(async () => await queryable.Select(e => e.IntNumber).MinAsync());
 		}
 		[TestMethod]
 		public async Task MinAsync_HasValues_Number()

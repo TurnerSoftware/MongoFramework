@@ -230,13 +230,13 @@ public class MappingBuilderExtensionTests : MappingTestBase
 		});
 
 		var testModelDefinition = GetDefinition<TestModel>();
-		Assert.AreEqual(1, testModelDefinition.Properties.Count);
+		Assert.HasCount(1, testModelDefinition.Properties);
 		Assert.AreEqual(typeof(TestModel).GetProperty("OneOfThem"), testModelDefinition.Properties[0].PropertyInfo);
 		Assert.IsTrue(testModelDefinition.ExtraElements.IgnoreExtraElements);
-		Assert.AreEqual(0, testModelDefinition.Indexes.Count);
+		Assert.IsEmpty(testModelDefinition.Indexes);
 
 		var testModelBaseDefinition = GetDefinition<TestModelBase>();
 		Assert.IsNull(testModelBaseDefinition.Key);
-		Assert.AreEqual(0, testModelBaseDefinition.Properties.Count);
+		Assert.IsEmpty(testModelBaseDefinition.Properties);
 	}
 }

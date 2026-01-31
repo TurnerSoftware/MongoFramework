@@ -202,7 +202,7 @@ namespace MongoFramework.Tests
 			var result = dbSet.AsNoTracking().FirstOrDefault();
 			result.TenantId = tenantId + "a";
 
-			Assert.ThrowsException<MultiTenantException>(() => context.Attach(result));
+			Assert.Throws<MultiTenantException>(() => context.Attach(result));
 		}
 
 		[TestMethod]
@@ -236,7 +236,7 @@ namespace MongoFramework.Tests
 			var result = dbSet.AsNoTracking().ToList();
 			result[0].TenantId = tenantId + "a";
 
-			Assert.ThrowsException<MultiTenantException>(() => context.AttachRange(result));
+			Assert.Throws<MultiTenantException>(() => context.AttachRange(result));
 		}
 
 	}

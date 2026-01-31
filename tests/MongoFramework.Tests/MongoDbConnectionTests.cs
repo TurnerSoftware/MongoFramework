@@ -16,7 +16,7 @@ namespace MongoFramework.Tests
 		[TestMethod]
 		public void NullUrlThrowsException()
 		{
-			Assert.ThrowsException<ArgumentNullException>(() => MongoDbConnection.FromUrl(null));
+			Assert.Throws<ArgumentNullException>(() => MongoDbConnection.FromUrl(null));
 		}
 	}
 }

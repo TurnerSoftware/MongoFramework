@@ -93,7 +93,7 @@ public class MappingBuilderTests : MappingTestBase
 	[TestMethod]
 	public void HasKey_KeyMustBeDefinedOnDeclaredType()
 	{
-		Assert.ThrowsException<ArgumentException>(() =>
+		Assert.Throws<ArgumentException>(() =>
 			SetupMapping(mappingBuilder =>
 			{
 				mappingBuilder.Entity<TestModel>()
@@ -135,7 +135,7 @@ public class MappingBuilderTests : MappingTestBase
 	[TestMethod]
 	public void HasProperty_PropertyMustBeDefinedOnDeclaredType()
 	{
-		Assert.ThrowsException<ArgumentException>(() =>
+		Assert.Throws<ArgumentException>(() =>
 			SetupMapping(mappingBuilder =>
 			{
 				mappingBuilder.Entity<TestModel>()
@@ -367,13 +367,13 @@ public class MappingBuilderTests : MappingTestBase
 		});
 
 		var testModelDefinition = GetDefinition<TestModel>();
-		Assert.AreEqual(1, testModelDefinition.Properties.Count);
+		Assert.HasCount(1, testModelDefinition.Properties);
 		Assert.AreEqual(typeof(TestModel).GetProperty("OneOfThem"), testModelDefinition.Properties[0].PropertyInfo);
 		Assert.IsTrue(testModelDefinition.ExtraElements.IgnoreExtraElements);
-		Assert.AreEqual(0, testModelDefinition.Indexes.Count);
+		Assert.IsEmpty(testModelDefinition.Indexes);
 
 		var testModelBaseDefinition = GetDefinition<TestModelBase>();
 		Assert.IsNull(testModelBaseDefinition.Key);
-		Assert.AreEqual(0, testModelBaseDefinition.Properties.Count);
+		Assert.IsEmpty(testModelBaseDefinition.Properties);
 	}
 }
