@@ -1,0 +1,51 @@
+# Note this will only work with Release-Please if you have given it a PAT.
+# The default GITHUB_TOKEN does not have permission to run workflows on releases
+name: Publish to NuGet
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  id-token: write # Required for OIDC
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment:
+      name: 'NuGet'
+      url: https://www.nuget.org/packages/MongoFramework
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup DotNet
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore -c Release
+
+      - name: Pack NuGet
+        run: dotnet pack --no-build -c Release -o nupkg
+
+      # Get a short-lived NuGet API key
+      - name: NuGet login (OIDC)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: Push NuGet
+        run: dotnet nuget push nupkg/*.nupkg -k ${{ steps.login.outputs.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json --skip-duplicate

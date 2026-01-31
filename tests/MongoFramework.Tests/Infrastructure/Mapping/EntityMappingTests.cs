@@ -17,7 +17,7 @@ namespace MongoFramework.Tests.Infrastructure.Mapping
 		/// A potentially common issue for web application startup, this tests that multiple threads
 		/// can map a class at the same time without concurrency issues.
 		///
-		/// Relates to: https://github.com/TurnerSoftware/MongoFramework/issues/7
+		/// Relates to: https://github.com/jcamp-code/MongoFramework/issues/7
 		/// </summary>
 		[TestMethod]
 		public void MappingLocks()

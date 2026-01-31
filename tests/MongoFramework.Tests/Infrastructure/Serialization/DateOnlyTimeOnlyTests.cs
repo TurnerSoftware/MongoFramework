@@ -116,7 +116,7 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 			var midYear = new DateOnly(2024, 6, 1);
 			var results = dbSet.Where(x => x.Date > midYear).ToArray();
 
-			Assert.AreEqual(2, results.Length);
+			Assert.HasCount(2, results);
 		}
 
 		[TestMethod]
@@ -203,7 +203,7 @@ namespace MongoFramework.Tests.Infrastructure.Serialization
 			var noon = new TimeOnly(12, 0, 0);
 			var results = dbSet.Where(x => x.Time >= noon).ToArray();
 
-			Assert.AreEqual(2, results.Length);
+			Assert.HasCount(2, results);
 		}
 
 		[TestMethod]

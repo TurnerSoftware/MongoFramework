@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup>
+    <PackageId>jcamp.$(AssemblyName)</PackageId>
+  </PropertyGroup>
+</Project>

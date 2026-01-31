@@ -1,31 +1,32 @@
 <Project>
+  <PropertyGroup>
+    <Version>3.0.0</Version>
+    <RootNamespace>MongoFramework</RootNamespace>
 
-	<PropertyGroup>
-		<RootNamespace>MongoFramework</RootNamespace>
+    <Company>Turner Software/JohnCampion</Company>
 
-		<Company>Turner Software</Company>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageProjectUrl>https://github.com/jcamp-code/MongoFramework</PackageProjectUrl>
+    <PackageBaseTags>mongo;mongodb;data;database;orm</PackageBaseTags>
 
-		<PackageId>$(AssemblyName)</PackageId>
-		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageIcon>icon.png</PackageIcon>
-		<PackageProjectUrl>https://github.com/TurnerSoftware/MongoFramework</PackageProjectUrl>
-		<PackageBaseTags>mongo;mongodb;data;database;orm</PackageBaseTags>
+    <!-- SourceLink Support -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <DebugType>embedded</DebugType>
 
-		<!-- SourceLink Support -->
-		<PublishRepositoryUrl>true</PublishRepositoryUrl>
-		<EmbedUntrackedSources>true</EmbedUntrackedSources>
-		<DebugType>embedded</DebugType>
+    <LangVersion>Latest</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference
+      Include="Microsoft.SourceLink.GitHub"
+      Version="10.0.102"
+      PrivateAssets="All"
+    />
+  </ItemGroup>
 
-		<LangVersion>Latest</LangVersion>
-	</PropertyGroup>
-	<ItemGroup>
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.102" PrivateAssets="All" />
-		<PackageReference Include="TurnerSoftware.BuildVersioning" Version="0.5.0" PrivateAssets="All" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Include="..\..\images\$(PackageIcon)" Pack="true" PackagePath="/" />
-	</ItemGroup>
-
+  <ItemGroup>
+    <None Include="..\..\images\$(PackageIcon)" Pack="true" PackagePath="/" />
+  </ItemGroup>
 </Project>

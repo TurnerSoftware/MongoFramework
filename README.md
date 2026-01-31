@@ -2,13 +2,19 @@
 
 ![Icon](images/icon.png)
 # MongoFramework
+
+![Build](https://img.shields.io/github/actions/workflow/status/jcamp-code/MongoFramework/build.yml?branch=main)
+[![Codecov](https://img.shields.io/codecov/c/github/jcamp-code/MongoFramework/main.svg)](https://codecov.io/gh/jcamp-code/MongoFramework)
+[![NuGet](https://img.shields.io/nuget/v/jcamp.MongoFramework.svg)](https://www.nuget.org/packages/jcamp.MongoFramework/)
+</div>
+
+## Fork
+Note this is a fork from the original, updated for latest .NET versions and packages.
+
+Version has been set to v3 to indicate compatibility with the v3 MongoDB CS driver.
+
 An "Entity Framework"-like interface for MongoDB
 
-![Build](https://img.shields.io/github/actions/workflow/status/TurnerSoftware/mongoframework/build.yml?branch=main)
-[![Codecov](https://img.shields.io/codecov/c/github/turnersoftware/mongoframework/main.svg)](https://codecov.io/gh/TurnerSoftware/MongoFramework)
-[![NuGet](https://img.shields.io/nuget/v/MongoFramework.svg)](https://www.nuget.org/packages/MongoFramework/)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/62fa31c90bf94f3d8e201b9684a7a4ca)](https://www.codacy.com/app/Turnerj/MongoFramework)
-</div>
 
 ## Overview
 MongoFramework tries to bring some of the nice features from Entity Framework into the world of MongoDB.
@@ -38,13 +44,9 @@ MongoFramework with MongoDB.Driver 3.x and .NET 10 delivers significant performa
 
 Benchmarks performed comparing MongoDB.Driver 2.x (.NET 6) vs 3.x (.NET 10). See [benchmark results](tests/MongoFramework.Benchmarks) for details.
 
-## Licensing and Support
+## Licensing
 
 MongoFramework is licensed under the MIT license. It is free to use in personal and commercial projects.
-
-There are [support plans](https://turnersoftware.com.au/support-plans) available that cover all active [Turner Software OSS projects](https://github.com/TurnerSoftware).
-Support plans provide private email support, expert usage advice for our projects, priority bug fixes and more.
-These support plans help fund our OSS commitments to provide better software for everyone.
 
 ## MongoFramework Extensions
 These extensions are official packages that enhance the functionality of MongoFramework, integrating it with other systems and tools.
