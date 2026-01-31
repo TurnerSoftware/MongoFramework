@@ -4,7 +4,7 @@ using MongoFramework.Infrastructure.Serialization;
 
 namespace MongoFramework.Benchmarks.Infrastructure.Serialization
 {
-	[SimpleJob(RuntimeMoniker.Net50), MemoryDiagnoser]
+	[MemoryDiagnoser]
 	public class TypeDiscovery_FindTypeBenchmark
 	{
 		private class LocalClass { }

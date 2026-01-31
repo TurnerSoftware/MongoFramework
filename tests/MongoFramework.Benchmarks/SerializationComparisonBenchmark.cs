@@ -8,7 +8,7 @@ using MongoDB.Bson.Serialization;
 
 namespace MongoFramework.Benchmarks
 {
-	[SimpleJob(RuntimeMoniker.Net50), MemoryDiagnoser]
+	[MemoryDiagnoser]
 	public class SerializationComparisonBenchmark
 	{
 		class ExampleClass

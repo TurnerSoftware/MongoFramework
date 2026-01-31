@@ -8,7 +8,7 @@ using MongoFramework.Infrastructure.DefinitionHelpers;
 
 namespace MongoFramework.Benchmarks.Infrastructure.DefinitionHelpers
 {
-	[SimpleJob(RuntimeMoniker.Net50), MemoryDiagnoser]
+	[MemoryDiagnoser]
 	public class UpdateDefinitionHelperBenchmark
 	{
 		[Benchmark]

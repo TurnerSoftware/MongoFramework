@@ -258,3 +258,9 @@ paket-files/
 
 # MacOS
 .DS_Store
+
+benchmark-results-v2/
+
+benchmark-results-v3/
+
+BenchmarkDotNet.Artifacts/

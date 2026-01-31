@@ -25,6 +25,19 @@ Some of the major features include:
 
 MongoFramework is currently built on-top of the official MongoDB C# driver.
 
+## Performance
+
+MongoFramework with MongoDB.Driver 3.x and .NET 10 delivers significant performance improvements:
+
+| Category | Speed Improvement | Memory Reduction |
+|----------|-------------------|------------------|
+| LINQ Operations | ~66% faster | ~55% less |
+| Entity Mapping | ~53% faster | ~10% less |
+| Serialization | ~47% faster | ~6% less |
+| Database Operations | ~84% faster | ~26% less |
+
+Benchmarks performed comparing MongoDB.Driver 2.x (.NET 6) vs 3.x (.NET 10). See [benchmark results](tests/MongoFramework.Benchmarks) for details.
+
 ## Licensing and Support
 
 MongoFramework is licensed under the MIT license. It is free to use in personal and commercial projects.
